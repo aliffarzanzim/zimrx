@@ -1,0 +1,191 @@
+#practice-profiles-page {
+    display: grid;
+    gap: var(--zrx-space-4);
+}
+
+.practice-profile-current {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--zrx-space-3) var(--zrx-space-5);
+}
+
+.practice-profile-current h2 {
+    padding: 0;
+    border: 0;
+}
+
+.practice-profile-current-name {
+    color: var(--zrx-text-main);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.practice-profile-list {
+    display: grid;
+    gap: var(--zrx-space-3);
+}
+
+.practice-profile-form,
+.practice-profile-create-form {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--zrx-space-4);
+    align-items: end;
+    min-width: 0;
+    padding: var(--zrx-space-4);
+    border: 1px solid var(--zrx-border-subtle);
+    border-radius: var(--zrx-border-radius);
+    background: var(--zrx-bg-card);
+}
+
+.practice-profile-form-heading {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--zrx-space-3);
+    padding-bottom: var(--zrx-space-3);
+    border-bottom: 1px solid var(--zrx-border-subtle);
+}
+
+.practice-profile-form-heading h3 {
+    color: var(--zrx-text-main);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.practice-profile-state {
+    color: var(--zrx-text-muted);
+    font-size: 0.8125rem;
+    font-weight: 600;
+}
+
+.practice-profile-state::before {
+    display: inline-block;
+    width: 0.45rem;
+    height: 0.45rem;
+    margin-right: var(--zrx-space-2);
+    border-radius: 50%;
+    background: var(--zrx-success);
+    content: "";
+    vertical-align: 0.05em;
+}
+
+.practice-profile-state.is-inactive::before {
+    background: var(--zrx-text-subtle);
+}
+
+.practice-profile-form > label,
+.practice-profile-create-form > label {
+    display: grid;
+    gap: var(--zrx-space-1);
+    min-width: 0;
+    color: var(--zrx-text-body);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.practice-profile-form textarea.zrx-form-control {
+    height: auto;
+    min-height: 5.5rem;
+    resize: vertical;
+}
+
+.practice-profile-form fieldset {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: var(--zrx-space-3);
+    min-width: 0;
+    border: 1px solid var(--zrx-border-subtle);
+    border-radius: var(--zrx-border-radius);
+    padding: var(--zrx-space-3) var(--zrx-space-4);
+}
+
+.practice-profile-form legend {
+    padding: 0 var(--zrx-space-2);
+    color: var(--zrx-text-main);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.practice-profile-sharing-options {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--zrx-space-3) var(--zrx-space-4);
+}
+
+.practice-profile-sharing-options label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--zrx-space-2);
+    min-width: 0;
+    color: var(--zrx-text-body);
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.practice-profile-sharing-options input {
+    flex: 0 0 auto;
+    margin-top: 0.18rem;
+    accent-color: var(--zrx-primary);
+}
+
+.practice-profile-form fieldset > p {
+    color: var(--zrx-text-muted);
+    font-size: 0.8125rem;
+}
+
+.practice-profile-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--zrx-space-2);
+    padding-top: var(--zrx-space-3);
+    border-top: 1px solid var(--zrx-border-subtle);
+}
+
+.practice-profile-removal p {
+    color: var(--zrx-text-muted);
+    font-size: 0.875rem;
+}
+
+.practice-profile-create-form > button {
+    justify-self: start;
+}
+
+.practice-profile-status {
+    min-height: 1.5em;
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+.practice-profile-status[data-state="error"] {
+    color: var(--zrx-danger);
+}
+
+.practice-profile-status[data-state="success"] {
+    color: var(--zrx-success);
+}
+
+@media (max-width: 900px) {
+    .practice-profile-form,
+    .practice-profile-create-form {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .practice-profile-sharing-options {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .practice-profile-current {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .practice-profile-form,
+    .practice-profile-create-form {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

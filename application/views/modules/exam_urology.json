@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "urology",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "Urology",
+    "view":  "exam_urology.php",
+    "enabled_by_default": false,
+    "default_order":  null
+}

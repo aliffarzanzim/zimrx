@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "dental_chart",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "Dental Chart",
+    "view":  "exam_dental.php",
+    "enabled_by_default": false,
+    "default_order":  null
+}

@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "psychiatry",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "Psychiatry",
+    "view":  "exam_psychiatry.php",
+    "enabled_by_default": false,
+    "default_order":  null
+}

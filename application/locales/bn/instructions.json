@@ -1,0 +1,126 @@
+{
+    "1": {
+        "text": "খাবার আগে",
+        "alias": "khabar, age, before"
+    },
+    "2": {
+        "text": "খাবার পর",
+        "alias": "khabar, pore, after"
+    },
+    "3": {
+        "text": "আহারের পূর্বে",
+        "alias": "ahar, age, before"
+    },
+    "4": {
+        "text": "আহারের পর",
+        "alias": "ahar, pore, after"
+    },
+    "5": {
+        "text": "সকালে নাস্তার ৩০ মিনিট পূর্বে",
+        "alias": "nasta, age, before, 30"
+    },
+    "6": {
+        "text": "ভরা পেটে",
+        "alias": "bhora, full"
+    },
+    "7": {
+        "text": "খালি পেটে",
+        "alias": "khali, empty"
+    },
+    "8": {
+        "text": "খাবারের সাথে",
+        "alias": "khabar, sathe, with"
+    },
+    "9": {
+        "text": "খাবারের ৩০ মিনিট পূর্বে",
+        "alias": "khabar, age, before, 30"
+    },
+    "10": {
+        "text": "খাবারের ১ ঘণ্টা পূর্বে",
+        "alias": "khabar, age, before, 1, hour, 1 hour"
+    },
+    "11": {
+        "text": "খাবারের ২ ঘণ্টা পর",
+        "alias": "khabar, pore, after, 2, hour, 2 hours"
+    },
+    "12": {
+        "text": "খাবারের আগে বা পরে যেকোনো সময়",
+        "alias": "khabar, age, pore, age pore, anytime"
+    },
+    "13": {
+        "text": "খাবারের প্রথম লোকমার সাথে",
+        "alias": "first, prothom, khabar, age, before"
+    },
+    "14": {
+        "text": "খাবারের ঠিক পূর্বে",
+        "alias": "khabar, age, before"
+    },
+    "15": {
+        "text": "খাবারের ঠিক পর",
+        "alias": "khabar, pore, after"
+    },
+    "16": {
+        "text": "খাবারের মাঝখানে",
+        "alias": "khabar, majhkhane, middle"
+    },
+    "17": {
+        "text": "নাস্তার পর",
+        "alias": "nasta, pore, after"
+    },
+    "18": {
+        "text": "রাতে শোবার আগে",
+        "alias": "rate, bedtime, shobar, age, before"
+    },
+    "19": {
+        "text": "ভ্রমণের পূর্বে",
+        "alias": "journey, travel, tour, age, before"
+    },
+    "20": {
+        "text": "সহবাসের পূর্বে",
+        "alias": "intercourse, sex, coitus, age, before, sohobaser age, sohobas"
+    },
+    "21": {
+        "text": "ব্যবহারের পূর্বে ভালোভাবে ঝাঁকিয়ে নিন",
+        "alias": "shake, jhakie, bebohar"
+    },
+    "22": {
+        "text": "ভালোভাবে চিবিয়ে খাবেন",
+        "alias": "chew, chibie"
+    },
+    "23": {
+        "text": "এক গ্লাস পানিতে গুলিয়ে খাবেন",
+        "alias": "dissolve, glass, guliye"
+    },
+    "24": {
+        "text": "জিহ্বার নিচে রাখবেন",
+        "alias": "sublingual, jihba, tongue"
+    },
+    "25": {
+        "text": "আক্রান্ত স্থানে লাগাবেন",
+        "alias": "apply, lagaben, affected, area"
+    },
+    "26": {
+        "text": "মলদ্বারে দিবেন",
+        "alias": "rectum, moldare, payupothe"
+    },
+    "27": {
+        "text": "যোনিপথে দিবেন",
+        "alias": "vagina, joni, jonipoth"
+    },
+    "28": {
+        "text": "নেবুলাইজার মেশিনের সাহায্যে নিবেন",
+        "alias": "nebulizer, nebuliser, nebulizer machine, nebuliser machine"
+    },
+    "29": {
+        "text": "চামড়ার নিচে দিবেন",
+        "alias": "subcutaneous, sc, chamra, skin"
+    },
+    "30": {
+        "text": "ব্যবহারের পর কুলি করবেন",
+        "alias": "rinse mouth, kuli, mouth"
+    },
+    "31": {
+        "text": "চামড়ায় লাগিয়ে রাখবেন",
+        "alias": "patch, lagaben, chamra, skin"
+    }
+}

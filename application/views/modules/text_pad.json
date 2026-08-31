@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "text_pad",
+    "aliases":  [
+
+                ],
+    "panel":  "right",
+    "name":  "Text Pad",
+    "view":  "text_pad.php",
+    "enabled_by_default": true,
+    "default_order":  6
+}

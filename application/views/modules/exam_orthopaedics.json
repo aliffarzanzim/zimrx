@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "orthopaedics",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "Orthopaedics",
+    "view":  "exam_orthopaedics.php",
+    "enabled_by_default": false,
+    "default_order":  null
+}

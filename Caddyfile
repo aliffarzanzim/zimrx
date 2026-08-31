@@ -1,0 +1,84 @@
+{
+	admin off
+	frankenphp
+}
+
+:{$ZIMRX_HTTP_PORT:8080} {
+	root * ./application/public
+
+	handle /favicon.ico {
+		respond 204
+	}
+
+	# 1. Public stationery media (clinic logos & print headers) needed for prescription preview.
+	# Safe to serve: filenames use random tokens, directory listing is off, and clinical reports stay blocked below.
+	handle_path /userdata/uploads/header-logos/* {
+		root * ./application/userdata/uploads/header-logos
+		file_server
+	}
+	handle_path /userdata/uploads/full-body-headers/* {
+		root * ./application/userdata/uploads/full-body-headers
+		file_server
+	}
+	handle_path /uploads/header-logos/* {
+		root * ./application/userdata/uploads/header-logos
+		file_server
+	}
+	handle_path /uploads/full-body-headers/* {
+		root * ./application/userdata/uploads/full-body-headers
+		file_server
+	}
+	handle_path /uploads/app-branding/* {
+		root * ./application/userdata/uploads/app-branding
+		file_server
+	}
+
+
+	# Clinical reports are streamed only through the authenticated report endpoint.
+	@clinicalReports path /userdata/uploads/reports/* /uploads/reports/*
+	handle @clinicalReports {
+		respond 404
+	}
+
+	# Keep private application data and files out of the static and PHP routes.
+	@privateData path /userdata/* /systemdata/* /uploads/* /obsolete/* /migrations/* /tests/* /lib/* /db/* /modules/* /views/*
+	handle @privateData {
+		respond 404
+	}
+
+	@privateFiles path /config.php /auth.php /db.php /header.php /footer.php /composer.json /composer.lock
+	handle @privateFiles {
+		respond 404
+	}
+
+	@databaseFiles path *.db *.db3 *.sqlite *.sqlite3 *.sql *.mdb *.accdb *.db-wal *.db-shm *.sqlite-wal *.sqlite-shm
+	handle @databaseFiles {
+		respond 404
+	}
+
+	# Only the manually bundled browser assets are public from application/vendor.
+	@privateVendor {
+		path /vendor/*
+		not path /vendor/nicedit/*
+		not path /vendor/flatpickr/*
+	}
+	handle @privateVendor {
+		respond 404
+	}
+
+	# 6. Global security headers
+	header {
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		X-XSS-Protection "0"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "microphone=(), geolocation=()"
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob:; connect-src 'self' http://127.0.0.1:* http://localhost:*; frame-ancestors 'self'; base-uri 'self'; form-action 'self';"
+	}
+
+	encode gzip
+	handle {
+		php_server
+	}
+}
+

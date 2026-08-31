@@ -1,0 +1,65 @@
+/* ENT examination panes, ear/nose/throat layout cards, badges, and tuning fork tests */
+.zrx-ent-pane[hidden] {
+    display: none;
+}
+.zrx-ent-ear-grid,
+.zrx-ent-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 0.65rem;
+}
+@media (max-width: 800px) {
+    .zrx-ent-ear-grid,
+    .zrx-ent-two-col {
+        grid-template-columns: 1fr;
+    }
+}
+.zrx-ent-ear-card,
+.zrx-ent-col-card {
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
+    border-radius: 6px;
+    padding: 0.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+.zrx-ent-card-head {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--zrx-border-subtle);
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--zrx-text-main);
+}
+.zrx-ent-badge {
+    font-size: 0.66rem;
+    font-weight: 800;
+    padding: 1px 5px;
+    border-radius: 3px;
+    letter-spacing: 0.3px;
+}
+.zrx-ent-badge.ad { background: var(--zrx-blue-100); color: var(--zrx-blue-800); }
+.zrx-ent-badge.as { background: var(--zrx-blue-100); color: var(--zrx-blue-800); }
+.zrx-ent-badge.nose { background: var(--zrx-amber-100); color: var(--zrx-amber-700); }
+.zrx-ent-badge.pns { background: var(--zrx-rose-50); color: var(--zrx-rose-800); }
+.zrx-ent-badge.throat { background: var(--zrx-emerald-100); color: var(--zrx-emerald-700); }
+
+.zrx-ent-weber-row {
+    display: flex;
+    gap: 0.75rem;
+    background: var(--zrx-bg-subtle);
+    border: 1px solid var(--zrx-border);
+    border-radius: 6px;
+    padding: 0.55rem 0.65rem;
+    margin-bottom: 0.65rem;
+}
+@media (max-width: 768px) {
+    .zrx-ent-weber-row {
+        flex-direction: column;
+    }
+}
+

@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "obstetric_history",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "O/H",
+    "view":  "oh.php",
+    "enabled_by_default": true,
+    "default_order":  8
+}

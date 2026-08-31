@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "prescription",
+    "aliases":  [
+
+                ],
+    "panel":  "right",
+    "name":  "Rx",
+    "view":  "rx.php",
+    "enabled_by_default": true,
+    "default_order":  1
+}

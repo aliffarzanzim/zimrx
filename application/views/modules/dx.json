@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "diagnosis",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "Dx",
+    "view":  "dx.php",
+    "enabled_by_default": true,
+    "default_order":  5
+}

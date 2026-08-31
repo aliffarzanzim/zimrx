@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "note",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "Note",
+    "view":  "note.php",
+    "enabled_by_default": false,
+    "default_order":  null
+}

@@ -1,0 +1,10 @@
+/* Hidden state rules for specialty examination panes (psychiatry, neurology, urology, etc.) */
+.zrx-psych-pane[hidden],
+.zrx-ortho-pane[hidden],
+.zrx-uro-pane[hidden],
+.zrx-neuro-pane[hidden],
+.zrx-cardio-pane[hidden],
+.zrx-pulmo-pane[hidden],
+.zrx-endo-pane[hidden] {
+    display: none;
+}

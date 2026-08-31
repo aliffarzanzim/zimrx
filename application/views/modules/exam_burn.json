@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "burn_assessment",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "Burn Assessment",
+    "view":  "exam_burn.php",
+    "enabled_by_default": false,
+    "default_order":  null
+}

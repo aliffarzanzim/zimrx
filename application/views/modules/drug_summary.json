@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "drug_summary",
+    "aliases":  [
+
+                ],
+    "panel":  "right",
+    "name":  "Drug Summary \u0026 Interaction",
+    "view":  "drug_summary.php",
+    "enabled_by_default": false,
+    "default_order":  null
+}

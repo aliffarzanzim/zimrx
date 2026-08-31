@@ -1,0 +1,69 @@
+.zrx-clinical-settings-page {
+    display: grid;
+    gap: 1rem;
+    color: var(--zrx-text-main);
+}
+
+.zrx-clinical-settings-page h1,
+.zrx-clinical-settings-page p {
+    margin: 0;
+}
+
+.zrx-clinical-settings-page header p {
+    margin-top: 0.4rem;
+    color: var(--zrx-text-muted);
+}
+
+.pe-settings-page-modal {
+    position: static;
+    inset: auto;
+    z-index: auto;
+    display: block;
+    padding: 0;
+}
+
+.pe-settings-page-modal .pe-settings-panel {
+    width: 100%;
+    max-width: 1180px;
+    height: min(740px, calc(100vh - 260px));
+    min-height: 460px;
+    margin: 0 auto;
+    border-radius: var(--zrx-border-radius);
+    box-shadow: var(--zrx-shadow-sm);
+}
+
+.pe-settings-page-modal .pe-settings-header > div {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.pe-settings-page-modal .pe-settings-header p {
+    margin: 0;
+}
+
+.pe-settings-page-modal .pe-settings-add-card {
+    max-height: calc(100% - 2rem);
+}
+
+#pe-settings-status {
+    color: var(--zrx-text-muted);
+    font-size: 0.82rem;
+}
+
+@media (max-width: 760px) {
+    .pe-settings-page-modal .pe-settings-panel {
+        height: calc(100vh - 230px);
+        min-height: 380px;
+    }
+
+    .pe-settings-page-modal .pe-settings-grid {
+        grid-template-columns: 170px minmax(0, 1fr);
+    }
+
+    .pe-settings-page-modal .pe-settings-header > div {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+}

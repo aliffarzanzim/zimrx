@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "calculators",
+    "aliases":  [
+
+                ],
+    "panel":  "right",
+    "name":  "Calculators",
+    "view":  "calculators.php",
+    "enabled_by_default": true,
+    "default_order":  5
+}

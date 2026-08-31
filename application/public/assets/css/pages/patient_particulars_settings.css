@@ -1,0 +1,152 @@
+.zrx-patient-particulars-settings {
+    display: grid;
+    gap: var(--zrx-space-4);
+    color: var(--zrx-text-main);
+}
+
+.zrx-patient-particulars-settings h1,
+.zrx-patient-particulars-settings p {
+    margin: 0;
+}
+
+.zrx-patient-particulars-settings .patient-fields-config-panel {
+    display: grid;
+    gap: var(--zrx-space-4);
+    padding: var(--zrx-space-4);
+    border: 1px solid var(--zrx-border);
+    border-radius: var(--zrx-border-radius);
+    background: var(--zrx-bg-card);
+}
+
+.zrx-patient-particulars-settings .config-panel-intro {
+    display: grid;
+    gap: var(--zrx-space-1);
+    color: var(--zrx-text-muted);
+}
+
+.zrx-patient-particulars-settings .config-panel-intro strong {
+    color: var(--zrx-text-main);
+}
+
+.zrx-patient-particulars-settings .config-fields-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--zrx-space-3);
+}
+
+.zrx-patient-particulars-settings .config-field-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--zrx-space-4);
+    padding: var(--zrx-space-3);
+    border: 1px solid var(--zrx-border-light);
+    border-radius: 0.4rem;
+    background: var(--zrx-bg-subtle);
+}
+
+.zrx-patient-particulars-settings .config-field-row select {
+    min-width: 9rem;
+    padding: var(--zrx-space-1) var(--zrx-space-2);
+    border: 1px solid var(--zrx-border);
+    border-radius: var(--zrx-border-radius);
+    background: var(--zrx-bg-card);
+    color: var(--zrx-text-body);
+    font: inherit;
+}
+
+.zrx-patient-particulars-settings .custom-field-add-row {
+    display: grid;
+    grid-template-columns: minmax(12rem, 1.5fr) minmax(8rem, 0.8fr) minmax(9rem, 1fr) minmax(14rem, 1.5fr) auto;
+    align-items: end;
+    gap: var(--zrx-space-3);
+}
+
+.zrx-patient-particulars-settings .custom-field-add-row label,
+.zrx-patient-particulars-settings .custom-definition-row label {
+    display: grid;
+    gap: var(--zrx-space-1);
+    color: var(--zrx-text-body);
+    font-size: 0.875rem;
+}
+
+.zrx-patient-particulars-settings .custom-field-add-row input,
+.zrx-patient-particulars-settings .custom-field-add-row select,
+.zrx-patient-particulars-settings .custom-definition-row input {
+    min-width: 0;
+    padding: var(--zrx-space-2);
+    border: 1px solid var(--zrx-border);
+    border-radius: var(--zrx-border-radius);
+    background: var(--zrx-bg-card);
+    color: var(--zrx-text-body);
+    font: inherit;
+}
+
+.zrx-patient-particulars-settings .custom-definition-row {
+    align-items: end;
+}
+
+.zrx-patient-particulars-settings .custom-field-add-row > button {
+    justify-self: start;
+}
+
+.zrx-patient-particulars-settings .custom-field-type {
+    padding-bottom: var(--zrx-space-2);
+    color: var(--zrx-text-muted);
+    font-size: 0.875rem;
+}
+
+.zrx-patient-particulars-settings .custom-field-package-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--zrx-space-2);
+}
+
+.zrx-patient-particulars-settings .config-radio-group label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--zrx-space-1);
+    color: var(--zrx-text-body);
+}
+
+.zrx-patient-particulars-settings .config-panel-footer,
+.zrx-patient-particulars-settings .config-panel-footer > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--zrx-space-2);
+}
+
+.zrx-patient-particulars-settings #patient-fields-settings-status {
+    color: var(--zrx-text-muted);
+}
+
+@media (max-width: 900px) {
+    .zrx-patient-particulars-settings .custom-field-add-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .zrx-patient-particulars-settings .custom-field-options-label {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 520px) {
+    .zrx-patient-particulars-settings .config-fields-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .zrx-patient-particulars-settings .config-field-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .zrx-patient-particulars-settings .config-panel-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .zrx-patient-particulars-settings .custom-field-add-row {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

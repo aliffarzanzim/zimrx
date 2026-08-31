@@ -1,0 +1,59 @@
+/* Paediatric history form controls. */
+
+
+
+.ph-select-custom-wrap {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+}
+.ph-select-custom-wrap select {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    font-size: 0.85rem;
+    color: inherit;
+    padding: 0 4px;
+    cursor: pointer;
+}
+.ph-custom-input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: var(--zrx-bg-card);
+    font: inherit;
+    font-size: 0.85rem;
+    padding: 0 4px;
+}
+
+.ph-muac-split {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    height: 100%;
+}
+.ph-add-row-btn {
+    min-width: 110px;
+    height: 30px;
+    border: 1px solid var(--zrx-border-divider);
+    border-radius: 8px;
+    background: var(--zrx-bg-card);
+    color: var(--zrx-text-main);
+    font: inherit;
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--zrx-shadow-sm);
+    transition: all 0.15s ease;
+}
+.ph-add-row-btn:hover {
+    background: var(--zrx-blue-50);
+    border-color: var(--zrx-primary);
+    color: var(--zrx-primary);
+}

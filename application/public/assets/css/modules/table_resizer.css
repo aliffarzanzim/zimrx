@@ -1,0 +1,220 @@
+/* Table column resizing handles and visual indicators */
+
+.zrx-table th,
+.pc-table th,
+.rx-table th,
+.oh-table th,
+.ot-table th,
+.reports-table th,
+.template-table-container th {
+    position: relative;
+    transition: border-right-color 0.15s ease;
+}
+
+.zrx-col-resizer {
+    position: absolute;
+    top: 0;
+    right: -6px;
+    width: 12px;
+    height: 100%;
+    cursor: col-resize;
+    user-select: none;
+    z-index: 50;
+    background: transparent;
+}
+
+/* Highlight the active column border during drag */
+
+th:has(> .zrx-col-resizer:hover),
+th:has(> .zrx-col-resizer.is-resizing),
+th.zrx-th-resizing {
+    border-right-color: var(--zrx-primary, var(--zrx-primary));
+}
+
+/* Text wrapping and header cell height adjustments */
+
+.zrx-th-text,
+.pc-header-flex,
+.pc-header-flex span {
+    display: block;
+    overflow: visible;
+    white-space: normal;
+    word-break: break-word;
+    max-width: 100%;
+    min-width: 0;
+    line-height: 1.25;
+}
+
+.pc-table th,
+.oh-table th,
+.ot-table th,
+.reports-table th,
+.zrx-table th {
+    white-space: normal;
+    word-break: break-word;
+    overflow: visible;
+    height: auto;
+    min-height: 32px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    line-height: 1.25;
+}
+
+/* Keep index and action columns single-line and centered */
+
+.pc-table th:nth-child(1),
+.pc-table th:nth-child(2),
+.pc-table th:last-child,
+.rx-table th:nth-child(1),
+.rx-table th:nth-child(2),
+.rx-table th:nth-child(3),
+.rx-table th:last-child,
+.oh-table th:nth-child(1),
+.oh-table th:nth-child(2),
+.oh-table th:last-child {
+    white-space: nowrap;
+    word-break: keep-all;
+    padding-left: 2px;
+    padding-right: 2px;
+    text-align: center;
+}
+
+.pc-table thead tr,
+.oh-table thead tr,
+.ot-table thead tr,
+.reports-table thead tr,
+.zrx-table thead tr {
+    height: auto;
+}
+
+/* Rx table auto-row-size toggle support */
+
+body.rx-auto-row-size-enabled .rx-table th {
+    white-space: normal;
+    word-break: break-word;
+    overflow: visible;
+    height: auto;
+    min-height: 32px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    line-height: 1.25;
+}
+
+body.rx-auto-row-size-enabled .rx-table thead tr {
+    height: auto;
+}
+
+/* Layout persistence actions (save, reset, help) */
+
+.zrx-tbl-layout-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 4px;
+}
+
+.zrx-btn-layout-save {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    height: 30px;
+    padding: 0 14px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    font-family: inherit;
+    border-radius: 8px;
+    border: 1px solid var(--zrx-primary, var(--zrx-primary));
+    background: var(--zrx-primary, var(--zrx-primary));
+    color: var(--zrx-white);
+    cursor: pointer;
+    box-shadow: var(--zrx-shadow-sm);
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.zrx-btn-layout-save:hover {
+    background: var(--zrx-primary-hover, var(--zrx-primary-hover));
+    border-color: var(--zrx-primary-hover, var(--zrx-primary-hover));
+    box-shadow: var(--zrx-shadow-md);
+}
+
+.zrx-btn-layout-save.saved,
+.zrx-btn-layout-save.saved:hover {
+    background: var(--zrx-success, var(--zrx-emerald-600));
+    border-color: var(--zrx-success, var(--zrx-emerald-600));
+}
+
+.zrx-btn-layout-reset {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    height: 30px;
+    padding: 0 14px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    font-family: inherit;
+    border-radius: 8px;
+    border: 1px solid var(--zrx-border-divider);
+    background: var(--zrx-bg-card);
+    color: var(--zrx-slate-700);
+    cursor: pointer;
+    box-shadow: var(--zrx-shadow-sm);
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.zrx-btn-layout-reset:hover {
+    background: var(--zrx-red-50);
+    color: var(--zrx-red-600);
+    border-color: var(--zrx-red-400);
+    box-shadow: var(--zrx-shadow-md);
+}
+
+.zrx-tbl-layout-help {
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
+    color: var(--zrx-text-muted);
+    cursor: pointer;
+    margin-left: 2px;
+    transition: all 0.15s ease;
+    box-shadow: var(--zrx-shadow-sm);
+}
+
+.zrx-tbl-layout-help:hover {
+    background: var(--zrx-blue-50);
+    border-color: var(--zrx-primary, var(--zrx-primary));
+    color: var(--zrx-primary, var(--zrx-primary));
+    box-shadow: var(--zrx-shadow-sm);
+}
+
+.pc-footer,
+.rx-add-row,
+.oh-footer,
+.ot-footer,
+.reports-footer,
+.ph-add-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+body.zrx-column-resizing {
+    cursor: col-resize !important;
+    user-select: none !important;
+}
+
+body.zrx-column-resizing * {
+    user-select: none !important;
+    cursor: col-resize !important;
+}
+

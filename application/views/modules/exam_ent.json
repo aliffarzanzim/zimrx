@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "ent_examination",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "ENT Examination",
+    "view":  "exam_ent.php",
+    "enabled_by_default": false,
+    "default_order":  null
+}

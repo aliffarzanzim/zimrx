@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "breast_examination",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "Breast Examination",
+    "view":  "exam_breast.php",
+    "enabled_by_default": false,
+    "default_order":  null
+}

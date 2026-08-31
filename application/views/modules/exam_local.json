@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "local_examination",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "Local Examination",
+    "view":  "exam_local.php",
+    "enabled_by_default": false,
+    "default_order":  null
+}

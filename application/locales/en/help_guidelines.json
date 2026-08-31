@@ -1,0 +1,132 @@
+{
+  "pres-reg": {
+    "title": "Registration Number (Reg No) Guide",
+    "badge": "Prescription Page",
+    "steps": [
+      {
+        "icon": "1",
+        "text": "For <strong>existing registered patients</strong>, search by typing their Reg No, scanning their barcode, or searching directly from the phone number field."
+      },
+      {
+        "icon": "2",
+        "text": "For <strong>new patients</strong>, leave this field blank and enter patient particulars or write the prescription. A unique Reg No is automatically assigned when you click <strong>Save & Print</strong> or <strong>Save Only</strong>."
+      }
+    ]
+  },
+  "appt-reg": {
+    "title": "Registration Number (Reg No) Guide",
+    "badge": "Appointments Page",
+    "steps": [
+      {
+        "icon": "1",
+        "text": "For <strong>existing registered patients</strong>, search by entering their Reg No, scanning barcode, or searching via the mobile number field."
+      },
+      {
+        "icon": "2",
+        "text": "For <strong>new patients</strong>, leave blank and complete patient particulars. A unique Reg No is automatically assigned when you click <strong>Save Appointment</strong>."
+      }
+    ]
+  },
+  "mobile": {
+    "title": "Phone Number (Mobile) Guide",
+    "badge": "Search & Registration",
+    "steps": [
+      {
+        "icon": "1",
+        "text": "For <strong>existing patients</strong>, search by typing the phone number. You can also search by Reg No or scan barcode."
+      },
+      {
+        "icon": "2",
+        "text": "For <strong>new patients</strong>, enter the phone number. If another patient is already registered under this number, select <strong>It's a new patient</strong> from the dropdown: both patients share the contact number with separate Reg Nos and records."
+      }
+    ]
+  },
+  "col-resize": {
+    "title": "Table Layout Guide",
+    "badge": "Column Resize & Layout",
+    "steps": [
+      {
+        "icon": "1",
+        "text": "Drag column dividers to resize. Click <strong>Save layout</strong> to persist your custom widths, or click <strong>Reset</strong> to restore default dimensions."
+      }
+    ]
+  },
+  "dob": {
+    "title": "Date of Birth & Age (DOB & Age) Guide",
+    "badge": "Patient Particulars & Calculation",
+    "wide": true,
+    "steps": [
+      {
+        "icon": "★",
+        "text": "<strong>Entering either Age or DOB is sufficient.</strong> Providing one will automatically calculate and set the other."
+      },
+      {
+        "icon": "1",
+        "text": "<strong>Entering DOB auto-calculates Age and Unit:</strong><br>Selecting Date of Birth will automatically calculate the exact age and select the appropriate clinical unit:<ul class=\"zrx-help-list\"><li><strong>&ge; 1 Year:</strong> Age shown in completed years (<code>Unit = \"Years\"</code>).</li><li><strong>&lt; 1 Year but &ge; 1 Month:</strong> Age shown in months (<code>Unit = \"Months\"</code>).</li><li><strong>&lt; 1 Month but &ge; 7 Days:</strong> Age shown in weeks (<code>Unit = \"Weeks\"</code>).</li><li><strong>&lt; 7 Days (Neonate):</strong> Age shown in exact days (<code>Unit = \"Days\"</code>).</li></ul>"
+      },
+      {
+        "icon": "2",
+        "text": "<strong>Entering Age auto-estimates DOB:</strong><br>Typing an age and choosing a unit constructs an estimated backend DOB:<ul class=\"zrx-help-list\"><li><strong>Years (e.g. 25 Years):</strong> Sets estimated DOB to Jan 1st of that birth year.</li><li><strong>Months (e.g. 6 Months):</strong> Sets estimated DOB to the 1st of the calculated birth month.</li><li><strong>Weeks (e.g. 3 Weeks):</strong> Subtracts 21 days (3 &times; 7) from today's date.</li><li><strong>Days (e.g. 5 Days):</strong> Subtracts the exact number of days from today.</li></ul>"
+      }
+    ]
+  },
+  "visit-id": {
+    "title": "Visit ID Guide",
+    "badge": "Prescription & EMR Records",
+    "steps": [
+      {
+        "icon": "1",
+        "text": "<strong>Prescription Tracking & History:</strong> The Visit ID is tied directly to the clinical encounter. Each prescription has a unique Visit ID allowing precise lookup of the exact consultation notes and Rx state."
+      },
+      {
+        "icon": "2",
+        "text": "<strong>Automated Unique Identifier:</strong> The system automatically generates and assigns this ID when saving the prescription. No manual entry or modification is required."
+      }
+    ]
+  },
+  "occupation": {
+    "title": "Occupation Guide",
+    "badge": "Patient Particulars & EMR",
+    "wide": false,
+    "steps": [
+      {
+        "icon": "1",
+        "text": "Capturing occupational history helps assess socioeconomic status and evaluate occupational health hazards related to presenting complaints."
+      },
+      {
+        "icon": "2",
+        "text": "Common occupations are pre-populated in the dropdown. You can also type custom occupations, which are automatically saved to your practice directory for future prescriptions."
+      },
+      {
+        "icon": "3",
+        "text": "Dropdown suggestions are ranked by usage frequency. Manage pinned, hidden, and custom suggestions in Settings under Address and Occupation Directories."
+      }
+    ]
+  },
+  "address": {
+    "title": "Address Guide",
+    "badge": "Patient Particulars & Geography",
+    "wide": false,
+    "steps": [
+      {
+        "icon": "1",
+        "text": "<strong>Smart Comma (,) Hierarchy:</strong> Typing an area name followed by a comma (<code>,</code>) automatically anticipates and suggests parent jurisdictions (e.g., typing <code>Savar,</code> suggests <code>Dhaka</code>)."
+      },
+      {
+        "icon": "2",
+        "text": "<strong>National Directory & Custom Entries:</strong> Autocomplete searches across comprehensive national administrative subdivisions as well as your saved custom addresses."
+      },
+      {
+        "icon": "3",
+        "text": "<strong>Frequency-Ranked Predictions:</strong> Frequently entered addresses and exact matches are automatically elevated to the top of suggestion lists."
+      },
+      {
+        "icon": "4",
+        "text": "<strong>Practice Region Filtering:</strong> Select preferred districts and manage custom addresses in Settings under Address and Occupation Directories."
+      }
+    ]
+  },
+  "modal_ui": {
+    "btn_ok": "Got it"
+  }
+}

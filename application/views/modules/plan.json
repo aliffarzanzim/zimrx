@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "plan",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "Plan",
+    "view":  "plan.php",
+    "enabled_by_default": true,
+    "default_order":  7
+}

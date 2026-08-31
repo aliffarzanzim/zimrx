@@ -1,0 +1,33 @@
+.zrx-pc-settings-page {
+    display: grid;
+    gap: 1rem;
+    color: var(--zrx-text-main);
+}
+
+.zrx-pc-settings-page h1,
+.zrx-pc-settings-page p {
+    margin: 0;
+}
+
+.pc-settings-page-modal {
+    position: static;
+    inset: auto;
+    z-index: auto;
+    display: block;
+    padding: 0;
+}
+
+.pc-settings-page-modal .pc-settings-panel {
+    width: 100%;
+    height: min(760px, calc(100vh - 250px));
+    max-height: none;
+    margin: 0;
+    border-radius: var(--zrx-border-radius);
+    box-shadow: var(--zrx-shadow-sm);
+}
+
+@media (max-width: 768px) {
+    .pc-settings-page-modal .pc-settings-panel {
+        height: calc(100vh - 220px);
+    }
+}

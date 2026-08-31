@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "investigations",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "Ix",
+    "view":  "ix.php",
+    "enabled_by_default": true,
+    "default_order":  6
+}

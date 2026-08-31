@@ -1,0 +1,108 @@
+.zrx-visit-form-settings {
+    display: grid;
+    gap: 1rem;
+    color: var(--zrx-text-main);
+}
+
+.zrx-visit-form-settings > header h1,
+.zrx-visit-form-settings > header p,
+.visit-form-builder-toolbar p {
+    margin: 0;
+}
+
+.zrx-visit-form-settings > header p,
+.visit-form-builder-toolbar p {
+    color: var(--zrx-text-muted);
+}
+
+.visit-form-builder-toolbar,
+.visit-form-builder-toolbar > div,
+.visit-form-builder-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.visit-form-builder-toolbar > div {
+    flex-wrap: wrap;
+}
+
+.visit-form-module-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.visit-form-module-editor {
+    display: grid;
+    gap: 0.85rem;
+    padding: 1rem;
+    border: 1px solid var(--zrx-border);
+    border-radius: var(--zrx-border-radius);
+    background: var(--zrx-bg-card);
+}
+
+.visit-form-module-editor > header,
+.visit-form-field-editor {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: end;
+    gap: 0.75rem;
+}
+
+.visit-form-field-editor {
+    grid-template-columns: minmax(10rem, 1.3fr) minmax(8rem, 0.8fr) minmax(12rem, 1.3fr) auto auto auto;
+    padding: 0.85rem;
+    border: 1px solid var(--zrx-border-light);
+    border-radius: var(--zrx-border-radius);
+}
+
+.visit-form-module-editor label {
+    display: grid;
+    gap: 0.35rem;
+    color: var(--zrx-text-muted);
+    font-size: 0.875rem;
+}
+
+.visit-form-module-editor input:not([type="checkbox"]),
+.visit-form-module-editor select {
+    width: 100%;
+    min-width: 0;
+}
+
+.visit-form-module-editor .visit-form-check {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+}
+
+.visit-form-fields {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.visit-form-empty {
+    margin: 0;
+    padding: 1rem;
+    color: var(--zrx-text-muted);
+    border: 1px solid var(--zrx-border);
+    border-radius: var(--zrx-border-radius);
+}
+
+.visit-form-builder-footer {
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--zrx-border-light);
+}
+
+@media (max-width: 900px) {
+    .visit-form-builder-toolbar,
+    .visit-form-builder-footer {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .visit-form-field-editor {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}

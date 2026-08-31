@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "ophthalmology",
+    "aliases":  [
+
+                ],
+    "panel":  "right",
+    "name":  "Ophthalmology",
+    "view":  "exam_ophthalmology.php",
+    "enabled_by_default": false,
+    "default_order":  null
+}

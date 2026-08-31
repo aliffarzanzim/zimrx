@@ -1,0 +1,12 @@
+{
+    "id":  "physical_examination",
+    "name":  "P/E",
+    "schema_version":  1,
+    "aliases":  [
+                    "O/E"
+                ],
+    "panel":  "left",
+    "enabled_by_default": true,
+    "default_order":  4,
+    "view":  "pe.php"
+}
