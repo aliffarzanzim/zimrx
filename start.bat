@@ -15,9 +15,17 @@ echo.
 
 if not exist "runtime\frankenphp\frankenphp.exe" (
     echo FrankenPHP runtime was not found at runtime\frankenphp\frankenphp.exe
-    echo Extract frankenphp-windows-x86_64.zip into runtime\frankenphp first.
-    pause
-    exit /b 1
+    echo.
+    set /p "DO_SETUP=Would you like to automatically download and configure FrankenPHP now? (Y/n): "
+    if /i not "%DO_SETUP%"=="n" (
+        call "%~dp0setup-franken-for-dev.cmd"
+    )
+    if not exist "runtime\frankenphp\frankenphp.exe" (
+        echo.
+        echo [ERROR] FrankenPHP runtime was not found. Please run setup-franken-for-dev.cmd manually.
+        pause
+        exit /b 1
+    )
 )
 
 if not exist "application\userdata\database" mkdir application\userdata\database
