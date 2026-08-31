@@ -72,6 +72,28 @@ php -r "require_once 'application/db.php';"
 
 ---
 
+## 🤝 Acknowledgements & Special Thanks
+
+Heartfelt gratitude to the contributors and researchers who supported the ZimRx medical intelligence and pharmaceutical database:
+
+### 💊 Drug Database Contributions
+* **Sifat Islam**
+* **Sifat Bin Siddique Urfi** *(DMC K-79)*
+* **Yeamin Faiaj**
+* **Azithromycin**
+* **Sauda Noor Sara** *(NMC)*
+* **Sohaila Raida** *(CMC)*
+* **Asif Iqbal** *(KMC K31)*
+* **Shamsul** *(RpMC)*
+* **Ramisa Subah** *(CMC)*
+* **Mahbub, The Dark Lord**
+* **Jaowad Arham**
+
+### 🔬 Drug Interaction & Research Concept
+* **Saif** — for pioneering drug interaction research ideas and clinical logic.
+
+---
+
 ## 📄 License
 
 ZimRx is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**. See the [LICENSE](LICENSE) file for details.
