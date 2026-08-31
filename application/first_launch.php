@@ -10,6 +10,62 @@ function fl_config_get(PDO $pdo, string $key): string {
     return (string)($stmt->fetchColumn() ?? '');
 }
 
+// ── Quick Demo Mode Trigger ────────────────────────────────────────────────
+if (!empty($_GET['quick_demo'])) {
+    if (zimrx_db_table_exists($pdo, 'zimrx_app_config')) {
+        $configs = [
+            'setup_complete' => '1',
+            'practice_type'  => 'solo',
+            'install_type'   => 'local',
+            'auto_login'     => '1',
+            'recovery_email' => '',
+        ];
+        $cfgStmt = $pdo->prepare(
+            "INSERT INTO zimrx_app_config (config_key, config_value, updated_at)
+             VALUES (:key, :val, CURRENT_TIMESTAMP)
+             ON CONFLICT(config_key) DO UPDATE SET config_value = :val, updated_at = CURRENT_TIMESTAMP"
+        );
+        foreach ($configs as $k => $v) {
+            $cfgStmt->execute(['key' => $k, 'val' => $v]);
+        }
+    }
+
+    // Populate standard sample doctor profile if empty
+    if (zimrx_db_table_exists($pdo, 'zimrx_doctors')) {
+        $doc = $pdo->query("SELECT id, name_en FROM zimrx_doctors WHERE id = 1 LIMIT 1")->fetch();
+        if ($doc && empty(trim($doc['name_en'] ?? ''))) {
+            $pdo->prepare(
+                "UPDATE zimrx_doctors
+                 SET name_en = 'Prof. Dr. M. A. Karim',
+                     name_bn = 'প্রফেসর ডাঃ মোঃ আব্দুল করিম',
+                     degrees_en = 'MBBS (DMC), FCPS (Medicine), MD (Internal Medicine)',
+                     degrees_bn = 'এমবিবিএস (ডিএমসি), এফসিপিএস (মেডিসিন), এমডি (ইন্টারনাল মেডিসিন)',
+                     designation_en = 'Professor & Head of Department of Medicine',
+                     designation_bn = 'অধ্যাপক ও বিভাগীয় প্রধান, মেডিসিন বিভাগ',
+                     hospital_en = 'Dhaka Medical College & Hospital',
+                     hospital_bn = 'ঢাকা মেডিকেল কলেজ ও হাসপাতাল',
+                     bmdc_reg_no = 'A-12345',
+                     phone = '+8801700000000',
+                     updated_at = CURRENT_TIMESTAMP
+                 WHERE id = 1"
+            )->execute();
+        }
+    }
+
+    // Ensure active session for default solo doctor
+    $user = zimrx_db_table_exists($pdo, 'zimrx_user_accounts')
+        ? $pdo->query("SELECT id, display_name FROM zimrx_user_accounts WHERE role = 'doctor' AND doctor_id = 1 LIMIT 1")->fetch()
+        : null;
+
+    $_SESSION['user_id']   = $user ? (int)$user['id'] : 1;
+    $_SESSION['user_role'] = 'doctor';
+    $_SESSION['user_name'] = $user && !empty($user['display_name']) ? $user['display_name'] : 'Dr. M. A. Karim';
+    $_SESSION['doctor_id'] = 1;
+
+    header('Location: prescription.php');
+    exit();
+}
+
 $setupComplete = fl_config_get($pdo, 'setup_complete') === '1';
 $step = (int)($_GET['step'] ?? 1);
 
@@ -305,6 +361,31 @@ if ($step === 3 && !is_logged_in()) {
         .step3-skip { text-align: center; margin-top: 1rem; }
         .step3-skip a { color: #64748b; font-size: 0.82rem; text-decoration: none; }
         .step3-skip a:hover { color: #94a3b8; }
+
+        .btn-demo-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(37, 99, 235, 0.12);
+            color: #60a5fa;
+            border: 1px dashed rgba(59, 130, 246, 0.5);
+            border-radius: 9px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+        .btn-demo-link:hover {
+            background: rgba(37, 99, 235, 0.25);
+            border-color: #3b82f6;
+            color: #93c5fd;
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 <body>
@@ -346,6 +427,12 @@ if ($step === 3 && !is_logged_in()) {
                     Let's get you set up in under a minute.
                 </p>
                 <button class="btn btn-primary btn-full" onclick="goStep2()">Get Started →</button>
+
+                <div style="margin-top: 1rem; text-align: center;">
+                    <a href="first_launch.php?quick_demo=1" class="btn-demo-link" title="Skip all setup wizards and immediately launch the prescription interface with demo defaults">
+                        ⚡ Skip All (Quick Demo) →
+                    </a>
+                </div>
             </div>
 
             <?php elseif ($step === 2): ?>
@@ -422,6 +509,12 @@ if ($step === 3 && !is_logged_in()) {
                 <div class="btn-row">
                     <button class="btn btn-ghost" onclick="window.location='first_launch.php?step=1'">← Back</button>
                     <button class="btn btn-primary" id="btnSaveSetup" onclick="saveSetup()">Continue →</button>
+                </div>
+
+                <div style="margin-top: 1rem; text-align: center;">
+                    <a href="first_launch.php?quick_demo=1" class="btn-demo-link" title="Skip all setup wizards and immediately launch the prescription interface with demo defaults">
+                        ⚡ Skip All (Quick Demo) →
+                    </a>
                 </div>
             </div>
 

@@ -11,7 +11,32 @@ if (zimrx_db_table_exists($pdo, 'zimrx_app_config')) {
 }
 
 if (($appConfig['setup_complete'] ?? '0') !== '1') {
+    if (!empty($_GET['quick_demo'])) {
+        header('Location: first_launch.php?quick_demo=1');
+        exit();
+    }
     header('Location: first_launch.php');
+    exit();
+}
+
+// ── Quick Demo Mode Trigger ────────────────────────────────────────────────
+if (!empty($_GET['quick_demo'])) {
+    if (zimrx_db_table_exists($pdo, 'zimrx_app_config')) {
+        $pdo->prepare("INSERT INTO zimrx_app_config (config_key, config_value, updated_at) VALUES ('setup_complete', '1', CURRENT_TIMESTAMP) ON CONFLICT(config_key) DO UPDATE SET config_value = '1', updated_at = CURRENT_TIMESTAMP")->execute();
+        $pdo->prepare("INSERT INTO zimrx_app_config (config_key, config_value, updated_at) VALUES ('practice_type', 'solo', CURRENT_TIMESTAMP) ON CONFLICT(config_key) DO UPDATE SET config_value = 'solo', updated_at = CURRENT_TIMESTAMP")->execute();
+        $pdo->prepare("INSERT INTO zimrx_app_config (config_key, config_value, updated_at) VALUES ('install_type', 'local', CURRENT_TIMESTAMP) ON CONFLICT(config_key) DO UPDATE SET config_value = 'local', updated_at = CURRENT_TIMESTAMP")->execute();
+        $pdo->prepare("INSERT INTO zimrx_app_config (config_key, config_value, updated_at) VALUES ('auto_login', '1', CURRENT_TIMESTAMP) ON CONFLICT(config_key) DO UPDATE SET config_value = '1', updated_at = CURRENT_TIMESTAMP")->execute();
+    }
+
+    $user = zimrx_db_table_exists($pdo, 'zimrx_user_accounts')
+        ? $pdo->query("SELECT id, display_name FROM zimrx_user_accounts WHERE role = 'doctor' AND doctor_id = 1 AND is_active = 1 LIMIT 1")->fetch()
+        : null;
+
+    $_SESSION['user_id']   = $user ? (int)$user['id'] : 1;
+    $_SESSION['user_role'] = 'doctor';
+    $_SESSION['user_name'] = $user && !empty($user['display_name']) ? $user['display_name'] : 'Dr. M. A. Karim';
+    $_SESSION['doctor_id'] = 1;
+    header('Location: prescription.php');
     exit();
 }
 
@@ -229,7 +254,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <button type="submit" class="btn btn-primary btn-login">Sign In</button>
         </form>
 
-        <div style="margin-top: 1.15rem; margin-bottom: 0.25rem;">
+        <div style="margin-top: 1rem; margin-bottom: 0.5rem;">
+            <a href="index.php?quick_demo=1" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 0.75rem 1rem; background: rgba(37, 99, 235, 0.08); color: var(--primary); border: 1px dashed var(--primary-border, #93c5fd); border-radius: 8px; font-size: 0.9rem; font-weight: 600; text-decoration: none; transition: all 0.2s; box-sizing: border-box;">
+                ⚡ Skip All (Quick Demo) →
+            </a>
+        </div>
+
+        <div style="margin-top: 0.75rem; margin-bottom: 0.25rem;">
             <a href="forgot_password.php" style="font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 500;">Forgot Password?</a>
         </div>
 
