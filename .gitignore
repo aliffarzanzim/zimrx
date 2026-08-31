@@ -1,0 +1,55 @@
+# ==============================================================================
+# ZimRx .gitignore
+# ==============================================================================
+
+# 1. User Data & Private Clinic Storage
+application/userdata/*
+!application/userdata/database/
+application/userdata/database/*
+!application/userdata/database/zimrx_userdata_schema_only.sql
+!application/userdata/**/.gitkeep
+
+# 2. Binary Database Files
+*.db
+*.sqlite
+*.sqlite3
+*.tmp.db
+*.old.db
+*.bak
+*.db-journal
+*.db-wal
+*.db-shm
+
+# 3. PHP runtime, logs, caches
+logs/
+error_log
+*.log
+.phpunit.result.cache
+
+# 4. Local Runtimes & Server Binaries
+runtime/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# 5. Caddy & Web Server local state
+.caddy/
+caddy_data/
+caddy_config/
+
+# 6. OS temporary files & metadata
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# 7. IDEs & Editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~

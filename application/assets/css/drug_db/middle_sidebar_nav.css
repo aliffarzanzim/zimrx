@@ -1,0 +1,93 @@
+/* Middle Column Styles */
+    .mid-header { padding: 15px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; flex-shrink: 0; }
+    .mid-row-title-cont { display: flex; flex-direction: column; }
+    .mid-title-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .mid-title { font-size: 1.1rem; font-weight: 700; color: var(--navy-dark); margin: 0; line-height: 1.2; }
+    .mid-count { font-size: 0.75rem; color: var(--grey-text); font-weight: 600; margin-top: 2px; }
+    .mid-view-btn { 
+        padding: 5px 10px; 
+        font-size: 0.7rem; 
+        font-weight: 700; 
+        background: var(--accent-blue); 
+        color: #fff; 
+        border: none; 
+        border-radius: 4px; 
+        cursor: pointer; 
+        transition: 0.2s;
+        text-transform: uppercase;
+        flex-shrink: 0;
+    }
+    .mid-view-btn:hover { background: #1d4ed8; transform: translateY(-1px); }
+    
+    .mid-search-group { display: flex; flex-direction: column; gap: 8px; }
+    .mid-input { padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 0.85rem; outline: none; transition: 0.2s; width: 100%; }
+    .mid-input:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+    .mid-select { padding: 8px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 0.82rem; background: #fff; outline: none; cursor: pointer; }
+    
+    .mid-results { flex: 1; overflow-y: auto; background: #fff; min-height: 0; }
+    .mid-row { padding: 12px 15px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: background-color 0.15s; display: flex; gap: 12px; align-items: start; }
+    .mid-row:hover { background: #f8fafc; }
+    .mid-row.active { background: #eff6ff; box-shadow: inset 4px 0 0 var(--accent-blue); }
+    .mid-icon { width: 32px; height: 32px; flex-shrink: 0; object-fit: contain; margin-top: 3px; }
+    .mid-info { flex: 1; overflow: hidden; display: flex; flex-direction: column; padding-top: 1px; gap: 2px; }
+    .mid-line-1 { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; }
+    .mid-brand { font-weight: 700; color: var(--navy-dark); font-size: 1.1rem; line-height: 1.2; }
+    .mid-price { color: #475569; font-weight: 700; font-size: 1rem; flex-shrink: 0; margin-left: 10px; }
+    .mid-line-2 { font-size: 0.9rem; color: #2563eb; font-weight: 700; }
+    .mid-line-3 { font-size: 0.82rem; color: #64748b; }
+    .mid-line-4 { font-size: 0.82rem; color: #ef4444; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    #drugDetailArea { display: flex; flex-direction: column; }
+
+    /* Modal Tweaks */
+    .modal-head { display: flex; align-items: center; gap: 15px; }
+    .modal-search { flex: 1; display: flex; gap: 10px; }
+    .modal-select { padding: 8px; border: 1.5px solid rgba(255,255,255,0.2); border-radius: 6px; font-size: 0.85rem; background: rgba(0,0,0,0.2); color: #fff; outline: none; width: 150px; }
+    .modal-select option { background: #1e293b; color: #fff; }
+    
+    /* Table Responsive Scroll Fix */
+    .modal-body { flex: 1; overflow-y: scroll; -webkit-overflow-scrolling: touch; }
+    /* Sidebar Navigation (Drill-down) */
+    .sidebar-nav {
+        display: none;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 15px;
+        background: #f8fafc;
+        color: var(--navy-dark);
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .btn-back-sidebar {
+        background: #fff;
+        border: 1.5px solid #cbd5e1;
+        color: #64748b;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .btn-back-sidebar:hover { border-color: var(--accent-blue); color: var(--accent-blue); background: #f0f9ff; }
+    .sidebar-nav-main {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        column-gap: 10px;
+        row-gap: 8px;
+    }
+    .sidebar-nav-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
+        line-height: 1.35;
+        flex: 0 1 auto;
+        color: var(--navy-dark);
+        min-width: 0;
+    }
