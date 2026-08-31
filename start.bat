@@ -18,11 +18,11 @@ if not exist "runtime\frankenphp\frankenphp.exe" (
     echo.
     set /p "DO_SETUP=Would you like to automatically download and configure FrankenPHP now? (Y/n): "
     if /i not "%DO_SETUP%"=="n" (
-        call "%~dp0setup-franken-for-dev.cmd"
+        call "%~dp0setup-franken-for-dev.bat"
     )
     if not exist "runtime\frankenphp\frankenphp.exe" (
         echo.
-        echo [ERROR] FrankenPHP runtime was not found. Please run setup-franken-for-dev.cmd manually.
+        echo [ERROR] FrankenPHP runtime was not found. Please run setup-franken-for-dev.bat manually.
         pause
         exit /b 1
     )
