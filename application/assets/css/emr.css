@@ -1,0 +1,1255 @@
+/* =======================================================
+   ZimRx EMR (Electronic Medical Record) Styling
+   Master Profile, Active Clinical Canvas, Past Rx Drawer
+======================================================= */
+
+.emr-page {
+    margin-bottom: 3rem;
+}
+
+/* ── Top Header / Alert Banners ── */
+.emr-alert-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1.25rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.emr-alert-banner.allergy-alert {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+}
+
+.emr-alert-banner.due-alert {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    color: #92400e;
+}
+
+.emr-alert-content {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.emr-alert-badge {
+    background: #dc2626;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.18rem 0.55rem;
+    border-radius: 4px;
+}
+
+/* ── Top Bar Header (Master & Active) ── */
+.emr-top-card {
+    background: #ffffff;
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: var(--border-radius, 10px);
+    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.05));
+    padding: 1.15rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.emr-patient-identity {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 0;
+}
+
+.emr-avatar-badge {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    background: #e0f2fe;
+    color: #0369a1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.emr-title-group h1 {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+}
+
+.emr-meta-pills {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.emr-meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #475569;
+    background: #f1f5f9;
+    padding: 0.2rem 0.6rem;
+    border-radius: 5px;
+    border: 1px solid #e2e8f0;
+}
+
+.emr-meta-pill.reg-pill {
+    background: #ecfdf5;
+    color: #047857;
+    border-color: #a7f3d0;
+    font-weight: 700;
+}
+
+.emr-meta-pill.visit-pill {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-color: #bfdbfe;
+    font-weight: 700;
+}
+
+.emr-top-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-shrink: 0;
+}
+
+/* ── Omni Search Hub Landing View ── */
+.emr-hub-hero {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.emr-hub-hero h2 {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 0.5rem;
+}
+
+.emr-hub-hero p {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin: 0 0 1.5rem;
+}
+
+.emr-omni-searchbox-wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.emr-omni-input {
+    width: 100%;
+    height: 52px;
+    border: 2px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 0 1.25rem 0 3.25rem;
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #0f172a;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    outline: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.emr-omni-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+
+.emr-omni-icon {
+    position: absolute;
+    left: 1.1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    pointer-events: none;
+}
+
+.emr-scanner-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #059669;
+    background: #ecfdf5;
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    margin-top: 1rem;
+    border: 1px solid #a7f3d0;
+}
+
+.emr-scanner-dot {
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    animation: scanner-pulse 1.8s infinite;
+}
+
+@keyframes scanner-pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* ── Master Profile Grid Layout ── */
+.emr-master-grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+/* Left Demographics Card */
+.emr-demographics-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    padding: 1.25rem;
+}
+
+.emr-demographics-card h3 {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 1rem;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.emr-demo-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.emr-demo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.86rem;
+}
+
+.emr-demo-item .label {
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    flex-shrink: 0;
+}
+
+.emr-demo-item .val {
+    color: #0f172a;
+    font-weight: 700;
+    text-align: right;
+    word-break: break-word;
+}
+
+.emr-allergies-box {
+    margin-top: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.emr-allergies-box .label {
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: #dc2626;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.35rem;
+    display: block;
+}
+
+.emr-allergy-tag {
+    display: inline-block;
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    margin: 0.15rem 0.2rem 0.15rem 0;
+}
+
+/* Right Clinical Timeline & Trends */
+.emr-timeline-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.emr-timeline-card h3 {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.emr-timeline-table-wrap {
+    overflow-x: auto;
+}
+
+.emr-timeline-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.88rem;
+}
+
+.emr-timeline-table th {
+    background: #f8fafc;
+    color: #475569;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.65rem 0.85rem;
+    border-bottom: 1px solid #cbd5e1;
+    text-align: left;
+}
+
+.emr-timeline-table td {
+    padding: 0.75rem 0.85rem;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: top;
+    color: #1e293b;
+}
+
+.emr-timeline-table tr:hover td {
+    background: #f8fafc;
+}
+
+/* ── Modular Vitals & Longitudinal Trajectories ── */
+.emr-trends-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    padding: 1.25rem;
+}
+
+.emr-trends-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.15rem;
+    flex-wrap: wrap;
+}
+
+.emr-trends-title-group h3 {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 0.35rem;
+}
+
+.emr-trajectory-legend {
+    display: flex;
+    gap: 0.85rem;
+    align-items: center;
+    font-size: 0.76rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.legend-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.legend-dot.clinic-dot {
+    background: #2563eb;
+    border: 1.5px solid #ffffff;
+    box-shadow: 0 0 0 1px #2563eb;
+}
+
+.legend-dot.home-dot {
+    background: #f59e0b;
+    border: 1.5px solid #ffffff;
+    box-shadow: 0 0 0 1px #f59e0b;
+}
+
+.emr-dropdown-wrap {
+    position: relative;
+    display: inline-block;
+}
+
+.emr-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    min-width: 260px;
+    max-height: 440px;
+    overflow-y: auto;
+    z-index: 1050;
+    padding: 0.25rem 0;
+}
+
+.emr-dropdown-menu.open {
+    display: block;
+}
+
+.emr-dropdown-section-title {
+    font-size: 0.69rem;
+    font-weight: 800;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.45rem 0.95rem 0.25rem;
+    background: #f8fafc;
+    border-top: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
+    margin: 0.2rem 0;
+}
+
+.emr-dropdown-section-title:first-child {
+    border-top: none;
+    margin-top: 0;
+}
+
+.emr-dropdown-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.48rem 0.95rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #1e293b;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.emr-dropdown-item:hover {
+    background: #f1f5f9;
+    color: #0284c7;
+}
+
+.emr-trends-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.15rem;
+}
+
+.emr-trend-box {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 9px;
+    padding: 0.95rem 1rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.emr-trend-box-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.65rem;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.emr-trend-box-title {
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: #334155;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.emr-trend-latest-val {
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: #0284c7;
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 4px;
+    padding: 0.1rem 0.45rem;
+}
+
+.emr-trend-delta {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+}
+.emr-trend-delta.delta-up {
+    background: #fff7ed;
+    color: #ea580c;
+}
+.emr-trend-delta.delta-down {
+    background: #f0f9ff;
+    color: #0284c7;
+}
+.emr-trend-delta.delta-stable {
+    background: #f8fafc;
+    color: #64748b;
+}
+
+.emr-trend-actions {
+    display: flex;
+    gap: 0.35rem;
+    align-items: center;
+}
+
+.btn-trend-action {
+    background: none;
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    padding: 0.22rem 0.5rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-trend-action:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #0f172a;
+}
+
+.btn-trend-action.btn-trend-remove:hover {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #dc2626;
+}
+
+.emr-trend-svg-wrap {
+    position: relative;
+    width: 100%;
+    height: 185px;
+    margin-top: 0.35rem;
+}
+
+.emr-chart-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.emr-chart-crosshair {
+    stroke: #94a3b8;
+    stroke-width: 1.2;
+    stroke-dasharray: 4 4;
+    pointer-events: none;
+}
+
+.emr-chart-dot {
+    cursor: pointer;
+    transition: r 0.15s ease, stroke-width 0.15s ease;
+}
+
+.emr-chart-dot.active {
+    r: 6.5 !important;
+    stroke-width: 3px !important;
+}
+
+.emr-chart-point-val {
+    font-size: 10.5px;
+    font-weight: 700;
+    fill: #475569;
+    pointer-events: none;
+    transition: opacity 0.15s ease, font-size 0.15s ease, fill 0.15s ease;
+    opacity: 0;
+}
+
+.emr-chart-point-val.visible {
+    opacity: 0.95;
+}
+
+.emr-chart-point-val.active {
+    opacity: 1 !important;
+    font-size: 12.5px;
+    font-weight: 800;
+    fill: #0f172a;
+}
+
+.chart-hit-slice {
+    cursor: crosshair;
+}
+
+.emr-chart-tooltip {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.99);
+    backdrop-filter: blur(8px);
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.18), 0 4px 6px -2px rgba(15, 23, 42, 0.08);
+    padding: 0.5rem 0.75rem;
+    pointer-events: auto;
+    z-index: 40;
+    min-width: 175px;
+    max-width: 250px;
+    font-size: 0.76rem;
+    color: #1e293b;
+    transition: left 0.08s cubic-bezier(0.16, 1, 0.3, 1), top 0.08s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.12s ease;
+}
+
+/* Caret pointing down to the dot */
+.emr-chart-tooltip.caret-bottom::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: #ffffff transparent transparent transparent;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+}
+
+/* Caret pointing up if near top border */
+.emr-chart-tooltip.caret-top::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent transparent #ffffff transparent;
+}
+
+.tooltip-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 0.3rem;
+    margin-bottom: 0.35rem;
+}
+
+.tooltip-date {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #475569;
+}
+
+.tooltip-metric-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    font-size: 0.82rem;
+    margin-bottom: 0.2rem;
+}
+
+.tooltip-metric-title {
+    font-weight: 600;
+    color: #334155;
+    white-space: nowrap;
+}
+
+.tooltip-metric-value {
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.tooltip-badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.12rem 0.45rem;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.tooltip-badge.badge-clinic {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+
+.tooltip-badge.badge-home {
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.tooltip-notes {
+    margin-top: 0.3rem;
+    padding-top: 0.25rem;
+    border-top: 1px dashed #e2e8f0;
+    font-size: 0.72rem;
+    color: #64748b;
+    word-break: break-word;
+}
+
+.emr-chart-empty {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-size: 0.8rem;
+    text-align: center;
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+    background: #f8fafc;
+    padding: 1rem;
+}
+
+/* ── Active Clinical Canvas ── */
+.emr-active-workspace {
+    display: grid;
+    grid-template-columns: 320px 1fr 340px;
+    gap: 1.25rem;
+    align-items: start;
+}
+
+.emr-panel-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    padding: 1.15rem;
+}
+
+.emr-panel-header {
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.emr-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-bottom: 0.85rem;
+}
+
+.emr-form-group label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.emr-form-group input,
+.emr-form-group textarea,
+.emr-form-group select {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.86rem;
+    font-family: inherit;
+    color: #0f172a;
+    background: #ffffff;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.15s ease;
+}
+
+.emr-form-group input:focus,
+.emr-form-group textarea:focus,
+.emr-form-group select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.emr-vitals-mini-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+}
+
+/* ── Rx Grid in Center Panel ── */
+.emr-rx-entry-bar {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr auto;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    background: #f8fafc;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    align-items: end;
+}
+
+.emr-rx-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.86rem;
+    margin-top: 0.5rem;
+}
+
+.emr-rx-table th {
+    background: #f8fafc;
+    color: #475569;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 0.55rem 0.65rem;
+    border-bottom: 1px solid #cbd5e1;
+    text-align: left;
+}
+
+.emr-rx-table td {
+    padding: 0.6rem 0.65rem;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.emr-rx-table tr:hover td {
+    background: #f8fafc;
+}
+
+/* ── Sliding Past Rx Reference Drawer ── */
+.emr-drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 1300;
+    display: none;
+}
+
+.emr-drawer-overlay.open {
+    display: block;
+}
+
+.emr-past-rx-drawer {
+    position: fixed;
+    top: 0;
+    right: -560px;
+    width: 540px;
+    max-width: calc(100vw - 2rem);
+    height: 100vh;
+    background: #ffffff;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.18);
+    z-index: 1301;
+    transition: right 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.emr-past-rx-drawer.open {
+    right: 0;
+}
+
+.emr-drawer-header {
+    padding: 1.15rem 1.5rem;
+    background: #0f172a;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.emr-drawer-header h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+    color: #ffffff;
+}
+
+.emr-drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+}
+
+.emr-drawer-close-btn {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 1.5rem;
+    line-height: 1;
+    padding: 0;
+}
+
+.emr-drawer-close-btn:hover {
+    color: #ffffff;
+}
+
+/* ── Modals (Edit Demographics, Print Preview) ── */
+.emr-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.5);
+    z-index: 1400;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.emr-modal.open {
+    display: flex;
+}
+
+.emr-modal-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 1.75rem;
+}
+
+.emr-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.emr-modal-header h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+}
+
+.emr-modal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+}
+
+.emr-modal-grid .span-2 {
+    grid-column: span 2;
+}
+
+.emr-modal-footer {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+/* ── Buttons & Utilities ── */
+.btn-emr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border-radius: 6px;
+    padding: 0.45rem 1rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-decoration: none;
+    border: 1px solid transparent;
+}
+
+.btn-emr-primary {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.btn-emr-primary:hover {
+    background: #1d4ed8;
+}
+
+.btn-emr-success {
+    background: #059669;
+    color: #ffffff;
+}
+
+.btn-emr-success:hover {
+    background: #047857;
+}
+
+.btn-emr-outline {
+    background: #ffffff;
+    color: #334155;
+    border-color: #cbd5e1;
+}
+
+.btn-emr-outline:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+}
+
+.btn-emr-sm {
+    padding: 0.25rem 0.6rem;
+    font-size: 0.78rem;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1200px) {
+    .emr-active-workspace {
+        grid-template-columns: 1fr;
+    }
+    
+    .emr-master-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Particulars Audit Log Modal & Timeline ── */
+.emr-audit-modal-card {
+    max-width: 680px;
+}
+
+.emr-audit-timeline {
+    position: relative;
+    padding-left: 24px;
+    margin-top: 0.5rem;
+}
+
+.emr-audit-timeline::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    left: 7px;
+    width: 2px;
+    background: #e2e8f0;
+}
+
+.audit-timeline-event {
+    position: relative;
+    padding-bottom: 1.5rem;
+}
+
+.audit-timeline-event:last-child {
+    padding-bottom: 0.5rem;
+}
+
+.audit-event-dot {
+    position: absolute;
+    left: -24px;
+    top: 4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 3px solid #2563eb;
+    box-shadow: 0 0 0 2px #eff6ff;
+}
+
+.audit-event-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.audit-event-actor {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.88rem;
+    color: #0f172a;
+}
+
+.audit-event-time {
+    font-size: 0.78rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.audit-role-pill {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    letter-spacing: 0.03em;
+}
+
+.audit-role-pill.role-doctor {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+
+.audit-role-pill.role-assistant {
+    background: #fdf2f8;
+    color: #be185d;
+    border: 1px solid #fbcfe8;
+}
+
+.audit-role-pill.role-admin {
+    background: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.audit-source-pill {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.audit-source-pill.source-prescription {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+.audit-source-pill.source-appointment {
+    background: #f0f9ff;
+    color: #0284c7;
+    border: 1px solid #bae6fd;
+}
+
+.audit-source-pill.source-emr {
+    background: #faf5ff;
+    color: #7e22ce;
+    border: 1px solid #e9d5ff;
+}
+
+.audit-event-diffs {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.audit-diff-item {
+    font-size: 0.84rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.audit-diff-item.initial-reg {
+    color: #047857;
+    font-weight: 600;
+}
+
+.diff-field {
+    font-weight: 600;
+    color: #334155;
+    min-width: 110px;
+}
+
+.diff-old {
+    color: #dc2626;
+    background: #fee2e2;
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    text-decoration: line-through;
+    font-size: 0.8rem;
+}
+
+.diff-arrow {
+    color: #94a3b8;
+    font-size: 0.8rem;
+}
+
+.diff-new {
+    color: #059669;
+    background: #d1fae5;
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.emr-audit-empty {
+    text-align: center;
+    padding: 2.5rem 1rem;
+}
+

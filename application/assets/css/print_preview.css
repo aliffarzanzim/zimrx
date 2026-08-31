@@ -1,0 +1,890 @@
+/* ZimRx prescription preview and print layout */
+
+@font-face {
+    font-family: "SolaimanLipi";
+    src: url("../fonts/SolaimanLipi.woff2") format("woff2"),
+         url("../fonts/SolaimanLipi.woff") format("woff"),
+         url("../fonts/SolaimanLipi.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+
+
+@font-face {
+    font-family: "Kongsho";
+    src: url("../fonts/KongshoOMJ.woff2") format("woff2"),
+         url("../fonts/KongshoOMJ.woff") format("woff"),
+         url("../fonts/KongshoOMJ.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "AdorshoLipi";
+    src: url("../fonts/AdorshoLipi.woff2") format("woff2"),
+         url("../fonts/AdorshoLipi.woff") format("woff"),
+         url("../fonts/AdorshoLipi.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Times New Roman";
+    src: url("../fonts/TimesNewRoman.woff2") format("woff2"),
+         url("../fonts/TimesNewRoman.woff") format("woff"),
+         url("../fonts/TimesNewRoman.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Arial";
+    src: url("../fonts/Arial.woff2") format("woff2"),
+         url("../fonts/Arial.woff") format("woff"),
+         url("../fonts/Arial.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Calibri";
+    src: url("../fonts/Calibri.woff2") format("woff2"),
+         url("../fonts/Calibri.woff") format("woff"),
+         url("../fonts/Calibri.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Tahoma";
+    src: url("../fonts/Tahoma.woff2") format("woff2"),
+         url("../fonts/Tahoma.woff") format("woff"),
+         url("../fonts/Tahoma.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Georgia";
+    src: url("../fonts/Georgia.woff2") format("woff2"),
+         url("../fonts/Georgia.woff") format("woff"),
+         url("../fonts/Georgia.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Gabriola";
+    src: url("../fonts/Gabriola.woff2") format("woff2"),
+         url("../fonts/Gabriola.woff") format("woff"),
+         url("../fonts/Gabriola.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Lucida Calligraphy";
+    src: url("../fonts/LucidaCalligraphy.woff2") format("woff2"),
+         url("../fonts/LucidaCalligraphy.woff") format("woff"),
+         url("../fonts/LucidaCalligraphy.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Courier New";
+    src: url("../fonts/CourierNew.woff2") format("woff2"),
+         url("../fonts/CourierNew.woff") format("woff"),
+         url("../fonts/CourierNew.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "BenSenHandwriting";
+    src: url("../fonts/BenSenHandwriting.woff2") format("woff2"),
+         url("../fonts/BenSenHandwriting.woff") format("woff"),
+         url("../fonts/BenSenHandwriting.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Nikosh";
+    src: url("../fonts/Nikosh.woff2") format("woff2"),
+         url("../fonts/Nikosh.woff") format("woff"),
+         url("../fonts/Nikosh.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Siyamrupali";
+    src: url("../fonts/Siyamrupali.woff2") format("woff2"),
+         url("../fonts/Siyamrupali.woff") format("woff"),
+         url("../fonts/Siyamrupali.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "KumarkhaliUnicode";
+    src: url("../fonts/KumarkhaliUnicode.woff2") format("woff2"),
+         url("../fonts/KumarkhaliUnicode.woff") format("woff"),
+         url("../fonts/KumarkhaliUnicode.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+@font-face {
+    font-family: "MangalikUnicode";
+    src: url("../fonts/MangalikUnicode.woff2") format("woff2"),
+         url("../fonts/MangalikUnicode.woff") format("woff"),
+         url("../fonts/MangalikUnicode.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+@font-face {
+    font-family: "Comic Sans";
+    src: url("../fonts/ComicSans.woff2") format("woff2"),
+         url("../fonts/ComicSans.woff") format("woff"),
+         url("../fonts/ComicSans.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Bradley Hand ITC";
+    src: url("../fonts/BradleyHandITC.woff2") format("woff2"),
+         url("../fonts/BradleyHandITC.woff") format("woff"),
+         url("../fonts/BradleyHandITC.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+
+@font-face {
+    font-family: "AkayaKanadaka";
+    src: url("../fonts/AkayaKanadaka.woff2") format("woff2"),
+         url("../fonts/AkayaKanadaka.woff") format("woff"),
+         url("../fonts/AkayaKanadaka.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Birthstone";
+    src: url("../fonts/Birthstone.woff2") format("woff2"),
+         url("../fonts/Birthstone.woff") format("woff"),
+         url("../fonts/Birthstone.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Charm";
+    src: url("../fonts/Charm.woff2") format("woff2"),
+         url("../fonts/Charm.woff") format("woff"),
+         url("../fonts/Charm.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Cookie";
+    src: url("../fonts/Cookie.woff2") format("woff2"),
+         url("../fonts/Cookie.woff") format("woff"),
+         url("../fonts/Cookie.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Damion";
+    src: url("../fonts/Damion.woff2") format("woff2"),
+         url("../fonts/Damion.woff") format("woff"),
+         url("../fonts/Damion.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Engagement";
+    src: url("../fonts/Engagement.woff2") format("woff2"),
+         url("../fonts/Engagement.woff") format("woff"),
+         url("../fonts/Engagement.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "HappyMonkey";
+    src: url("../fonts/HappyMonkey.woff2") format("woff2"),
+         url("../fonts/HappyMonkey.woff") format("woff"),
+         url("../fonts/HappyMonkey.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "JimNightshade";
+    src: url("../fonts/JimNightshade.woff2") format("woff2"),
+         url("../fonts/JimNightshade.woff") format("woff"),
+         url("../fonts/JimNightshade.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Kings";
+    src: url("../fonts/Kings.woff2") format("woff2"),
+         url("../fonts/Kings.woff") format("woff"),
+         url("../fonts/Kings.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Macondo";
+    src: url("../fonts/Macondo.woff2") format("woff2"),
+         url("../fonts/Macondo.woff") format("woff"),
+         url("../fonts/Macondo.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Metamorphous";
+    src: url("../fonts/Metamorphous.woff2") format("woff2"),
+         url("../fonts/Metamorphous.woff") format("woff"),
+         url("../fonts/Metamorphous.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "MonteCarlo";
+    src: url("../fonts/MonteCarlo.woff2") format("woff2"),
+         url("../fonts/MonteCarlo.woff") format("woff"),
+         url("../fonts/MonteCarlo.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Parisienne";
+    src: url("../fonts/Parisienne.woff2") format("woff2"),
+         url("../fonts/Parisienne.woff") format("woff"),
+         url("../fonts/Parisienne.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "ShantellSans";
+    src: url("../fonts/ShantellSans.woff2") format("woff2"),
+         url("../fonts/ShantellSans.woff") format("woff"),
+         url("../fonts/ShantellSans.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "TeXGyreChorus";
+    src: url("../fonts/TeXGyreChorus.woff2") format("woff2"),
+         url("../fonts/TeXGyreChorus.woff") format("woff"),
+         url("../fonts/TeXGyreChorus.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+
+font[face="solaimanlipi"],
+font[face="SolaimanLipi"] {
+    font-family: "SolaimanLipi" !important;
+}
+
+font[face="kongsho"],
+font[face="Kongsho"] {
+    font-family: "Kongsho" !important;
+}
+
+font[face="adorsholipi"],
+font[face="AdorshoLipi"] {
+    font-family: "AdorshoLipi" !important;
+}
+
+font[face="bensenhandwriting"],
+font[face="BenSenHandwriting"] {
+    font-family: "BenSenHandwriting" !important;
+}
+
+font[face="nikosh"],
+font[face="Nikosh"] {
+    font-family: "Nikosh" !important;
+}
+
+font[face="siyamrupali"],
+font[face="Siyamrupali"] {
+    font-family: "Siyamrupali" !important;
+}
+
+font[face="kumarkhaliunicode"],
+font[face="KumarkhaliUnicode"] {
+    font-family: "KumarkhaliUnicode" !important;
+}
+
+font[face="mangalikunicode"],
+font[face="MangalikUnicode"] {
+    font-family: "MangalikUnicode" !important;
+}
+
+font[face="comic sans"],
+font[face="Comic Sans"] {
+    font-family: "Comic Sans" !important;
+}
+
+font[face="bradley hand itc"],
+font[face="Bradley Hand ITC"] {
+    font-family: "Bradley Hand ITC" !important;
+}
+
+font[face="akayakanadaka"],
+font[face="AkayaKanadaka"] {
+    font-family: "AkayaKanadaka" !important;
+}
+
+font[face="birthstone"],
+font[face="Birthstone"] {
+    font-family: "Birthstone" !important;
+}
+
+font[face="charm"],
+font[face="Charm"] {
+    font-family: "Charm" !important;
+}
+
+font[face="cookie"],
+font[face="Cookie"] {
+    font-family: "Cookie" !important;
+}
+
+font[face="damion"],
+font[face="Damion"] {
+    font-family: "Damion" !important;
+}
+
+font[face="engagement"],
+font[face="Engagement"] {
+    font-family: "Engagement" !important;
+}
+
+font[face="happymonkey"],
+font[face="HappyMonkey"] {
+    font-family: "HappyMonkey" !important;
+}
+
+font[face="jimnightshade"],
+font[face="JimNightshade"] {
+    font-family: "JimNightshade" !important;
+}
+
+font[face="kings"],
+font[face="Kings"] {
+    font-family: "Kings" !important;
+}
+
+font[face="macondo"],
+font[face="Macondo"] {
+    font-family: "Macondo" !important;
+}
+
+font[face="metamorphous"],
+font[face="Metamorphous"] {
+    font-family: "Metamorphous" !important;
+}
+
+font[face="montecarlo"],
+font[face="MonteCarlo"] {
+    font-family: "MonteCarlo" !important;
+}
+
+font[face="parisienne"],
+font[face="Parisienne"] {
+    font-family: "Parisienne" !important;
+}
+
+font[face="shantellsans"],
+font[face="ShantellSans"] {
+    font-family: "ShantellSans" !important;
+}
+
+font[face="texgyrechorus"],
+font[face="TeXGyreChorus"] {
+    font-family: "TeXGyreChorus" !important;
+}
+
+
+
+@page {
+    size: A4;
+    margin: 0;
+}
+
+html,
+body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+body {
+    font-family: "Times New Roman", serif;
+}
+
+.zrx-print-page {
+    position: relative;
+    display: block;
+    float: left;
+    margin: 0;
+    overflow: hidden;
+    background: #fff;
+    color: #000;
+    box-sizing: border-box;
+}
+
+.zrx-print-header,
+.zrx-patient-strip,
+.zrx-print-footer {
+    box-sizing: border-box;
+}
+
+.zrx-print-header {
+    float: left;
+    width: 100%;
+    overflow: hidden;
+}
+
+.zrx-header-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    min-height: 100%;
+    padding: 0.42cm 5% 0.25cm;
+    box-sizing: border-box;
+}
+
+.zrx-header-text {
+    display: block;
+    min-width: 0;
+}
+
+.zrx-header-text p,
+.zrx-header-text div,
+.zrx-header-text span {
+    margin: 0;
+    padding: 0;
+    line-height: 1.15;
+}
+
+.zrx-has-logo .zrx-header-text {
+    width: 40%;
+}
+
+.zrx-no-logo .zrx-header-text {
+    width: 49%;
+}
+
+.zrx-header-right {
+    text-align: right;
+}
+.zrx-header-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    width: 18%;
+}
+
+.zrx-header-logo img {
+    max-width: 100%;
+    max-height: 120px;
+    object-fit: contain;
+}
+
+.zrx-header-line {
+    margin: 0;
+    line-height: 1.12;
+    white-space: normal;
+}
+
+
+.zrx-patient-strip {
+    clear: both;
+    float: left;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.zrx-patient-table {
+    margin: 0 auto;
+    border-collapse: collapse;
+    box-sizing: border-box;
+    text-align: left;
+}
+
+.zrx-patient-table td {
+    padding: 2px 4px;
+    vertical-align: middle;
+}
+
+.zrx-patient-label,
+.zrx-patient-colon {
+    font-weight: bold;
+    white-space: nowrap;
+    width: 1%;
+}
+
+.zrx-patient-value {
+    min-width: 0;
+    width: 25%;
+}
+
+.zrx-patient-position-4,
+.zrx-patient-position-8 {
+    text-align: right;
+}
+
+.zrx-patient-address-value {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+}
+
+.zrx-body-left,
+.zrx-body-right {
+    display: block;
+    float: left;
+    min-height: 0;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.zrx-body-left {
+    clear: both;
+}
+
+.zrx-body-right {
+    position: relative;
+}
+
+.zrx-left-content {
+    display: block;
+    float: left;
+    overflow: hidden;
+    padding-right: 10px;
+    box-sizing: border-box;
+}
+
+.zrx-ref-by,
+.zrx-barcode,
+.zrx-visit-no {
+    display: block;
+    float: left;
+    width: 85%;
+    margin-left: 13%;
+    text-align: left;
+    box-sizing: border-box;
+}
+
+.zrx-ref-by {
+    margin-top: 10px;
+}
+
+.zrx-barcode {
+    margin-top: 7px;
+    text-align: left;
+    display: block;
+}
+
+.zrx-barcode-svg,
+.zrx-barcode svg {
+    display: inline-block;
+    max-width: 100%;
+    height: auto;
+    background: #ffffff;
+}
+
+.zrx-visit-no {
+    margin-top: 2px;
+    overflow: hidden;
+    font-size: 12pt;
+    font-weight: bold;
+    line-height: 11px;
+}
+
+.zrx-clinical-section {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    page-break-inside: avoid;
+}
+
+.zrx-section-title {
+    display: block;
+    width: 100%;
+    margin: 0 0 5px;
+    font-size: 12pt;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.zrx-section-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.zrx-clinical-section--history .zrx-section-table {
+    width: calc(100% - 6px);
+    margin-left: 6px;
+}
+
+.zrx-section-table td {
+    padding: 1px 3px;
+    vertical-align: top;
+}
+
+.zrx-bullet-cell {
+    width: 14px;
+    white-space: nowrap;
+}
+
+.zrx-label-cell {
+    width: 54px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.zrx-clinical-section--history .zrx-section-table td {
+    padding: 0 0 4px 0;
+    line-height: 10pt;
+}
+
+.zrx-clinical-section--history .zrx-section-table tr:last-child td {
+    padding-bottom: 0;
+}
+
+.zrx-history-label {
+    display: inline-block;
+    font-weight: bold;
+    white-space: nowrap;
+    -webkit-transform: scaleX(0.88);
+    transform: scaleX(0.88);
+    -webkit-transform-origin: left center;
+    transform-origin: left center;
+    margin-right: -0.25em;
+}
+
+.zrx-history-bullet {
+    display: block;
+    padding-left: 12px;
+    line-height: 10pt;
+    font-weight: normal;
+}
+
+.zrx-colon-cell {
+    width: 10px;
+    text-align: center;
+}
+
+.zrx-report-name {
+    width: 46%;
+}
+
+.zrx-report-date {
+    font-size: 0.9em;
+}
+
+.zrx-report-value {
+    width: 54%;
+}
+
+.zrx-rx-mark {
+    display: block;
+    float: left;
+    width: 100%;
+    height: 10mm;
+    font-weight: bold;
+}
+
+.zrx-rx-symbol {
+    display: block;
+    float: left;
+    width: 60px;
+}
+
+.zrx-prescription-main {
+    display: block;
+    float: left;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.zrx-drug-list,
+.zrx-text-pad,
+.zrx-advice-section {
+    display: block;
+    float: left;
+    width: 100%;
+}
+
+.zrx-drug-table,
+.zrx-advice-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.zrx-drug-table td {
+    padding: 0;
+    vertical-align: top;
+}
+
+.zrx-drug-number {
+    font-weight: bold;
+    vertical-align: top;
+    white-space: nowrap;
+}
+
+.zrx-drug-bullet {
+    font-size: 17pt;
+}
+
+.zrx-drug-name-cell {
+    font-weight: bold;
+    vertical-align: top;
+}
+
+.zrx-drug-generic {
+    display: block;
+    overflow: hidden;
+    font-size: 9pt;
+    font-style: italic;
+    font-weight: normal;
+    white-space: nowrap;
+}
+
+.zrx-drug-detail-pad {
+    min-width: 25px;
+}
+
+.zrx-drug-dose,
+.zrx-drug-instruction {
+    width: auto;
+}
+
+.zrx-drug-duration {
+    min-width: 60px;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.zrx-text-pad {
+    margin-top: 20px;
+}
+
+.zrx-advice-section {
+    margin-top: 20px;
+}
+
+.zrx-advice-table td {
+    vertical-align: top;
+}
+
+.zrx-advice-bullet {
+    width: 14px;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.zrx-followup {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.zrx-print-footer {
+    clear: both;
+    float: left;
+    width: 100%;
+    overflow: hidden;
+    padding: 10px 1cm 5px;
+    text-align: center;
+    font-family: "Times New Roman", "SolaimanLipi", serif;
+    font-size: 9.5pt;
+    line-height: 1.35;
+}
+
+.zrx-print-footer p {
+    margin: 0 0 4px;
+}
+
+.zrx-print-footer p:last-child {
+    margin-bottom: 0;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+.highlight-active {
+    background: rgba(254, 240, 138, 0.4) !important;
+    box-shadow: inset 0 0 0 2px #eab308 !important;
+}
+
+@media print {
+    body {
+        background: #fff !important;
+    }
+
+    .zrx-print-page {
+        margin: 0;
+        box-shadow: none !important;
+    }
+}

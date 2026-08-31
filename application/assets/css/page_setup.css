@@ -1,0 +1,916 @@
+@font-face {
+    font-family: "SolaimanLipi";
+    src: url("../fonts/SolaimanLipi.woff2") format("woff2"),
+         url("../fonts/SolaimanLipi.woff") format("woff"),
+         url("../fonts/SolaimanLipi.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+
+
+@font-face {
+    font-family: "Kongsho";
+    src: url("../fonts/KongshoOMJ.woff2") format("woff2"),
+         url("../fonts/KongshoOMJ.woff") format("woff"),
+         url("../fonts/KongshoOMJ.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "AdorshoLipi";
+    src: url("../fonts/AdorshoLipi.woff2") format("woff2"),
+         url("../fonts/AdorshoLipi.woff") format("woff"),
+         url("../fonts/AdorshoLipi.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Times New Roman";
+    src: url("../fonts/TimesNewRoman.woff2") format("woff2"),
+         url("../fonts/TimesNewRoman.woff") format("woff"),
+         url("../fonts/TimesNewRoman.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Arial";
+    src: url("../fonts/Arial.woff2") format("woff2"),
+         url("../fonts/Arial.woff") format("woff"),
+         url("../fonts/Arial.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Calibri";
+    src: url("../fonts/Calibri.woff2") format("woff2"),
+         url("../fonts/Calibri.woff") format("woff"),
+         url("../fonts/Calibri.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Tahoma";
+    src: url("../fonts/Tahoma.woff2") format("woff2"),
+         url("../fonts/Tahoma.woff") format("woff"),
+         url("../fonts/Tahoma.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Georgia";
+    src: url("../fonts/Georgia.woff2") format("woff2"),
+         url("../fonts/Georgia.woff") format("woff"),
+         url("../fonts/Georgia.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Gabriola";
+    src: url("../fonts/Gabriola.woff2") format("woff2"),
+         url("../fonts/Gabriola.woff") format("woff"),
+         url("../fonts/Gabriola.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Lucida Calligraphy";
+    src: url("../fonts/LucidaCalligraphy.woff2") format("woff2"),
+         url("../fonts/LucidaCalligraphy.woff") format("woff"),
+         url("../fonts/LucidaCalligraphy.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Courier New";
+    src: url("../fonts/CourierNew.woff2") format("woff2"),
+         url("../fonts/CourierNew.woff") format("woff"),
+         url("../fonts/CourierNew.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "BenSenHandwriting";
+    src: url("../fonts/BenSenHandwriting.woff2") format("woff2"),
+         url("../fonts/BenSenHandwriting.woff") format("woff"),
+         url("../fonts/BenSenHandwriting.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Nikosh";
+    src: url("../fonts/Nikosh.woff2") format("woff2"),
+         url("../fonts/Nikosh.woff") format("woff"),
+         url("../fonts/Nikosh.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Siyamrupali";
+    src: url("../fonts/Siyamrupali.woff2") format("woff2"),
+         url("../fonts/Siyamrupali.woff") format("woff"),
+         url("../fonts/Siyamrupali.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "KumarkhaliUnicode";
+    src: url("../fonts/KumarkhaliUnicode.woff2") format("woff2"),
+         url("../fonts/KumarkhaliUnicode.woff") format("woff"),
+         url("../fonts/KumarkhaliUnicode.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+@font-face {
+    font-family: "MangalikUnicode";
+    src: url("../fonts/MangalikUnicode.woff2") format("woff2"),
+         url("../fonts/MangalikUnicode.woff") format("woff"),
+         url("../fonts/MangalikUnicode.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+@font-face {
+    font-family: "Comic Sans";
+    src: url("../fonts/ComicSans.woff2") format("woff2"),
+         url("../fonts/ComicSans.woff") format("woff"),
+         url("../fonts/ComicSans.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Bradley Hand ITC";
+    src: url("../fonts/BradleyHandITC.woff2") format("woff2"),
+         url("../fonts/BradleyHandITC.woff") format("woff"),
+         url("../fonts/BradleyHandITC.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+
+@font-face {
+    font-family: "AkayaKanadaka";
+    src: url("../fonts/AkayaKanadaka.woff2") format("woff2"),
+         url("../fonts/AkayaKanadaka.woff") format("woff"),
+         url("../fonts/AkayaKanadaka.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Birthstone";
+    src: url("../fonts/Birthstone.woff2") format("woff2"),
+         url("../fonts/Birthstone.woff") format("woff"),
+         url("../fonts/Birthstone.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Charm";
+    src: url("../fonts/Charm.woff2") format("woff2"),
+         url("../fonts/Charm.woff") format("woff"),
+         url("../fonts/Charm.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Cookie";
+    src: url("../fonts/Cookie.woff2") format("woff2"),
+         url("../fonts/Cookie.woff") format("woff"),
+         url("../fonts/Cookie.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Damion";
+    src: url("../fonts/Damion.woff2") format("woff2"),
+         url("../fonts/Damion.woff") format("woff"),
+         url("../fonts/Damion.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Engagement";
+    src: url("../fonts/Engagement.woff2") format("woff2"),
+         url("../fonts/Engagement.woff") format("woff"),
+         url("../fonts/Engagement.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "HappyMonkey";
+    src: url("../fonts/HappyMonkey.woff2") format("woff2"),
+         url("../fonts/HappyMonkey.woff") format("woff"),
+         url("../fonts/HappyMonkey.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "JimNightshade";
+    src: url("../fonts/JimNightshade.woff2") format("woff2"),
+         url("../fonts/JimNightshade.woff") format("woff"),
+         url("../fonts/JimNightshade.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Kings";
+    src: url("../fonts/Kings.woff2") format("woff2"),
+         url("../fonts/Kings.woff") format("woff"),
+         url("../fonts/Kings.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Macondo";
+    src: url("../fonts/Macondo.woff2") format("woff2"),
+         url("../fonts/Macondo.woff") format("woff"),
+         url("../fonts/Macondo.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Metamorphous";
+    src: url("../fonts/Metamorphous.woff2") format("woff2"),
+         url("../fonts/Metamorphous.woff") format("woff"),
+         url("../fonts/Metamorphous.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "MonteCarlo";
+    src: url("../fonts/MonteCarlo.woff2") format("woff2"),
+         url("../fonts/MonteCarlo.woff") format("woff"),
+         url("../fonts/MonteCarlo.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Parisienne";
+    src: url("../fonts/Parisienne.woff2") format("woff2"),
+         url("../fonts/Parisienne.woff") format("woff"),
+         url("../fonts/Parisienne.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "ShantellSans";
+    src: url("../fonts/ShantellSans.woff2") format("woff2"),
+         url("../fonts/ShantellSans.woff") format("woff"),
+         url("../fonts/ShantellSans.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "TeXGyreChorus";
+    src: url("../fonts/TeXGyreChorus.woff2") format("woff2"),
+         url("../fonts/TeXGyreChorus.woff") format("woff"),
+         url("../fonts/TeXGyreChorus.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+
+font[face="solaimanlipi"],
+font[face="SolaimanLipi"] {
+    font-family: "SolaimanLipi" !important;
+}
+
+font[face="kongsho"],
+font[face="Kongsho"] {
+    font-family: "Kongsho" !important;
+}
+
+font[face="adorsholipi"],
+font[face="AdorshoLipi"] {
+    font-family: "AdorshoLipi" !important;
+}
+
+font[face="bensenhandwriting"],
+font[face="BenSenHandwriting"] {
+    font-family: "BenSenHandwriting" !important;
+}
+
+font[face="nikosh"],
+font[face="Nikosh"] {
+    font-family: "Nikosh" !important;
+}
+
+font[face="siyamrupali"],
+font[face="Siyamrupali"] {
+    font-family: "Siyamrupali" !important;
+}
+
+font[face="kumarkhaliunicode"],
+font[face="KumarkhaliUnicode"] {
+    font-family: "KumarkhaliUnicode" !important;
+}
+
+font[face="mangalikunicode"],
+font[face="MangalikUnicode"] {
+    font-family: "MangalikUnicode" !important;
+}
+
+font[face="comic sans"],
+font[face="Comic Sans"] {
+    font-family: "Comic Sans" !important;
+}
+
+font[face="bradley hand itc"],
+font[face="Bradley Hand ITC"] {
+    font-family: "Bradley Hand ITC" !important;
+}
+
+font[face="akayakanadaka"],
+font[face="AkayaKanadaka"] {
+    font-family: "AkayaKanadaka" !important;
+}
+
+font[face="birthstone"],
+font[face="Birthstone"] {
+    font-family: "Birthstone" !important;
+}
+
+font[face="charm"],
+font[face="Charm"] {
+    font-family: "Charm" !important;
+}
+
+font[face="cookie"],
+font[face="Cookie"] {
+    font-family: "Cookie" !important;
+}
+
+font[face="damion"],
+font[face="Damion"] {
+    font-family: "Damion" !important;
+}
+
+font[face="engagement"],
+font[face="Engagement"] {
+    font-family: "Engagement" !important;
+}
+
+font[face="happymonkey"],
+font[face="HappyMonkey"] {
+    font-family: "HappyMonkey" !important;
+}
+
+font[face="jimnightshade"],
+font[face="JimNightshade"] {
+    font-family: "JimNightshade" !important;
+}
+
+font[face="kings"],
+font[face="Kings"] {
+    font-family: "Kings" !important;
+}
+
+font[face="macondo"],
+font[face="Macondo"] {
+    font-family: "Macondo" !important;
+}
+
+font[face="metamorphous"],
+font[face="Metamorphous"] {
+    font-family: "Metamorphous" !important;
+}
+
+font[face="montecarlo"],
+font[face="MonteCarlo"] {
+    font-family: "MonteCarlo" !important;
+}
+
+font[face="parisienne"],
+font[face="Parisienne"] {
+    font-family: "Parisienne" !important;
+}
+
+font[face="shantellsans"],
+font[face="ShantellSans"] {
+    font-family: "ShantellSans" !important;
+}
+
+font[face="texgyrechorus"],
+font[face="TeXGyreChorus"] {
+    font-family: "TeXGyreChorus" !important;
+}
+
+
+
+.zps-page {
+    margin-bottom: 2rem;
+    box-sizing: border-box;
+}
+
+.zps-heading-card {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    margin-bottom: 1rem;
+}
+
+.zps-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.zps-heading h1 {
+    margin: 0;
+    color: var(--text-dark);
+    font-size: 1.45rem;
+    line-height: 1.2;
+}
+
+.zps-heading p {
+    margin: 0.35rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+}
+
+.zps-heading-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+}
+
+.zps-status {
+    min-width: 8rem;
+    color: var(--primary);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-align: right;
+}
+
+.zps-danger {
+    color: #dc2626;
+    border-color: #fecaca;
+}
+
+.zps-note {
+    margin-bottom: 1rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #334155;
+    font-size: 0.9rem;
+}
+
+.zps-grid {
+    display: grid;
+    grid-template-columns: minmax(620px, 1fr) 420px;
+    gap: 1rem;
+    align-items: start;
+}
+
+.zps-preview-panel,
+.zps-controls-panel {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.zps-panel-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 0.9rem;
+    border-bottom: 1px solid #cbd5e1;
+    background: #e2e8f0;
+}
+
+.zps-panel-title h2 {
+    margin: 0;
+    color: var(--text-dark);
+    font-size: 1rem;
+}
+
+.zps-panel-title span {
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.zps-preview-stage {
+    min-height: 680px;
+    overflow: auto;
+    padding: 1rem;
+    background: #94a3b8;
+}
+
+.zps-preview-scale {
+    position: relative;
+    margin: 0 auto;
+}
+
+.zps-preview-page {
+    display: block;
+    float: left;
+    position: relative;
+    overflow: hidden;
+    background: #fee2e2;
+    color: #0f172a;
+    box-sizing: border-box;
+}
+
+.zps-preview-header,
+.zps-preview-patient,
+.zps-preview-left,
+.zps-preview-right,
+.zps-preview-footer {
+    display: block;
+    float: left;
+    background: #ffffff;
+    box-sizing: border-box;
+    overflow: hidden;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.zps-preview-header {
+    border-bottom: 1px solid #0f172a;
+    padding: 0;
+}
+
+.zps-header-left,
+.zps-header-right {
+    display: block;
+    float: left;
+    width: 48%;
+    font-family: "Times New Roman", serif;
+}
+
+.zps-header-right {
+    float: right;
+    text-align: right;
+}
+
+.zps-header-left b,
+.zps-header-right b,
+.zps-sidebar-lines b,
+.zps-rx-lines b {
+    display: block;
+}
+
+.zps-header-left span,
+.zps-header-right span,
+.zps-sidebar-lines span,
+.zps-rx-lines span {
+    display: block;
+    margin-top: 0.08cm;
+}
+
+.zps-preview-patient {
+    clear: both;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-bottom: 1px solid #0f172a;
+    font-family: "Times New Roman", serif;
+    font-size: 12pt;
+    box-sizing: border-box;
+}
+
+.zps-preview-patient table {
+    width: 90%;
+    margin: 0 auto;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-collapse: collapse;
+}
+
+.zps-preview-patient td {
+    padding: 2px 4px;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.zps-preview-patient td:nth-child(3n+1),
+.zps-preview-patient td:nth-child(3n+2) {
+    width: 1%;
+}
+
+.zps-preview-patient .pos_1,
+.zps-preview-patient .pos_2,
+.zps-preview-patient .pos_3,
+.zps-preview-patient .pos_4,
+.zps-preview-patient .pos_5,
+.zps-preview-patient .pos_6,
+.zps-preview-patient .pos_7,
+.zps-preview-patient .pos_8 {
+    width: 25%;
+}
+
+.zps-preview-patient .pos_4,
+.zps-preview-patient .pos_8 {
+    text-align: right;
+}
+
+.zps-preview-left {
+    clear: both;
+    border-right: 1px solid #0f172a;
+    padding-top: 0.45cm;
+}
+
+.zps-sidebar-lines {
+    margin-left: 70px;
+    padding-right: 10px;
+    font-family: "Times New Roman", serif;
+    font-size: 11pt;
+}
+
+.zps-sidebar-lines b {
+    margin-top: 0.35cm;
+    text-decoration: underline;
+}
+
+.zps-sidebar-lines b:first-child {
+    margin-top: 0;
+}
+
+.zps-preview-right {
+    position: relative;
+    padding-top: 0.25cm;
+}
+
+.zps-rx {
+    margin-left: 10px;
+    margin-top: 7px;
+    height: 10mm;
+    font-family: "Lucida Calligraphy", "Times New Roman", serif;
+    font-size: 18pt;
+    font-weight: 700;
+}
+
+.zps-rx-lines {
+    margin-left: 40px;
+    margin-top: 10px;
+    font-family: "Times New Roman", serif;
+    font-size: 11pt;
+}
+
+.zps-rx-lines b {
+    margin-top: 0.35cm;
+}
+
+.zps-rx-lines b:first-child {
+    margin-top: 0;
+}
+
+.zps-preview-footer {
+    clear: both;
+    border-top: 1px solid #0f172a;
+    padding: 0.25cm 0.5cm;
+    text-align: center;
+    font-family: "Times New Roman", serif;
+    font-size: 10pt;
+}
+
+.zps-preview-active {
+    background: #fef3c7 !important;
+    box-shadow: inset 0 0 0 2px #f59e0b;
+}
+
+.zps-settings-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.zps-settings-table td {
+    padding: 0.42rem 0.5rem;
+    color: #0f172a;
+    font-size: 0.9rem;
+    vertical-align: middle;
+}
+
+.zps-section-row td {
+    padding-top: 0.8rem;
+    color: #1e293b;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+}
+
+.zps-section-row:first-child td {
+    border-top: none;
+}
+
+.zps-input-row:hover td {
+    background: #f8fafc;
+}
+
+.zps-size-input {
+    width: 7rem;
+    min-height: 34px;
+    padding: 0.35rem 0.5rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #0f172a;
+    font: inherit;
+    font-weight: 600;
+}
+
+.zps-size-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.16);
+    outline: none;
+}
+
+.zps-row-gap {
+    height: 0.35rem;
+    padding: 0 !important;
+}
+
+@media (max-width: 1180px) {
+    .zps-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .zps-controls-panel {
+        max-width: 620px;
+    }
+}
+
+@media (max-width: 760px) {
+    .zps-page {
+        padding: 0.75rem;
+    }
+
+    .zps-heading {
+        display: block;
+    }
+
+    .zps-heading-actions {
+        justify-content: flex-start;
+        margin-top: 0.75rem;
+    }
+
+    .zps-preview-stage {
+        min-height: 520px;
+    }
+
+    .zps-settings-table,
+    .zps-settings-table tbody,
+    .zps-settings-table tr,
+    .zps-settings-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .zps-input-row td:nth-child(2),
+    .zps-input-row td:nth-child(4) {
+        display: none;
+    }
+}
+
+/* Real Header Styles */
+.zrx-header-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    min-height: 100%;
+    padding: 0.42cm 5% 0.25cm;
+    box-sizing: border-box;
+}
+
+.zrx-header-text {
+    display: block;
+    min-width: 0;
+}
+
+.zrx-header-text p,
+.zrx-header-text div,
+.zrx-header-text span {
+    margin: 0;
+    padding: 0;
+    line-height: 1.15;
+}
+
+.zrx-has-logo .zrx-header-text {
+    width: 40%;
+}
+
+.zrx-no-logo .zrx-header-text {
+    width: 49%;
+}
+
+.zrx-header-right {
+    text-align: right;
+}
+
+.zrx-header-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    width: 18%;
+}
+
+.zrx-header-logo img {
+    max-width: 100%;
+    max-height: 120px;
+    object-fit: contain;
+}
+
+.zrx-header-line {
+    margin: 0;
+    line-height: 1.12;
+    white-space: normal;
+}
+
+
+/* =======================================================
+   Help Circle Button Styles
+======================================================= */
+.zps-help-circle-btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #475569;
+    color: #ffffff;
+    border: none;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+    padding: 0;
+    margin: 0;
+    outline: none;
+}
+
+.zps-help-circle-btn:hover {
+    background: #0f172a;
+}
+

@@ -1,0 +1,324 @@
+<?php
+require_once __DIR__ . '/../auth.php';
+require_login();
+require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/pc_catalog_lib.php';
+
+function pc_settings_used_groups(PDO $pdo, int $doctorId, array $priorityRows): array {
+    $groups = [];
+    foreach ($priorityRows as $row) {
+        $groups[$row['source']] = [
+            'source' => $row['source'],
+            'label' => $row['label'],
+            'is_enabled' => (int)($row['is_enabled'] ?? 0),
+            'items' => [],
+        ];
+    }
+
+    if (!isset($groups['most_used'])) {
+        $groups['most_used'] = [
+            'source' => 'most_used',
+            'label' => pc_source_label('most_used'),
+            'is_enabled' => 1,
+            'items' => [],
+        ];
+    }
+
+    $hiddenMap = pc_hidden_map($pdo, $doctorId);
+    foreach (pc_learned_terms($pdo, $doctorId, 'PC', '', 'usage', 60) as $row) {
+        $term = rx_clean($row['term'] ?? '');
+        if ($term === '') {
+            continue;
+        }
+
+        $source = pc_classify_term_source($pdo, $doctorId, $term, $priorityRows);
+        if (!isset($groups[$source])) {
+            $groups[$source] = [
+                'source' => $source,
+                'label' => pc_source_label($source),
+                'is_enabled' => 1,
+                'items' => [],
+            ];
+        }
+
+        $groups[$source]['items'][] = [
+            'term' => $term,
+            'usage_count' => (int)($row['usage_count'] ?? 0),
+            'updated_at' => (string)($row['updated_at'] ?? ''),
+            'is_hidden' => pc_is_hidden($hiddenMap, $source, $term),
+        ];
+    }
+
+    return array_values($groups);
+}
+
+function pc_settings_custom_terms(PDO $pdo, int $doctorId): array {
+    return array_map(static function ($row) {
+        return [
+            'term' => (string)($row['term'] ?? ''),
+            'updated_at' => (string)($row['updated_at'] ?? ''),
+        ];
+    }, pc_custom_terms($pdo, $doctorId, '', 80));
+}
+
+function pc_settings_search_results(PDO $pdo, int $doctorId, string $query, array $priorityRows): array {
+    $query = rx_clean($query);
+    if ($query === '') {
+        return [];
+    }
+
+    $hiddenMap = pc_hidden_map($pdo, $doctorId);
+    $rankMap = pc_source_rank_map($priorityRows);
+    $results = [];
+    $seen = [];
+    $ordinal = 0;
+
+    $add = function (string $source, string $term, array $extra = []) use (&$results, &$seen, $hiddenMap, $rankMap, &$ordinal) {
+        $term = rx_clean($term);
+        if ($term === '') {
+            return;
+        }
+        $key = $source . '|' . rx_norm($term);
+        if (isset($seen[$key])) {
+            return;
+        }
+        $seen[$key] = true;
+        $results[] = array_merge([
+            'source' => $source,
+            'source_label' => pc_source_label($source),
+            'term' => $term,
+            'is_hidden' => pc_is_hidden($hiddenMap, $source, $term),
+            'sort_rank' => $rankMap[$source] ?? 999,
+            'ordinal' => ++$ordinal,
+        ], $extra);
+    };
+
+    foreach (pc_learned_terms($pdo, $doctorId, 'PC', $query, 'usage', 16) as $row) {
+        $add('most_used', (string)($row['term'] ?? ''), [
+            'usage_count' => (int)($row['usage_count'] ?? 0),
+        ]);
+    }
+
+    foreach (pc_snomed_search($query, 16) as $row) {
+        $add('snomed', (string)($row['preferred_term'] ?? ''), [
+            'category' => (string)($row['category'] ?? ''),
+        ]);
+    }
+
+    foreach (pc_icd_search($query, 16) as $row) {
+        $add('icd', (string)($row['search_term'] ?? ''), [
+            'is_official' => (int)($row['is_official'] ?? 0),
+        ]);
+    }
+
+    usort($results, static function ($a, $b) {
+        return ($a['sort_rank'] <=> $b['sort_rank'])
+            ?: ($a['ordinal'] <=> $b['ordinal'])
+            ?: strcmp($a['term'], $b['term']);
+    });
+
+    return array_slice(array_map(static function ($row) {
+        unset($row['sort_rank']);
+        unset($row['ordinal']);
+        return $row;
+    }, $results), 0, 40);
+}
+
+function pc_settings_payload(PDO $pdo, int $doctorId): array {
+    $priorityRows = pc_priority_rows($pdo, $doctorId);
+    return [
+        'priorities' => $priorityRows,
+        'used_groups' => pc_settings_used_groups($pdo, $doctorId, $priorityRows),
+        'custom_terms' => pc_settings_custom_terms($pdo, $doctorId),
+    ];
+}
+
+function pc_settings_save_priorities(PDO $pdo, int $doctorId, array $priorities): void {
+    $userPdo = rx_user_pdo();
+    $validSources = array_keys(pc_supported_sources());
+    $prepared = [];
+    foreach ($priorities as $index => $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        $source = rx_clean($row['source'] ?? '');
+        if (!in_array($source, $validSources, true) || isset($prepared[$source])) {
+            continue;
+        }
+        $prepared[$source] = [
+            'source' => $source,
+            'sort_order' => count($prepared) + 1,
+            'is_enabled' => (int)($row['is_enabled'] ?? 0) === 1 ? 1 : 0,
+        ];
+    }
+
+    foreach (pc_priority_default_rows() as $defaultRow) {
+        if (!isset($prepared[$defaultRow['source']])) {
+            $prepared[$defaultRow['source']] = [
+                'source' => $defaultRow['source'],
+                'sort_order' => count($prepared) + 1,
+                'is_enabled' => (int)$defaultRow['is_enabled'],
+            ];
+        }
+    }
+
+    $userPdo->beginTransaction();
+    try {
+        pc_ensure_priority_rows($pdo, $doctorId);
+        $stmt = $userPdo->prepare(
+            "UPDATE zimrx_user_pc_settings
+             SET sort_order = :sort_order,
+                 is_enabled = :is_enabled,
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE doctor_id = :doctor_id
+               AND setting_key = 'source_priority'
+               AND source = :source"
+        );
+        foreach (array_values($prepared) as $index => $row) {
+            $stmt->execute([
+                'doctor_id' => max(1, $doctorId),
+                'source' => $row['source'],
+                'sort_order' => $index + 1,
+                'is_enabled' => $row['is_enabled'],
+            ]);
+        }
+        $userPdo->commit();
+    } catch (Throwable $e) {
+        if ($userPdo->inTransaction()) {
+            $userPdo->rollBack();
+        }
+        throw $e;
+    }
+}
+
+if (realpath((string)($_SERVER['SCRIPT_FILENAME'] ?? '')) !== realpath(__FILE__)) {
+    return;
+}
+
+try {
+    $doctorId = current_user_doctor_id();
+    $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+
+    if ($method === 'GET') {
+        $action = strtolower(rx_clean($_GET['action'] ?? ''));
+        if ($action === 'search') {
+            $query = rx_clean($_GET['q'] ?? '');
+            $priorityRows = pc_priority_rows($pdo, $doctorId);
+            rx_json(['results' => pc_settings_search_results($pdo, $doctorId, $query, $priorityRows)]);
+        }
+
+        rx_json(pc_settings_payload($pdo, $doctorId));
+    }
+
+    if ($method !== 'POST') {
+        rx_json(['error' => 'Unsupported request method.']);
+    }
+
+    $payload = json_decode(file_get_contents('php://input'), true);
+    $action = strtolower(rx_clean($payload['action'] ?? ''));
+
+    if ($action === 'add_custom') {
+        $userPdo = rx_user_pdo();
+        $term = trim((string)preg_replace('/\s+/u', ' ', rx_clean($payload['term'] ?? '')));
+        if ($term === '') {
+            rx_json(['error' => 'Custom PC is required.']);
+        }
+
+        $stmt = $userPdo->prepare(
+            "INSERT INTO zimrx_user_pc (
+                doctor_id, category, term, usage_count, created_at, updated_at
+            ) VALUES (
+                :doctor_id, 'custom', :term, 0, " . DbSql::now() . ", " . DbSql::now() . "
+            )
+            " . DbSql::upsert('doctor_id, category, term', ['updated_at'], ['updated_at' => DbSql::now()])
+        );
+        $stmt->execute([
+            'doctor_id' => max(1, $doctorId),
+            'term' => $term,
+        ]);
+
+        $userPdo->prepare(
+                "DELETE FROM zimrx_user_pc_settings
+                 WHERE doctor_id = :doctor_id
+                   AND setting_key = 'hidden_term'
+                   AND source = 'custom'
+                   AND term = :term COLLATE NOCASE"
+            )->execute([
+                'doctor_id' => max(1, $doctorId),
+                'term' => $term,
+            ]);
+
+        rx_json(pc_settings_payload($pdo, $doctorId));
+    }
+
+    if ($action === 'remove_custom') {
+        $userPdo = rx_user_pdo();
+        $term = rx_clean($payload['term'] ?? '');
+        $stmt = $userPdo->prepare(
+            "DELETE FROM zimrx_user_pc
+             WHERE doctor_id = :doctor_id
+               AND category = 'custom'
+               AND term = :term COLLATE NOCASE"
+        );
+        $stmt->execute([
+            'doctor_id' => max(1, $doctorId),
+            'term' => $term,
+        ]);
+        rx_json(pc_settings_payload($pdo, $doctorId));
+    }
+
+    if ($action === 'save_priorities') {
+        $priorities = is_array($payload['priorities'] ?? null) ? $payload['priorities'] : [];
+        pc_settings_save_priorities($pdo, $doctorId, $priorities);
+        rx_json(pc_settings_payload($pdo, $doctorId));
+    }
+
+    if ($action === 'toggle_hidden') {
+        $source = rx_clean($payload['source'] ?? '');
+        $term = rx_clean($payload['term'] ?? '');
+        $hidden = (int)($payload['hidden'] ?? 0) === 1;
+        $supportedSources = pc_supported_sources();
+        if (!isset($supportedSources[$source]) || $term === '') {
+            rx_json(['error' => 'Source and term are required.']);
+        }
+
+        if ($hidden) {
+            $userPdo = rx_user_pdo();
+            $userPdo->prepare(
+                "INSERT OR IGNORE INTO zimrx_user_pc_settings (
+                    doctor_id, setting_key, source, term, sort_order, is_enabled, created_at, updated_at
+                ) VALUES (
+                    :doctor_id, 'hidden_term', :source, :term, 0, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+                )"
+            )->execute([
+                'doctor_id' => max(1, $doctorId),
+                'source' => $source,
+                'term' => $term,
+            ]);
+        } else {
+            $userPdo = rx_user_pdo();
+            $userPdo->prepare(
+                "DELETE FROM zimrx_user_pc_settings
+                 WHERE doctor_id = :doctor_id
+                   AND setting_key = 'hidden_term'
+                   AND source = :source
+                   AND term = :term COLLATE NOCASE"
+            )->execute([
+                'doctor_id' => max(1, $doctorId),
+                'source' => $source,
+                'term' => $term,
+            ]);
+        }
+
+        $priorityRows = pc_priority_rows($pdo, $doctorId);
+        rx_json([
+            'ok' => true,
+            'results' => pc_settings_search_results($pdo, $doctorId, rx_clean($payload['query'] ?? ''), $priorityRows),
+            'data' => pc_settings_payload($pdo, $doctorId),
+        ]);
+    }
+
+    rx_json(['error' => 'Unknown action.']);
+} catch (Exception $e) {
+    rx_json(['error' => $e->getMessage()]);
+}

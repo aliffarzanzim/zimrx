@@ -1,0 +1,409 @@
+/* ==========================================================================
+   ZimRx - Clinical & Practice Performance Dashboard Stylesheet
+   ========================================================================== */
+
+:root {
+    --dash-primary: #2563eb;
+    --dash-primary-hover: #1d4ed8;
+    --dash-success: #10b981;
+    --dash-warning: #f59e0b;
+    --dash-purple: #8b5cf6;
+    --dash-cyan: #06b6d4;
+    --dash-pink: #ec4899;
+    --dash-border: #e2e8f0;
+    --dash-bg: #f8fafc;
+    --dash-card-bg: #ffffff;
+    --dash-text: #0f172a;
+    --dash-muted: #64748b;
+}
+
+.dash-container {
+    margin-bottom: 3rem;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--dash-text);
+}
+
+/* Page Header */
+.dash-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.dash-title-wrap h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.dash-title-wrap p {
+    margin: 0.25rem 0 0;
+    font-size: 0.86rem;
+    color: #64748b;
+}
+
+/* Period Controls */
+.dash-period-group {
+    display: inline-flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 3px;
+    gap: 2px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+
+.dash-period-btn {
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.dash-period-btn:hover {
+    color: #0f172a;
+    background: #f1f5f9;
+}
+
+.dash-period-btn.active {
+    background: var(--dash-primary);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+}
+
+/* KPI Summary Cards */
+.dash-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.dash-kpi-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.15rem 1.25rem;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dash-kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+.dash-kpi-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.dash-kpi-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.dash-kpi-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.kpi-blue { background: #eff6ff; color: #2563eb; }
+.kpi-green { background: #ecfdf5; color: #059669; }
+.kpi-purple { background: #f5f3ff; color: #7c3aed; }
+.kpi-amber { background: #fffbeb; color: #d97706; }
+
+.dash-kpi-num {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.15;
+    margin-bottom: 0.35rem;
+    font-feature-settings: "tnum";
+}
+
+.dash-kpi-footer {
+    font-size: 0.78rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Multi-column Grid Layouts */
+.dash-grid-2col {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+    .dash-grid-2col {
+        grid-template-columns: 1fr;
+    }
+}
+
+.dash-grid-3col {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Card Wrapper */
+.dash-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.dash-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1.25rem;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.dash-card-header h3 {
+    margin: 0;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dash-card-header span {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.dash-card-body {
+    padding: 1.25rem;
+    flex: 1;
+    position: relative;
+}
+
+/* SVG Chart Engine Styling */
+.chart-svg-wrap {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.chart-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.chart-grid-line {
+    stroke: #f1f5f9;
+    stroke-width: 1;
+    stroke-dasharray: 4 4;
+}
+
+.chart-axis-text {
+    font-size: 10px;
+    fill: #94a3b8;
+    font-family: inherit;
+}
+
+.chart-line-patients {
+    fill: none;
+    stroke: #2563eb;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.chart-area-patients {
+    fill: url(#patientsGrad);
+    opacity: 0.15;
+}
+
+.chart-line-revenue {
+    fill: none;
+    stroke: #10b981;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.chart-point {
+    cursor: pointer;
+    transition: r 0.15s ease, stroke-width 0.15s ease;
+}
+
+.chart-point:hover {
+    r: 6 !important;
+    stroke-width: 3 !important;
+}
+
+/* Donut & Demographics */
+.donut-center-text-val {
+    font-size: 20px;
+    font-weight: 800;
+    fill: #0f172a;
+    text-anchor: middle;
+    font-feature-settings: "tnum";
+}
+
+.donut-center-text-lbl {
+    font-size: 9px;
+    font-weight: 600;
+    fill: #64748b;
+    text-anchor: middle;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.chart-legend-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 1rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8rem;
+}
+
+.legend-color-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+/* Horizontal Progress Bars (for Top Complaints & Referrals) */
+.bar-metric-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.bar-metric-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.bar-metric-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8rem;
+}
+
+.bar-metric-label {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.bar-metric-value {
+    font-size: 0.78rem;
+    color: #64748b;
+    font-feature-settings: "tnum";
+}
+
+.bar-metric-track {
+    height: 7px;
+    background: #f1f5f9;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.bar-metric-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.4s ease;
+}
+
+/* Interactive SVG Tooltip */
+.dash-tooltip {
+    position: absolute;
+    z-index: 100;
+    background: #0f172a;
+    color: #ffffff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.74rem;
+    font-weight: 500;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+    transform: translate(-50%, -120%);
+}
+
+/* Monthly Table */
+.dash-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    text-align: left;
+}
+
+.dash-table th {
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 0.65rem 0.85rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.dash-table td {
+    padding: 0.7rem 0.85rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: #1e293b;
+}
+
+.dash-table tr:hover td {
+    background: #f8fafc;
+}
