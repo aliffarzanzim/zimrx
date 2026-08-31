@@ -1,0 +1,42 @@
+{
+	admin off
+	frankenphp
+}
+
+:{$ZIMRX_HTTP_PORT:8080} {
+	root * ./application
+
+	handle /favicon.ico {
+		respond 204
+	}
+
+	# Allow uploads while protecting databases and private data
+	handle_path /userdata/uploads/* {
+		root * ./application/userdata/uploads
+		file_server
+	}
+
+	# Never expose local data stores or old import dumps through the browser.
+	@privateData path /userdata/* /obsolete/*
+	respond @privateData 404
+
+	@databaseFiles path *.db *.db3 *.sqlite *.sqlite3 *.sql *.mdb *.accdb *.db-wal *.db-shm *.sqlite-wal *.sqlite-shm
+	respond @databaseFiles 404
+
+	# Composer dependencies live in application/vendor for portability.
+	# Only the manually bundled NicEdit browser asset should be public.
+	@privateVendor {
+		path /vendor/*
+		not path /vendor/nicedit/*
+	}
+	respond @privateVendor 404
+
+	encode gzip
+	php_server
+
+	# Handle uploads directory
+	handle_path /uploads/* {
+		root * ./application/userdata/uploads
+		file_server
+	}
+}
