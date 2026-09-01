@@ -4,9 +4,9 @@ require_once __DIR__ . '/rx_regimen_lib.php';
 function pc_supported_sources(): array {
     return [
         'most_used' => 'Most Used P/C',
-        'custom' => 'Custom P/C',
-        'snomed' => 'SNOMED GPS',
-        'icd' => 'ICD-11',
+        'custom'    => 'Custom P/C',
+        'static_pc' => 'Standard P/C',
+        'icd'       => 'ICD-11',
     ];
 }
 
@@ -28,6 +28,9 @@ function pc_lookup_db_path(string $filename): string {
 }
 
 function pc_source_label(string $source): string {
+    if ($source === 'snomed') {
+        return 'Standard P/C';
+    }
     $sources = pc_supported_sources();
     return $sources[$source] ?? strtoupper($source);
 }
@@ -319,7 +322,7 @@ function pc_custom_term_exists(PDO $pdo, int $doctorId, string $term): bool {
     return $cache[$cacheKey];
 }
 
-function pc_snomed_exact_match(string $term): bool {
+function pc_static_pc_exact_match(string $term): bool {
     static $cache = [];
     $term = rx_clean($term);
     if ($term === '') {
@@ -345,6 +348,10 @@ function pc_snomed_exact_match(string $term): bool {
     $stmt->execute(['term' => $term]);
     $cache[$cacheKey] = (bool)$stmt->fetchColumn();
     return $cache[$cacheKey];
+}
+
+function pc_snomed_exact_match(string $term): bool {
+    return pc_static_pc_exact_match($term);
 }
 
 function pc_icd_exact_match(string $term): bool {
@@ -385,8 +392,8 @@ function pc_source_candidates_for_term(PDO $pdo, int $doctorId, string $term): a
     if (pc_custom_term_exists($pdo, $doctorId, $term)) {
         $candidates[] = 'custom';
     }
-    if (pc_snomed_exact_match($term)) {
-        $candidates[] = 'snomed';
+    if (pc_static_pc_exact_match($term)) {
+        $candidates[] = 'static_pc';
     }
     if (pc_icd_exact_match($term)) {
         $candidates[] = 'icd';
@@ -420,7 +427,7 @@ function pc_match_priority(string $label, string $term): array {
     ];
 }
 
-function pc_sort_snomed_matches(array $rows, string $term): array {
+function pc_sort_static_pc_matches(array $rows, string $term): array {
     usort($rows, static function ($a, $b) use ($term) {
         [$aMatch, $aLengthDelta, $aLabelNorm] = pc_match_priority((string)($a['preferred_term'] ?? ''), $term);
         [$bMatch, $bLengthDelta, $bLabelNorm] = pc_match_priority((string)($b['preferred_term'] ?? ''), $term);
@@ -446,6 +453,10 @@ function pc_sort_snomed_matches(array $rows, string $term): array {
     return $rows;
 }
 
+function pc_sort_snomed_matches(array $rows, string $term): array {
+    return pc_sort_static_pc_matches($rows, $term);
+}
+
 function pc_classify_term_source(PDO $pdo, int $doctorId, string $term, array $priorityRows = []): string {
     $candidates = pc_source_candidates_for_term($pdo, $doctorId, $term);
     if (!$candidates) {
@@ -460,17 +471,17 @@ function pc_classify_term_source(PDO $pdo, int $doctorId, string $term, array $p
     return $candidates[0] ?? 'most_used';
 }
 
-function pc_snomed_search(string $term, int $limit = 25): array {
+function pc_static_pc_search(string $term, int $limit = 25): array {
     $db = pc_catalog_db('zimrx_static.db');
     if (!$db instanceof PDO || $limit < 1) {
         return [];
     }
 
     if ($term === '') {
-        static $snomedSeedCache = null;
-        static $snomedSeedLimit = 0;
-        if ($snomedSeedCache !== null && $snomedSeedLimit >= $limit) {
-            return array_slice($snomedSeedCache, 0, $limit);
+        static $staticPcSeedCache = null;
+        static $staticPcSeedLimit = 0;
+        if ($staticPcSeedCache !== null && $staticPcSeedLimit >= $limit) {
+            return array_slice($staticPcSeedCache, 0, $limit);
         }
 
         $seeds = [];
@@ -512,8 +523,8 @@ function pc_snomed_search(string $term, int $limit = 25): array {
             }
         }
 
-        $snomedSeedCache = $results;
-        $snomedSeedLimit = $limit;
+        $staticPcSeedCache = $results;
+        $staticPcSeedLimit = $limit;
         return array_slice($results, 0, $limit);
     }
 
@@ -590,7 +601,7 @@ function pc_snomed_search(string $term, int $limit = 25): array {
         $stmt->bindValue(':fts_query', $ftsQuery, PDO::PARAM_STR);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
-        return array_slice(pc_sort_snomed_matches($stmt->fetchAll(), $term), 0, $limit);
+        return array_slice(pc_sort_static_pc_matches($stmt->fetchAll(), $term), 0, $limit);
     }
 
     $stmt = $db->prepare(
@@ -614,7 +625,11 @@ function pc_snomed_search(string $term, int $limit = 25): array {
     $stmt->bindValue(':prefix', $term . '%', PDO::PARAM_STR);
     $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
     $stmt->execute();
-    return array_slice(pc_sort_snomed_matches($stmt->fetchAll(), $term), 0, $limit);
+    return array_slice(pc_sort_static_pc_matches($stmt->fetchAll(), $term), 0, $limit);
+}
+
+function pc_snomed_search(string $term, int $limit = 25): array {
+    return pc_static_pc_search($term, $limit);
 }
 
 function pc_icd_search(string $term, int $limit = 15): array {

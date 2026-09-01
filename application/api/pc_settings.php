@@ -99,8 +99,8 @@ function pc_settings_search_results(PDO $pdo, int $doctorId, string $query, arra
         ]);
     }
 
-    foreach (pc_snomed_search($query, 16) as $row) {
-        $add('snomed', (string)($row['preferred_term'] ?? ''), [
+    foreach (pc_static_pc_search($query, 16) as $row) {
+        $add('static_pc', (string)($row['preferred_term'] ?? ''), [
             'category' => (string)($row['category'] ?? ''),
         ]);
     }

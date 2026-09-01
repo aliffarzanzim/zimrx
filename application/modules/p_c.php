@@ -130,7 +130,7 @@ if (!defined('ZIMRX_PC_SETTINGS_SEEDED')) {
                 <section class="pc-settings-card">
                     <div class="pc-settings-card-head">
                         <h4>Used PC</h4>
-                        <p>Grouped by source so learning, custom, SNOMED, and ICD stay easy to audit.</p>
+                        <p>Grouped by source so learning, custom, Standard P/C (zimrx_static_pc), and ICD stay easy to audit.</p>
                     </div>
                     <div class="pc-used-groups"></div>
                 </section>

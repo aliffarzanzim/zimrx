@@ -135,6 +135,14 @@ Heartfelt gratitude to the contributors and researchers who supported the ZimRx 
 
 ---
 
-## 📄 License
+## ⚖️ License & Medical Data Attribution
 
-ZimRx is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**. See the [LICENSE](LICENSE) file for details.
+### 💻 Software Code (GNU AGPLv3)
+ZimRx application source code, UI components, database migration engine (`DbMigrator`), and backend APIs are licensed under the **[GNU Affero General Public License v3.0 (AGPL-3.0)](LICENSE)**.
+
+### 📋 Clinical Catalogs & Data Aggregation
+The standalone reference databases bundled in `application/assets/database/` are distributed alongside the software under a mere aggregation model:
+* **Presenting Complaints (`zimrx_static_pc`)**: 
+  The medical terminology catalogs represent standard, public clinical vocabulary curated from standard medical literature & textbooks, clinical practitioner notes, and the **SNOMED CT Global Patient Set (GPS)** for workflow efficiency and rapid autocomplete. They do not incorporate proprietary code systems or relational ontologies. Applicable SNOMED descriptions are used under the SNOMED International GPS Open License:
+  > *"This material includes SNOMED Clinical Terms ® (SNOMED CT ®) which is used by permission of SNOMED International. All rights reserved. SNOMED CT ® was originally created by the College of American Pathologists."*
+* **Pharmaceutical Catalog**: Curated from public national pharmacopoeias, clinical formularies, open drug registries, and standard medical & pharmacology reference and textbooks.

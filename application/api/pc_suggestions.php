@@ -109,11 +109,11 @@ try {
                     if (pc_is_hidden($hiddenMap, 'custom', $value)) continue;
                     $add($value, 'custom', $baseScore - $index);
                 }
-            } elseif ($source === 'snomed') {
-                foreach (pc_snomed_search('', 18) as $index => $row) {
+            } elseif ($source === 'static_pc' || $source === 'snomed') {
+                foreach (pc_static_pc_search('', 18) as $index => $row) {
                     $value = (string)($row['preferred_term'] ?? '');
-                    if (pc_is_hidden($hiddenMap, 'snomed', $value)) continue;
-                    $add($value, 'snomed', $baseScore - $index, ['category' => (string)($row['category'] ?? '')]);
+                    if (pc_is_hidden($hiddenMap, $source, $value) || pc_is_hidden($hiddenMap, 'static_pc', $value) || pc_is_hidden($hiddenMap, 'snomed', $value)) continue;
+                    $add($value, 'static_pc', $baseScore - $index, ['category' => (string)($row['category'] ?? '')]);
                 }
             } elseif ($source === 'icd') {
                 foreach (pc_icd_search('', 12) as $index => $row) {
@@ -189,13 +189,13 @@ try {
             continue;
         }
 
-        if ($source === 'snomed') {
-            foreach (pc_snomed_search($term, $term === '' ? 18 : 30) as $index => $row) {
+        if ($source === 'static_pc' || $source === 'snomed') {
+            foreach (pc_static_pc_search($term, $term === '' ? 18 : 30) as $index => $row) {
                 $value = (string)($row['preferred_term'] ?? '');
-                if (pc_is_hidden($hiddenMap, 'snomed', $value)) {
+                if (pc_is_hidden($hiddenMap, $source, $value) || pc_is_hidden($hiddenMap, 'static_pc', $value) || pc_is_hidden($hiddenMap, 'snomed', $value)) {
                     continue;
                 }
-                $add($value, 'snomed', $baseScore - $index, [
+                $add($value, 'static_pc', $baseScore - $index, [
                     'category' => (string)($row['category'] ?? ''),
                 ]);
             }
