@@ -39,8 +39,14 @@ if exist "logs\frankenphp.pid" (
 
 echo [1/2] Detecting free HTTP port...
 for /f %%P in ('powershell -NoLogo -NoProfile -Command "$Env:POWERSHELL_UPDATECHECK='Off'; $p=8080; try{$l=[Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback,$p);$l.Start();$l.Stop();$p}catch{$l=[Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback,0);$l.Start();$p=$l.LocalEndpoint.Port;$l.Stop();$p}"') do set "ZIMRX_HTTP_PORT=%%P"
+if "%ZIMRX_HTTP_PORT%"=="" set "ZIMRX_HTTP_PORT=8080"
 
-echo [2/2] Starting FrankenPHP...
+echo [2/2] Starting FrankenPHP on port %ZIMRX_HTTP_PORT%...
+start /b "" runtime\frankenphp\frankenphp.exe run --config Caddyfile --adapter caddyfile --pidfile logs\frankenphp.pid > logs\frankenphp.log 2>&1
+
+:: Wait for TCP port to be actively listening
+powershell -NoLogo -NoProfile -Command "$Env:POWERSHELL_UPDATECHECK='Off'; for ($i=0; $i -lt 30; $i++) { try { $t=New-Object Net.Sockets.TcpClient('127.0.0.1', %ZIMRX_HTTP_PORT%); $t.Close(); break } catch { Start-Sleep -Milliseconds 150 } }"
+
 echo.
 echo ==========================================
 echo   System Ready!
@@ -59,8 +65,16 @@ echo   logs\frankenphp.log
 echo   logs\php-errors.log
 echo ==========================================
 echo.
+echo ZimRx is running. Press any key to stop the server...
 
 start "" "http://localhost:%ZIMRX_HTTP_PORT%"
 
-runtime\frankenphp\frankenphp.exe run --config Caddyfile --adapter caddyfile --pidfile logs\frankenphp.pid > logs\frankenphp.log 2>&1
-pause
+pause >nul
+
+echo.
+echo Stopping FrankenPHP...
+if exist "logs\frankenphp.pid" (
+    for /f "usebackq delims=" %%P in ("logs\frankenphp.pid") do powershell -NoLogo -NoProfile -Command "$Env:POWERSHELL_UPDATECHECK='Off'; Stop-Process -Id %%P -Force -ErrorAction SilentlyContinue" >nul 2>&1
+    del /q "logs\frankenphp.pid" >nul 2>&1
+)
+exit /b 0
