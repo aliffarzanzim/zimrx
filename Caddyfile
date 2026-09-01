@@ -3,7 +3,7 @@
 	frankenphp
 }
 
-:8080 {
+:{$ZIMRX_HTTP_PORT:8080} {
 	root * ./application
 
 	handle /favicon.ico {
