@@ -115,14 +115,6 @@ try {
                     if (pc_is_hidden($hiddenMap, $source, $value) || pc_is_hidden($hiddenMap, 'static_pc', $value) || pc_is_hidden($hiddenMap, 'snomed', $value)) continue;
                     $add($value, 'static_pc', $baseScore - $index, ['category' => (string)($row['category'] ?? '')]);
                 }
-            } elseif ($source === 'icd') {
-                foreach (pc_icd_search('', 12) as $index => $row) {
-                    $value = (string)($row['search_term'] ?? '');
-                    if (pc_is_hidden($hiddenMap, 'icd', $value)) continue;
-                    $score = $baseScore - $index;
-                    if ((int)($row['is_official'] ?? 0) === 1) $score += 10;
-                    $add($value, 'icd', $score, ['is_official' => (int)($row['is_official'] ?? 0)]);
-                }
             }
         }
         usort($suggestions, static function ($a, $b) { return ($b['score'] <=> $a['score']) ?: strcmp($a['label'], $b['label']); });
@@ -200,22 +192,6 @@ try {
                 ]);
             }
             continue;
-        }
-
-        if ($source === 'icd') {
-            foreach (pc_icd_search($term, $term === '' ? 12 : 20) as $index => $row) {
-                $value = (string)($row['search_term'] ?? '');
-                if (pc_is_hidden($hiddenMap, 'icd', $value)) {
-                    continue;
-                }
-                $score = $baseScore - $index;
-                if ((int)($row['is_official'] ?? 0) === 1) {
-                    $score += 10;
-                }
-                $add($value, 'icd', $score, [
-                    'is_official' => (int)($row['is_official'] ?? 0),
-                ]);
-            }
         }
     }
 

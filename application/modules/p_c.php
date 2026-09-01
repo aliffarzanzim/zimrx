@@ -83,69 +83,109 @@ if (!defined('ZIMRX_PC_SETTINGS_SEEDED')) {
     <div class="pc-settings-backdrop" data-pc-settings-close></div>
     <div class="pc-settings-panel" role="dialog" aria-modal="true" aria-labelledby="pc-settings-title">
         <div class="pc-settings-header">
-            <div>
-                <h3 id="pc-settings-title">Presenting Complaint Settings</h3>
-                <p>Doctor-wise priority, hidden terms, and custom complaint management.</p>
+            <div class="pc-settings-header-left">
+                <div class="pc-settings-header-icon">
+                    <?= zrx_icon('settings', 20) ?>
+                </div>
+                <div>
+                    <h3 id="pc-settings-title">Presenting Complaints (P/C) Settings</h3>
+                    <p>Doctor-specific suggestion hierarchy, custom clinical entries, and term visibility.</p>
+                </div>
             </div>
-            <button type="button" class="pc-settings-close" data-pc-settings-close aria-label="Close Presenting Complaint Settings"><?= zrx_icon('x', 16) ?></button>
+            <button type="button" class="pc-settings-close" data-pc-settings-close aria-label="Close Presenting Complaint Settings">
+                <?= zrx_icon('x', 16) ?>
+            </button>
         </div>
 
-        <div class="pc-settings-grid">
-            <div class="pc-settings-column">
-                <section class="pc-settings-card">
-                    <div class="pc-settings-card-head">
-                        <h4>Suggestion Priority</h4>
-                        <p>Tick sources to keep them active, then move them up or down.</p>
-                    </div>
-                    <div class="pc-priority-table-wrap">
-                        <table class="pc-priority-table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 60px;">Use</th>
-                                    <th>Source</th>
-                                    <th style="width: 96px; text-align: right;">Order</th>
-                                </tr>
-                            </thead>
-                            <tbody class="pc-priority-body"></tbody>
-                        </table>
-                    </div>
-                    <div class="pc-settings-actions">
-                        <button type="button" class="pc-settings-save-btn">Save Priority</button>
-                    </div>
-                </section>
-
-                <section class="pc-settings-card">
-                    <div class="pc-settings-card-head">
-                        <h4>Hide Terms</h4>
-                        <p>Hide suggestions for this doctor only without deleting source data.</p>
-                    </div>
-                    <div class="pc-hide-search-box">
-                        <input type="text" class="pc-hide-search-input" placeholder="Search PC to hide or unhide">
-                    </div>
-                    <div class="pc-hide-search-results"></div>
-                </section>
+        <div class="pc-settings-body">
+            <!-- Clinical Practice Guidance Banner -->
+            <div class="pc-clinical-note-banner">
+                <div class="pc-note-icon">
+                    <?= zrx_icon('alert-circle', 18) ?>
+                </div>
+                <div class="pc-note-content">
+                    <span class="pc-note-badge">Clinical Practice Note</span>
+                    <p>In modern clinical practice, we encourage using <strong>'Presenting Complaints' (P/C)</strong> instead of <strong>'Chief Complaints' (C/C)</strong>. A patient may suffer from many problems simultaneously, but the P/C isolates exactly what they are presenting or appearing for right now to the doctor.</p>
+                </div>
             </div>
 
-            <div class="pc-settings-column">
-                <section class="pc-settings-card">
-                    <div class="pc-settings-card-head">
-                        <h4>Used PC</h4>
-                        <p>Grouped by source so learning, custom, Standard P/C (zimrx_static_pc), and ICD stay easy to audit.</p>
-                    </div>
-                    <div class="pc-used-groups"></div>
-                </section>
+            <div class="pc-settings-grid">
+                <!-- Left Column: Priority & Hide Settings -->
+                <div class="pc-settings-column">
+                    <section class="pc-settings-card">
+                        <div class="pc-settings-card-head">
+                            <div class="pc-card-title-wrap">
+                                <span class="pc-card-icon"><?= zrx_icon('sliders', 16) ?></span>
+                                <h4>Suggestion Priority</h4>
+                            </div>
+                            <p>Enable sources and adjust search ranking hierarchy (Most Used, Custom, System P/C).</p>
+                        </div>
+                        <div class="pc-priority-table-wrap">
+                            <table class="pc-priority-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 54px; text-align: center;">Active</th>
+                                        <th>Catalog Source</th>
+                                        <th style="width: 100px; text-align: right;">Order</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="pc-priority-body"></tbody>
+                            </table>
+                        </div>
+                        <div class="pc-settings-actions">
+                            <button type="button" class="pc-settings-save-btn">
+                                <?= zrx_icon('save', 14) ?> Save Priority
+                            </button>
+                        </div>
+                    </section>
 
-                <section class="pc-settings-card">
-                    <div class="pc-settings-card-head">
-                        <h4>Custom Added PC</h4>
-                        <p>Add doctor-specific complaints here. They stay separate from global catalogs.</p>
-                    </div>
-                    <div class="pc-custom-add-row">
-                        <input type="text" class="pc-custom-input" placeholder="Add custom complaint">
-                        <button type="button" class="pc-custom-add-btn" title="Add Custom PC"><?= zrx_icon('plus', 14) ?></button>
-                    </div>
-                    <div class="pc-custom-list"></div>
-                </section>
+                    <section class="pc-settings-card">
+                        <div class="pc-settings-card-head">
+                            <div class="pc-card-title-wrap">
+                                <span class="pc-card-icon"><?= zrx_icon('eye', 16) ?></span>
+                                <h4>Hide / Suppress Suggestions</h4>
+                            </div>
+                            <p>Hide unwanted suggestions for this doctor without deleting catalog data.</p>
+                        </div>
+                        <div class="pc-hide-search-box">
+                            <span class="pc-search-box-icon"><?= zrx_icon('search', 14) ?></span>
+                            <input type="text" class="pc-hide-search-input" placeholder="Search complaint term to hide or unhide...">
+                            <button type="button" class="pc-search-clear-btn" title="Clear search" hidden><?= zrx_icon('x', 14) ?></button>
+                        </div>
+                        <div class="pc-hide-search-results"></div>
+                    </section>
+                </div>
+
+                <!-- Right Column: Used P/C & Custom Additions -->
+                <div class="pc-settings-column">
+                    <section class="pc-settings-card">
+                        <div class="pc-settings-card-head">
+                            <div class="pc-card-title-wrap">
+                                <span class="pc-card-icon"><?= zrx_icon('activity', 16) ?></span>
+                                <h4>Used & Learned P/C</h4>
+                            </div>
+                            <p>Grouped by source (Most Used, Custom, and System P/C) with live usage tracking.</p>
+                        </div>
+                        <div class="pc-used-groups"></div>
+                    </section>
+
+                    <section class="pc-settings-card">
+                        <div class="pc-settings-card-head">
+                            <div class="pc-card-title-wrap">
+                                <span class="pc-card-icon"><?= zrx_icon('plus', 16) ?></span>
+                                <h4>Custom Added P/C</h4>
+                            </div>
+                            <p>Add doctor-specific complaints. They remain private to your local clinic profile.</p>
+                        </div>
+                        <div class="pc-custom-add-row">
+                            <input type="text" class="pc-custom-input" placeholder="Type new custom complaint...">
+                            <button type="button" class="pc-custom-add-btn" title="Add Custom P/C">
+                                <?= zrx_icon('plus', 16) ?> Add
+                            </button>
+                        </div>
+                        <div class="pc-custom-list"></div>
+                    </section>
+                </div>
             </div>
         </div>
     </div>

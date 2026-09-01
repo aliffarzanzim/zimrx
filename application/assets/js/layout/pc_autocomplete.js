@@ -313,13 +313,13 @@ function initPcAutocomplete() {
 
     tbody.innerHTML = priorityDraft.map((row, index) => `
       <tr data-source="${escapeHtml(row.source)}">
-        <td><input type="checkbox" class="pc-priority-checkbox" data-priority-toggle="${escapeHtml(row.source)}" ${row.is_enabled ? 'checked' : ''}></td>
+        <td style="text-align: center;"><input type="checkbox" class="pc-priority-checkbox" data-priority-toggle="${escapeHtml(row.source)}" ${row.is_enabled ? 'checked' : ''} aria-label="Toggle ${escapeHtml(row.label)}"></td>
         <td><span class="pc-priority-row-label">${escapeHtml(row.label)}</span></td>
         <td>
           <div class="pc-priority-order">
             <span class="pc-priority-badge">${index + 1}</span>
-            <button type="button" class="pc-priority-move" data-priority-move="up" data-source="${escapeHtml(row.source)}" ${index === 0 ? 'disabled' : ''}>&uarr;</button>
-            <button type="button" class="pc-priority-move" data-priority-move="down" data-source="${escapeHtml(row.source)}" ${index === priorityDraft.length - 1 ? 'disabled' : ''}>&darr;</button>
+            <button type="button" class="pc-priority-move" data-priority-move="up" data-source="${escapeHtml(row.source)}" ${index === 0 ? 'disabled' : ''} title="Move Up">&#9650;</button>
+            <button type="button" class="pc-priority-move" data-priority-move="down" data-source="${escapeHtml(row.source)}" ${index === priorityDraft.length - 1 ? 'disabled' : ''} title="Move Down">&#9660;</button>
           </div>
         </td>
       </tr>
@@ -385,37 +385,85 @@ function initPcAutocomplete() {
     `).join('');
   };
 
-  const renderHideResults = (results) => {
+  const renderHideResults = (results = null) => {
     const modal = getSettingsModal();
     const container = modal?.querySelector('.pc-hide-search-results');
     if (!container) return;
 
+    const searchInput = modal?.querySelector('.pc-hide-search-input');
+    const clearBtn = modal?.querySelector('.pc-search-clear-btn');
+    const query = searchInput?.value.trim() || '';
+
+    if (clearBtn) {
+      clearBtn.hidden = !query;
+    }
+
+    // If no search query is typed, show all currently hidden terms cleanly
+    if (!query) {
+      const hiddenItems = Array.isArray(settingsData?.hidden_terms) ? settingsData.hidden_terms : [];
+      if (!hiddenItems.length) {
+        container.innerHTML = '<div class="pc-settings-empty">No terms are currently hidden for this doctor. Search above to find and hide any suggestion.</div>';
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="pc-hidden-list-header">
+          <span>Currently Hidden Terms (${hiddenItems.length})</span>
+          <button type="button" class="pc-unhide-all-btn" data-unhide-all title="Unhide all suppressed terms">Unhide All</button>
+        </div>
+        ${hiddenItems.map((item) => `
+          <div class="pc-search-result" data-term-card="${escapeHtml(item.term)}">
+            <div class="pc-search-result-main">
+              <div class="pc-search-result-term">${escapeHtml(item.term)}</div>
+              <div class="pc-search-result-meta">
+                <span class="pc-tag hidden">Hidden</span>
+              </div>
+            </div>
+            <button type="button" class="pc-search-toggle" data-toggle-hidden="${escapeHtml(item.source || 'static_pc')}" data-term="${escapeHtml(item.term)}" data-hidden="1">
+              Unhide
+            </button>
+          </div>
+        `).join('')}
+      `;
+      return;
+    }
+
+    // When searching, show search results
     if (!Array.isArray(results) || !results.length) {
-      container.innerHTML = '<div class="pc-settings-empty">Search a complaint to hide or unhide it for this doctor.</div>';
+      container.innerHTML = '<div class="pc-settings-empty">No matching terms found.</div>';
       return;
     }
 
     container.innerHTML = results.map((item) => `
-      <div class="pc-search-result">
+      <div class="pc-search-result" data-term-card="${escapeHtml(item.term)}">
         <div class="pc-search-result-main">
           <div class="pc-search-result-term">${escapeHtml(item.term)}</div>
           <div class="pc-search-result-meta">
-            <span class="pc-tag">${escapeHtml(item.source_label)}</span>
-            ${typeof item.usage_count === 'number' ? `<span>Used ${item.usage_count} time${item.usage_count === 1 ? '' : 's'}</span>` : ''}
-            ${item.is_hidden ? '<span class="pc-tag hidden">Hidden</span>' : ''}
+            ${item.is_hidden 
+              ? '<span class="pc-tag hidden">Hidden</span>' 
+              : `<span class="pc-tag">${escapeHtml(item.source_label)}</span>`}
+            ${!item.is_hidden && typeof item.usage_count === 'number' ? `<span>Used ${item.usage_count} time${item.usage_count === 1 ? '' : 's'}</span>` : ''}
           </div>
         </div>
-        <button type="button" class="pc-search-toggle" data-toggle-hidden="${escapeHtml(item.source)}" data-term="${escapeHtml(item.term)}" data-hidden="${item.is_hidden ? '1' : '0'}">
+        <button type="button" class="pc-search-toggle" data-toggle-hidden="${escapeHtml(item.source || 'static_pc')}" data-term="${escapeHtml(item.term)}" data-hidden="${item.is_hidden ? '1' : '0'}">
           ${item.is_hidden ? 'Unhide' : 'Hide'}
         </button>
       </div>
     `).join('');
   };
 
+  const pcSourceLabel = (source) => {
+    if (source === 'most_used') return 'Most Used P/C';
+    if (source === 'custom') return 'Custom P/C';
+    if (source === 'static_pc' || source === 'snomed') return 'System P/C';
+    return source || '';
+  };
+
   const refreshSettingsUi = () => {
     renderPriorityTable();
     renderUsedGroups();
     renderCustomList();
+    renderHideResults();
   };
 
   const applySettingsData = (data) => {
@@ -430,7 +478,7 @@ function initPcAutocomplete() {
     if (query) {
       performHideSearch(query);
     } else {
-      renderHideResults([]);
+      renderHideResults();
     }
   };
 
@@ -577,6 +625,10 @@ function initPcAutocomplete() {
     }
 
     if (event.target.matches('.pc-hide-search-input')) {
+      const clearBtn = event.target.closest('.pc-hide-search-box')?.querySelector('.pc-search-clear-btn');
+      if (clearBtn) {
+        clearBtn.hidden = !event.target.value.trim();
+      }
       clearTimeout(hideSearchTimer);
       hideSearchTimer = setTimeout(() => performHideSearch(event.target.value), 180);
     }
@@ -594,6 +646,15 @@ function initPcAutocomplete() {
     }
 
     if (event.key === 'Escape' && !getSettingsModal()?.hidden) {
+      const searchInput = getSettingsModal()?.querySelector('.pc-hide-search-input');
+      if (searchInput && searchInput === document.activeElement && searchInput.value.trim()) {
+        event.preventDefault();
+        searchInput.value = '';
+        const clearBtn = getSettingsModal()?.querySelector('.pc-search-clear-btn');
+        if (clearBtn) clearBtn.hidden = true;
+        renderHideResults();
+        return;
+      }
       close();
       closeSettings();
       return;
@@ -628,6 +689,44 @@ function initPcAutocomplete() {
   });
 
   document.addEventListener('click', async (event) => {
+    const searchClearBtn = event.target.closest('.pc-search-clear-btn');
+    if (searchClearBtn) {
+      event.preventDefault();
+      const modal = getSettingsModal();
+      const input = modal?.querySelector('.pc-hide-search-input');
+      if (input) {
+        input.value = '';
+        searchClearBtn.hidden = true;
+        input.focus();
+      }
+      renderHideResults();
+      return;
+    }
+
+    const unhideAllBtn = event.target.closest('[data-unhide-all]');
+    if (unhideAllBtn) {
+      event.preventDefault();
+      if (!confirm('Are you sure you want to unhide all hidden complaint terms?')) return;
+      if (settingsData) {
+        settingsData.hidden_terms = [];
+      }
+      renderHideResults();
+      try {
+        const data = await postSettings({ action: 'unhide_all' });
+        if (data.data) {
+          settingsData = data.data;
+          priorityDraft = Array.isArray(settingsData?.priorities)
+            ? settingsData.priorities.map((row) => ({ ...row }))
+            : priorityDraft;
+        }
+        refreshSettingsUi();
+      } catch (error) {
+        alert(error.message || 'Could not unhide all terms.');
+        loadSettingsData().catch(() => {});
+      }
+      return;
+    }
+
     const settingsButton = event.target.closest('.pc-settings-btn');
     if (settingsButton) {
       event.preventDefault();
@@ -635,7 +734,8 @@ function initPcAutocomplete() {
       return;
     }
 
-    if (event.target.closest('[data-pc-settings-close]')) {
+    const closeButton = event.target.closest('[data-pc-settings-close]');
+    if (closeButton) {
       event.preventDefault();
       closeSettings();
       return;
@@ -726,26 +826,68 @@ function initPcAutocomplete() {
     if (hiddenToggle) {
       event.preventDefault();
       const modal = getSettingsModal();
-      const query = modal?.querySelector('.pc-hide-search-input')?.value.trim() || '';
+      const searchInput = modal?.querySelector('.pc-hide-search-input');
+      const query = searchInput?.value.trim() || '';
+      const source = hiddenToggle.dataset.toggleHidden || 'static_pc';
+      const term = hiddenToggle.dataset.term || '';
       const nextHidden = hiddenToggle.dataset.hidden !== '1';
-      try {
-        const data = await postSettings({
-          action: 'toggle_hidden',
-          source: hiddenToggle.dataset.toggleHidden || '',
-          term: hiddenToggle.dataset.term || '',
-          hidden: nextHidden ? 1 : 0,
-          query,
-        });
-        if (data.error) throw new Error(data.error);
-        settingsData = data.data || settingsData;
-        priorityDraft = Array.isArray(settingsData?.priorities)
-          ? settingsData.priorities.map((row) => ({ ...row }))
-          : priorityDraft;
-        refreshSettingsUi();
-        renderHideResults(data.results || []);
-      } catch (error) {
-        alert(error.message || 'Could not update hidden status.');
+
+      // 1. Instant Optimistic UI state flip
+      hiddenToggle.dataset.hidden = nextHidden ? '1' : '0';
+      hiddenToggle.textContent = nextHidden ? 'Unhide' : 'Hide';
+
+      if (Array.isArray(settingsData?.hidden_terms)) {
+        const normKey = term.toLowerCase().trim();
+        settingsData.hidden_terms = settingsData.hidden_terms.filter(
+          (item) => (item.term || '').toLowerCase().trim() !== normKey
+        );
+        if (nextHidden) {
+          settingsData.hidden_terms.unshift({
+            source,
+            source_label: pcSourceLabel(source),
+            term,
+            is_hidden: true,
+            updated_at: new Date().toISOString(),
+          });
+        }
       }
+
+      // If in default view (no search active), remove card immediately with zero lag
+      if (!query) {
+        renderHideResults();
+      } else {
+        const card = hiddenToggle.closest('.pc-search-result');
+        const meta = card?.querySelector('.pc-search-result-meta');
+        if (meta) {
+          meta.innerHTML = nextHidden
+            ? '<span class="pc-tag hidden">Hidden</span>'
+            : `<span class="pc-tag">${escapeHtml(pcSourceLabel(source))}</span>`;
+        }
+      }
+
+      // 2. Background persistence
+      postSettings({
+        action: 'toggle_hidden',
+        source,
+        term,
+        hidden: nextHidden ? 1 : 0,
+        query,
+      }).then((data) => {
+        if (data.error) throw new Error(data.error);
+        if (data.data) {
+          settingsData = data.data;
+          priorityDraft = Array.isArray(settingsData?.priorities)
+            ? settingsData.priorities.map((row) => ({ ...row }))
+            : priorityDraft;
+        }
+        const currentQuery = modal?.querySelector('.pc-hide-search-input')?.value.trim() || '';
+        if (currentQuery) {
+          renderHideResults(data.results || []);
+        }
+      }).catch((error) => {
+        alert(error.message || 'Could not update hidden status.');
+        loadSettingsData().catch(() => {});
+      });
       return;
     }
 
