@@ -1,14 +1,29 @@
-# ZimRx — Privacy-First, Local-First Digital Prescription & EMR Suite
+<p align="center">
+  <img src="application/assets/images/favicon.svg" alt="ZimRx Logo" width="100" height="100">
+</p>
 
-[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[![Local-First](https://img.shields.io/badge/Architecture-Local--First-green.svg)](#architecture--data-sovereignty)
-[![PHP](https://img.shields.io/badge/PHP-8.2%2B%20%7C%20PDO-8892BF.svg)](https://www.php.net/)
-[![FrankenPHP](https://img.shields.io/badge/Runtime-FrankenPHP%20%2B%20Caddy-blueviolet.svg)](https://frankenphp.dev/)
+<h1 align="center">ZimRx</h1>
+
+<p align="center">
+  <b>Privacy-First, Local-First Digital Prescription & EMR Suite</b><br>
+  <i>Built for solo physicians, medical practitioners, and clinics in low-resource and low-connectivity regions.</i>
+</p>
+
+<p align="center">
+  <a href="https://www.gnu.org/licenses/agpl-3.0"><img src="https://img.shields.io/badge/License-AGPL_v3-blue.svg" alt="License: AGPL v3"></a>
+  <a href="#architecture--data-sovereignty"><img src="https://img.shields.io/badge/Architecture-Local--First-green.svg" alt="Local-First"></a>
+  <a href="https://www.php.net/"><img src="https://img.shields.io/badge/PHP-8.2%2B%20%7C%20PDO-8892BF.svg" alt="PHP"></a>
+  <a href="https://frankenphp.dev/"><img src="https://img.shields.io/badge/Runtime-FrankenPHP%20%2B%20Caddy-blueviolet.svg" alt="FrankenPHP"></a>
+</p>
+
+---
 
 ![ZimRx Prescription Interface](preview/interface-preview.png)
 *A preview of the ZimRx ultra-fast Prescription Grid UI*
 
 > 📹 **Prototype Demo**: [Watch the Prototype Video (preview/prototype-preview.mp4)](preview/prototype-preview.mp4) — *A demonstration of the doctor-friendly, ultra-fast prescription workflow.*
+
+---
 
 **ZimRx** is an open-source, high-performance digital prescription and Electronic Medical Record (EMR) system built for solo doctors, medical practitioners, and clinics in low-resource or bandwidth-constrained regions. Built on a strict **local-first philosophy**, ZimRx runs 100% offline, eliminates recurring SaaS subscription costs, and guarantees complete patient data privacy and sovereignty.
 
