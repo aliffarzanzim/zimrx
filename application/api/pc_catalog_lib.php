@@ -57,7 +57,7 @@ function pc_fts_prefix_query(string $query): string {
     preg_match_all('/[\p{L}\p{N}]+/u', $query, $matches);
     $tokens = array_slice($matches[0] ?? [], 0, 8);
     $tokens = array_filter($tokens, static function ($token) {
-        return mb_strlen($token, 'UTF-8') >= 2;
+        return mb_strlen($token, 'UTF-8') >= 1;
     });
 
     return implode(' ', array_map(static function ($token) {
@@ -568,10 +568,6 @@ function pc_static_pc_search(string $term, int $limit = 25): array {
         return array_slice($results, 0, $limit);
     }
 
-    if (mb_strlen($term, 'UTF-8') < 2) {
-        return [];
-    }
-
     $ftsQuery = pc_fts_prefix_query($term);
     $hasFts = (bool)$db->query(
         "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'fts_zimrx_static_pc' LIMIT 1"
@@ -727,10 +723,6 @@ function pc_icd_search(string $term, int $limit = 15): array {
         $icdSeedCache = $results;
         $icdSeedLimit = $limit;
         return array_slice($results, 0, $limit);
-    }
-
-    if (mb_strlen($term, 'UTF-8') < 2) {
-        return [];
     }
 
     $ftsQuery = pc_fts_prefix_query($term);

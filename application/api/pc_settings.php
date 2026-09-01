@@ -78,7 +78,7 @@ function pc_settings_search_results(PDO $pdo, int $doctorId, string $query, arra
         if ($term === '') {
             return;
         }
-        $key = $source . '|' . rx_norm($term);
+        $key = rx_norm($term);
         if (isset($seen[$key])) {
             return;
         }
@@ -93,29 +93,85 @@ function pc_settings_search_results(PDO $pdo, int $doctorId, string $query, arra
         ], $extra);
     };
 
-    foreach (pc_learned_terms($pdo, $doctorId, 'PC', $query, 'usage', 16) as $row) {
+    // 1. Most Used / Learned
+    foreach (pc_learned_terms($pdo, $doctorId, 'PC', $query, 'usage', 20) as $row) {
         $add('most_used', (string)($row['term'] ?? ''), [
             'usage_count' => (int)($row['usage_count'] ?? 0),
         ]);
     }
 
-    foreach (pc_static_pc_search($query, 16) as $row) {
+    // 2. Custom Terms
+    foreach (pc_custom_terms($pdo, $doctorId, $query, 20) as $row) {
+        $add('custom', (string)($row['term'] ?? ''));
+    }
+
+    // 3. System Static P/C
+    foreach (pc_static_pc_search($query, 40) as $row) {
         $add('static_pc', (string)($row['preferred_term'] ?? ''), [
             'category' => (string)($row['category'] ?? ''),
         ]);
     }
 
-    usort($results, static function ($a, $b) {
-        return ($a['sort_rank'] <=> $b['sort_rank'])
-            ?: ($a['ordinal'] <=> $b['ordinal'])
-            ?: strcmp($a['term'], $b['term']);
+    usort($results, static function ($a, $b) use ($query) {
+        $aTerm = strtolower($a['term']);
+        $bTerm = strtolower($b['term']);
+        $q = strtolower($query);
+
+        $aExact = $aTerm === $q ? 0 : 1;
+        $bExact = $bTerm === $q ? 0 : 1;
+        if ($aExact !== $bExact) {
+            return $aExact <=> $bExact;
+        }
+
+        $aPrefix = str_starts_with($aTerm, $q) ? 0 : 1;
+        $bPrefix = str_starts_with($bTerm, $q) ? 0 : 1;
+        if ($aPrefix !== $bPrefix) {
+            return $aPrefix <=> $bPrefix;
+        }
+
+        if (($a['sort_rank'] ?? 999) !== ($b['sort_rank'] ?? 999)) {
+            return ($a['sort_rank'] ?? 999) <=> ($b['sort_rank'] ?? 999);
+        }
+
+        $lenDiff = strlen($aTerm) <=> strlen($bTerm);
+        if ($lenDiff !== 0) {
+            return $lenDiff;
+        }
+
+        return ($a['ordinal'] ?? 0) <=> ($b['ordinal'] ?? 0)
+            ?: strcmp($aTerm, $bTerm);
     });
 
     return array_slice(array_map(static function ($row) {
         unset($row['sort_rank']);
         unset($row['ordinal']);
         return $row;
-    }, $results), 0, 40);
+    }, $results), 0, 50);
+}
+
+function pc_settings_usage_ranking(PDO $pdo, int $doctorId, array $priorityRows): array {
+    $hiddenMap = pc_hidden_map($pdo, $doctorId);
+    $items = [];
+    $rank = 0;
+    foreach (pc_learned_terms($pdo, $doctorId, 'PC', '', 'usage', 100) as $row) {
+        $term = rx_clean($row['term'] ?? '');
+        if ($term === '') {
+            continue;
+        }
+
+        $source = pc_classify_term_source($pdo, $doctorId, $term, $priorityRows);
+        $rank++;
+        $items[] = [
+            'rank' => $rank,
+            'term' => $term,
+            'source' => $source,
+            'source_label' => pc_source_label($source),
+            'usage_count' => (int)($row['usage_count'] ?? 0),
+            'updated_at' => (string)($row['updated_at'] ?? ''),
+            'is_hidden' => pc_is_hidden($hiddenMap, $source, $term),
+        ];
+    }
+    return $items;
 }
 
 function pc_settings_payload(PDO $pdo, int $doctorId): array {
@@ -123,6 +179,7 @@ function pc_settings_payload(PDO $pdo, int $doctorId): array {
     return [
         'priorities' => $priorityRows,
         'used_groups' => pc_settings_used_groups($pdo, $doctorId, $priorityRows),
+        'usage_ranking' => pc_settings_usage_ranking($pdo, $doctorId, $priorityRows),
         'custom_terms' => pc_settings_custom_terms($pdo, $doctorId),
         'hidden_terms' => pc_hidden_terms($pdo, $doctorId),
     ];
