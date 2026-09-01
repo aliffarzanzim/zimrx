@@ -105,12 +105,6 @@ function pc_settings_search_results(PDO $pdo, int $doctorId, string $query, arra
         ]);
     }
 
-    foreach (pc_icd_search($query, 16) as $row) {
-        $add('icd', (string)($row['search_term'] ?? ''), [
-            'is_official' => (int)($row['is_official'] ?? 0),
-        ]);
-    }
-
     usort($results, static function ($a, $b) {
         return ($a['sort_rank'] <=> $b['sort_rank'])
             ?: ($a['ordinal'] <=> $b['ordinal'])
@@ -130,6 +124,7 @@ function pc_settings_payload(PDO $pdo, int $doctorId): array {
         'priorities' => $priorityRows,
         'used_groups' => pc_settings_used_groups($pdo, $doctorId, $priorityRows),
         'custom_terms' => pc_settings_custom_terms($pdo, $doctorId),
+        'hidden_terms' => pc_hidden_terms($pdo, $doctorId),
     ];
 }
 
@@ -273,36 +268,50 @@ try {
         rx_json(pc_settings_payload($pdo, $doctorId));
     }
 
+    if ($action === 'unhide_all') {
+        $userPdo = rx_user_pdo();
+        $userPdo->prepare(
+            "DELETE FROM zimrx_user_pc_settings
+             WHERE doctor_id = :doctor_id
+               AND setting_key = 'hidden_term'"
+        )->execute(['doctor_id' => max(1, $doctorId)]);
+
+        rx_json([
+            'ok' => true,
+            'data' => pc_settings_payload($pdo, $doctorId),
+        ]);
+    }
+
     if ($action === 'toggle_hidden') {
         $source = rx_clean($payload['source'] ?? '');
         $term = rx_clean($payload['term'] ?? '');
         $hidden = (int)($payload['hidden'] ?? 0) === 1;
-        $supportedSources = pc_supported_sources();
-        if (!isset($supportedSources[$source]) || $term === '') {
-            rx_json(['error' => 'Source and term are required.']);
+        if ($term === '') {
+            rx_json(['error' => 'Term is required.']);
+        }
+        if ($source === '') {
+            $source = 'static_pc';
         }
 
+        $userPdo = rx_user_pdo();
+        // Clear all previous hidden entries for this term first
+        $userPdo->prepare(
+            "DELETE FROM zimrx_user_pc_settings
+             WHERE doctor_id = :doctor_id
+               AND setting_key = 'hidden_term'
+               AND term = :term COLLATE NOCASE"
+        )->execute([
+            'doctor_id' => max(1, $doctorId),
+            'term' => $term,
+        ]);
+
         if ($hidden) {
-            $userPdo = rx_user_pdo();
             $userPdo->prepare(
-                "INSERT OR IGNORE INTO zimrx_user_pc_settings (
+                "INSERT INTO zimrx_user_pc_settings (
                     doctor_id, setting_key, source, term, sort_order, is_enabled, created_at, updated_at
                 ) VALUES (
                     :doctor_id, 'hidden_term', :source, :term, 0, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
                 )"
-            )->execute([
-                'doctor_id' => max(1, $doctorId),
-                'source' => $source,
-                'term' => $term,
-            ]);
-        } else {
-            $userPdo = rx_user_pdo();
-            $userPdo->prepare(
-                "DELETE FROM zimrx_user_pc_settings
-                 WHERE doctor_id = :doctor_id
-                   AND setting_key = 'hidden_term'
-                   AND source = :source
-                   AND term = :term COLLATE NOCASE"
             )->execute([
                 'doctor_id' => max(1, $doctorId),
                 'source' => $source,

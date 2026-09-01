@@ -5,8 +5,7 @@ function pc_supported_sources(): array {
     return [
         'most_used' => 'Most Used P/C',
         'custom'    => 'Custom P/C',
-        'static_pc' => 'Standard P/C',
-        'icd'       => 'ICD-11',
+        'static_pc' => 'System P/C',
     ];
 }
 
@@ -28,8 +27,8 @@ function pc_lookup_db_path(string $filename): string {
 }
 
 function pc_source_label(string $source): string {
-    if ($source === 'snomed') {
-        return 'Standard P/C';
+    if ($source === 'snomed' || $source === 'static_pc') {
+        return 'System P/C';
     }
     $sources = pc_supported_sources();
     return $sources[$source] ?? strtoupper($source);
@@ -202,17 +201,61 @@ function pc_hidden_map(PDO $pdo, int $doctorId): array {
     foreach ($stmt->fetchAll() as $row) {
         $source = rx_clean($row['source'] ?? '');
         $term = rx_clean($row['term'] ?? '');
-        if ($source === '' || $term === '') {
+        if ($term === '') {
             continue;
         }
-        $hidden[pc_hidden_key($source, $term)] = true;
+        $normTerm = rx_norm($term);
+        if ($source !== '') {
+            $hidden[pc_hidden_key($source, $term)] = true;
+        }
+        // Universal term suppression key
+        $hidden[$normTerm] = true;
     }
 
     return $hidden;
 }
 
+function pc_hidden_terms(PDO $pdo, int $doctorId): array {
+    $userPdo = rx_user_pdo();
+    $stmt = $userPdo->prepare(
+        "SELECT source, term, updated_at
+         FROM zimrx_user_pc_settings
+         WHERE doctor_id = :doctor_id AND setting_key = 'hidden_term'
+         ORDER BY updated_at DESC, id DESC"
+    );
+    $stmt->execute(['doctor_id' => max(1, $doctorId)]);
+
+    $items = [];
+    $seen = [];
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $source = rx_clean($row['source'] ?? '');
+        $term = rx_clean($row['term'] ?? '');
+        if ($term === '') {
+            continue;
+        }
+        $normKey = rx_norm($term);
+        if (isset($seen[$normKey])) {
+            continue;
+        }
+        $seen[$normKey] = true;
+        $items[] = [
+            'source' => $source ?: 'static_pc',
+            'source_label' => pc_source_label($source ?: 'static_pc'),
+            'term' => $term,
+            'is_hidden' => true,
+            'updated_at' => (string)($row['updated_at'] ?? ''),
+        ];
+    }
+    return $items;
+}
+
 function pc_is_hidden(array $hiddenMap, string $source, string $term): bool {
-    return isset($hiddenMap[pc_hidden_key($source, $term)]);
+    $termNorm = rx_norm($term);
+    if ($termNorm === '') {
+        return false;
+    }
+    // Matches either source-specific suppression or universal complaint suppression
+    return isset($hiddenMap[pc_hidden_key($source, $term)]) || isset($hiddenMap[$termNorm]);
 }
 
 function pc_learned_terms(PDO $pdo, int $doctorId, string $category, string $term, string $mode, int $limit): array {
@@ -394,9 +437,6 @@ function pc_source_candidates_for_term(PDO $pdo, int $doctorId, string $term): a
     }
     if (pc_static_pc_exact_match($term)) {
         $candidates[] = 'static_pc';
-    }
-    if (pc_icd_exact_match($term)) {
-        $candidates[] = 'icd';
     }
     return $candidates;
 }
