@@ -27,6 +27,13 @@ function initPcAutocomplete() {
 
   const getSettingsModal = () => document.getElementById('pc-settings-modal');
 
+  const renderIcon = (name, size = 14, attrs = {}) => {
+    if (window.ZimRxIcon && typeof window.ZimRxIcon.render === 'function') {
+      return window.ZimRxIcon.render(name, size, attrs);
+    }
+    return '';
+  };
+
   const escapeHtml = (value) => {
     const div = document.createElement('div');
     div.textContent = value == null ? '' : String(value);
@@ -318,8 +325,8 @@ function initPcAutocomplete() {
         <td>
           <div class="pc-priority-order">
             <span class="pc-priority-badge">${index + 1}</span>
-            <button type="button" class="pc-priority-move" data-priority-move="up" data-source="${escapeHtml(row.source)}" ${index === 0 ? 'disabled' : ''} title="Move Up">&#9650;</button>
-            <button type="button" class="pc-priority-move" data-priority-move="down" data-source="${escapeHtml(row.source)}" ${index === priorityDraft.length - 1 ? 'disabled' : ''} title="Move Down">&#9660;</button>
+            <button type="button" class="pc-priority-move" data-priority-move="up" data-source="${escapeHtml(row.source)}" ${index === 0 ? 'disabled' : ''} title="Move Up">${renderIcon('chevron-up', 12)}</button>
+            <button type="button" class="pc-priority-move" data-priority-move="down" data-source="${escapeHtml(row.source)}" ${index === priorityDraft.length - 1 ? 'disabled' : ''} title="Move Down">${renderIcon('chevron-down', 12)}</button>
           </div>
         </td>
       </tr>
@@ -366,6 +373,87 @@ function initPcAutocomplete() {
     }).join('');
   };
 
+  const renderUsageRanking = (filterQuery = '') => {
+    const modal = getSettingsModal();
+    const container = modal?.querySelector('.pc-usage-ranking-list');
+    if (!container) return;
+
+    const searchInput = modal?.querySelector('.pc-usage-search-input');
+    const clearBtn = modal?.querySelector('.pc-usage-search-clear-btn');
+    const query = (typeof filterQuery === 'string' ? filterQuery : (searchInput?.value || '')).trim().toLowerCase();
+
+    if (clearBtn && searchInput) {
+      clearBtn.hidden = !searchInput.value.trim();
+    }
+
+    let items = Array.isArray(settingsData?.usage_ranking) ? [...settingsData.usage_ranking] : [];
+
+    // Fallback to extracting from used_groups if usage_ranking wasn't in legacy cache
+    if (!items.length && Array.isArray(settingsData?.used_groups)) {
+      let rank = 0;
+      settingsData.used_groups.forEach((group) => {
+        (group.items || []).forEach((item) => {
+          rank++;
+          items.push({
+            rank,
+            term: item.term,
+            source: group.source,
+            source_label: group.label,
+            usage_count: item.usage_count || 0,
+            is_hidden: item.is_hidden,
+          });
+        });
+      });
+      items.sort((a, b) => (b.usage_count - a.usage_count) || a.term.localeCompare(b.term));
+      items = items.slice(0, 100);
+      items.forEach((item, idx) => { item.rank = idx + 1; });
+    }
+
+    if (!items.length) {
+      container.innerHTML = '<div class="pc-settings-empty">No clinical usage data recorded yet. As you prescribe complaints, your Top 100 ranking will automatically appear here.</div>';
+      return;
+    }
+
+    if (query) {
+      items = items.filter((item) => (item.term || '').toLowerCase().includes(query));
+    }
+
+    if (!items.length) {
+      container.innerHTML = `<div class="pc-settings-empty">No complaints matching "<strong>${escapeHtml(query)}</strong>" found in Top 100 usage rankings.</div>`;
+      return;
+    }
+
+    container.innerHTML = items.map((item) => {
+      let topClass = '';
+      if (item.rank === 1) topClass = ' top-1';
+      else if (item.rank === 2) topClass = ' top-2';
+      else if (item.rank === 3) topClass = ' top-3';
+
+      const usageLabel = Number(item.usage_count || 0) === 1 ? '1 use' : `${Number(item.usage_count || 0)} uses`;
+
+      return `
+        <div class="pc-usage-rank-item">
+          <div class="pc-usage-rank-left">
+            <div class="pc-usage-rank-badge${topClass}">#${item.rank}</div>
+            <div>
+              <div class="pc-search-result-term">${escapeHtml(item.term)}</div>
+              <div class="pc-search-result-meta">
+                <span class="pc-tag">${escapeHtml(item.source_label || pcSourceLabel(item.source))}</span>
+                ${item.is_hidden ? '<span class="pc-tag hidden">Hidden</span>' : ''}
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <span class="pc-usage-count-badge">${usageLabel}</span>
+            <button type="button" class="pc-search-toggle" data-toggle-hidden="${escapeHtml(item.source || 'static_pc')}" data-term="${escapeHtml(item.term)}" data-hidden="${item.is_hidden ? '1' : '0'}">
+              ${item.is_hidden ? 'Unhide' : 'Hide'}
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  };
+
   const renderCustomList = () => {
     const modal = getSettingsModal();
     const container = modal?.querySelector('.pc-custom-list');
@@ -380,7 +468,7 @@ function initPcAutocomplete() {
     container.innerHTML = items.map((item) => `
       <div class="pc-custom-item">
         <div class="pc-custom-term">${escapeHtml(item.term)}</div>
-        <button type="button" class="pc-custom-remove" data-remove-custom="${escapeHtml(item.term)}" title="Remove Custom PC">&times;</button>
+        <button type="button" class="pc-custom-remove" data-remove-custom="${escapeHtml(item.term)}" title="Remove Custom PC">${renderIcon('x', 14)}</button>
       </div>
     `).join('');
   };
@@ -462,6 +550,7 @@ function initPcAutocomplete() {
   const refreshSettingsUi = () => {
     renderPriorityTable();
     renderUsedGroups();
+    renderUsageRanking();
     renderCustomList();
     renderHideResults();
   };
@@ -526,23 +615,65 @@ function initPcAutocomplete() {
     applySettingsData(data);
   };
 
+  const resetModalScroll = () => {
+    const modal = getSettingsModal();
+    if (!modal) return;
+    const body = modal.querySelector('.pc-settings-body');
+    if (body) {
+      body.scrollTop = 0;
+      if (typeof body.scrollTo === 'function') {
+        body.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      }
+    }
+    const panel = modal.querySelector('.pc-settings-panel');
+    if (panel) {
+      panel.scrollTop = 0;
+      if (typeof panel.scrollTo === 'function') {
+        panel.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      }
+    }
+  };
+
   const openSettings = async () => {
     const modal = getSettingsModal();
     if (!modal) return;
     close();
+
+    // Blur any active element outside the modal
+    if (document.activeElement && typeof document.activeElement.blur === 'function') {
+      document.activeElement.blur();
+    }
+
     const hasInitialData = applyInitialSettingsData();
     modal.hidden = false;
     document.body.style.overflow = 'hidden';
 
+    // Default to the first tab (Settings)
+    modal.querySelectorAll('.pc-settings-tab-btn').forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.pcTab === 'settings');
+    });
+    modal.querySelectorAll('.pc-tab-pane').forEach((pane) => {
+      const isSettings = pane.id === 'pc-tab-pane-settings';
+      pane.hidden = !isSettings;
+      pane.classList.toggle('active', isSettings);
+    });
+
+    resetModalScroll();
+    requestAnimationFrame(resetModalScroll);
+    setTimeout(resetModalScroll, 20);
+    setTimeout(resetModalScroll, 80);
+    setTimeout(resetModalScroll, 220);
+
     if (hasInitialData) {
       loadSettingsData().catch(() => {});
-      modal.querySelector('.pc-custom-input')?.focus();
       return;
     }
 
     try {
       await loadSettingsData();
-      modal.querySelector('.pc-custom-input')?.focus();
+      resetModalScroll();
+      requestAnimationFrame(resetModalScroll);
+      setTimeout(resetModalScroll, 50);
     } catch (error) {
       alert(error.message || 'Could not load P/C settings.');
     }
@@ -632,6 +763,14 @@ function initPcAutocomplete() {
       clearTimeout(hideSearchTimer);
       hideSearchTimer = setTimeout(() => performHideSearch(event.target.value), 180);
     }
+
+    if (event.target.matches('.pc-usage-search-input')) {
+      const clearBtn = event.target.closest('.pc-usage-search-box')?.querySelector('.pc-usage-search-clear-btn');
+      if (clearBtn) {
+        clearBtn.hidden = !event.target.value.trim();
+      }
+      renderUsageRanking(event.target.value);
+    }
   });
 
   document.addEventListener('focus', (event) => {
@@ -653,6 +792,15 @@ function initPcAutocomplete() {
         const clearBtn = getSettingsModal()?.querySelector('.pc-search-clear-btn');
         if (clearBtn) clearBtn.hidden = true;
         renderHideResults();
+        return;
+      }
+      const usageInput = getSettingsModal()?.querySelector('.pc-usage-search-input');
+      if (usageInput && usageInput === document.activeElement && usageInput.value.trim()) {
+        event.preventDefault();
+        usageInput.value = '';
+        const clearBtn = getSettingsModal()?.querySelector('.pc-usage-search-clear-btn');
+        if (clearBtn) clearBtn.hidden = true;
+        renderUsageRanking();
         return;
       }
       close();
@@ -689,6 +837,33 @@ function initPcAutocomplete() {
   });
 
   document.addEventListener('click', async (event) => {
+    const tabBtn = event.target.closest('[data-pc-tab]');
+    if (tabBtn) {
+      event.preventDefault();
+      const modal = getSettingsModal();
+      if (!modal) return;
+      const tabName = tabBtn.dataset.pcTab;
+
+      modal.querySelectorAll('.pc-settings-tab-btn').forEach((b) => b.classList.remove('active'));
+      tabBtn.classList.add('active');
+
+      modal.querySelectorAll('.pc-tab-pane').forEach((pane) => {
+        pane.hidden = true;
+        pane.classList.remove('active');
+      });
+
+      const activePane = modal.querySelector(`#pc-tab-pane-${tabName}`);
+      if (activePane) {
+        activePane.hidden = false;
+        activePane.classList.add('active');
+      }
+
+      resetModalScroll();
+      requestAnimationFrame(resetModalScroll);
+      setTimeout(resetModalScroll, 30);
+      return;
+    }
+
     const searchClearBtn = event.target.closest('.pc-search-clear-btn');
     if (searchClearBtn) {
       event.preventDefault();
@@ -700,6 +875,20 @@ function initPcAutocomplete() {
         input.focus();
       }
       renderHideResults();
+      return;
+    }
+
+    const usageClearBtn = event.target.closest('.pc-usage-search-clear-btn');
+    if (usageClearBtn) {
+      event.preventDefault();
+      const modal = getSettingsModal();
+      const input = modal?.querySelector('.pc-usage-search-input');
+      if (input) {
+        input.value = '';
+        usageClearBtn.hidden = true;
+        input.focus();
+      }
+      renderUsageRanking();
       return;
     }
 
@@ -852,7 +1041,18 @@ function initPcAutocomplete() {
         }
       }
 
-      // If in default view (no search active), remove card immediately with zero lag
+      // Also update is_hidden in settingsData.usage_ranking
+      if (Array.isArray(settingsData?.usage_ranking)) {
+        const normKey = term.toLowerCase().trim();
+        const rankingItem = settingsData.usage_ranking.find(
+          (item) => (item.term || '').toLowerCase().trim() === normKey
+        );
+        if (rankingItem) {
+          rankingItem.is_hidden = nextHidden;
+        }
+      }
+
+      // If in default view (no search active), update lists
       if (!query) {
         renderHideResults();
       } else {
@@ -864,6 +1064,7 @@ function initPcAutocomplete() {
             : `<span class="pc-tag">${escapeHtml(pcSourceLabel(source))}</span>`;
         }
       }
+      renderUsageRanking();
 
       // 2. Background persistence
       postSettings({
@@ -884,6 +1085,7 @@ function initPcAutocomplete() {
         if (currentQuery) {
           renderHideResults(data.results || []);
         }
+        renderUsageRanking();
       }).catch((error) => {
         alert(error.message || 'Could not update hidden status.');
         loadSettingsData().catch(() => {});
