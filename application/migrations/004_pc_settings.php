@@ -7,7 +7,7 @@ class Migration004PcSettings {
     private array $defaultPriorities = [
         ['source' => 'most_used', 'sort_order' => 1, 'is_enabled' => 1],
         ['source' => 'custom',    'sort_order' => 2, 'is_enabled' => 1],
-        ['source' => 'snomed',    'sort_order' => 3, 'is_enabled' => 1],
+        ['source' => 'static_pc', 'sort_order' => 3, 'is_enabled' => 1],
         ['source' => 'icd',       'sort_order' => 4, 'is_enabled' => 1],
     ];
 
@@ -50,6 +50,11 @@ class Migration004PcSettings {
             )"
         );
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_zimrx_user_pc_settings_doctor_key ON zimrx_user_pc_settings(doctor_id, setting_key, source, term)");
+
+        // Migrate any legacy 'snomed' source references to 'static_pc'
+        try {
+            $pdo->exec("UPDATE zimrx_user_pc_settings SET source = 'static_pc' WHERE source = 'snomed'");
+        } catch (Throwable $_) {}
 
         $stmt = $pdo->prepare(
             DbSql::insertIgnore(
