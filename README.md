@@ -5,16 +5,22 @@
 [![PHP](https://img.shields.io/badge/PHP-8.2%2B%20%7C%20PDO-8892BF.svg)](https://www.php.net/)
 [![FrankenPHP](https://img.shields.io/badge/Runtime-FrankenPHP%20%2B%20Caddy-blueviolet.svg)](https://frankenphp.dev/)
 
+![ZimRx Prescription Interface](preview/interface-preview.png)
+*A preview of the ZimRx ultra-fast Prescription Grid UI*
+
+> 📹 **Prototype Demo**: [Watch the Prototype Video (preview/prototype-preview.mp4)](preview/prototype-preview.mp4) — *A demonstration of the doctor-friendly, ultra-fast prescription workflow.*
+
 **ZimRx** is an open-source, high-performance digital prescription and Electronic Medical Record (EMR) system built for solo doctors, medical practitioners, and clinics in low-resource or bandwidth-constrained regions. Built on a strict **local-first philosophy**, ZimRx runs 100% offline, eliminates recurring SaaS subscription costs, and guarantees complete patient data privacy and sovereignty.
 
 ---
 
 ## ✨ Key Features
 
-* **⚡ 100% Offline & Portable**: Runs anywhere without an internet connection using a self-contained portable runtime (powered by FrankenPHP and Caddy). Launchable with a single click from a laptop or local clinic LAN.
+* **⚡ 100% Offline & Portable**: Runs anywhere without an internet connection using a self-contained portable runtime (powered by FrankenPHP and Caddy). Launchable with a single double-click directly from a USB flash drive or laptop with zero installation overhead.
+* **⌨️ Ultra-Fast Grid UI**: Custom-engineered, lightweight Prescription Grid UI built with pure Vanilla JS and CSS tokens. Entirely keyboard-driven (Tab & Arrow keys) to eliminate mouse fatigue, allowing doctors to compose an error-free prescription in under 20–30 seconds.
 * **💊 Sub-Millisecond Pharmaceutical Search**: Instant full-text search across 30,000+ national commercial drug brands, formulations, strengths, and generic equivalents powered by SQLite FTS5.
 * **🛡️ Clinical Decision Support (CDS)**: Built-in safety checks for drug-drug interactions, pregnancy & lactation contraindications, renal/hepatic adjustments, and pediatric dosage calculators.
-* **📋 Rapid 30-Second Prescription Flow**: Streamlined interface for presenting complaints, vitals, medical history, physical examinations, diagnostic investigations, and individualized patient advice templates.
+* **📋 Rapid Consultation Workflow**: Streamlined interface for presenting complaints, vitals, medical history, physical examinations, diagnostic investigations, and individualized patient advice templates.
 * **🖨️ Pixel-Perfect Print Formatting**: Highly customizable prescription pad layout engine supporting custom doctor headers, clinic logos, multi-column formatters, and watermark overlays for standard A4/A5 or thermal printers.
 * **🔌 Driver-Agnostic Central PDO Core**: Database abstraction layer with automated, versioned schema migrations (`DbMigrator`), allowing seamless operation on SQLite locally, or scaling to MariaDB, MySQL, and PostgreSQL for multi-user hospital networks.
 
@@ -51,10 +57,12 @@ Patient health records should **never** be monetized, tracked, or leaked to cent
 
 ## 🚀 Quick Start (Windows)
 
-1. **Download the latest release ZIP** from the [Releases](https://github.com/aliffarzanzim/zimrx/releases) tab.
-2. Extract the archive to any folder (e.g. `C:\ZimRx`).
-3. Double-click **`start.bat`**.
-4. ZimRx automatically opens in your browser at `http://localhost:8080`.
+1. **Download or Clone the Repository**:
+   ```bash
+   git clone https://github.com/aliffarzanzim/zimrx.git
+   ```
+2. Double-click **`start.bat`** (it will automatically configure the FrankenPHP runtime if needed).
+3. ZimRx automatically opens in your browser at `http://localhost:8080`.
 
 ---
 
@@ -64,11 +72,29 @@ Patient health records should **never** be monetized, tracked, or leaked to cent
 * PHP 8.2+ with PDO SQLite extension (or Docker / FrankenPHP)
 * Caddy / Apache / Nginx (optional for production web servers)
 
+### Automated Setup for Developers
+Windows developers can run the included setup script to configure FrankenPHP and required extensions with one click:
+```cmd
+setup-franken-for-dev.bat
+```
+
 ### Database Migrations
 Database schemas and versioning are managed through `DbMigrator.php`. Run the application or execute `db.php` to apply any pending schema migrations automatically:
 ```bash
 php -r "require_once 'application/db.php';"
 ```
+
+---
+
+## 🗺️ Roadmap & Upcoming Features
+
+ZimRx is actively under development. Our immediate technical roadmap includes:
+* **🔐 Cryptographic Delta-Updates**: 15–30 KB differential SQL patches for low-bandwidth database syncing (cryptographically signed and verified via Libsodium Ed25519).
+* **📺 Smart TV Waiting Room Dashboard**: Live, anonymized token tracking and ethical queue management for clinic waiting areas.
+* **🔤 Native Bengali Transliteration**: In-app phonetic typing engine (Avro-compatible) to remove reliance on OS-level keyboard bloatware.
+* **📟 Hardware Normalization**: ESC/POS dialect translation for thermal receipt printers and barcode buffer normalization for unstandardized clinic hardware.
+* **📈 Dynamic Pediatric Growth Charts**: Multi-visit child growth plotting against WHO and CDC Z-score curves.
+* **📦 Multi-Platform Packaging**: Pre-built one-click standalone distributions for Windows, Linux, macOS, and Docker.
 
 ---
 
