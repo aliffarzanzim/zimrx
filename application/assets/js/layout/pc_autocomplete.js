@@ -247,7 +247,7 @@ function initPcAutocomplete() {
       const li = document.createElement('li');
       li.className = 'zrx-dropdown-item rx-dropdown-item';
       if (index === 0) li.classList.add('active');
-      li.innerHTML = `<div style="padding:2px 0; width:100%;"><strong>${escapeHtml(item.label)}</strong></div>`;
+      li.innerHTML = `<div class="pc-dropdown-item-content"><strong>${escapeHtml(item.label)}</strong></div>`;
       
       li.addEventListener('mouseenter', () => {
         const allItems = ul.querySelectorAll('.zrx-dropdown-item, .rx-dropdown-item');
@@ -320,7 +320,7 @@ function initPcAutocomplete() {
 
     tbody.innerHTML = priorityDraft.map((row, index) => `
       <tr data-source="${escapeHtml(row.source)}">
-        <td style="text-align: center;"><input type="checkbox" class="pc-priority-checkbox" data-priority-toggle="${escapeHtml(row.source)}" ${row.is_enabled ? 'checked' : ''} aria-label="Toggle ${escapeHtml(row.label)}"></td>
+        <td class="pc-priority-td-active"><input type="checkbox" class="pc-priority-checkbox" data-priority-toggle="${escapeHtml(row.source)}" ${row.is_enabled ? 'checked' : ''} aria-label="Toggle ${escapeHtml(row.label)}"></td>
         <td><span class="pc-priority-row-label">${escapeHtml(row.label)}</span></td>
         <td>
           <div class="pc-priority-order">
@@ -443,7 +443,7 @@ function initPcAutocomplete() {
               </div>
             </div>
           </div>
-          <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <div class="pc-usage-rank-actions">
             <span class="pc-usage-count-badge">${usageLabel}</span>
             <button type="button" class="pc-search-toggle" data-toggle-hidden="${escapeHtml(item.source || 'static_pc')}" data-term="${escapeHtml(item.term)}" data-hidden="${item.is_hidden ? '1' : '0'}">
               ${item.is_hidden ? 'Unhide' : 'Hide'}

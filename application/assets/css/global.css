@@ -59,6 +59,14 @@
 
     --zrx-table-border: #b8c5d6;
     --zrx-table-border-width: 2px;
+
+    /* ZimRx PC Module Tokens */
+    --pc-col-del-width: 32px;
+    --pc-col-no-width: 36px;
+    --pc-col-drag-width: 36px;
+    --pc-col-duration-width: 76px;
+    --pc-col-unit-width: 80px;
+    --pc-row-min-height: 36px;
 }
 
 * {
@@ -3912,9 +3920,20 @@ tbody tr.oh-dragging:first-child td {
     background: transparent !important;
 }
 
-.pc-input { width: 100%; min-height: 36px; height: 36px; border: none; padding: 6px 0.5rem; font-size: 16px; line-height: 1.35; background: transparent; outline: none; font-family: var(--font-family); color: var(--text-dark); display: block; }
+/* PC Table Column Width & Alignment Utilities */
+.pc-col-del { width: var(--pc-col-del-width, 32px); }
+.pc-col-no { width: var(--pc-col-no-width, 36px); }
+.pc-col-complaint { width: auto; }
+.pc-col-duration { width: var(--pc-col-duration-width, 76px); }
+.pc-col-unit { width: var(--pc-col-unit-width, 80px); }
+.pc-col-drag { width: var(--pc-col-drag-width, 36px); }
+
+.pc-th-center { text-align: center; }
+.pc-th-settings { text-align: center; padding: 0 !important; }
+
+.pc-input { width: 100%; min-height: var(--pc-row-min-height, 36px); height: var(--pc-row-min-height, 36px); border: none; padding: 6px 0.5rem; font-size: 16px; line-height: 1.35; background: transparent; outline: none; font-family: var(--font-family); color: var(--text-dark); display: block; }
 .pc-table textarea.pc-input { resize: none; overflow: hidden; }
-.pc-duration-input, .pc-unit-input { padding-top: 0; padding-bottom: 0; }
+.pc-duration-input, .pc-unit-input { padding-top: 0; padding-bottom: 0; text-align: center; }
 .pc-input:focus { background: #f0f9ff; box-shadow: inset 0 0 0 2px rgba(37,99,235,0.3); }
 td:has(> .pc-input:focus) { background: #f0f9ff; box-shadow: inset 0 0 0 2px rgba(37,99,235,0.3); }
 td:has(> .pc-input:focus) > .pc-input { background: transparent; box-shadow: none; }
@@ -4279,6 +4298,27 @@ td:has(> .pc-input:focus) > .pc-input { background: transparent; box-shadow: non
     font-weight: 600; 
     color: #0f172a; 
     font-size: 0.86rem;
+}
+.pc-priority-th-active,
+.pc-priority-td-active {
+    width: 54px;
+    text-align: center !important;
+}
+.pc-priority-th-order {
+    width: 100px;
+    text-align: right !important;
+}
+.pc-usage-card .pc-insight-body {
+    margin-bottom: 0.95rem;
+}
+.pc-dropdown-item-content {
+    padding: 2px 0;
+    width: 100%;
+}
+.pc-usage-rank-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
 }
 .pc-priority-order { 
     display: flex; 

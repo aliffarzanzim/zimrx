@@ -16,21 +16,21 @@ if (!defined('ZIMRX_PC_SETTINGS_SEEDED')) {
     <div class="pc-table-container">
         <table class="pc-table" id="pc-table">
             <colgroup>
-                <col style="width: 32px;">
-                <col style="width: 36px;">
-                <col>
-                <col style="width: 76px;">
-                <col style="width: 80px;">
-                <col style="width: 36px;">
+                <col class="pc-col-del">
+                <col class="pc-col-no">
+                <col class="pc-col-complaint">
+                <col class="pc-col-duration">
+                <col class="pc-col-unit">
+                <col class="pc-col-drag">
             </colgroup>
             <thead>
                 <tr>
-                    <th style="text-align: center;"></th>
-                    <th style="text-align: center;">#</th>
+                    <th class="pc-th-center"></th>
+                    <th class="pc-th-center">#</th>
                     <th>Presenting Complaints</th>
-                    <th style="text-align: center;">Duration</th>
-                    <th style="text-align: center;">Unit</th>
-                    <th style="text-align: center; padding: 0;">
+                    <th class="pc-th-center">Duration</th>
+                    <th class="pc-th-center">Unit</th>
+                    <th class="pc-th-settings">
                         <button type="button" class="pc-settings-btn" title="Presenting Complaint Settings" aria-haspopup="dialog" aria-controls="pc-settings-modal">
                             <?= zrx_icon('settings', 14) ?>
                         </button>
@@ -43,8 +43,8 @@ if (!defined('ZIMRX_PC_SETTINGS_SEEDED')) {
                     <td class="pc-action pc-del"><button type="button" title="Remove Row">X</button></td>
                     <td class="pc-row-no"><?= $i ?></td>
                     <td><textarea class="pc-input pc-complaint-input" autocomplete="off" rows="1"></textarea></td>
-                    <td><input type="text" class="pc-input pc-duration-input" style="text-align: center;" autocomplete="off"></td>
-                    <td><input type="text" class="pc-input pc-unit-input" style="text-align: center;" autocomplete="off"></td>
+                    <td><input type="text" class="pc-input pc-duration-input" autocomplete="off"></td>
+                    <td><input type="text" class="pc-input pc-unit-input" autocomplete="off"></td>
                     <td class="pc-action pc-drag">
                         <button type="button" class="pc-row-move-btn" title="Move Row">
                             <?= zrx_icon('move', 14) ?>
@@ -64,8 +64,8 @@ if (!defined('ZIMRX_PC_SETTINGS_SEEDED')) {
             <td class="pc-action pc-del"><button type="button" title="Remove Row">X</button></td>
             <td class="pc-row-no"></td>
             <td><textarea class="pc-input pc-complaint-input" autocomplete="off" rows="1"></textarea></td>
-            <td><input type="text" class="pc-input pc-duration-input" style="text-align: center;" autocomplete="off"></td>
-            <td><input type="text" class="pc-input pc-unit-input" style="text-align: center;" autocomplete="off"></td>
+            <td><input type="text" class="pc-input pc-duration-input" autocomplete="off"></td>
+            <td><input type="text" class="pc-input pc-unit-input" autocomplete="off"></td>
             <td class="pc-action pc-drag">
                 <button type="button" class="pc-row-move-btn" title="Move Row">
                     <?= zrx_icon('move', 14) ?>
@@ -135,9 +135,9 @@ if (!defined('ZIMRX_PC_SETTINGS_SEEDED')) {
                         <table class="pc-priority-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 54px; text-align: center;">Active</th>
+                                    <th class="pc-priority-th-active">Active</th>
                                     <th>Catalog Source</th>
-                                    <th style="width: 100px; text-align: right;">Order</th>
+                                    <th class="pc-priority-th-order">Order</th>
                                 </tr>
                             </thead>
                             <tbody class="pc-priority-body"></tbody>
@@ -184,7 +184,7 @@ if (!defined('ZIMRX_PC_SETTINGS_SEEDED')) {
                     </div>
                     <div class="pc-hide-search-results"></div>
                 </section>
-                <div class="pc-settings-bottom-spacer" style="height: 4px; min-height: 4px; flex-shrink: 0;" aria-hidden="true"></div>
+                <div class="pc-settings-bottom-spacer" aria-hidden="true"></div>
             </div>
 
             <!-- Tab Pane 2: Usage Ranking -->
@@ -198,7 +198,7 @@ if (!defined('ZIMRX_PC_SETTINGS_SEEDED')) {
                             <span class="pc-insight-title">Clinical Usage Ranking (Top 100)</span>
                         </div>
                     </div>
-                    <div class="pc-insight-body" style="margin-bottom: 0.95rem;">
+                    <div class="pc-insight-body">
                         <p>Unified leaderboard of your most frequently prescribed complaints with live usage count and catalog classification.</p>
                     </div>
                     <div class="pc-usage-search-box">
