@@ -281,6 +281,7 @@ function initPcAutocomplete() {
   const suggestCache = {};
 
   const load = (input) => {
+    if (window.ZimRxNavSuppressDropdown) return;
     clearTimeout(timeout);
     close(); // Immediately remove old dropdown
     activeInput = input;
@@ -774,6 +775,7 @@ function initPcAutocomplete() {
   });
 
   document.addEventListener('focus', (event) => {
+    if (window.ZimRxNavSuppressDropdown) return;
     if (event.target.matches(fieldSelector) && isInPcRoot(event.target)) load(event.target);
   }, true);
 

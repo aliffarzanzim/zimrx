@@ -3747,8 +3747,8 @@ body.zrx-column-resizing * {
 .pc-table-container { flex: 1; overflow: hidden; background: transparent; border-radius: 0; margin: 0; padding: 0; }
 .pc-table { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; margin: 0; padding: 0; border: none; }
 .pc-table thead { background: #cbd5e1; }
-.pc-table thead tr { background: #cbd5e1; height: auto; }
-.pc-table th { background: #cbd5e1; color: var(--text-dark); font-weight: 600; font-size: 0.75rem; padding: 4px 0.5rem; min-height: 32px; height: auto; box-sizing: border-box; vertical-align: middle; border: none; border-right: var(--zrx-table-border-width, 2px) solid #94a3b8; border-bottom: var(--zrx-table-border-width, 2px) solid #94a3b8; text-align: left; white-space: normal; word-break: break-word; }
+.pc-table thead tr { background: #cbd5e1; height: 32px; }
+.pc-table th { background: #cbd5e1; color: var(--text-dark); font-weight: 600; font-size: 0.75rem; padding: 0 0.5rem; height: 32px; box-sizing: border-box; vertical-align: middle !important; border: none; border-right: var(--zrx-table-border-width, 2px) solid #94a3b8; border-bottom: var(--zrx-table-border-width, 2px) solid #94a3b8; text-align: left; white-space: nowrap; line-height: 32px; }
 .pc-table thead th:first-child { border-left: none; }
 .pc-table thead th:last-child { border-right: none; }
 .pc-table td { border: none; border-right: var(--zrx-table-border-width, 2px) solid var(--zrx-table-border, #b8c5d6); border-bottom: var(--zrx-table-border-width, 2px) solid var(--zrx-table-border, #b8c5d6); padding: 0; vertical-align: middle; background: #ffffff;}
@@ -3928,8 +3928,8 @@ tbody tr.oh-dragging:first-child td {
 .pc-col-unit { width: var(--pc-col-unit-width, 80px); }
 .pc-col-drag { width: var(--pc-col-drag-width, 36px); }
 
-.pc-th-center { text-align: center; }
-.pc-th-settings { text-align: center; padding: 0 !important; }
+.pc-th-center { text-align: center; vertical-align: middle !important; }
+.pc-th-settings { text-align: center; padding: 0 !important; vertical-align: middle !important; line-height: 1; }
 
 .pc-input { width: 100%; min-height: var(--pc-row-min-height, 36px); height: var(--pc-row-min-height, 36px); border: none; padding: 6px 0.5rem; font-size: 16px; line-height: 1.35; background: transparent; outline: none; font-family: var(--font-family); color: var(--text-dark); display: block; }
 .pc-table textarea.pc-input { resize: none; overflow: hidden; }
@@ -4962,6 +4962,15 @@ td:has(> .pc-input:focus) > .pc-input { background: transparent; box-shadow: non
     display: inline-block;
     vertical-align: middle;
     flex-shrink: 0;
+}
+
+/* Universal Grid Navigation Dropdown Suppression (Prevents flickering during rapid navigation) */
+body.zrx-suppress-dropdowns .zrx-dropdown,
+body.zrx-suppress-dropdowns .rx-dropdown,
+body.zrx-suppress-dropdowns .autocomplete-list,
+body.zrx-suppress-dropdowns .appointment-lookup-list {
+    display: none !important;
+    pointer-events: none !important;
 }
 
 /* Global Dropdown Component */
