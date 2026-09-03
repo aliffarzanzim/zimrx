@@ -470,12 +470,22 @@ function initPcAutocomplete() {
       return;
     }
 
-    container.innerHTML = items.map((item) => `
-      <div class="pc-custom-item">
-        <div class="pc-custom-term">${escapeHtml(item.term)}</div>
-        <button type="button" class="pc-custom-remove" data-remove-custom="${escapeHtml(item.term)}" title="Remove Custom PC">${renderIcon('x', 14)}</button>
-      </div>
-    `).join('');
+    container.innerHTML = items.map((item) => {
+      const usageCount = Number(item.usage_count || 0);
+      const usageBadge = usageCount > 0
+        ? `<span class="pc-custom-usage-badge">${usageCount}× used</span>`
+        : `<span class="pc-custom-usage-badge pc-custom-unused">Not used yet</span>`;
+
+      return `
+        <div class="pc-custom-item">
+          <div class="pc-custom-term-group">
+            <div class="pc-custom-term">${escapeHtml(item.term)}</div>
+            ${usageBadge}
+          </div>
+          <button type="button" class="pc-custom-remove" data-remove-custom="${escapeHtml(item.term)}" title="Remove Custom PC">${renderIcon('x', 14)}</button>
+        </div>
+      `;
+    }).join('');
   };
 
   const renderHideResults = (results = null) => {

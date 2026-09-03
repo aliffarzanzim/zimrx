@@ -311,20 +311,26 @@ function pc_custom_terms(PDO $pdo, int $doctorId, string $term = '', int $limit 
     }
 
     $stmt = $userPdo->prepare(
-        "SELECT term, created_at, updated_at
-         FROM zimrx_user_pc
-         WHERE doctor_id = :doctor_id
-           AND category = 'custom'
-           AND (:term = '' OR term LIKE :term_like COLLATE NOCASE)
+        "SELECT c.term, c.created_at, c.updated_at,
+                COALESCE(u.usage_count, c.usage_count, 0) AS usage_count
+         FROM zimrx_user_pc c
+         LEFT JOIN zimrx_user_pc u
+           ON u.doctor_id = c.doctor_id
+          AND u.category = 'PC'
+          AND u.term = c.term COLLATE NOCASE
+         WHERE c.doctor_id = :doctor_id
+           AND c.category = 'custom'
+           AND (:term = '' OR c.term LIKE :term_like COLLATE NOCASE)
          ORDER BY
             CASE
                 WHEN :term = '' THEN 0
-                WHEN term = :term_exact COLLATE NOCASE THEN 0
-                WHEN term LIKE :term_prefix COLLATE NOCASE THEN 1
+                WHEN c.term = :term_exact COLLATE NOCASE THEN 0
+                WHEN c.term LIKE :term_prefix COLLATE NOCASE THEN 1
                 ELSE 2
             END,
-            updated_at DESC,
-            term ASC
+            COALESCE(u.usage_count, c.usage_count, 0) DESC,
+            c.updated_at DESC,
+            c.term ASC
          LIMIT :limit"
     );
     $stmt->bindValue(':doctor_id', max(1, $doctorId), PDO::PARAM_INT);

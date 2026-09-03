@@ -4857,11 +4857,35 @@ td:has(> .pc-input:focus) > .pc-input { background: transparent; box-shadow: non
     gap: 0.75rem; 
     box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02);
 }
+.pc-custom-term-group {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+    min-width: 0;
+}
 .pc-custom-term { 
     font-size: 0.84rem; 
     color: #0f172a; 
     font-weight: 600; 
     word-break: break-word; 
+}
+.pc-custom-usage-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.16rem 0.5rem;
+    border-radius: 6px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1d4ed8;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+.pc-custom-usage-badge.pc-custom-unused {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #64748b;
 }
 .pc-custom-remove { 
     width: 28px; 
