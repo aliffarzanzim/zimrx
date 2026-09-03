@@ -279,6 +279,10 @@ function initPcAutocomplete() {
 
   // Cache for all PC suggestion results
   const suggestCache = {};
+  const clearPcSuggestCache = () => {
+    Object.keys(suggestCache).forEach((k) => delete suggestCache[k]);
+  };
+  window.clearPcSuggestCache = clearPcSuggestCache;
 
   const load = (input) => {
     if (window.ZimRxNavSuppressDropdown) return;
@@ -557,6 +561,7 @@ function initPcAutocomplete() {
   };
 
   const applySettingsData = (data) => {
+    clearPcSuggestCache();
     settingsData = data;
     priorityDraft = Array.isArray(data?.priorities)
       ? data.priorities.map((row) => ({ ...row }))

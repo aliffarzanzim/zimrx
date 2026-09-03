@@ -309,13 +309,24 @@ try {
         $stmt = $userPdo->prepare(
             "DELETE FROM zimrx_user_pc
              WHERE doctor_id = :doctor_id
-               AND category = 'custom'
+               AND category IN ('custom', 'PC')
                AND term = :term COLLATE NOCASE"
         );
         $stmt->execute([
             'doctor_id' => max(1, $doctorId),
             'term' => $term,
         ]);
+
+        $userPdo->prepare(
+            "DELETE FROM zimrx_user_pc_settings
+             WHERE doctor_id = :doctor_id
+               AND setting_key = 'hidden_term'
+               AND term = :term COLLATE NOCASE"
+        )->execute([
+            'doctor_id' => max(1, $doctorId),
+            'term' => $term,
+        ]);
+
         rx_json(pc_settings_payload($pdo, $doctorId));
     }
 
