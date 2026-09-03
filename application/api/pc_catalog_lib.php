@@ -4,9 +4,8 @@ require_once __DIR__ . '/rx_regimen_lib.php';
 function pc_supported_sources(): array {
     return [
         'most_used' => 'Most Used P/C',
-        'custom' => 'Custom P/C',
-        'snomed' => 'SNOMED GPS',
-        'icd' => 'ICD-11',
+        'custom'    => 'Custom P/C',
+        'static_pc' => 'System P/C',
     ];
 }
 
@@ -28,6 +27,9 @@ function pc_lookup_db_path(string $filename): string {
 }
 
 function pc_source_label(string $source): string {
+    if ($source === 'snomed' || $source === 'static_pc') {
+        return 'System P/C';
+    }
     $sources = pc_supported_sources();
     return $sources[$source] ?? strtoupper($source);
 }
@@ -55,7 +57,7 @@ function pc_fts_prefix_query(string $query): string {
     preg_match_all('/[\p{L}\p{N}]+/u', $query, $matches);
     $tokens = array_slice($matches[0] ?? [], 0, 8);
     $tokens = array_filter($tokens, static function ($token) {
-        return mb_strlen($token, 'UTF-8') >= 2;
+        return mb_strlen($token, 'UTF-8') >= 1;
     });
 
     return implode(' ', array_map(static function ($token) {
@@ -199,17 +201,61 @@ function pc_hidden_map(PDO $pdo, int $doctorId): array {
     foreach ($stmt->fetchAll() as $row) {
         $source = rx_clean($row['source'] ?? '');
         $term = rx_clean($row['term'] ?? '');
-        if ($source === '' || $term === '') {
+        if ($term === '') {
             continue;
         }
-        $hidden[pc_hidden_key($source, $term)] = true;
+        $normTerm = rx_norm($term);
+        if ($source !== '') {
+            $hidden[pc_hidden_key($source, $term)] = true;
+        }
+        // Universal term suppression key
+        $hidden[$normTerm] = true;
     }
 
     return $hidden;
 }
 
+function pc_hidden_terms(PDO $pdo, int $doctorId): array {
+    $userPdo = rx_user_pdo();
+    $stmt = $userPdo->prepare(
+        "SELECT source, term, updated_at
+         FROM zimrx_user_pc_settings
+         WHERE doctor_id = :doctor_id AND setting_key = 'hidden_term'
+         ORDER BY updated_at DESC, id DESC"
+    );
+    $stmt->execute(['doctor_id' => max(1, $doctorId)]);
+
+    $items = [];
+    $seen = [];
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $source = rx_clean($row['source'] ?? '');
+        $term = rx_clean($row['term'] ?? '');
+        if ($term === '') {
+            continue;
+        }
+        $normKey = rx_norm($term);
+        if (isset($seen[$normKey])) {
+            continue;
+        }
+        $seen[$normKey] = true;
+        $items[] = [
+            'source' => $source ?: 'static_pc',
+            'source_label' => pc_source_label($source ?: 'static_pc'),
+            'term' => $term,
+            'is_hidden' => true,
+            'updated_at' => (string)($row['updated_at'] ?? ''),
+        ];
+    }
+    return $items;
+}
+
 function pc_is_hidden(array $hiddenMap, string $source, string $term): bool {
-    return isset($hiddenMap[pc_hidden_key($source, $term)]);
+    $termNorm = rx_norm($term);
+    if ($termNorm === '') {
+        return false;
+    }
+    // Matches either source-specific suppression or universal complaint suppression
+    return isset($hiddenMap[pc_hidden_key($source, $term)]) || isset($hiddenMap[$termNorm]);
 }
 
 function pc_learned_terms(PDO $pdo, int $doctorId, string $category, string $term, string $mode, int $limit): array {
@@ -265,20 +311,26 @@ function pc_custom_terms(PDO $pdo, int $doctorId, string $term = '', int $limit 
     }
 
     $stmt = $userPdo->prepare(
-        "SELECT term, created_at, updated_at
-         FROM zimrx_user_pc
-         WHERE doctor_id = :doctor_id
-           AND category = 'custom'
-           AND (:term = '' OR term LIKE :term_like COLLATE NOCASE)
+        "SELECT c.term, c.created_at, c.updated_at,
+                COALESCE(u.usage_count, c.usage_count, 0) AS usage_count
+         FROM zimrx_user_pc c
+         LEFT JOIN zimrx_user_pc u
+           ON u.doctor_id = c.doctor_id
+          AND u.category = 'PC'
+          AND u.term = c.term COLLATE NOCASE
+         WHERE c.doctor_id = :doctor_id
+           AND c.category = 'custom'
+           AND (:term = '' OR c.term LIKE :term_like COLLATE NOCASE)
          ORDER BY
             CASE
                 WHEN :term = '' THEN 0
-                WHEN term = :term_exact COLLATE NOCASE THEN 0
-                WHEN term LIKE :term_prefix COLLATE NOCASE THEN 1
+                WHEN c.term = :term_exact COLLATE NOCASE THEN 0
+                WHEN c.term LIKE :term_prefix COLLATE NOCASE THEN 1
                 ELSE 2
             END,
-            updated_at DESC,
-            term ASC
+            COALESCE(u.usage_count, c.usage_count, 0) DESC,
+            c.updated_at DESC,
+            c.term ASC
          LIMIT :limit"
     );
     $stmt->bindValue(':doctor_id', max(1, $doctorId), PDO::PARAM_INT);
@@ -319,7 +371,7 @@ function pc_custom_term_exists(PDO $pdo, int $doctorId, string $term): bool {
     return $cache[$cacheKey];
 }
 
-function pc_snomed_exact_match(string $term): bool {
+function pc_static_pc_exact_match(string $term): bool {
     static $cache = [];
     $term = rx_clean($term);
     if ($term === '') {
@@ -345,6 +397,10 @@ function pc_snomed_exact_match(string $term): bool {
     $stmt->execute(['term' => $term]);
     $cache[$cacheKey] = (bool)$stmt->fetchColumn();
     return $cache[$cacheKey];
+}
+
+function pc_snomed_exact_match(string $term): bool {
+    return pc_static_pc_exact_match($term);
 }
 
 function pc_icd_exact_match(string $term): bool {
@@ -385,11 +441,8 @@ function pc_source_candidates_for_term(PDO $pdo, int $doctorId, string $term): a
     if (pc_custom_term_exists($pdo, $doctorId, $term)) {
         $candidates[] = 'custom';
     }
-    if (pc_snomed_exact_match($term)) {
-        $candidates[] = 'snomed';
-    }
-    if (pc_icd_exact_match($term)) {
-        $candidates[] = 'icd';
+    if (pc_static_pc_exact_match($term)) {
+        $candidates[] = 'static_pc';
     }
     return $candidates;
 }
@@ -420,7 +473,7 @@ function pc_match_priority(string $label, string $term): array {
     ];
 }
 
-function pc_sort_snomed_matches(array $rows, string $term): array {
+function pc_sort_static_pc_matches(array $rows, string $term): array {
     usort($rows, static function ($a, $b) use ($term) {
         [$aMatch, $aLengthDelta, $aLabelNorm] = pc_match_priority((string)($a['preferred_term'] ?? ''), $term);
         [$bMatch, $bLengthDelta, $bLabelNorm] = pc_match_priority((string)($b['preferred_term'] ?? ''), $term);
@@ -446,6 +499,10 @@ function pc_sort_snomed_matches(array $rows, string $term): array {
     return $rows;
 }
 
+function pc_sort_snomed_matches(array $rows, string $term): array {
+    return pc_sort_static_pc_matches($rows, $term);
+}
+
 function pc_classify_term_source(PDO $pdo, int $doctorId, string $term, array $priorityRows = []): string {
     $candidates = pc_source_candidates_for_term($pdo, $doctorId, $term);
     if (!$candidates) {
@@ -460,17 +517,40 @@ function pc_classify_term_source(PDO $pdo, int $doctorId, string $term, array $p
     return $candidates[0] ?? 'most_used';
 }
 
-function pc_snomed_search(string $term, int $limit = 25): array {
+function pc_static_term_exists(string $term): bool {
+    static $cache = [];
+    $termClean = trim((string)preg_replace('/\s+/u', ' ', $term));
+    if ($termClean === '') {
+        return false;
+    }
+    $termNorm = mb_strtolower($termClean, 'UTF-8');
+    if (array_key_exists($termNorm, $cache)) {
+        return $cache[$termNorm];
+    }
+    $db = pc_catalog_db('zimrx_static.db');
+    if (!$db instanceof PDO) {
+        return false;
+    }
+    $stmt = $db->prepare(
+        "SELECT 1 FROM zimrx_static_pc WHERE term = :term COLLATE NOCASE LIMIT 1"
+    );
+    $stmt->execute(['term' => $termClean]);
+    $exists = (bool)$stmt->fetchColumn();
+    $cache[$termNorm] = $exists;
+    return $exists;
+}
+
+function pc_static_pc_search(string $term, int $limit = 25): array {
     $db = pc_catalog_db('zimrx_static.db');
     if (!$db instanceof PDO || $limit < 1) {
         return [];
     }
 
     if ($term === '') {
-        static $snomedSeedCache = null;
-        static $snomedSeedLimit = 0;
-        if ($snomedSeedCache !== null && $snomedSeedLimit >= $limit) {
-            return array_slice($snomedSeedCache, 0, $limit);
+        static $staticPcSeedCache = null;
+        static $staticPcSeedLimit = 0;
+        if ($staticPcSeedCache !== null && $staticPcSeedLimit >= $limit) {
+            return array_slice($staticPcSeedCache, 0, $limit);
         }
 
         $seeds = [];
@@ -512,13 +592,9 @@ function pc_snomed_search(string $term, int $limit = 25): array {
             }
         }
 
-        $snomedSeedCache = $results;
-        $snomedSeedLimit = $limit;
+        $staticPcSeedCache = $results;
+        $staticPcSeedLimit = $limit;
         return array_slice($results, 0, $limit);
-    }
-
-    if (mb_strlen($term, 'UTF-8') < 2) {
-        return [];
     }
 
     $ftsQuery = pc_fts_prefix_query($term);
@@ -590,7 +666,7 @@ function pc_snomed_search(string $term, int $limit = 25): array {
         $stmt->bindValue(':fts_query', $ftsQuery, PDO::PARAM_STR);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
-        return array_slice(pc_sort_snomed_matches($stmt->fetchAll(), $term), 0, $limit);
+        return array_slice(pc_sort_static_pc_matches($stmt->fetchAll(), $term), 0, $limit);
     }
 
     $stmt = $db->prepare(
@@ -614,7 +690,11 @@ function pc_snomed_search(string $term, int $limit = 25): array {
     $stmt->bindValue(':prefix', $term . '%', PDO::PARAM_STR);
     $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
     $stmt->execute();
-    return array_slice(pc_sort_snomed_matches($stmt->fetchAll(), $term), 0, $limit);
+    return array_slice(pc_sort_static_pc_matches($stmt->fetchAll(), $term), 0, $limit);
+}
+
+function pc_snomed_search(string $term, int $limit = 25): array {
+    return pc_static_pc_search($term, $limit);
 }
 
 function pc_icd_search(string $term, int $limit = 15): array {
@@ -672,10 +752,6 @@ function pc_icd_search(string $term, int $limit = 15): array {
         $icdSeedCache = $results;
         $icdSeedLimit = $limit;
         return array_slice($results, 0, $limit);
-    }
-
-    if (mb_strlen($term, 'UTF-8') < 2) {
-        return [];
     }
 
     $ftsQuery = pc_fts_prefix_query($term);

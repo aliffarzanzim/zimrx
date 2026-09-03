@@ -3,6 +3,16 @@ require_once __DIR__ . '/../auth.php';
 require_login();
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/rx_regimen_lib.php';
+require_once __DIR__ . '/pc_catalog_lib.php';
+
+function pc_is_valid_complaint_term(string $term): bool {
+    $clean = trim($term);
+    if (mb_strlen($clean, 'UTF-8') < 2) {
+        return false;
+    }
+    // Must contain at least 2 alphanumeric characters
+    return (bool)preg_match('/[\p{L}\p{N}].*[\p{L}\p{N}]/u', $clean);
+}
 
 try {
     header('Content-Type: application/json');
@@ -76,9 +86,19 @@ try {
             continue;
         }
 
-        $learn('PC', $complaint);
-        $learn('pc_duration', $duration);
-        $learn('pc_unit', $unit);
+        if ($complaint !== '' && pc_is_valid_complaint_term($complaint)) {
+            $learn('PC', $complaint);
+            // If this complaint does not exist in the pre-seeded system catalog, auto-register as custom P/C
+            if (!pc_static_term_exists($complaint)) {
+                $learn('custom', $complaint);
+            }
+        }
+        if ($duration !== '') {
+            $learn('pc_duration', $duration);
+        }
+        if ($unit !== '') {
+            $learn('pc_unit', $unit);
+        }
     }
 
     rx_json(['learned' => $learned, 'skipped' => $skipped]);

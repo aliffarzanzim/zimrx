@@ -27,6 +27,13 @@ function initPcAutocomplete() {
 
   const getSettingsModal = () => document.getElementById('pc-settings-modal');
 
+  const renderIcon = (name, size = 14, attrs = {}) => {
+    if (window.ZimRxIcon && typeof window.ZimRxIcon.render === 'function') {
+      return window.ZimRxIcon.render(name, size, attrs);
+    }
+    return '';
+  };
+
   const escapeHtml = (value) => {
     const div = document.createElement('div');
     div.textContent = value == null ? '' : String(value);
@@ -240,7 +247,7 @@ function initPcAutocomplete() {
       const li = document.createElement('li');
       li.className = 'zrx-dropdown-item rx-dropdown-item';
       if (index === 0) li.classList.add('active');
-      li.innerHTML = `<div style="padding:2px 0; width:100%;"><strong>${escapeHtml(item.label)}</strong></div>`;
+      li.innerHTML = `<div class="pc-dropdown-item-content"><strong>${escapeHtml(item.label)}</strong></div>`;
       
       li.addEventListener('mouseenter', () => {
         const allItems = ul.querySelectorAll('.zrx-dropdown-item, .rx-dropdown-item');
@@ -272,8 +279,13 @@ function initPcAutocomplete() {
 
   // Cache for all PC suggestion results
   const suggestCache = {};
+  const clearPcSuggestCache = () => {
+    Object.keys(suggestCache).forEach((k) => delete suggestCache[k]);
+  };
+  window.clearPcSuggestCache = clearPcSuggestCache;
 
   const load = (input) => {
+    if (window.ZimRxNavSuppressDropdown) return;
     clearTimeout(timeout);
     close(); // Immediately remove old dropdown
     activeInput = input;
@@ -313,13 +325,13 @@ function initPcAutocomplete() {
 
     tbody.innerHTML = priorityDraft.map((row, index) => `
       <tr data-source="${escapeHtml(row.source)}">
-        <td><input type="checkbox" class="pc-priority-checkbox" data-priority-toggle="${escapeHtml(row.source)}" ${row.is_enabled ? 'checked' : ''}></td>
+        <td class="pc-priority-td-active"><input type="checkbox" class="pc-priority-checkbox" data-priority-toggle="${escapeHtml(row.source)}" ${row.is_enabled ? 'checked' : ''} aria-label="Toggle ${escapeHtml(row.label)}"></td>
         <td><span class="pc-priority-row-label">${escapeHtml(row.label)}</span></td>
         <td>
           <div class="pc-priority-order">
             <span class="pc-priority-badge">${index + 1}</span>
-            <button type="button" class="pc-priority-move" data-priority-move="up" data-source="${escapeHtml(row.source)}" ${index === 0 ? 'disabled' : ''}>&uarr;</button>
-            <button type="button" class="pc-priority-move" data-priority-move="down" data-source="${escapeHtml(row.source)}" ${index === priorityDraft.length - 1 ? 'disabled' : ''}>&darr;</button>
+            <button type="button" class="pc-priority-move" data-priority-move="up" data-source="${escapeHtml(row.source)}" ${index === 0 ? 'disabled' : ''} title="Move Up">${renderIcon('chevron-up', 12)}</button>
+            <button type="button" class="pc-priority-move" data-priority-move="down" data-source="${escapeHtml(row.source)}" ${index === priorityDraft.length - 1 ? 'disabled' : ''} title="Move Down">${renderIcon('chevron-down', 12)}</button>
           </div>
         </td>
       </tr>
@@ -366,6 +378,87 @@ function initPcAutocomplete() {
     }).join('');
   };
 
+  const renderUsageRanking = (filterQuery = '') => {
+    const modal = getSettingsModal();
+    const container = modal?.querySelector('.pc-usage-ranking-list');
+    if (!container) return;
+
+    const searchInput = modal?.querySelector('.pc-usage-search-input');
+    const clearBtn = modal?.querySelector('.pc-usage-search-clear-btn');
+    const query = (typeof filterQuery === 'string' ? filterQuery : (searchInput?.value || '')).trim().toLowerCase();
+
+    if (clearBtn && searchInput) {
+      clearBtn.hidden = !searchInput.value.trim();
+    }
+
+    let items = Array.isArray(settingsData?.usage_ranking) ? [...settingsData.usage_ranking] : [];
+
+    // Fallback to extracting from used_groups if usage_ranking wasn't in legacy cache
+    if (!items.length && Array.isArray(settingsData?.used_groups)) {
+      let rank = 0;
+      settingsData.used_groups.forEach((group) => {
+        (group.items || []).forEach((item) => {
+          rank++;
+          items.push({
+            rank,
+            term: item.term,
+            source: group.source,
+            source_label: group.label,
+            usage_count: item.usage_count || 0,
+            is_hidden: item.is_hidden,
+          });
+        });
+      });
+      items.sort((a, b) => (b.usage_count - a.usage_count) || a.term.localeCompare(b.term));
+      items = items.slice(0, 100);
+      items.forEach((item, idx) => { item.rank = idx + 1; });
+    }
+
+    if (!items.length) {
+      container.innerHTML = '<div class="pc-settings-empty">No clinical usage data recorded yet. As you prescribe complaints, your Top 100 ranking will automatically appear here.</div>';
+      return;
+    }
+
+    if (query) {
+      items = items.filter((item) => (item.term || '').toLowerCase().includes(query));
+    }
+
+    if (!items.length) {
+      container.innerHTML = `<div class="pc-settings-empty">No complaints matching "<strong>${escapeHtml(query)}</strong>" found in Top 100 usage rankings.</div>`;
+      return;
+    }
+
+    container.innerHTML = items.map((item) => {
+      let topClass = '';
+      if (item.rank === 1) topClass = ' top-1';
+      else if (item.rank === 2) topClass = ' top-2';
+      else if (item.rank === 3) topClass = ' top-3';
+
+      const usageLabel = Number(item.usage_count || 0) === 1 ? '1 use' : `${Number(item.usage_count || 0)} uses`;
+
+      return `
+        <div class="pc-usage-rank-item">
+          <div class="pc-usage-rank-left">
+            <div class="pc-usage-rank-badge${topClass}">#${item.rank}</div>
+            <div>
+              <div class="pc-search-result-term">${escapeHtml(item.term)}</div>
+              <div class="pc-search-result-meta">
+                <span class="pc-tag">${escapeHtml(item.source_label || pcSourceLabel(item.source))}</span>
+                ${item.is_hidden ? '<span class="pc-tag hidden">Hidden</span>' : ''}
+              </div>
+            </div>
+          </div>
+          <div class="pc-usage-rank-actions">
+            <span class="pc-usage-count-badge">${usageLabel}</span>
+            <button type="button" class="pc-search-toggle" data-toggle-hidden="${escapeHtml(item.source || 'static_pc')}" data-term="${escapeHtml(item.term)}" data-hidden="${item.is_hidden ? '1' : '0'}">
+              ${item.is_hidden ? 'Unhide' : 'Hide'}
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  };
+
   const renderCustomList = () => {
     const modal = getSettingsModal();
     const container = modal?.querySelector('.pc-custom-list');
@@ -377,48 +470,111 @@ function initPcAutocomplete() {
       return;
     }
 
-    container.innerHTML = items.map((item) => `
-      <div class="pc-custom-item">
-        <div class="pc-custom-term">${escapeHtml(item.term)}</div>
-        <button type="button" class="pc-custom-remove" data-remove-custom="${escapeHtml(item.term)}" title="Remove Custom PC">&times;</button>
-      </div>
-    `).join('');
+    container.innerHTML = items.map((item) => {
+      const usageCount = Number(item.usage_count || 0);
+      const usageBadge = usageCount > 0
+        ? `<span class="pc-custom-usage-badge">${usageCount}× used</span>`
+        : `<span class="pc-custom-usage-badge pc-custom-unused">Not used yet</span>`;
+
+      return `
+        <div class="pc-custom-item" data-custom-item="${escapeHtml(item.term)}">
+          <div class="pc-custom-term-group">
+            <div class="pc-custom-term">${escapeHtml(item.term)}</div>
+            ${usageBadge}
+          </div>
+          <div class="pc-custom-actions">
+            <button type="button" class="pc-custom-edit" data-edit-custom="${escapeHtml(item.term)}" title="Rename Custom PC">${renderIcon('edit', 13)}</button>
+            <button type="button" class="pc-custom-remove" data-remove-custom="${escapeHtml(item.term)}" title="Remove Custom PC">${renderIcon('x', 14)}</button>
+          </div>
+        </div>
+      `;
+    }).join('');
   };
 
-  const renderHideResults = (results) => {
+  const renderHideResults = (results = null) => {
     const modal = getSettingsModal();
     const container = modal?.querySelector('.pc-hide-search-results');
     if (!container) return;
 
+    const searchInput = modal?.querySelector('.pc-hide-search-input');
+    const clearBtn = modal?.querySelector('.pc-search-clear-btn');
+    const query = searchInput?.value.trim() || '';
+
+    if (clearBtn) {
+      clearBtn.hidden = !query;
+    }
+
+    // If no search query is typed, show all currently hidden terms cleanly
+    if (!query) {
+      const hiddenItems = Array.isArray(settingsData?.hidden_terms) ? settingsData.hidden_terms : [];
+      if (!hiddenItems.length) {
+        container.innerHTML = '<div class="pc-settings-empty">No terms are currently hidden for this doctor. Search above to find and hide any suggestion.</div>';
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="pc-hidden-list-header">
+          <span>Currently Hidden Terms (${hiddenItems.length})</span>
+          <button type="button" class="pc-unhide-all-btn" data-unhide-all title="Unhide all suppressed terms">Unhide All</button>
+        </div>
+        ${hiddenItems.map((item) => `
+          <div class="pc-search-result" data-term-card="${escapeHtml(item.term)}">
+            <div class="pc-search-result-main">
+              <div class="pc-search-result-term">${escapeHtml(item.term)}</div>
+              <div class="pc-search-result-meta">
+                <span class="pc-tag hidden">Hidden</span>
+              </div>
+            </div>
+            <button type="button" class="pc-search-toggle" data-toggle-hidden="${escapeHtml(item.source || 'static_pc')}" data-term="${escapeHtml(item.term)}" data-hidden="1">
+              Unhide
+            </button>
+          </div>
+        `).join('')}
+      `;
+      return;
+    }
+
+    // When searching, show search results
     if (!Array.isArray(results) || !results.length) {
-      container.innerHTML = '<div class="pc-settings-empty">Search a complaint to hide or unhide it for this doctor.</div>';
+      container.innerHTML = '<div class="pc-settings-empty">No matching terms found.</div>';
       return;
     }
 
     container.innerHTML = results.map((item) => `
-      <div class="pc-search-result">
+      <div class="pc-search-result" data-term-card="${escapeHtml(item.term)}">
         <div class="pc-search-result-main">
           <div class="pc-search-result-term">${escapeHtml(item.term)}</div>
           <div class="pc-search-result-meta">
-            <span class="pc-tag">${escapeHtml(item.source_label)}</span>
-            ${typeof item.usage_count === 'number' ? `<span>Used ${item.usage_count} time${item.usage_count === 1 ? '' : 's'}</span>` : ''}
-            ${item.is_hidden ? '<span class="pc-tag hidden">Hidden</span>' : ''}
+            ${item.is_hidden 
+              ? '<span class="pc-tag hidden">Hidden</span>' 
+              : `<span class="pc-tag">${escapeHtml(item.source_label)}</span>`}
+            ${!item.is_hidden && typeof item.usage_count === 'number' ? `<span>Used ${item.usage_count} time${item.usage_count === 1 ? '' : 's'}</span>` : ''}
           </div>
         </div>
-        <button type="button" class="pc-search-toggle" data-toggle-hidden="${escapeHtml(item.source)}" data-term="${escapeHtml(item.term)}" data-hidden="${item.is_hidden ? '1' : '0'}">
+        <button type="button" class="pc-search-toggle" data-toggle-hidden="${escapeHtml(item.source || 'static_pc')}" data-term="${escapeHtml(item.term)}" data-hidden="${item.is_hidden ? '1' : '0'}">
           ${item.is_hidden ? 'Unhide' : 'Hide'}
         </button>
       </div>
     `).join('');
   };
 
+  const pcSourceLabel = (source) => {
+    if (source === 'most_used') return 'Most Used P/C';
+    if (source === 'custom') return 'Custom P/C';
+    if (source === 'static_pc' || source === 'snomed') return 'System P/C';
+    return source || '';
+  };
+
   const refreshSettingsUi = () => {
     renderPriorityTable();
     renderUsedGroups();
+    renderUsageRanking();
     renderCustomList();
+    renderHideResults();
   };
 
   const applySettingsData = (data) => {
+    clearPcSuggestCache();
     settingsData = data;
     priorityDraft = Array.isArray(data?.priorities)
       ? data.priorities.map((row) => ({ ...row }))
@@ -430,7 +586,7 @@ function initPcAutocomplete() {
     if (query) {
       performHideSearch(query);
     } else {
-      renderHideResults([]);
+      renderHideResults();
     }
   };
 
@@ -478,23 +634,65 @@ function initPcAutocomplete() {
     applySettingsData(data);
   };
 
+  const resetModalScroll = () => {
+    const modal = getSettingsModal();
+    if (!modal) return;
+    const body = modal.querySelector('.pc-settings-body');
+    if (body) {
+      body.scrollTop = 0;
+      if (typeof body.scrollTo === 'function') {
+        body.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      }
+    }
+    const panel = modal.querySelector('.pc-settings-panel');
+    if (panel) {
+      panel.scrollTop = 0;
+      if (typeof panel.scrollTo === 'function') {
+        panel.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      }
+    }
+  };
+
   const openSettings = async () => {
     const modal = getSettingsModal();
     if (!modal) return;
     close();
+
+    // Blur any active element outside the modal
+    if (document.activeElement && typeof document.activeElement.blur === 'function') {
+      document.activeElement.blur();
+    }
+
     const hasInitialData = applyInitialSettingsData();
     modal.hidden = false;
     document.body.style.overflow = 'hidden';
 
+    // Default to the first tab (Settings)
+    modal.querySelectorAll('.pc-settings-tab-btn').forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.pcTab === 'settings');
+    });
+    modal.querySelectorAll('.pc-tab-pane').forEach((pane) => {
+      const isSettings = pane.id === 'pc-tab-pane-settings';
+      pane.hidden = !isSettings;
+      pane.classList.toggle('active', isSettings);
+    });
+
+    resetModalScroll();
+    requestAnimationFrame(resetModalScroll);
+    setTimeout(resetModalScroll, 20);
+    setTimeout(resetModalScroll, 80);
+    setTimeout(resetModalScroll, 220);
+
     if (hasInitialData) {
       loadSettingsData().catch(() => {});
-      modal.querySelector('.pc-custom-input')?.focus();
       return;
     }
 
     try {
       await loadSettingsData();
-      modal.querySelector('.pc-custom-input')?.focus();
+      resetModalScroll();
+      requestAnimationFrame(resetModalScroll);
+      setTimeout(resetModalScroll, 50);
     } catch (error) {
       alert(error.message || 'Could not load P/C settings.');
     }
@@ -577,12 +775,25 @@ function initPcAutocomplete() {
     }
 
     if (event.target.matches('.pc-hide-search-input')) {
+      const clearBtn = event.target.closest('.pc-hide-search-box')?.querySelector('.pc-search-clear-btn');
+      if (clearBtn) {
+        clearBtn.hidden = !event.target.value.trim();
+      }
       clearTimeout(hideSearchTimer);
       hideSearchTimer = setTimeout(() => performHideSearch(event.target.value), 180);
+    }
+
+    if (event.target.matches('.pc-usage-search-input')) {
+      const clearBtn = event.target.closest('.pc-usage-search-box')?.querySelector('.pc-usage-search-clear-btn');
+      if (clearBtn) {
+        clearBtn.hidden = !event.target.value.trim();
+      }
+      renderUsageRanking(event.target.value);
     }
   });
 
   document.addEventListener('focus', (event) => {
+    if (window.ZimRxNavSuppressDropdown) return;
     if (event.target.matches(fieldSelector) && isInPcRoot(event.target)) load(event.target);
   }, true);
 
@@ -594,6 +805,24 @@ function initPcAutocomplete() {
     }
 
     if (event.key === 'Escape' && !getSettingsModal()?.hidden) {
+      const searchInput = getSettingsModal()?.querySelector('.pc-hide-search-input');
+      if (searchInput && searchInput === document.activeElement && searchInput.value.trim()) {
+        event.preventDefault();
+        searchInput.value = '';
+        const clearBtn = getSettingsModal()?.querySelector('.pc-search-clear-btn');
+        if (clearBtn) clearBtn.hidden = true;
+        renderHideResults();
+        return;
+      }
+      const usageInput = getSettingsModal()?.querySelector('.pc-usage-search-input');
+      if (usageInput && usageInput === document.activeElement && usageInput.value.trim()) {
+        event.preventDefault();
+        usageInput.value = '';
+        const clearBtn = getSettingsModal()?.querySelector('.pc-usage-search-clear-btn');
+        if (clearBtn) clearBtn.hidden = true;
+        renderUsageRanking();
+        return;
+      }
       close();
       closeSettings();
       return;
@@ -628,6 +857,85 @@ function initPcAutocomplete() {
   });
 
   document.addEventListener('click', async (event) => {
+    const tabBtn = event.target.closest('[data-pc-tab]');
+    if (tabBtn) {
+      event.preventDefault();
+      const modal = getSettingsModal();
+      if (!modal) return;
+      const tabName = tabBtn.dataset.pcTab;
+
+      modal.querySelectorAll('.pc-settings-tab-btn').forEach((b) => b.classList.remove('active'));
+      tabBtn.classList.add('active');
+
+      modal.querySelectorAll('.pc-tab-pane').forEach((pane) => {
+        pane.hidden = true;
+        pane.classList.remove('active');
+      });
+
+      const activePane = modal.querySelector(`#pc-tab-pane-${tabName}`);
+      if (activePane) {
+        activePane.hidden = false;
+        activePane.classList.add('active');
+      }
+
+      resetModalScroll();
+      requestAnimationFrame(resetModalScroll);
+      setTimeout(resetModalScroll, 30);
+      return;
+    }
+
+    const searchClearBtn = event.target.closest('.pc-search-clear-btn');
+    if (searchClearBtn) {
+      event.preventDefault();
+      const modal = getSettingsModal();
+      const input = modal?.querySelector('.pc-hide-search-input');
+      if (input) {
+        input.value = '';
+        searchClearBtn.hidden = true;
+        input.focus();
+      }
+      renderHideResults();
+      return;
+    }
+
+    const usageClearBtn = event.target.closest('.pc-usage-search-clear-btn');
+    if (usageClearBtn) {
+      event.preventDefault();
+      const modal = getSettingsModal();
+      const input = modal?.querySelector('.pc-usage-search-input');
+      if (input) {
+        input.value = '';
+        usageClearBtn.hidden = true;
+        input.focus();
+      }
+      renderUsageRanking();
+      return;
+    }
+
+    const unhideAllBtn = event.target.closest('[data-unhide-all]');
+    if (unhideAllBtn) {
+      event.preventDefault();
+      if (!confirm('Are you sure you want to unhide all hidden complaint terms?')) return;
+      if (settingsData) {
+        settingsData.hidden_terms = [];
+      }
+      renderHideResults();
+      try {
+        const data = await postSettings({ action: 'unhide_all' });
+        if (data.data) {
+          settingsData = data.data;
+          priorityDraft = Array.isArray(settingsData?.priorities)
+            ? settingsData.priorities.map((row) => ({ ...row }))
+            : priorityDraft;
+        }
+        refreshSettingsUi();
+      } catch (error) {
+        alert(error.message || 'Could not unhide all terms.');
+        loadSettingsData().catch(() => {});
+      }
+      return;
+    }
+
     const settingsButton = event.target.closest('.pc-settings-btn');
     if (settingsButton) {
       event.preventDefault();
@@ -635,7 +943,8 @@ function initPcAutocomplete() {
       return;
     }
 
-    if (event.target.closest('[data-pc-settings-close]')) {
+    const closeButton = event.target.closest('[data-pc-settings-close]');
+    if (closeButton) {
       event.preventDefault();
       closeSettings();
       return;
@@ -702,6 +1011,78 @@ function initPcAutocomplete() {
       return;
     }
 
+    const editCustomButton = event.target.closest('[data-edit-custom]');
+    if (editCustomButton) {
+      event.preventDefault();
+      const itemEl = editCustomButton.closest('.pc-custom-item');
+      const term = editCustomButton.dataset.editCustom || '';
+      if (!itemEl || !term) return;
+
+      itemEl.innerHTML = `
+        <div class="pc-custom-edit-form">
+          <input type="text" class="pc-custom-inline-input" value="${escapeHtml(term)}">
+          <div class="pc-custom-inline-actions">
+            <button type="button" class="pc-custom-save-edit" data-save-custom-edit="${escapeHtml(term)}" title="Save Rename">${renderIcon('check', 14)}</button>
+            <button type="button" class="pc-custom-cancel-edit" title="Cancel">${renderIcon('x', 14)}</button>
+          </div>
+        </div>
+      `;
+      const input = itemEl.querySelector('.pc-custom-inline-input');
+      if (input) {
+        input.focus();
+        input.select();
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            itemEl.querySelector('.pc-custom-save-edit')?.click();
+          } else if (e.key === 'Escape') {
+            e.preventDefault();
+            renderCustomList();
+          }
+        });
+      }
+      return;
+    }
+
+    const saveEditButton = event.target.closest('[data-save-custom-edit]');
+    if (saveEditButton) {
+      event.preventDefault();
+      const itemEl = saveEditButton.closest('.pc-custom-item');
+      const oldTerm = saveEditButton.dataset.saveCustomEdit || '';
+      const input = itemEl?.querySelector('.pc-custom-inline-input');
+      const newTerm = input?.value.trim() || '';
+
+      if (!newTerm || newTerm.toLowerCase() === oldTerm.toLowerCase()) {
+        renderCustomList();
+        return;
+      }
+
+      try {
+        const data = await postSettings({
+          action: 'edit_custom',
+          old_term: oldTerm,
+          new_term: newTerm,
+        });
+        if (data.error) throw new Error(data.error);
+        settingsData = data;
+        priorityDraft = Array.isArray(data.priorities)
+          ? data.priorities.map((row) => ({ ...row }))
+          : priorityDraft;
+        refreshSettingsUi();
+      } catch (error) {
+        alert(error.message || 'Could not rename custom PC.');
+        renderCustomList();
+      }
+      return;
+    }
+
+    const cancelEditButton = event.target.closest('.pc-custom-cancel-edit');
+    if (cancelEditButton) {
+      event.preventDefault();
+      renderCustomList();
+      return;
+    }
+
     const removeCustomButton = event.target.closest('[data-remove-custom]');
     if (removeCustomButton) {
       event.preventDefault();
@@ -726,26 +1107,81 @@ function initPcAutocomplete() {
     if (hiddenToggle) {
       event.preventDefault();
       const modal = getSettingsModal();
-      const query = modal?.querySelector('.pc-hide-search-input')?.value.trim() || '';
+      const searchInput = modal?.querySelector('.pc-hide-search-input');
+      const query = searchInput?.value.trim() || '';
+      const source = hiddenToggle.dataset.toggleHidden || 'static_pc';
+      const term = hiddenToggle.dataset.term || '';
       const nextHidden = hiddenToggle.dataset.hidden !== '1';
-      try {
-        const data = await postSettings({
-          action: 'toggle_hidden',
-          source: hiddenToggle.dataset.toggleHidden || '',
-          term: hiddenToggle.dataset.term || '',
-          hidden: nextHidden ? 1 : 0,
-          query,
-        });
-        if (data.error) throw new Error(data.error);
-        settingsData = data.data || settingsData;
-        priorityDraft = Array.isArray(settingsData?.priorities)
-          ? settingsData.priorities.map((row) => ({ ...row }))
-          : priorityDraft;
-        refreshSettingsUi();
-        renderHideResults(data.results || []);
-      } catch (error) {
-        alert(error.message || 'Could not update hidden status.');
+
+      // 1. Instant Optimistic UI state flip
+      hiddenToggle.dataset.hidden = nextHidden ? '1' : '0';
+      hiddenToggle.textContent = nextHidden ? 'Unhide' : 'Hide';
+
+      if (Array.isArray(settingsData?.hidden_terms)) {
+        const normKey = term.toLowerCase().trim();
+        settingsData.hidden_terms = settingsData.hidden_terms.filter(
+          (item) => (item.term || '').toLowerCase().trim() !== normKey
+        );
+        if (nextHidden) {
+          settingsData.hidden_terms.unshift({
+            source,
+            source_label: pcSourceLabel(source),
+            term,
+            is_hidden: true,
+            updated_at: new Date().toISOString(),
+          });
+        }
       }
+
+      // Also update is_hidden in settingsData.usage_ranking
+      if (Array.isArray(settingsData?.usage_ranking)) {
+        const normKey = term.toLowerCase().trim();
+        const rankingItem = settingsData.usage_ranking.find(
+          (item) => (item.term || '').toLowerCase().trim() === normKey
+        );
+        if (rankingItem) {
+          rankingItem.is_hidden = nextHidden;
+        }
+      }
+
+      // If in default view (no search active), update lists
+      if (!query) {
+        renderHideResults();
+      } else {
+        const card = hiddenToggle.closest('.pc-search-result');
+        const meta = card?.querySelector('.pc-search-result-meta');
+        if (meta) {
+          meta.innerHTML = nextHidden
+            ? '<span class="pc-tag hidden">Hidden</span>'
+            : `<span class="pc-tag">${escapeHtml(pcSourceLabel(source))}</span>`;
+        }
+      }
+      renderUsageRanking();
+
+      // 2. Background persistence
+      postSettings({
+        action: 'toggle_hidden',
+        source,
+        term,
+        hidden: nextHidden ? 1 : 0,
+        query,
+      }).then((data) => {
+        if (data.error) throw new Error(data.error);
+        if (data.data) {
+          settingsData = data.data;
+          priorityDraft = Array.isArray(settingsData?.priorities)
+            ? settingsData.priorities.map((row) => ({ ...row }))
+            : priorityDraft;
+        }
+        const currentQuery = modal?.querySelector('.pc-hide-search-input')?.value.trim() || '';
+        if (currentQuery) {
+          renderHideResults(data.results || []);
+        }
+        renderUsageRanking();
+      }).catch((error) => {
+        alert(error.message || 'Could not update hidden status.');
+        loadSettingsData().catch(() => {});
+      });
       return;
     }
 
