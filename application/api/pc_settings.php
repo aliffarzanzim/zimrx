@@ -330,6 +330,46 @@ try {
         rx_json(pc_settings_payload($pdo, $doctorId));
     }
 
+    if ($action === 'edit_custom') {
+        $userPdo = rx_user_pdo();
+        $oldTerm = trim((string)preg_replace('/\s+/u', ' ', rx_clean($payload['old_term'] ?? '')));
+        $newTerm = trim((string)preg_replace('/\s+/u', ' ', rx_clean($payload['new_term'] ?? '')));
+
+        if ($oldTerm === '' || $newTerm === '') {
+            rx_json(['error' => 'Both current and new complaint terms are required.']);
+        }
+
+        if (strcasecmp($oldTerm, $newTerm) !== 0) {
+            $stmt = $userPdo->prepare(
+                "UPDATE zimrx_user_pc
+                 SET term = :new_term,
+                     updated_at = " . DbSql::now() . "
+                 WHERE doctor_id = :doctor_id
+                   AND category IN ('custom', 'PC')
+                   AND term = :old_term COLLATE NOCASE"
+            );
+            $stmt->execute([
+                'doctor_id' => max(1, $doctorId),
+                'old_term' => $oldTerm,
+                'new_term' => $newTerm,
+            ]);
+
+            $userPdo->prepare(
+                "UPDATE zimrx_user_pc_settings
+                 SET term = :new_term
+                 WHERE doctor_id = :doctor_id
+                   AND setting_key = 'hidden_term'
+                   AND term = :old_term COLLATE NOCASE"
+            )->execute([
+                'doctor_id' => max(1, $doctorId),
+                'old_term' => $oldTerm,
+                'new_term' => $newTerm,
+            ]);
+        }
+
+        rx_json(pc_settings_payload($pdo, $doctorId));
+    }
+
     if ($action === 'save_priorities') {
         $priorities = is_array($payload['priorities'] ?? null) ? $payload['priorities'] : [];
         pc_settings_save_priorities($pdo, $doctorId, $priorities);
