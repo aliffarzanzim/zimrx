@@ -511,6 +511,29 @@ function pc_classify_term_source(PDO $pdo, int $doctorId, string $term, array $p
     return $candidates[0] ?? 'most_used';
 }
 
+function pc_static_term_exists(string $term): bool {
+    static $cache = [];
+    $termClean = trim((string)preg_replace('/\s+/u', ' ', $term));
+    if ($termClean === '') {
+        return false;
+    }
+    $termNorm = mb_strtolower($termClean, 'UTF-8');
+    if (array_key_exists($termNorm, $cache)) {
+        return $cache[$termNorm];
+    }
+    $db = pc_catalog_db('zimrx_static.db');
+    if (!$db instanceof PDO) {
+        return false;
+    }
+    $stmt = $db->prepare(
+        "SELECT 1 FROM zimrx_static_pc WHERE term = :term COLLATE NOCASE LIMIT 1"
+    );
+    $stmt->execute(['term' => $termClean]);
+    $exists = (bool)$stmt->fetchColumn();
+    $cache[$termNorm] = $exists;
+    return $exists;
+}
+
 function pc_static_pc_search(string $term, int $limit = 25): array {
     $db = pc_catalog_db('zimrx_static.db');
     if (!$db instanceof PDO || $limit < 1) {
