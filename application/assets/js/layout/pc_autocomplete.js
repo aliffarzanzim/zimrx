@@ -477,12 +477,15 @@ function initPcAutocomplete() {
         : `<span class="pc-custom-usage-badge pc-custom-unused">Not used yet</span>`;
 
       return `
-        <div class="pc-custom-item">
+        <div class="pc-custom-item" data-custom-item="${escapeHtml(item.term)}">
           <div class="pc-custom-term-group">
             <div class="pc-custom-term">${escapeHtml(item.term)}</div>
             ${usageBadge}
           </div>
-          <button type="button" class="pc-custom-remove" data-remove-custom="${escapeHtml(item.term)}" title="Remove Custom PC">${renderIcon('x', 14)}</button>
+          <div class="pc-custom-actions">
+            <button type="button" class="pc-custom-edit" data-edit-custom="${escapeHtml(item.term)}" title="Rename Custom PC">${renderIcon('edit', 13)}</button>
+            <button type="button" class="pc-custom-remove" data-remove-custom="${escapeHtml(item.term)}" title="Remove Custom PC">${renderIcon('x', 14)}</button>
+          </div>
         </div>
       `;
     }).join('');
@@ -1005,6 +1008,78 @@ function initPcAutocomplete() {
       } catch (error) {
         alert(error.message || 'Could not add custom PC.');
       }
+      return;
+    }
+
+    const editCustomButton = event.target.closest('[data-edit-custom]');
+    if (editCustomButton) {
+      event.preventDefault();
+      const itemEl = editCustomButton.closest('.pc-custom-item');
+      const term = editCustomButton.dataset.editCustom || '';
+      if (!itemEl || !term) return;
+
+      itemEl.innerHTML = `
+        <div class="pc-custom-edit-form">
+          <input type="text" class="pc-custom-inline-input" value="${escapeHtml(term)}">
+          <div class="pc-custom-inline-actions">
+            <button type="button" class="pc-custom-save-edit" data-save-custom-edit="${escapeHtml(term)}" title="Save Rename">${renderIcon('check', 14)}</button>
+            <button type="button" class="pc-custom-cancel-edit" title="Cancel">${renderIcon('x', 14)}</button>
+          </div>
+        </div>
+      `;
+      const input = itemEl.querySelector('.pc-custom-inline-input');
+      if (input) {
+        input.focus();
+        input.select();
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            itemEl.querySelector('.pc-custom-save-edit')?.click();
+          } else if (e.key === 'Escape') {
+            e.preventDefault();
+            renderCustomList();
+          }
+        });
+      }
+      return;
+    }
+
+    const saveEditButton = event.target.closest('[data-save-custom-edit]');
+    if (saveEditButton) {
+      event.preventDefault();
+      const itemEl = saveEditButton.closest('.pc-custom-item');
+      const oldTerm = saveEditButton.dataset.saveCustomEdit || '';
+      const input = itemEl?.querySelector('.pc-custom-inline-input');
+      const newTerm = input?.value.trim() || '';
+
+      if (!newTerm || newTerm.toLowerCase() === oldTerm.toLowerCase()) {
+        renderCustomList();
+        return;
+      }
+
+      try {
+        const data = await postSettings({
+          action: 'edit_custom',
+          old_term: oldTerm,
+          new_term: newTerm,
+        });
+        if (data.error) throw new Error(data.error);
+        settingsData = data;
+        priorityDraft = Array.isArray(data.priorities)
+          ? data.priorities.map((row) => ({ ...row }))
+          : priorityDraft;
+        refreshSettingsUi();
+      } catch (error) {
+        alert(error.message || 'Could not rename custom PC.');
+        renderCustomList();
+      }
+      return;
+    }
+
+    const cancelEditButton = event.target.closest('.pc-custom-cancel-edit');
+    if (cancelEditButton) {
+      event.preventDefault();
+      renderCustomList();
       return;
     }
 
