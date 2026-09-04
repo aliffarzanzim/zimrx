@@ -96,6 +96,10 @@ function pc_enabled_priority_rows(PDO $pdo, int $doctorId): array {
     return pc_priority_default_rows();
 }
 
+if (realpath((string)($_SERVER['SCRIPT_FILENAME'] ?? '')) !== realpath(__FILE__)) {
+    return;
+}
+
 try {
     $field = strtolower(rx_clean($_GET['field'] ?? 'complaint'));
     $term = rx_clean($_GET['term'] ?? '');

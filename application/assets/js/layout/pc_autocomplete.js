@@ -461,7 +461,7 @@ function initPcAutocomplete() {
 
   const renderCustomList = () => {
     const modal = getSettingsModal();
-    const container = modal?.querySelector('.pc-custom-list');
+    const container = modal?.querySelector('.pc-custom-complaint-list, .pc-custom-list:not(.pc-custom-duration-list)');
     if (!container) return;
 
     const items = settingsData?.custom_terms || [];
@@ -485,6 +485,38 @@ function initPcAutocomplete() {
           <div class="pc-custom-actions">
             <button type="button" class="pc-custom-edit" data-edit-custom="${escapeHtml(item.term)}" title="Rename Custom PC">${renderIcon('edit', 13)}</button>
             <button type="button" class="pc-custom-remove" data-remove-custom="${escapeHtml(item.term)}" title="Remove Custom PC">${renderIcon('x', 14)}</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  };
+
+  const renderCustomDurationList = () => {
+    const modal = getSettingsModal();
+    const container = modal?.querySelector('.pc-custom-duration-list');
+    if (!container) return;
+
+    const items = settingsData?.custom_durations || [];
+    if (!items.length) {
+      container.innerHTML = '<div class="pc-settings-empty">No custom duration has been added for this doctor yet.</div>';
+      return;
+    }
+
+    container.innerHTML = items.map((item) => {
+      const usageCount = Number(item.usage_count || 0);
+      const usageBadge = usageCount > 0
+        ? `<span class="pc-custom-usage-badge">${usageCount}× used</span>`
+        : `<span class="pc-custom-usage-badge pc-custom-unused">Not used yet</span>`;
+
+      return `
+        <div class="pc-custom-item" data-custom-duration-item="${escapeHtml(item.term)}">
+          <div class="pc-custom-term-group">
+            <div class="pc-custom-term">${escapeHtml(item.term)}</div>
+            ${usageBadge}
+          </div>
+          <div class="pc-custom-actions">
+            <button type="button" class="pc-custom-edit pc-custom-duration-edit" data-edit-custom-duration="${escapeHtml(item.term)}" title="Rename Custom Duration">${renderIcon('edit', 13)}</button>
+            <button type="button" class="pc-custom-remove pc-custom-duration-remove" data-remove-custom-duration="${escapeHtml(item.term)}" title="Remove Custom Duration">${renderIcon('x', 14)}</button>
           </div>
         </div>
       `;
@@ -566,10 +598,12 @@ function initPcAutocomplete() {
   };
 
   const refreshSettingsUi = () => {
+    clearPcSuggestCache();
     renderPriorityTable();
     renderUsedGroups();
     renderUsageRanking();
     renderCustomList();
+    renderCustomDurationList();
     renderHideResults();
   };
 
@@ -983,11 +1017,11 @@ function initPcAutocomplete() {
       return;
     }
 
-    const addCustomButton = event.target.closest('.pc-custom-add-btn');
+    const addCustomButton = event.target.closest('.pc-custom-add-btn:not(.pc-custom-duration-add-btn)');
     if (addCustomButton) {
       event.preventDefault();
       const modal = getSettingsModal();
-      const input = modal?.querySelector('.pc-custom-input');
+      const input = modal?.querySelector('.pc-custom-input:not(.pc-custom-duration-input)');
       const term = input?.value.trim() || '';
       if (!term) {
         input?.focus();
@@ -1007,6 +1041,29 @@ function initPcAutocomplete() {
         if (query) performHideSearch(query);
       } catch (error) {
         alert(error.message || 'Could not add custom PC.');
+      }
+      return;
+    }
+
+    const addCustomDurationButton = event.target.closest('.pc-custom-duration-add-btn');
+    if (addCustomDurationButton) {
+      event.preventDefault();
+      const modal = getSettingsModal();
+      const input = modal?.querySelector('.pc-custom-duration-input');
+      const term = input?.value.trim() || '';
+      if (!term) {
+        input?.focus();
+        return;
+      }
+      try {
+        const data = await postSettings({ action: 'add_custom_duration', term });
+        if (data.error) throw new Error(data.error);
+        settingsData = data;
+        refreshSettingsUi();
+        input.value = '';
+        input.focus();
+      } catch (error) {
+        alert(error.message || 'Could not add custom duration.');
       }
       return;
     }
@@ -1099,6 +1156,92 @@ function initPcAutocomplete() {
         refreshSettingsUi();
       } catch (error) {
         alert(error.message || 'Could not remove custom PC.');
+      }
+      return;
+    }
+
+    const editCustomDurationButton = event.target.closest('[data-edit-custom-duration]');
+    if (editCustomDurationButton) {
+      event.preventDefault();
+      const itemEl = editCustomDurationButton.closest('.pc-custom-item');
+      const term = editCustomDurationButton.dataset.editCustomDuration || '';
+      if (!itemEl || !term) return;
+
+      itemEl.innerHTML = `
+        <div class="pc-custom-edit-form">
+          <input type="text" class="pc-custom-inline-input pc-custom-duration-inline-input" value="${escapeHtml(term)}">
+          <div class="pc-custom-inline-actions">
+            <button type="button" class="pc-custom-save-edit pc-custom-duration-save-edit" data-save-custom-duration-edit="${escapeHtml(term)}" title="Save Rename">${renderIcon('check', 14)}</button>
+            <button type="button" class="pc-custom-cancel-edit pc-custom-duration-cancel-edit" title="Cancel">${renderIcon('x', 14)}</button>
+          </div>
+        </div>
+      `;
+      const input = itemEl.querySelector('.pc-custom-duration-inline-input');
+      if (input) {
+        input.focus();
+        input.select();
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            itemEl.querySelector('.pc-custom-duration-save-edit')?.click();
+          } else if (e.key === 'Escape') {
+            e.preventDefault();
+            renderCustomDurationList();
+          }
+        });
+      }
+      return;
+    }
+
+    const saveEditDurationButton = event.target.closest('[data-save-custom-duration-edit]');
+    if (saveEditDurationButton) {
+      event.preventDefault();
+      const itemEl = saveEditDurationButton.closest('.pc-custom-item');
+      const oldTerm = saveEditDurationButton.dataset.saveCustomDurationEdit || '';
+      const input = itemEl?.querySelector('.pc-custom-duration-inline-input');
+      const newTerm = input?.value.trim() || '';
+
+      if (!newTerm || newTerm.toLowerCase() === oldTerm.toLowerCase()) {
+        renderCustomDurationList();
+        return;
+      }
+
+      try {
+        const data = await postSettings({
+          action: 'edit_custom_duration',
+          old_term: oldTerm,
+          new_term: newTerm,
+        });
+        if (data.error) throw new Error(data.error);
+        settingsData = data;
+        refreshSettingsUi();
+      } catch (error) {
+        alert(error.message || 'Could not rename custom duration.');
+        renderCustomDurationList();
+      }
+      return;
+    }
+
+    const cancelEditDurationButton = event.target.closest('.pc-custom-duration-cancel-edit');
+    if (cancelEditDurationButton) {
+      event.preventDefault();
+      renderCustomDurationList();
+      return;
+    }
+
+    const removeCustomDurationButton = event.target.closest('[data-remove-custom-duration]');
+    if (removeCustomDurationButton) {
+      event.preventDefault();
+      try {
+        const data = await postSettings({
+          action: 'remove_custom_duration',
+          term: removeCustomDurationButton.dataset.removeCustomDuration || '',
+        });
+        if (data.error) throw new Error(data.error);
+        settingsData = data;
+        refreshSettingsUi();
+      } catch (error) {
+        alert(error.message || 'Could not remove custom duration.');
       }
       return;
     }

@@ -371,6 +371,78 @@ function pc_custom_term_exists(PDO $pdo, int $doctorId, string $term): bool {
     return $cache[$cacheKey];
 }
 
+function pc_custom_durations(PDO $pdo, int $doctorId, string $term = '', int $limit = 50): array {
+    $userPdo = rx_user_pdo();
+    if (!rx_table_exists($userPdo, 'zimrx_user_pc') || $limit < 1) {
+        return [];
+    }
+
+    $defaults = pc_duration_defaults();
+    $placeholders = implode(',', array_fill(0, count($defaults), '?'));
+
+    $sql = "SELECT c.term,
+                   MAX(c.created_at) AS created_at,
+                   MAX(c.updated_at) AS updated_at,
+                   MAX(COALESCE(u.usage_count, c.usage_count, 0)) AS usage_count
+            FROM zimrx_user_pc c
+            LEFT JOIN zimrx_user_pc u
+              ON u.doctor_id = c.doctor_id
+             AND u.category = 'pc_duration'
+             AND u.term = c.term COLLATE NOCASE
+            WHERE c.doctor_id = ?
+              AND (
+                   c.category = 'custom_duration'
+                   OR (c.category = 'pc_duration' AND c.term NOT IN ($placeholders))
+              )
+              AND (? = '' OR c.term LIKE ? COLLATE NOCASE)
+            GROUP BY c.term";
+
+    $stmt = $userPdo->prepare($sql);
+    $params = [max(1, $doctorId)];
+    foreach ($defaults as $d) {
+        $params[] = (string)$d;
+    }
+    $params[] = $term;
+    $params[] = '%' . $term . '%';
+
+    $stmt->execute($params);
+    $rows = $stmt->fetchAll();
+
+    usort($rows, static function ($a, $b) {
+        $aNum = is_numeric($a['term']) ? (float)$a['term'] : null;
+        $bNum = is_numeric($b['term']) ? (float)$b['term'] : null;
+        if ($aNum !== null && $bNum !== null) {
+            return $aNum <=> $bNum;
+        }
+        if ($aNum !== null) return -1;
+        if ($bNum !== null) return 1;
+        return strnatcasecmp((string)$a['term'], (string)$b['term']);
+    });
+
+    return array_slice($rows, 0, $limit);
+}
+
+function pc_custom_duration_exists(PDO $pdo, int $doctorId, string $term): bool {
+    $userPdo = rx_user_pdo();
+    if (!rx_table_exists($userPdo, 'zimrx_user_pc')) {
+        return false;
+    }
+
+    $stmt = $userPdo->prepare(
+        "SELECT 1
+         FROM zimrx_user_pc
+         WHERE doctor_id = :doctor_id
+           AND category IN ('custom_duration', 'pc_duration')
+           AND term = :term COLLATE NOCASE
+         LIMIT 1"
+    );
+    $stmt->execute([
+        'doctor_id' => max(1, $doctorId),
+        'term' => rx_clean($term),
+    ]);
+    return (bool)$stmt->fetchColumn();
+}
+
 function pc_static_pc_exact_match(string $term): bool {
     static $cache = [];
     $term = rx_clean($term);

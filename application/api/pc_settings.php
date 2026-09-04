@@ -56,9 +56,20 @@ function pc_settings_custom_terms(PDO $pdo, int $doctorId): array {
     return array_map(static function ($row) {
         return [
             'term' => (string)($row['term'] ?? ''),
+            'usage_count' => (int)($row['usage_count'] ?? 0),
             'updated_at' => (string)($row['updated_at'] ?? ''),
         ];
     }, pc_custom_terms($pdo, $doctorId, '', 80));
+}
+
+function pc_settings_custom_durations(PDO $pdo, int $doctorId): array {
+    return array_map(static function ($row) {
+        return [
+            'term' => (string)($row['term'] ?? ''),
+            'usage_count' => (int)($row['usage_count'] ?? 0),
+            'updated_at' => (string)($row['updated_at'] ?? ''),
+        ];
+    }, pc_custom_durations($pdo, $doctorId, '', 80));
 }
 
 function pc_settings_search_results(PDO $pdo, int $doctorId, string $query, array $priorityRows): array {
@@ -181,6 +192,7 @@ function pc_settings_payload(PDO $pdo, int $doctorId): array {
         'used_groups' => pc_settings_used_groups($pdo, $doctorId, $priorityRows),
         'usage_ranking' => pc_settings_usage_ranking($pdo, $doctorId, $priorityRows),
         'custom_terms' => pc_settings_custom_terms($pdo, $doctorId),
+        'custom_durations' => pc_settings_custom_durations($pdo, $doctorId),
         'hidden_terms' => pc_hidden_terms($pdo, $doctorId),
     ];
 }
@@ -366,6 +378,85 @@ try {
                 'new_term' => $newTerm,
             ]);
         }
+
+        rx_json(pc_settings_payload($pdo, $doctorId));
+    }
+
+    if ($action === 'add_custom_duration') {
+        $userPdo = rx_user_pdo();
+        $term = trim((string)preg_replace('/\s+/u', ' ', rx_clean($payload['term'] ?? '')));
+        if ($term === '') {
+            rx_json(['error' => 'Duration value is required.']);
+        }
+
+        if (in_array($term, pc_duration_defaults(), true)) {
+            rx_json(['error' => "\"$term\" is already a standard default duration."]);
+        }
+
+        foreach (['custom_duration', 'pc_duration'] as $category) {
+            $stmt = $userPdo->prepare(
+                "INSERT INTO zimrx_user_pc (
+                    doctor_id, category, term, usage_count, created_at, updated_at
+                ) VALUES (
+                    :doctor_id, :category, :term, 0, " . DbSql::now() . ", " . DbSql::now() . "
+                )
+                " . DbSql::upsert('doctor_id, category, term', ['updated_at'], ['updated_at' => DbSql::now()])
+            );
+            $stmt->execute([
+                'doctor_id' => max(1, $doctorId),
+                'category' => $category,
+                'term' => $term,
+            ]);
+        }
+
+        rx_json(pc_settings_payload($pdo, $doctorId));
+    }
+
+    if ($action === 'edit_custom_duration') {
+        $userPdo = rx_user_pdo();
+        $oldTerm = trim((string)preg_replace('/\s+/u', ' ', rx_clean($payload['old_term'] ?? '')));
+        $newTerm = trim((string)preg_replace('/\s+/u', ' ', rx_clean($payload['new_term'] ?? '')));
+
+        if ($oldTerm === '' || $newTerm === '') {
+            rx_json(['error' => 'Both current and new duration values are required.']);
+        }
+
+        if (in_array($newTerm, pc_duration_defaults(), true)) {
+            rx_json(['error' => "\"$newTerm\" is already a standard default duration."]);
+        }
+
+        if (strcasecmp($oldTerm, $newTerm) !== 0) {
+            $stmt = $userPdo->prepare(
+                "UPDATE zimrx_user_pc
+                 SET term = :new_term,
+                     updated_at = " . DbSql::now() . "
+                 WHERE doctor_id = :doctor_id
+                   AND category IN ('custom_duration', 'pc_duration')
+                   AND term = :old_term COLLATE NOCASE"
+            );
+            $stmt->execute([
+                'doctor_id' => max(1, $doctorId),
+                'new_term' => $newTerm,
+                'old_term' => $oldTerm,
+            ]);
+        }
+
+        rx_json(pc_settings_payload($pdo, $doctorId));
+    }
+
+    if ($action === 'remove_custom_duration') {
+        $userPdo = rx_user_pdo();
+        $term = rx_clean($payload['term'] ?? '');
+        $stmt = $userPdo->prepare(
+            "DELETE FROM zimrx_user_pc
+             WHERE doctor_id = :doctor_id
+               AND category IN ('custom_duration', 'pc_duration')
+               AND term = :term COLLATE NOCASE"
+        );
+        $stmt->execute([
+            'doctor_id' => max(1, $doctorId),
+            'term' => $term,
+        ]);
 
         rx_json(pc_settings_payload($pdo, $doctorId));
     }
