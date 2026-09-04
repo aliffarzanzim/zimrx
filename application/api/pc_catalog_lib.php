@@ -94,11 +94,11 @@ function pc_duration_defaults(): array {
 
 function pc_unit_defaults(): array {
     return [
-        'Hour', 'Hours',
         'Day', 'Days',
         'Week', 'Weeks',
         'Month', 'Months',
         'Year', 'Years',
+        'Hour', 'Hours',
         'Minute', 'Minutes',
         'Episode', 'Episodes',
         'Time', 'Times',
