@@ -53,9 +53,33 @@ function pc_aux_suggestions(PDO $pdo, int $doctorId, string $field, string $term
         $add($value, 320 - $index, 'default');
     }
 
-    usort($suggestions, static function ($a, $b) {
-        return ($b['score'] <=> $a['score']) ?: strcmp($a['label'], $b['label']);
-    });
+    if ($field === 'duration') {
+        usort($suggestions, static function ($a, $b) use ($term) {
+            if ($term !== '') {
+                $aPrefix = str_starts_with((string)$a['value'], $term) ? 0 : 1;
+                $bPrefix = str_starts_with((string)$b['value'], $term) ? 0 : 1;
+                if ($aPrefix !== $bPrefix) {
+                    return $aPrefix <=> $bPrefix;
+                }
+            }
+            $aNum = is_numeric($a['value']) ? (float)$a['value'] : null;
+            $bNum = is_numeric($b['value']) ? (float)$b['value'] : null;
+            if ($aNum !== null && $bNum !== null) {
+                return $aNum <=> $bNum;
+            }
+            if ($aNum !== null) {
+                return -1;
+            }
+            if ($bNum !== null) {
+                return 1;
+            }
+            return strnatcasecmp($a['label'], $b['label']);
+        });
+    } else {
+        usort($suggestions, static function ($a, $b) {
+            return ($b['score'] <=> $a['score']) ?: strcmp($a['label'], $b['label']);
+        });
+    }
     return array_slice(array_values($suggestions), 0, $limit);
 }
 
