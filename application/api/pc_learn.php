@@ -95,6 +95,9 @@ try {
         }
         if ($duration !== '') {
             $learn('pc_duration', $duration);
+            if (!in_array($duration, pc_duration_defaults(), true)) {
+                $learn('custom_duration', $duration);
+            }
         }
         if ($unit !== '') {
             $learn('pc_unit', $unit);

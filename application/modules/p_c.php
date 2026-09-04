@@ -165,7 +165,25 @@ if (!defined('ZIMRX_PC_SETTINGS_SEEDED')) {
                             <?= zrx_icon('plus', 16) ?> Add
                         </button>
                     </div>
-                    <div class="pc-custom-list"></div>
+                    <div class="pc-custom-complaint-list pc-custom-list"></div>
+                </section>
+
+                <!-- Custom Duration -->
+                <section class="pc-settings-card">
+                    <div class="pc-settings-card-head">
+                        <div class="pc-card-title-wrap">
+                            <span class="pc-card-icon"><?= zrx_icon('clock', 16) ?></span>
+                            <h4>Custom Duration</h4>
+                        </div>
+                        <p>Add custom duration values (e.g. 21, 28, 45, 60). They slot numerically into the duration dropdown.</p>
+                    </div>
+                    <div class="pc-custom-duration-add-row pc-custom-add-row">
+                        <input type="text" class="pc-custom-duration-input pc-custom-input" placeholder="Type new duration (e.g. 21)...">
+                        <button type="button" class="pc-custom-duration-add-btn pc-custom-add-btn" title="Add Custom Duration">
+                            <?= zrx_icon('plus', 16) ?> Add
+                        </button>
+                    </div>
+                    <div class="pc-custom-duration-list pc-custom-list"></div>
                 </section>
 
                 <!-- Hide / Suppress Suggestions -->
