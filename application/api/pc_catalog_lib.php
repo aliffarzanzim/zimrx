@@ -311,15 +311,13 @@ function pc_custom_terms(PDO $pdo, int $doctorId, string $term = '', int $limit 
     }
 
     $stmt = $userPdo->prepare(
-        "SELECT c.term, c.created_at, c.updated_at,
-                COALESCE(u.usage_count, c.usage_count, 0) AS usage_count
+        "SELECT c.term, c.created_at, c.updated_at, c.usage_count, c.source
          FROM zimrx_user_pc c
-         LEFT JOIN zimrx_user_pc u
-           ON u.doctor_id = c.doctor_id
-          AND u.category = 'PC'
-          AND u.term = c.term COLLATE NOCASE
          WHERE c.doctor_id = :doctor_id
-           AND c.category = 'custom'
+           AND (
+                (c.category = 'PC' AND c.source = 'user')
+                OR c.category = 'custom'
+           )
            AND (:term = '' OR c.term LIKE :term_like COLLATE NOCASE)
          ORDER BY
             CASE
@@ -328,7 +326,7 @@ function pc_custom_terms(PDO $pdo, int $doctorId, string $term = '', int $limit 
                 WHEN c.term LIKE :term_prefix COLLATE NOCASE THEN 1
                 ELSE 2
             END,
-            COALESCE(u.usage_count, c.usage_count, 0) DESC,
+            c.usage_count DESC,
             c.updated_at DESC,
             c.term ASC
          LIMIT :limit"
@@ -359,7 +357,10 @@ function pc_custom_term_exists(PDO $pdo, int $doctorId, string $term): bool {
         "SELECT 1
          FROM zimrx_user_pc
          WHERE doctor_id = :doctor_id
-           AND category = 'custom'
+           AND (
+                (category = 'PC' AND source = 'user')
+                OR category = 'custom'
+           )
            AND term = :term COLLATE NOCASE
          LIMIT 1"
     );
@@ -383,16 +384,14 @@ function pc_custom_durations(PDO $pdo, int $doctorId, string $term = '', int $li
     $sql = "SELECT c.term,
                    MAX(c.created_at) AS created_at,
                    MAX(c.updated_at) AS updated_at,
-                   MAX(COALESCE(u.usage_count, c.usage_count, 0)) AS usage_count
+                   MAX(c.usage_count) AS usage_count,
+                   MAX(c.source) AS source
             FROM zimrx_user_pc c
-            LEFT JOIN zimrx_user_pc u
-              ON u.doctor_id = c.doctor_id
-             AND u.category = 'pc_duration'
-             AND u.term = c.term COLLATE NOCASE
             WHERE c.doctor_id = ?
               AND (
-                   c.category = 'custom_duration'
+                   (c.category = 'pc_duration' AND c.source = 'user')
                    OR (c.category = 'pc_duration' AND c.term NOT IN ($placeholders))
+                   OR c.category = 'custom_duration'
               )
               AND (? = '' OR c.term LIKE ? COLLATE NOCASE)
             GROUP BY c.term";
@@ -432,7 +431,10 @@ function pc_custom_duration_exists(PDO $pdo, int $doctorId, string $term): bool 
         "SELECT 1
          FROM zimrx_user_pc
          WHERE doctor_id = :doctor_id
-           AND category IN ('custom_duration', 'pc_duration')
+           AND (
+                (category = 'pc_duration' AND source = 'user')
+                OR category = 'custom_duration'
+           )
            AND term = :term COLLATE NOCASE
          LIMIT 1"
     );

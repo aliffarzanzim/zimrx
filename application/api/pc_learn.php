@@ -32,9 +32,9 @@ try {
 
     $stmt = $userPdo->prepare(
         "INSERT INTO zimrx_user_pc (
-            doctor_id, category, term, usage_count, created_at, updated_at
+            doctor_id, category, term, source, usage_count, created_at, updated_at
         ) VALUES (
-            :doctor_id, :category, :term, 1, " . DbSql::now() . ", " . DbSql::now() . "
+            :doctor_id, :category, :term, :source, 1, " . DbSql::now() . ", " . DbSql::now() . "
         )
         " . DbSql::upsert(
             'doctor_id, category, term',
@@ -51,7 +51,7 @@ try {
     $skipped = 0;
     $seen = [];
 
-    $learn = function (string $category, string $value) use (&$stmt, &$learned, &$seen, $doctorId) {
+    $learn = function (string $category, string $value, string $source = 'system') use (&$stmt, &$learned, &$seen, $doctorId) {
         $value = trim(preg_replace('/\s+/u', ' ', $value));
         if ($value === '') {
             return;
@@ -67,6 +67,7 @@ try {
             'doctor_id' => $doctorId,
             'category' => $category,
             'term' => $value,
+            'source' => $source,
         ]);
         $learned++;
     };
@@ -87,20 +88,16 @@ try {
         }
 
         if ($complaint !== '' && pc_is_valid_complaint_term($complaint)) {
-            $learn('PC', $complaint);
-            // If this complaint does not exist in the pre-seeded system catalog, auto-register as custom P/C
-            if (!pc_static_term_exists($complaint)) {
-                $learn('custom', $complaint);
-            }
+            $source = pc_static_term_exists($complaint) ? 'system' : 'user';
+            $learn('PC', $complaint, $source);
         }
         if ($duration !== '') {
-            $learn('pc_duration', $duration);
-            if (!in_array($duration, pc_duration_defaults(), true)) {
-                $learn('custom_duration', $duration);
-            }
+            $source = in_array($duration, pc_duration_defaults(), true) ? 'system' : 'user';
+            $learn('pc_duration', $duration, $source);
         }
         if ($unit !== '') {
-            $learn('pc_unit', $unit);
+            $source = in_array($unit, pc_unit_defaults(), true) ? 'system' : 'user';
+            $learn('pc_unit', $unit, $source);
         }
     }
 

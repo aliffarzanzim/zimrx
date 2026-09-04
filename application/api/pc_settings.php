@@ -290,13 +290,24 @@ try {
 
         $stmt = $userPdo->prepare(
             "INSERT INTO zimrx_user_pc (
-                doctor_id, category, term, usage_count, created_at, updated_at
+                doctor_id, category, term, source, usage_count, created_at, updated_at
             ) VALUES (
-                :doctor_id, 'custom', :term, 0, " . DbSql::now() . ", " . DbSql::now() . "
+                :doctor_id, 'PC', :term, 'user', 0, " . DbSql::now() . ", " . DbSql::now() . "
             )
-            " . DbSql::upsert('doctor_id, category, term', ['updated_at'], ['updated_at' => DbSql::now()])
+            " . DbSql::upsert('doctor_id, category, term', ['source', 'updated_at'], ['updated_at' => DbSql::now()])
         );
         $stmt->execute([
+            'doctor_id' => max(1, $doctorId),
+            'term' => $term,
+        ]);
+
+        // Clean up legacy 'custom' row if present
+        $userPdo->prepare(
+            "DELETE FROM zimrx_user_pc
+             WHERE doctor_id = :doctor_id
+               AND category = 'custom'
+               AND term = :term COLLATE NOCASE"
+        )->execute([
             'doctor_id' => max(1, $doctorId),
             'term' => $term,
         ]);
@@ -321,7 +332,10 @@ try {
         $stmt = $userPdo->prepare(
             "DELETE FROM zimrx_user_pc
              WHERE doctor_id = :doctor_id
-               AND category IN ('custom', 'PC')
+               AND (
+                    (category = 'PC' AND source = 'user')
+                    OR category = 'custom'
+               )
                AND term = :term COLLATE NOCASE"
         );
         $stmt->execute([
@@ -355,9 +369,13 @@ try {
             $stmt = $userPdo->prepare(
                 "UPDATE zimrx_user_pc
                  SET term = :new_term,
+                     source = 'user',
                      updated_at = " . DbSql::now() . "
                  WHERE doctor_id = :doctor_id
-                   AND category IN ('custom', 'PC')
+                   AND (
+                        (category = 'PC' AND source = 'user')
+                        OR category = 'custom'
+                   )
                    AND term = :old_term COLLATE NOCASE"
             );
             $stmt->execute([
@@ -393,21 +411,29 @@ try {
             rx_json(['error' => "\"$term\" is already a standard default duration."]);
         }
 
-        foreach (['custom_duration', 'pc_duration'] as $category) {
-            $stmt = $userPdo->prepare(
-                "INSERT INTO zimrx_user_pc (
-                    doctor_id, category, term, usage_count, created_at, updated_at
-                ) VALUES (
-                    :doctor_id, :category, :term, 0, " . DbSql::now() . ", " . DbSql::now() . "
-                )
-                " . DbSql::upsert('doctor_id, category, term', ['updated_at'], ['updated_at' => DbSql::now()])
-            );
-            $stmt->execute([
-                'doctor_id' => max(1, $doctorId),
-                'category' => $category,
-                'term' => $term,
-            ]);
-        }
+        $stmt = $userPdo->prepare(
+            "INSERT INTO zimrx_user_pc (
+                doctor_id, category, term, source, usage_count, created_at, updated_at
+            ) VALUES (
+                :doctor_id, 'pc_duration', :term, 'user', 0, " . DbSql::now() . ", " . DbSql::now() . "
+            )
+            " . DbSql::upsert('doctor_id, category, term', ['source', 'updated_at'], ['updated_at' => DbSql::now()])
+        );
+        $stmt->execute([
+            'doctor_id' => max(1, $doctorId),
+            'term' => $term,
+        ]);
+
+        // Clean up legacy 'custom_duration' row if present
+        $userPdo->prepare(
+            "DELETE FROM zimrx_user_pc
+             WHERE doctor_id = :doctor_id
+               AND category = 'custom_duration'
+               AND term = :term COLLATE NOCASE"
+        )->execute([
+            'doctor_id' => max(1, $doctorId),
+            'term' => $term,
+        ]);
 
         rx_json(pc_settings_payload($pdo, $doctorId));
     }
@@ -429,9 +455,13 @@ try {
             $stmt = $userPdo->prepare(
                 "UPDATE zimrx_user_pc
                  SET term = :new_term,
+                     source = 'user',
                      updated_at = " . DbSql::now() . "
                  WHERE doctor_id = :doctor_id
-                   AND category IN ('custom_duration', 'pc_duration')
+                   AND (
+                        (category = 'pc_duration' AND source = 'user')
+                        OR category = 'custom_duration'
+                   )
                    AND term = :old_term COLLATE NOCASE"
             );
             $stmt->execute([
@@ -450,7 +480,10 @@ try {
         $stmt = $userPdo->prepare(
             "DELETE FROM zimrx_user_pc
              WHERE doctor_id = :doctor_id
-               AND category IN ('custom_duration', 'pc_duration')
+               AND (
+                    (category = 'pc_duration' AND source = 'user')
+                    OR category = 'custom_duration'
+               )
                AND term = :term COLLATE NOCASE"
         );
         $stmt->execute([
