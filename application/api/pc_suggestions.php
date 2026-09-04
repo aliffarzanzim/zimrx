@@ -75,6 +75,23 @@ function pc_aux_suggestions(PDO $pdo, int $doctorId, string $field, string $term
             }
             return strnatcasecmp($a['label'], $b['label']);
         });
+    } elseif ($field === 'unit') {
+        $canonicalOrder = array_flip(pc_unit_defaults());
+        usort($suggestions, static function ($a, $b) use ($term, $canonicalOrder) {
+            if ($term !== '') {
+                $aPrefix = stripos((string)$a['label'], $term) === 0 ? 0 : 1;
+                $bPrefix = stripos((string)$b['label'], $term) === 0 ? 0 : 1;
+                if ($aPrefix !== $bPrefix) {
+                    return $aPrefix <=> $bPrefix;
+                }
+            }
+            $aRank = $canonicalOrder[$a['label']] ?? 1000;
+            $bRank = $canonicalOrder[$b['label']] ?? 1000;
+            if ($aRank !== $bRank) {
+                return $aRank <=> $bRank;
+            }
+            return strnatcasecmp($a['label'], $b['label']);
+        });
     } else {
         usort($suggestions, static function ($a, $b) {
             return ($b['score'] <=> $a['score']) ?: strcmp($a['label'], $b['label']);
