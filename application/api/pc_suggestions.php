@@ -53,9 +53,50 @@ function pc_aux_suggestions(PDO $pdo, int $doctorId, string $field, string $term
         $add($value, 320 - $index, 'default');
     }
 
-    usort($suggestions, static function ($a, $b) {
-        return ($b['score'] <=> $a['score']) ?: strcmp($a['label'], $b['label']);
-    });
+    if ($field === 'duration') {
+        usort($suggestions, static function ($a, $b) use ($term) {
+            if ($term !== '') {
+                $aPrefix = str_starts_with((string)$a['value'], $term) ? 0 : 1;
+                $bPrefix = str_starts_with((string)$b['value'], $term) ? 0 : 1;
+                if ($aPrefix !== $bPrefix) {
+                    return $aPrefix <=> $bPrefix;
+                }
+            }
+            $aNum = is_numeric($a['value']) ? (float)$a['value'] : null;
+            $bNum = is_numeric($b['value']) ? (float)$b['value'] : null;
+            if ($aNum !== null && $bNum !== null) {
+                return $aNum <=> $bNum;
+            }
+            if ($aNum !== null) {
+                return -1;
+            }
+            if ($bNum !== null) {
+                return 1;
+            }
+            return strnatcasecmp($a['label'], $b['label']);
+        });
+    } elseif ($field === 'unit') {
+        $canonicalOrder = array_flip(pc_unit_defaults());
+        usort($suggestions, static function ($a, $b) use ($term, $canonicalOrder) {
+            if ($term !== '') {
+                $aPrefix = stripos((string)$a['label'], $term) === 0 ? 0 : 1;
+                $bPrefix = stripos((string)$b['label'], $term) === 0 ? 0 : 1;
+                if ($aPrefix !== $bPrefix) {
+                    return $aPrefix <=> $bPrefix;
+                }
+            }
+            $aRank = $canonicalOrder[$a['label']] ?? 1000;
+            $bRank = $canonicalOrder[$b['label']] ?? 1000;
+            if ($aRank !== $bRank) {
+                return $aRank <=> $bRank;
+            }
+            return strnatcasecmp($a['label'], $b['label']);
+        });
+    } else {
+        usort($suggestions, static function ($a, $b) {
+            return ($b['score'] <=> $a['score']) ?: strcmp($a['label'], $b['label']);
+        });
+    }
     return array_slice(array_values($suggestions), 0, $limit);
 }
 
@@ -70,6 +111,10 @@ function pc_enabled_priority_rows(PDO $pdo, int $doctorId): array {
     }
 
     return pc_priority_default_rows();
+}
+
+if (realpath((string)($_SERVER['SCRIPT_FILENAME'] ?? '')) !== realpath(__FILE__)) {
+    return;
 }
 
 try {
@@ -98,19 +143,19 @@ try {
             $source = $sourceRow['source'];
             $baseScore = 1000 - ($sourceIndex * 240);
             if ($source === 'most_used') {
-                foreach (pc_learned_terms($pdo, $doctorId, 'PC', '', 'usage', 24) as $index => $row) {
+                foreach (pc_learned_terms($pdo, $doctorId, 'PC', '', 'usage', 15) as $index => $row) {
                     $value = (string)($row['term'] ?? '');
                     if (pc_is_hidden($hiddenMap, 'most_used', $value)) continue;
                     $add($value, 'most_used', $baseScore - $index + min(80, (int)($row['usage_count'] ?? 0)), ['usage_count' => (int)($row['usage_count'] ?? 0)]);
                 }
             } elseif ($source === 'custom') {
-                foreach (pc_custom_terms($pdo, $doctorId, '', 18) as $index => $row) {
+                foreach (pc_custom_terms($pdo, $doctorId, '', 15) as $index => $row) {
                     $value = (string)($row['term'] ?? '');
                     if (pc_is_hidden($hiddenMap, 'custom', $value)) continue;
                     $add($value, 'custom', $baseScore - $index);
                 }
             } elseif ($source === 'static_pc' || $source === 'snomed') {
-                foreach (pc_static_pc_search('', 18) as $index => $row) {
+                foreach (pc_static_pc_search('', 15) as $index => $row) {
                     $value = (string)($row['preferred_term'] ?? '');
                     if (pc_is_hidden($hiddenMap, $source, $value) || pc_is_hidden($hiddenMap, 'static_pc', $value) || pc_is_hidden($hiddenMap, 'snomed', $value)) continue;
                     $add($value, 'static_pc', $baseScore - $index, ['category' => (string)($row['category'] ?? '')]);
@@ -120,7 +165,7 @@ try {
         usort($suggestions, static function ($a, $b) { return ($b['score'] <=> $a['score']) ?: strcmp($a['label'], $b['label']); });
 
         rx_json([
-            'complaint' => array_slice(array_values($suggestions), 0, 60),
+            'complaint' => array_slice(array_values($suggestions), 0, 15),
             'duration'  => pc_aux_suggestions($pdo, $doctorId, 'duration', '', 20),
             'unit'      => pc_aux_suggestions($pdo, $doctorId, 'unit', '', 20),
         ]);
@@ -158,7 +203,7 @@ try {
         $baseScore = 1000 - ($sourceIndex * 240);
 
         if ($source === 'most_used') {
-            foreach (pc_learned_terms($pdo, $doctorId, 'PC', $term, 'usage', 24) as $index => $row) {
+            foreach (pc_learned_terms($pdo, $doctorId, 'PC', $term, 'usage', 15) as $index => $row) {
                 $value = (string)($row['term'] ?? '');
                 if (pc_is_hidden($hiddenMap, 'most_used', $value)) {
                     continue;
@@ -171,7 +216,7 @@ try {
         }
 
         if ($source === 'custom') {
-            foreach (pc_custom_terms($pdo, $doctorId, $term, 18) as $index => $row) {
+            foreach (pc_custom_terms($pdo, $doctorId, $term, 15) as $index => $row) {
                 $value = (string)($row['term'] ?? '');
                 if (pc_is_hidden($hiddenMap, 'custom', $value)) {
                     continue;
@@ -182,7 +227,7 @@ try {
         }
 
         if ($source === 'static_pc' || $source === 'snomed') {
-            foreach (pc_static_pc_search($term, $term === '' ? 18 : 30) as $index => $row) {
+            foreach (pc_static_pc_search($term, 15) as $index => $row) {
                 $value = (string)($row['preferred_term'] ?? '');
                 if (pc_is_hidden($hiddenMap, $source, $value) || pc_is_hidden($hiddenMap, 'static_pc', $value) || pc_is_hidden($hiddenMap, 'snomed', $value)) {
                     continue;
@@ -208,7 +253,7 @@ try {
         }
         return ($b['score'] <=> $a['score']) ?: strcmp($a['label'], $b['label']);
     });
-    rx_json(array_slice(array_values($suggestions), 0, 60));
+    rx_json(array_slice(array_values($suggestions), 0, 15));
 } catch (Exception $e) {
     rx_json(['error' => $e->getMessage()]);
 }

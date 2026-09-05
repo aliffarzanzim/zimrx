@@ -4430,6 +4430,67 @@ td:has(> .pc-input:focus) > .pc-input { background: transparent; box-shadow: non
     gap: 0.45rem;
 }
 
+/* Edit PC Combined Section Styles */
+.pc-edit-tabs {
+    display: inline-flex;
+    align-items: center;
+    background: #f1f5f9;
+    border-radius: 9px;
+    padding: 3px;
+    gap: 3px;
+    margin-bottom: 0.85rem;
+    border: 1px solid #e2e8f0;
+}
+.pc-edit-tab-btn {
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.35rem 0.75rem;
+    border-radius: 7px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: all 0.15s ease;
+}
+.pc-edit-tab-btn:hover {
+    color: #0f172a;
+}
+.pc-edit-tab-btn.active {
+    background: #ffffff;
+    color: var(--primary, #2563eb);
+    font-weight: 700;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+}
+.pc-edit-divider {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 1rem 0;
+}
+.pc-edit-subhead {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    margin-bottom: 0.65rem;
+}
+.pc-edit-subhead-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #334155;
+    letter-spacing: 0.02em;
+}
+.pc-edit-subhead-desc {
+    font-size: 0.76rem;
+    color: #64748b;
+    line-height: 1.35;
+}
+
 .pc-hide-search-box {
     position: relative;
     display: flex;
