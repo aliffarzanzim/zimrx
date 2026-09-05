@@ -94,7 +94,7 @@ class DbConnections {
 
     /**
      * Get PDO connection to static database
-     * Contains: global lookups (zimrx_static_doses, zimrx_static_durations, zimrx_static_instructions, zimrx_static_discount_causes)
+     * Contains: global lookups (zimrx_static_doses, zimrx_static_durations, zimrx_static_instructions, zimrx_static_discount_causes, zimrx_static_pc)
      */
     public static function staticDb(): PDO {
         return self::getConnection('static');
@@ -102,7 +102,7 @@ class DbConnections {
 
     /**
      * Get PDO connection to system database
-     * Contains: drug master data, ICD-11 codes, SNOMED codes, etc.
+     * Contains: drug master data, ICD-11 codes, Standard P/C (zimrx_static_pc), etc.
      */
     public static function systemDb(): PDO {
         return self::getConnection('system');

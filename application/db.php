@@ -308,8 +308,7 @@ function zimrx_pc_priority_defaults(): array {
     return [
         ['source' => 'most_used', 'sort_order' => 1, 'is_enabled' => 1],
         ['source' => 'custom', 'sort_order' => 2, 'is_enabled' => 1],
-        ['source' => 'snomed', 'sort_order' => 3, 'is_enabled' => 1],
-        ['source' => 'icd', 'sort_order' => 4, 'is_enabled' => 1],
+        ['source' => 'static_pc', 'sort_order' => 3, 'is_enabled' => 1],
     ];
 }
 
@@ -324,12 +323,19 @@ function zimrx_db_ensure_pc_settings_schema(PDO $pdo): void {
             term TEXT NOT NULL DEFAULT '',
             sort_order INTEGER NOT NULL DEFAULT 0,
             is_enabled INTEGER NOT NULL DEFAULT 1,
-            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(doctor_id, setting_key, source, term)
         )"
     );
+    zimrx_db_backfill_doctor_id($pdo, 'zimrx_user_pc_settings');
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_zimrx_user_pc_settings_doctor_key ON zimrx_user_pc_settings(doctor_id, setting_key, source, term)");
+
+    // Migrate any legacy 'snomed' source references to 'static_pc' and purge 'icd'
+    try {
+        $pdo->exec("UPDATE zimrx_user_pc_settings SET source = 'static_pc' WHERE source = 'snomed'");
+        $pdo->exec("DELETE FROM zimrx_user_pc_settings WHERE setting_key = 'source_priority' AND source = 'icd'");
+    } catch (Throwable $_) {}
 }
 
 function zimrx_db_ensure_medical_history_settings_schema(PDO $pdo): void {
