@@ -445,6 +445,72 @@ function pc_custom_duration_exists(PDO $pdo, int $doctorId, string $term): bool 
     return (bool)$stmt->fetchColumn();
 }
 
+function pc_custom_units(PDO $pdo, int $doctorId, string $term = '', int $limit = 50): array {
+    $userPdo = rx_user_pdo();
+    if (!rx_table_exists($userPdo, 'zimrx_user_pc') || $limit < 1) {
+        return [];
+    }
+
+    $defaults = pc_unit_defaults();
+    $placeholders = implode(',', array_fill(0, count($defaults), '?'));
+
+    $sql = "SELECT c.term,
+                   MAX(c.created_at) AS created_at,
+                   MAX(c.updated_at) AS updated_at,
+                   MAX(c.usage_count) AS usage_count,
+                   MAX(c.source) AS source
+            FROM zimrx_user_pc c
+            WHERE c.doctor_id = ?
+              AND (
+                   (c.category = 'pc_unit' AND c.source = 'user')
+                   OR (c.category = 'pc_unit' AND c.term NOT IN ($placeholders))
+                   OR c.category = 'custom_unit'
+              )
+              AND (? = '' OR c.term LIKE ? COLLATE NOCASE)
+            GROUP BY c.term";
+
+    $stmt = $userPdo->prepare($sql);
+    $params = [max(1, $doctorId)];
+    foreach ($defaults as $d) {
+        $params[] = (string)$d;
+    }
+    $params[] = $term;
+    $params[] = '%' . $term . '%';
+
+    $stmt->execute($params);
+    $rows = $stmt->fetchAll();
+
+    usort($rows, static function ($a, $b) {
+        return strcasecmp((string)$a['term'], (string)$b['term']);
+    });
+
+    return array_slice($rows, 0, $limit);
+}
+
+function pc_custom_unit_exists(PDO $pdo, int $doctorId, string $term): bool {
+    $userPdo = rx_user_pdo();
+    if (!rx_table_exists($userPdo, 'zimrx_user_pc')) {
+        return false;
+    }
+
+    $stmt = $userPdo->prepare(
+        "SELECT 1
+         FROM zimrx_user_pc
+         WHERE doctor_id = :doctor_id
+           AND (
+                (category = 'pc_unit' AND source = 'user')
+                OR category = 'custom_unit'
+           )
+           AND term = :term COLLATE NOCASE
+         LIMIT 1"
+    );
+    $stmt->execute([
+        'doctor_id' => max(1, $doctorId),
+        'term' => rx_clean($term),
+    ]);
+    return (bool)$stmt->fetchColumn();
+}
+
 function pc_static_pc_exact_match(string $term): bool {
     static $cache = [];
     $term = rx_clean($term);

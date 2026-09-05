@@ -150,32 +150,69 @@ if (!defined('ZIMRX_PC_SETTINGS_SEEDED')) {
                     </div>
                 </section>
 
-                <!-- Custom Added P/C -->
-                <section class="pc-settings-card">
+                <!-- Edit PC (Combined Custom Added P/C & Hide/Suppress Suggestions) -->
+                <section class="pc-settings-card pc-edit-card">
                     <div class="pc-settings-card-head">
                         <div class="pc-card-title-wrap">
-                            <span class="pc-card-icon"><?= zrx_icon('plus', 16) ?></span>
-                            <h4>Custom Added P/C</h4>
+                            <span class="pc-card-icon"><?= zrx_icon('edit', 16) ?></span>
+                            <h4>Edit PC</h4>
                         </div>
-                        <p>Add doctor-specific complaints. They remain private to your local clinic profile.</p>
+                        <p>Add custom complaints, rename or remove them, and hide unwanted catalog suggestions.</p>
                     </div>
-                    <div class="pc-custom-add-row">
-                        <input type="text" class="pc-custom-input" placeholder="Type new custom complaint...">
-                        <button type="button" class="pc-custom-add-btn" title="Add Custom P/C">
-                            <?= zrx_icon('plus', 16) ?> Add
+
+                    <div class="pc-edit-tabs" role="tablist">
+                        <button type="button" class="pc-edit-tab-btn active" data-edit-tab="all">
+                            All
+                        </button>
+                        <button type="button" class="pc-edit-tab-btn" data-edit-tab="custom">
+                            <?= zrx_icon('plus', 12) ?> Custom Added (<span class="pc-custom-count">0</span>)
+                        </button>
+                        <button type="button" class="pc-edit-tab-btn" data-edit-tab="hidden">
+                            <?= zrx_icon('eye', 12) ?> Hide / Suppress (<span class="pc-hidden-count">0</span>)
                         </button>
                     </div>
-                    <div class="pc-custom-complaint-list pc-custom-list"></div>
+
+                    <!-- Custom Complaints Subsection -->
+                    <div class="pc-edit-custom-section">
+                        <div class="pc-edit-subhead">
+                            <span class="pc-edit-subhead-title">Custom Added P/C</span>
+                            <span class="pc-edit-subhead-desc">Doctor-specific complaints private to your local clinic profile.</span>
+                        </div>
+                        <div class="pc-custom-add-row">
+                            <input type="text" class="pc-custom-input" placeholder="Type new custom complaint...">
+                            <button type="button" class="pc-custom-add-btn" title="Add Custom P/C">
+                                <?= zrx_icon('plus', 16) ?> Add
+                            </button>
+                        </div>
+                        <div class="pc-custom-complaint-list pc-custom-list"></div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="pc-edit-divider" aria-hidden="true"></div>
+
+                    <!-- Hide / Suppress Subsection -->
+                    <div class="pc-edit-suppress-section">
+                        <div class="pc-edit-subhead">
+                            <span class="pc-edit-subhead-title">Hide / Suppress Suggestions</span>
+                            <span class="pc-edit-subhead-desc">Hide unwanted suggestions for this doctor without deleting catalog data.</span>
+                        </div>
+                        <div class="pc-hide-search-box">
+                            <span class="pc-search-box-icon"><?= zrx_icon('search', 14) ?></span>
+                            <input type="text" class="pc-hide-search-input" placeholder="Search complaint term to hide or unhide...">
+                            <button type="button" class="pc-search-clear-btn" title="Clear search" hidden><?= zrx_icon('x', 14) ?></button>
+                        </div>
+                        <div class="pc-hide-search-results"></div>
+                    </div>
                 </section>
 
-                <!-- Custom Duration -->
+                <!-- Edit Duration -->
                 <section class="pc-settings-card">
                     <div class="pc-settings-card-head">
                         <div class="pc-card-title-wrap">
                             <span class="pc-card-icon"><?= zrx_icon('clock', 16) ?></span>
-                            <h4>Custom Duration</h4>
+                            <h4>Edit Duration</h4>
                         </div>
-                        <p>Add custom duration values (e.g. 21, 28, 45, 60). They slot numerically into the duration dropdown.</p>
+                        <p>Add and manage custom duration values (e.g. 21, 28, 45, 60). They slot numerically into the duration dropdown.</p>
                     </div>
                     <div class="pc-custom-duration-add-row pc-custom-add-row">
                         <input type="text" class="pc-custom-duration-input pc-custom-input" placeholder="Type new duration (e.g. 21)...">
@@ -186,21 +223,22 @@ if (!defined('ZIMRX_PC_SETTINGS_SEEDED')) {
                     <div class="pc-custom-duration-list pc-custom-list"></div>
                 </section>
 
-                <!-- Hide / Suppress Suggestions -->
+                <!-- Edit Units -->
                 <section class="pc-settings-card">
                     <div class="pc-settings-card-head">
                         <div class="pc-card-title-wrap">
-                            <span class="pc-card-icon"><?= zrx_icon('eye', 16) ?></span>
-                            <h4>Hide / Suppress Suggestions</h4>
+                            <span class="pc-card-icon"><?= zrx_icon('calendar', 16) ?></span>
+                            <h4>Edit Units</h4>
                         </div>
-                        <p>Hide unwanted suggestions for this doctor without deleting catalog data.</p>
+                        <p>Add and manage custom time units (e.g. Cycles, Doses, Puffs). They slot into the unit dropdown.</p>
                     </div>
-                    <div class="pc-hide-search-box">
-                        <span class="pc-search-box-icon"><?= zrx_icon('search', 14) ?></span>
-                        <input type="text" class="pc-hide-search-input" placeholder="Search complaint term to hide or unhide...">
-                        <button type="button" class="pc-search-clear-btn" title="Clear search" hidden><?= zrx_icon('x', 14) ?></button>
+                    <div class="pc-custom-unit-add-row pc-custom-add-row">
+                        <input type="text" class="pc-custom-unit-input pc-custom-input" placeholder="Type new unit (e.g. Cycles)...">
+                        <button type="button" class="pc-custom-unit-add-btn pc-custom-add-btn" title="Add Custom Unit">
+                            <?= zrx_icon('plus', 16) ?> Add
+                        </button>
                     </div>
-                    <div class="pc-hide-search-results"></div>
+                    <div class="pc-custom-unit-list pc-custom-list"></div>
                 </section>
                 <div class="pc-settings-bottom-spacer" aria-hidden="true"></div>
             </div>
