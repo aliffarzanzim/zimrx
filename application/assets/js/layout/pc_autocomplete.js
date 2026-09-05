@@ -461,7 +461,7 @@ function initPcAutocomplete() {
 
   const renderCustomList = () => {
     const modal = getSettingsModal();
-    const container = modal?.querySelector('.pc-custom-complaint-list, .pc-custom-list:not(.pc-custom-duration-list)');
+    const container = modal?.querySelector('.pc-custom-complaint-list');
     if (!container) return;
 
     const items = settingsData?.custom_terms || [];
@@ -517,6 +517,38 @@ function initPcAutocomplete() {
           <div class="pc-custom-actions">
             <button type="button" class="pc-custom-edit pc-custom-duration-edit" data-edit-custom-duration="${escapeHtml(item.term)}" title="Rename Custom Duration">${renderIcon('edit', 13)}</button>
             <button type="button" class="pc-custom-remove pc-custom-duration-remove" data-remove-custom-duration="${escapeHtml(item.term)}" title="Remove Custom Duration">${renderIcon('x', 14)}</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  };
+
+  const renderCustomUnitList = () => {
+    const modal = getSettingsModal();
+    const container = modal?.querySelector('.pc-custom-unit-list');
+    if (!container) return;
+
+    const items = settingsData?.custom_units || [];
+    if (!items.length) {
+      container.innerHTML = '<div class="pc-settings-empty">No custom unit has been added for this doctor yet.</div>';
+      return;
+    }
+
+    container.innerHTML = items.map((item) => {
+      const usageCount = Number(item.usage_count || 0);
+      const usageBadge = usageCount > 0
+        ? `<span class="pc-custom-usage-badge">${usageCount}× used</span>`
+        : `<span class="pc-custom-usage-badge pc-custom-unused">Not used yet</span>`;
+
+      return `
+        <div class="pc-custom-item" data-custom-unit-item="${escapeHtml(item.term)}">
+          <div class="pc-custom-term-group">
+            <div class="pc-custom-term">${escapeHtml(item.term)}</div>
+            ${usageBadge}
+          </div>
+          <div class="pc-custom-actions">
+            <button type="button" class="pc-custom-edit pc-custom-unit-edit" data-edit-custom-unit="${escapeHtml(item.term)}" title="Rename Custom Unit">${renderIcon('edit', 13)}</button>
+            <button type="button" class="pc-custom-remove pc-custom-unit-remove" data-remove-custom-unit="${escapeHtml(item.term)}" title="Remove Custom Unit">${renderIcon('x', 14)}</button>
           </div>
         </div>
       `;
@@ -604,7 +636,18 @@ function initPcAutocomplete() {
     renderUsageRanking();
     renderCustomList();
     renderCustomDurationList();
+    renderCustomUnitList();
     renderHideResults();
+
+    const modal = getSettingsModal();
+    if (modal) {
+      const customCount = (settingsData?.custom_terms || []).length;
+      const hiddenCount = (settingsData?.hidden_terms || []).length;
+      const customBadge = modal.querySelector('.pc-custom-count');
+      if (customBadge) customBadge.textContent = String(customCount);
+      const hiddenBadge = modal.querySelector('.pc-hidden-count');
+      if (hiddenBadge) hiddenBadge.textContent = String(hiddenCount);
+    }
   };
 
   const applySettingsData = (data) => {
@@ -710,6 +753,17 @@ function initPcAutocomplete() {
       pane.hidden = !isSettings;
       pane.classList.toggle('active', isSettings);
     });
+
+    // Reset Edit PC sub-tabs to 'all'
+    modal.querySelectorAll('.pc-edit-tab-btn').forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.editTab === 'all');
+    });
+    const customSec = modal.querySelector('.pc-edit-custom-section');
+    const suppressSec = modal.querySelector('.pc-edit-suppress-section');
+    const divider = modal.querySelector('.pc-edit-divider');
+    if (customSec) customSec.hidden = false;
+    if (suppressSec) suppressSec.hidden = false;
+    if (divider) divider.hidden = false;
 
     resetModalScroll();
     requestAnimationFrame(resetModalScroll);
@@ -999,6 +1053,34 @@ function initPcAutocomplete() {
       return;
     }
 
+    const editTabBtn = event.target.closest('.pc-edit-tab-btn');
+    if (editTabBtn) {
+      event.preventDefault();
+      const tab = editTabBtn.dataset.editTab || 'all';
+      const modal = getSettingsModal();
+      if (!modal) return;
+      modal.querySelectorAll('.pc-edit-tab-btn').forEach((btn) => {
+        btn.classList.toggle('active', btn === editTabBtn);
+      });
+      const customSec = modal.querySelector('.pc-edit-custom-section');
+      const suppressSec = modal.querySelector('.pc-edit-suppress-section');
+      const divider = modal.querySelector('.pc-edit-divider');
+      if (tab === 'all') {
+        if (customSec) customSec.hidden = false;
+        if (suppressSec) suppressSec.hidden = false;
+        if (divider) divider.hidden = false;
+      } else if (tab === 'custom') {
+        if (customSec) customSec.hidden = false;
+        if (suppressSec) suppressSec.hidden = true;
+        if (divider) divider.hidden = true;
+      } else if (tab === 'hidden') {
+        if (customSec) customSec.hidden = true;
+        if (suppressSec) suppressSec.hidden = false;
+        if (divider) divider.hidden = true;
+      }
+      return;
+    }
+
     const moveButton = event.target.closest('[data-priority-move]');
     if (moveButton) {
       event.preventDefault();
@@ -1017,11 +1099,11 @@ function initPcAutocomplete() {
       return;
     }
 
-    const addCustomButton = event.target.closest('.pc-custom-add-btn:not(.pc-custom-duration-add-btn)');
+    const addCustomButton = event.target.closest('.pc-custom-add-btn:not(.pc-custom-duration-add-btn):not(.pc-custom-unit-add-btn)');
     if (addCustomButton) {
       event.preventDefault();
       const modal = getSettingsModal();
-      const input = modal?.querySelector('.pc-custom-input:not(.pc-custom-duration-input)');
+      const input = modal?.querySelector('.pc-custom-input:not(.pc-custom-duration-input):not(.pc-custom-unit-input)');
       const term = input?.value.trim() || '';
       if (!term) {
         input?.focus();
@@ -1064,6 +1146,29 @@ function initPcAutocomplete() {
         input.focus();
       } catch (error) {
         alert(error.message || 'Could not add custom duration.');
+      }
+      return;
+    }
+
+    const addCustomUnitButton = event.target.closest('.pc-custom-unit-add-btn');
+    if (addCustomUnitButton) {
+      event.preventDefault();
+      const modal = getSettingsModal();
+      const input = modal?.querySelector('.pc-custom-unit-input');
+      const term = input?.value.trim() || '';
+      if (!term) {
+        input?.focus();
+        return;
+      }
+      try {
+        const data = await postSettings({ action: 'add_custom_unit', term });
+        if (data.error) throw new Error(data.error);
+        settingsData = data;
+        refreshSettingsUi();
+        input.value = '';
+        input.focus();
+      } catch (error) {
+        alert(error.message || 'Could not add custom unit.');
       }
       return;
     }
@@ -1242,6 +1347,92 @@ function initPcAutocomplete() {
         refreshSettingsUi();
       } catch (error) {
         alert(error.message || 'Could not remove custom duration.');
+      }
+      return;
+    }
+
+    const editCustomUnitButton = event.target.closest('[data-edit-custom-unit]');
+    if (editCustomUnitButton) {
+      event.preventDefault();
+      const itemEl = editCustomUnitButton.closest('.pc-custom-item');
+      const term = editCustomUnitButton.dataset.editCustomUnit || '';
+      if (!itemEl || !term) return;
+
+      itemEl.innerHTML = `
+        <div class="pc-custom-edit-form">
+          <input type="text" class="pc-custom-inline-input pc-custom-unit-inline-input" value="${escapeHtml(term)}">
+          <div class="pc-custom-inline-actions">
+            <button type="button" class="pc-custom-save-edit pc-custom-unit-save-edit" data-save-custom-unit-edit="${escapeHtml(term)}" title="Save Rename">${renderIcon('check', 14)}</button>
+            <button type="button" class="pc-custom-cancel-edit pc-custom-unit-cancel-edit" title="Cancel">${renderIcon('x', 14)}</button>
+          </div>
+        </div>
+      `;
+      const input = itemEl.querySelector('.pc-custom-unit-inline-input');
+      if (input) {
+        input.focus();
+        input.select();
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            itemEl.querySelector('.pc-custom-unit-save-edit')?.click();
+          } else if (e.key === 'Escape') {
+            e.preventDefault();
+            renderCustomUnitList();
+          }
+        });
+      }
+      return;
+    }
+
+    const saveEditUnitButton = event.target.closest('[data-save-custom-unit-edit]');
+    if (saveEditUnitButton) {
+      event.preventDefault();
+      const itemEl = saveEditUnitButton.closest('.pc-custom-item');
+      const oldTerm = saveEditUnitButton.dataset.saveCustomUnitEdit || '';
+      const input = itemEl?.querySelector('.pc-custom-unit-inline-input');
+      const newTerm = input?.value.trim() || '';
+
+      if (!newTerm || newTerm.toLowerCase() === oldTerm.toLowerCase()) {
+        renderCustomUnitList();
+        return;
+      }
+
+      try {
+        const data = await postSettings({
+          action: 'edit_custom_unit',
+          old_term: oldTerm,
+          new_term: newTerm,
+        });
+        if (data.error) throw new Error(data.error);
+        settingsData = data;
+        refreshSettingsUi();
+      } catch (error) {
+        alert(error.message || 'Could not rename custom unit.');
+        renderCustomUnitList();
+      }
+      return;
+    }
+
+    const cancelEditUnitButton = event.target.closest('.pc-custom-unit-cancel-edit');
+    if (cancelEditUnitButton) {
+      event.preventDefault();
+      renderCustomUnitList();
+      return;
+    }
+
+    const removeCustomUnitButton = event.target.closest('[data-remove-custom-unit]');
+    if (removeCustomUnitButton) {
+      event.preventDefault();
+      try {
+        const data = await postSettings({
+          action: 'remove_custom_unit',
+          term: removeCustomUnitButton.dataset.removeCustomUnit || '',
+        });
+        if (data.error) throw new Error(data.error);
+        settingsData = data;
+        refreshSettingsUi();
+      } catch (error) {
+        alert(error.message || 'Could not remove custom unit.');
       }
       return;
     }
