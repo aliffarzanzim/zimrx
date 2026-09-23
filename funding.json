@@ -1,0 +1,61 @@
+{
+  "$schema": "https://fundingjson.org/schema/v1.1.0.json",
+  "version": "v1.1.0",
+  "entity": {
+    "type": "individual",
+    "role": "owner",
+    "name": "Alif Farzan Zim",
+    "email": "aliffarzanzim@gmail.com",
+    "description": "5th-year medical student at Dhaka Medical College (Batch K-79) and Secretary of DMC IMIG, building open-source, local-first healthcare infrastructure.",
+    "webpageUrl": {
+      "url": "https://guessthecase.eu.org"
+    }
+  },
+  "projects": [
+    {
+      "guid": "zimrx",
+      "name": "ZimRx",
+      "description": "An open-source, local-first EMR and digital prescription engine designed for solo practitioners and rural clinics in low-resource regions.",
+      "webpageUrl": {
+        "url": "https://github.com/aliffarzanzim/zimrx"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/aliffarzanzim/zimrx"
+      },
+      "licenses": [
+        "spdx:AGPL-3.0-only"
+      ],
+      "tags": [
+        "healthcare",
+        "medical",
+        "emr",
+        "prescription",
+        "offline-first"
+      ]
+    }
+  ],
+  "funding": {
+    "channels": [
+      {
+        "guid": "bank-wire",
+        "type": "bank",
+        "address": "Direct bank wire (details upon request)",
+        "description": "Direct bank wire transfer to project account"
+      }
+    ],
+    "plans": [
+      {
+        "guid": "pilot-and-rd",
+        "status": "active",
+        "name": "Hardware, clinical trials & core software R&D",
+        "description": "Physical testing hardware (thermal printers, scanners, display), local clinical trials with 15-20 doctors, and core software R&D.",
+        "amount": 20000,
+        "currency": "USD",
+        "frequency": "one-time",
+        "channels": [
+          "bank-wire"
+        ]
+      }
+    ]
+  }
+}
