@@ -647,6 +647,39 @@ function collectOtnoteSection() {
   return lines;
 }
 
+function collectBreastExamSection() {
+  const root = getModuleExtractionRoot('Breast Examination');
+  if (!root) return [];
+  const lines = [];
+  const findings = root.querySelector('#breast-exam-findings')?.value.trim();
+  if (findings) {
+    findings.split('\n').map(l => l.trim()).filter(Boolean).forEach(l => lines.push(l));
+  }
+  return lines;
+}
+
+function collectLocalExamSection() {
+  const root = getModuleExtractionRoot('Local Examination');
+  if (!root) return [];
+  const lines = [];
+  const findings = root.querySelector('#local-exam-findings')?.value.trim();
+  if (findings) {
+    findings.split('\n').map(l => l.trim()).filter(Boolean).forEach(l => lines.push(l));
+  }
+  return lines;
+}
+
+function collectOphthalmologySection() {
+  const root = getModuleExtractionRoot('Ophthalmology');
+  if (!root) return [];
+  const lines = [];
+  const findings = root.querySelector('#ophthalmology-findings')?.value.trim();
+  if (findings) {
+    findings.split('\n').map(l => l.trim()).filter(Boolean).forEach(l => lines.push(l));
+  }
+  return lines;
+}
+
 function collectTextPadSection() {
   let value = '';
   if (window.nicEditors) {
@@ -753,6 +786,9 @@ function collectPrescriptionPreviewSnapshot() {
       ho: history.medical || extractListModuleLines('History'),
       pe: collectPeSection(),
       oe: collectPeSection(),
+      breast_exam: collectBreastExamSection(),
+      local_exam: collectLocalExamSection(),
+      ophthalmology: collectOphthalmologySection(),
       reports: collectReportsSection(),
       dh: history.drug_history || extractListModuleLines('D/H'),
       plan: extractListModuleLines('Plan'),

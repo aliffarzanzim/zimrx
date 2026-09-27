@@ -37,7 +37,7 @@ if exist "logs\frankenphp.pid" del /q "logs\frankenphp.pid" >nul 2>&1
 set "ZIMRX_HTTP_PORT=8080"
 
 echo [1/2] Launching FrankenPHP web server on port %ZIMRX_HTTP_PORT%...
-start "" /min runtime\frankenphp\frankenphp.exe run --config Caddyfile --adapter caddyfile
+start "" /b cmd /c "runtime\frankenphp\frankenphp.exe run --config Caddyfile --adapter caddyfile >> logs\frankenphp.log 2>&1"
 
 echo [2/2] Initializing application environment...
 timeout /t 2 /nobreak >nul

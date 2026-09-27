@@ -234,13 +234,13 @@ include 'header.php';
 <?php
 // Central Central Module Configurations & Mappings
 $default_left_layout = [
-  "P/C", "AI Analyzer", "History", "P/E", "Dx", "Ix",
+  "P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Dx", "Ix",
   "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter"
 ];
 
 $default_right_layout = [
   "Rx", "Drug Summary & Interaction", "Advice", "Report Entry", "Upload Reports & Documents", "Calculators",
-  "Text Pad", "OT Note", "Font Format"
+  "Ophthalmology", "Text Pad", "OT Note", "Font Format"
 ];
 
 $module_file_map = [
@@ -249,6 +249,8 @@ $module_file_map = [
   "History" => "history.php",
   "P/E" => "p_e.php",
   "O/E" => "p_e.php",
+  "Breast Examination" => "breast_exam.php",
+  "Local Examination" => "local_exam.php",
   "Dx" => "dx.php",
   "Ix" => "ix.php",
   "Plan" => "plan.php",
@@ -265,6 +267,7 @@ $module_file_map = [
   "Uploaded Reports" => "uploaded_reports.php",
   "Reports" => "reports.php",
   "Calculators" => "calculators.php",
+  "Ophthalmology" => "ophthalmology.php",
   "Text Pad" => "text_pad.php",
   "OT Note" => "ot_note.php",
   "Font Format" => "font_format.php"
@@ -318,6 +321,19 @@ if (isset($_COOKIE['zimrx_left_layout'])) {
     }
 }
 $left_layout = normalize_left_history_layout($left_layout);
+if (in_array('P/E', $left_layout, true)) {
+    $peIndex = array_search('P/E', $left_layout, true);
+    $leftInsert = [];
+    if (!in_array('Breast Examination', $left_layout, true)) {
+        $leftInsert[] = 'Breast Examination';
+    }
+    if (!in_array('Local Examination', $left_layout, true)) {
+        $leftInsert[] = 'Local Examination';
+    }
+    if (!empty($leftInsert)) {
+        array_splice($left_layout, $peIndex + 1, 0, $leftInsert);
+    }
+}
 
 $right_layout = $default_right_layout;
 if (isset($_COOKIE['zimrx_right_layout'])) {
@@ -329,6 +345,10 @@ if (isset($_COOKIE['zimrx_right_layout'])) {
 if (in_array('Rx', $right_layout, true) && !in_array('Drug Summary & Interaction', $right_layout, true)) {
     $rxIndex = array_search('Rx', $right_layout, true);
     array_splice($right_layout, $rxIndex + 1, 0, ['Drug Summary & Interaction']);
+}
+if (in_array('Text Pad', $right_layout, true) && !in_array('Ophthalmology', $right_layout, true)) {
+    $tpIndex = array_search('Text Pad', $right_layout, true);
+    array_splice($right_layout, $tpIndex, 0, ['Ophthalmology']);
 }
 $reportsIndex = array_search('Reports', $right_layout, true);
 if ($reportsIndex !== false) {
@@ -377,6 +397,7 @@ if ($reportsIndex !== false) {
     <script src="assets/js/layout/o_h_module.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/o_h_module.js') ?>"></script>
     <script src="assets/js/layout/growth_chart_data.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/growth_chart_data.js') ?>"></script>
     <script src="assets/js/layout/paediatric_module.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/paediatric_module.js') ?>"></script>
+    <script src="assets/js/layout/clinical_exam_modules.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/clinical_exam_modules.js') ?>"></script>
     <script src="assets/js/layout/prescription_preview.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/prescription_preview.js') ?>"></script>
     <script src="assets/js/layout/ho_diet_dropdown.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/ho_diet_dropdown.js') ?>"></script>
     <script src="assets/js/layout/boot.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/boot.js') ?>"></script>

@@ -7070,4 +7070,541 @@ html[data-dropdown-theme="subtle-tint"] .patient-lookup-option:not(.new-patient-
     100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
 }
 
+/* =======================================================
+   Clinical Examination Modules (Breast, Local, Ophthalmology)
+======================================================= */
+.zrx-exam-wrapper {
+    display: flex;
+    flex-direction: column;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+    margin: -2px;
+    width: calc(100% + 4px);
+}
+.zrx-exam-header {
+    height: 32px;
+    box-sizing: border-box;
+    background: #cbd5e1;
+    border-bottom: 1px solid #94a3b8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 0.75rem;
+    margin: -2px -2px 0 -2px;
+    width: calc(100% + 4px);
+}
+.zrx-exam-title-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: #0f172a;
+}
+.zrx-exam-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.zrx-exam-btn {
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid #94a3b8;
+    background: #f1f5f9;
+    color: #334155;
+    transition: all 0.12s ease-in-out;
+}
+.zrx-exam-btn-normal:hover {
+    background: #e0f2fe;
+    color: #0284c7;
+    border-color: #38bdf8;
+}
+.zrx-exam-btn-clear:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    border-color: #f87171;
+}
+.zrx-exam-body {
+    padding: 0.75rem;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    box-sizing: border-box;
+}
+.zrx-exam-dual-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+}
+@media (max-width: 768px) {
+    .zrx-exam-dual-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.zrx-exam-col {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0.5rem 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+.zrx-exam-col-header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 700;
+    font-size: 0.78rem;
+    color: #1e293b;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+.zrx-exam-col-badge {
+    background: #e2e8f0;
+    color: #475569;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+}
+.zrx-exam-section-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    margin-top: 0.2rem;
+}
+.zrx-exam-form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+.zrx-exam-lbl {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #475569;
+}
+.zrx-exam-select,
+.zrx-exam-input {
+    height: 28px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 0 6px;
+    font-size: 0.76rem;
+    color: #0f172a;
+    background: #ffffff;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+.zrx-exam-select:focus,
+.zrx-exam-input:focus,
+.zrx-exam-textarea:focus {
+    border-color: var(--zrx-primary, #2563eb);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+}
+.zrx-exam-flex-pair {
+    display: flex;
+    gap: 0.35rem;
+    align-items: center;
+}
+.zrx-exam-flex-pair .zrx-exam-input,
+.zrx-exam-flex-pair .zrx-exam-select {
+    flex: 1;
+}
+.zrx-exam-input-unit {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #64748b;
+    white-space: nowrap;
+}
+.zrx-exam-top-row,
+.zrx-exam-nodes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.5rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0.5rem 0.65rem;
+}
+.zrx-exam-top-cell,
+.zrx-exam-node-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+.zrx-exam-chips-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0.45rem 0.6rem;
+}
+.zrx-exam-chips-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 0.2rem;
+}
+.zrx-exam-chip {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.12s ease-in-out;
+    white-space: nowrap;
+}
+.zrx-exam-chip:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #1d4ed8;
+}
+.zrx-exam-findings-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+.zrx-exam-textarea {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: #0f172a;
+    background: #ffffff;
+    resize: vertical;
+    box-sizing: border-box;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.zrx-exam-refraction-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0.5rem 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+.zrx-exam-refraction-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #334155;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.zrx-exam-refraction-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+.zrx-exam-ref-row {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.zrx-exam-ref-eye {
+    font-weight: 700;
+    font-size: 0.75rem;
+    width: 28px;
+    color: #1e293b;
+    flex-shrink: 0;
+}
+.zrx-exam-ref-row .zrx-exam-input {
+    flex: 1;
+    text-align: center;
+}
+
+/* =======================================================
+   Breast Examination Diagram & Lesion Mapping
+======================================================= */
+.zrx-breast-diagram-section {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+.zrx-breast-diagram-header {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.zrx-diagram-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+.zrx-diagram-subtitle {
+    font-size: 0.70rem;
+    color: #64748b;
+}
+.zrx-breast-diagrams-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+}
+@media (max-width: 680px) {
+    .zrx-breast-diagrams-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.zrx-breast-diagram-card {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0.45rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+.zrx-diagram-card-top {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+.zrx-diagram-name {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #334155;
+}
+.zrx-diagram-btn-clear {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 3px;
+    font-size: 0.66rem;
+    font-weight: 600;
+    color: #64748b;
+    padding: 1px 6px;
+    cursor: pointer;
+    transition: all 0.12s;
+}
+.zrx-diagram-btn-clear:hover {
+    background: #fee2e2;
+    border-color: #f87171;
+    color: #dc2626;
+}
+.zrx-svg-canvas-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+}
+.zrx-breast-svg {
+    cursor: crosshair;
+    user-select: none;
+    display: block;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.04));
+}
+.zrx-svg-breast-outer {
+    transition: stroke 0.15s;
+}
+.zrx-breast-svg:hover .zrx-svg-breast-outer {
+    stroke: #2563eb;
+}
+.zrx-svg-hour {
+    font-size: 8px;
+    font-weight: 700;
+    fill: #64748b;
+    pointer-events: none;
+}
+.zrx-svg-label-tail {
+    font-size: 7.5px;
+    font-weight: 700;
+    fill: #64748b;
+    pointer-events: none;
+}
+.zrx-svg-pin {
+    cursor: pointer;
+    transition: transform 0.12s;
+}
+.zrx-svg-pin:hover {
+    transform: scale(1.18);
+}
+.zrx-diagram-lesions-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin-top: 0.2rem;
+}
+.zrx-diagram-empty-hint {
+    font-size: 0.72rem;
+    color: #64748b;
+    font-style: italic;
+    text-align: center;
+    padding: 0.45rem 0.6rem;
+    background: #ffffff;
+    border: 1px dashed #cbd5e1;
+    border-radius: 4px;
+}
+.zrx-lesion-card {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-left: 3px solid #ef4444;
+    border-radius: 5px;
+    padding: 0.45rem 0.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+.zrx-lesion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.zrx-lesion-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.zrx-lesion-badge {
+    background: #fee2e2;
+    color: #b91c1c;
+    font-size: 0.66rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    letter-spacing: 0.3px;
+}
+.zrx-lesion-title {
+    font-size: 0.74rem;
+    color: #1e293b;
+    font-weight: 500;
+}
+.zrx-lesion-del-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.15rem;
+    line-height: 1;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 0 4px;
+    border-radius: 3px;
+    transition: all 0.12s;
+}
+.zrx-lesion-del-btn:hover {
+    color: #dc2626;
+    background: #fee2e2;
+}
+.zrx-lesion-body {
+    display: grid;
+    grid-template-columns: 110px 145px 135px 1fr;
+    gap: 0.45rem;
+    align-items: center;
+}
+@media (max-width: 900px) {
+    .zrx-lesion-body {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+.zrx-lesion-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+.zrx-lesion-field label {
+    font-size: 0.66rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+/* Clinical Category (E1 - E5) Bar */
+.zrx-exam-e-score-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0.4rem 0.65rem;
+    flex-wrap: wrap;
+}
+.zrx-exam-e-score-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #334155;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.zrx-exam-e-score-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+.zrx-e-btn {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.14s ease-in-out;
+}
+.zrx-e-btn:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+}
+.zrx-e-btn.active[data-escore="E1"] {
+    background: #10b981;
+    color: #ffffff;
+    border-color: #059669;
+}
+.zrx-e-btn.active[data-escore="E2"] {
+    background: #0284c7;
+    color: #ffffff;
+    border-color: #0369a1;
+}
+.zrx-e-btn.active[data-escore="E3"] {
+    background: #f59e0b;
+    color: #ffffff;
+    border-color: #d97706;
+}
+.zrx-e-btn.active[data-escore="E4"] {
+    background: #ea580c;
+    color: #ffffff;
+    border-color: #c2410c;
+}
+.zrx-e-btn.active[data-escore="E5"] {
+    background: #dc2626;
+    color: #ffffff;
+    border-color: #b91c1c;
+}
+
+
+
 

@@ -1,21 +1,21 @@
 const availableLeftModules =[
-  "P/C", "AI Analyzer", "History", "P/E", "Dx", "Ix",
+  "P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Dx", "Ix",
   "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter", ""
 ];
 
 const availableRightModules =[
   "Rx", "Drug Summary & Interaction", "Advice", "Report Entry", "Upload Reports & Documents", "Calculators",
-  "Text Pad", "OT Note", "Font Format", ""
+  "Ophthalmology", "Text Pad", "OT Note", "Font Format", ""
 ];
 
 const defaultLeftLayout =[
-  "P/C", "AI Analyzer", "History", "P/E", "Dx", "Ix",
+  "P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Dx", "Ix",
   "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter"
 ];
 
 const defaultRightLayout =[
   "Rx", "Drug Summary & Interaction", "Advice", "Report Entry", "Upload Reports & Documents", "Calculators",
-  "Text Pad", "OT Note", "Font Format"
+  "Ophthalmology", "Text Pad", "OT Note", "Font Format"
 ];
 
 const storageKeys = {
@@ -36,6 +36,8 @@ const moduleFileMap = {
   "History": "history.php",
   "P/E": "p_e.php",
   "O/E": "p_e.php",
+  "Breast Examination": "breast_exam.php",
+  "Local Examination": "local_exam.php",
   "Dx": "dx.php",
   "Ix": "ix.php",
   "Plan": "plan.php",
@@ -52,6 +54,7 @@ const moduleFileMap = {
   "Uploaded Reports": "uploaded_reports.php",
   "Reports": "reports.php",
   "Calculators": "calculators.php",
+  "Ophthalmology": "ophthalmology.php",
   "Text Pad": "text_pad.php",
   "OT Note": "ot_note.php",
   "Font Format": "font_format.php"

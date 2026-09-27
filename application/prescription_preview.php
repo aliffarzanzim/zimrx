@@ -624,6 +624,9 @@ function zrx_render_left_sections(array $clinical, array $options): string {
         'dx' => $options['dx_name'] ?? 'Dx',
         'edd' => $options['edd_name'] ?? 'OT Note',
         'otnote' => $options['edd_name'] ?? 'OT Note',
+        'breast_exam' => $options['breast_exam_name'] ?? 'Breast Examination',
+        'local_exam' => $options['local_exam_name'] ?? 'Local Examination',
+        'ophthalmology' => $options['ophthalmology_name'] ?? 'Ophthalmology',
     ];
 
     $bullet = zrx_trim_text($options['bullet_text'] ?? '');
