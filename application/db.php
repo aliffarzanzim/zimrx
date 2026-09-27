@@ -461,7 +461,7 @@ function zimrx_ensure_doctor_scope(PDO $pdo): void {
             'username, password_hash, display_name, role, doctor_id, is_active',
             "'root', :password_hash, 'Root Admin', 'admin', 1, 1"
         )
-    )->execute(['password_hash' => hash('sha256', '123')]);
+    )->execute(['password_hash' => password_hash('123', PASSWORD_DEFAULT)]);
 
     $pdo->exec(
         "CREATE TABLE IF NOT EXISTS zimrx_doctor_assistants (

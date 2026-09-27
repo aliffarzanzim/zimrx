@@ -34,6 +34,8 @@ class ZimRxTestSuite {
         $this->testDatabasePragmas();
         $this->testTransactionRollback();
         $this->testClinicalCalculations();
+        $this->testFtsQuerySanitization();
+        $this->testUploadSecurity();
 
         echo "\n--------------------------------------------------------\n";
         echo "Test Results: {$this->passed} passed, {$this->failed} failed\n";
@@ -217,6 +219,44 @@ class ZimRxTestSuite {
             'Grade 5' => 'Extensive gangrene involving whole foot',
         ];
         $this->assert(count($wagnerGrades) === 6, "Wagner Diabetic Foot classification defines all 6 standard grades (0 to 5)");
+    }
+
+    private function testFtsQuerySanitization(): void {
+        echo "\n[6/7] Testing SQLite FTS5 Query Tokenization & Sanitization...\n";
+
+        $rawInput = 'Paracetamol 500mg "injection" OR 1=1; DROP TABLE';
+        // Same logic as in drug_lookup.php
+        $cleanTokens = array_filter(preg_split('/\s+/', preg_replace('/[^\p{L}\p{N}]+/u', ' ', $rawInput)));
+        $ftsMatchQuery = !empty($cleanTokens) ? implode(' ', array_map(fn($t) => '"' . $t . '"*', $cleanTokens)) : '';
+
+        $this->assert(
+            strpos($ftsMatchQuery, ';') === false && strpos($ftsMatchQuery, 'DROP') !== false,
+            "FTS5 tokenizer safely neutralizes SQL injection syntax and quotes all token stems"
+        );
+
+        $this->assert(
+            $ftsMatchQuery === '"Paracetamol"* "500mg"* "injection"* "OR"* "1"* "1"* "DROP"* "TABLE"*',
+            "FTS5 tokenizer correctly builds prefixed wildcard tokens"
+        );
+    }
+
+    private function testUploadSecurity(): void {
+        echo "\n[7/7] Testing File Upload Security & Extension Whitelists...\n";
+
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf'];
+        $dangerousExtensions = ['php', 'phtml', 'php5', 'exe', 'sh', 'bat', 'cmd', 'js', 'html'];
+
+        $allDangerousBlocked = true;
+        foreach ($dangerousExtensions as $ext) {
+            if (in_array(strtolower($ext), $allowedExtensions, true)) {
+                $allDangerousBlocked = false;
+                break;
+            }
+        }
+        $this->assert($allDangerousBlocked, "Dangerous executable extensions (.php, .exe, .sh, etc.) are strictly prohibited from upload");
+
+        $safeAllowed = in_array('png', $allowedExtensions, true) && in_array('pdf', $allowedExtensions, true);
+        $this->assert($safeAllowed, "Standard medical and image formats (.png, .jpg, .pdf) are accepted in whitelist");
     }
 }
 

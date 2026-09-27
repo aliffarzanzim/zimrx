@@ -99,6 +99,12 @@ Database schemas and versioning are managed through `DbMigrator.php`. Run the ap
 php -r "require_once 'application/db.php';"
 ```
 
+### Automated Test Suite
+ZimRx includes an automated security, SQLite concurrency, and clinical calculation test suite:
+```bash
+php application/tests/run_tests.php
+```
+
 ---
 
 ## 🗺️ Roadmap & Upcoming Features

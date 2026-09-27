@@ -88,7 +88,7 @@ class Migration001CoreIdentityTables {
             )
         )->execute([
             'username'      => 'root',
-            'password_hash' => hash('sha256', '123'),
+            'password_hash' => password_hash('123', PASSWORD_DEFAULT),
         ]);
 
         // ---- zimrx_assistants ----
