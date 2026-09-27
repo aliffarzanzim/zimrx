@@ -20,6 +20,7 @@
                                     <?= zrx_icon('calculator', 14) ?>
                                 </button>
                                 <button type="button" class="oh-chart-btn" aria-haspopup="dialog" aria-controls="oh-chart-modal">Obstetric Chart</button>
+                                <button type="button" class="oh-pv-btn" id="oh-pv-toggle-btn" title="Toggle Pelvic Examination (P/S & P/V)">P/S &amp; P/V Exam</button>
                             </div>
                         </div>
                     </th>
@@ -105,6 +106,138 @@
 
     <div class="oh-footer">
         <button type="button" class="oh-add-row-btn">Add More</button>
+    </div>
+
+    <!-- Pelvic Examination (P/S & P/V) Section -->
+    <div class="oh-pelvic-section" id="oh-pelvic-section" hidden>
+        <div class="oh-pelvic-header">
+            <div class="oh-pelvic-title-group">
+                <?= zrx_icon('target', 13) ?>
+                <span>Pelvic Examination (P/S &amp; P/V)</span>
+            </div>
+            <div class="oh-pelvic-actions">
+                <button type="button" class="oh-pelvic-quick-btn" id="oh-pelvic-normal-btn" title="Pre-fill normal pelvic examination">Normal P/S &amp; P/V</button>
+                <button type="button" class="oh-pelvic-quick-btn" id="oh-pelvic-clear-btn" title="Clear pelvic examination fields">Clear</button>
+            </div>
+        </div>
+
+        <div class="oh-pelvic-body">
+            <!-- Dual Grid: P/S on Left, P/V on Right -->
+            <div class="oh-pelvic-dual-grid">
+                <!-- P/S (Per Speculum) Column -->
+                <div class="oh-pelvic-col">
+                    <div class="oh-pelvic-col-head">
+                        <span class="oh-pelvic-col-tag">P/S</span>
+                        <span>Per Speculum Examination</span>
+                    </div>
+                    <div class="oh-pelvic-field">
+                        <label class="oh-pelvic-lbl">Cervix Appearance</label>
+                        <select class="oh-pelvic-select" id="oh-ps-cervix">
+                            <option value="Healthy / Smooth">Healthy / Smooth</option>
+                            <option value="Cervical Erosion / Ectropion">Cervical Erosion / Ectropion</option>
+                            <option value="Endocervical Polyp">Endocervical Polyp</option>
+                            <option value="Hypertrophied / Chronic Cervicitis">Hypertrophied / Cervicitis</option>
+                            <option value="Contact Bleeding Present">Contact Bleeding Present</option>
+                            <option value="Suspicious Cauliflower Growth">Suspicious Growth / Malignancy</option>
+                        </select>
+                    </div>
+                    <div class="oh-pelvic-field">
+                        <label class="oh-pelvic-lbl">External Os</label>
+                        <select class="oh-pelvic-select" id="oh-ps-os">
+                            <option value="Closed">Closed</option>
+                            <option value="Parous (transverse slit)">Parous (transverse slit)</option>
+                            <option value="Nulliparous (pinpoint)">Nulliparous (pinpoint)</option>
+                            <option value="Patulous / Open">Patulous / Open</option>
+                        </select>
+                    </div>
+                    <div class="oh-pelvic-field">
+                        <label class="oh-pelvic-lbl">Vaginal Discharge</label>
+                        <select class="oh-pelvic-select" id="oh-ps-discharge">
+                            <option value="None / Physiological">None / Physiological</option>
+                            <option value="Curdy White (Candida)">Curdy White (Candida)</option>
+                            <option value="Frothy Greenish-Yellow (Trichomoniasis)">Frothy Greenish-Yellow</option>
+                            <option value="Purulent / Mucopurulent">Purulent / Mucopurulent</option>
+                            <option value="Blood-stained">Blood-stained</option>
+                            <option value="Foul-smelling watery">Foul-smelling watery</option>
+                        </select>
+                    </div>
+                    <div class="oh-pelvic-field">
+                        <label class="oh-pelvic-lbl">Vaginal Walls</label>
+                        <select class="oh-pelvic-select" id="oh-ps-walls">
+                            <option value="Healthy / Rugose">Healthy / Rugose</option>
+                            <option value="Congested / Erythematous">Congested / Erythematous</option>
+                            <option value="Cystocele present">Cystocele present</option>
+                            <option value="Rectocele present">Rectocele present</option>
+                            <option value="Uterovaginal Prolapse">UV Prolapse</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- P/V (Per Vaginal / Bimanual) Column -->
+                <div class="oh-pelvic-col">
+                    <div class="oh-pelvic-col-head">
+                        <span class="oh-pelvic-col-tag">P/V</span>
+                        <span>Bimanual Examination</span>
+                    </div>
+                    <div class="oh-pelvic-field">
+                        <label class="oh-pelvic-lbl">Uterine Position &amp; Size</label>
+                        <div class="oh-pelvic-flex">
+                            <select class="oh-pelvic-select" id="oh-pv-position">
+                                <option value="Anteverted (AV), Anteflexed">Anteverted (AV)</option>
+                                <option value="Retroverted (RV), Retroflexed">Retroverted (RV)</option>
+                                <option value="Midposition">Midposition</option>
+                            </select>
+                            <select class="oh-pelvic-select" id="oh-pv-size">
+                                <option value="Normal size">Normal size</option>
+                                <option value="Bulky">Bulky</option>
+                                <option value="6-8 wks size">6-8 wks size</option>
+                                <option value="8-10 wks size">8-10 wks size</option>
+                                <option value="10-12 wks size">10-12 wks size</option>
+                                <option value=">12 wks size">>12 wks size</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="oh-pelvic-field">
+                        <label class="oh-pelvic-lbl">Mobility &amp; Tenderness</label>
+                        <div class="oh-pelvic-flex">
+                            <select class="oh-pelvic-select" id="oh-pv-mobility">
+                                <option value="Freely mobile">Freely mobile</option>
+                                <option value="Restricted mobility">Restricted mobility</option>
+                                <option value="Fixed / Frozen pelvis">Fixed / Frozen pelvis</option>
+                            </select>
+                            <select class="oh-pelvic-select" id="oh-pv-tenderness">
+                                <option value="Non-tender">Non-tender</option>
+                                <option value="Tender on palpation">Tender</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="oh-pelvic-field">
+                        <label class="oh-pelvic-lbl">Cervical Motion Tenderness (CMT)</label>
+                        <select class="oh-pelvic-select" id="oh-pv-cmt">
+                            <option value="Absent (Negative)">Absent (-ve)</option>
+                            <option value="Present (Positive / Chandelier sign)">Present (+ve / Chandelier sign)</option>
+                        </select>
+                    </div>
+                    <div class="oh-pelvic-field">
+                        <label class="oh-pelvic-lbl">Fornices &amp; Adnexa</label>
+                        <select class="oh-pelvic-select" id="oh-pv-adnexa">
+                            <option value="Fornices free, bilateral adnexa clear and non-tender">Fornices free, adnexa clear</option>
+                            <option value="Right adnexal tenderness / fullness">Right adnexal tenderness</option>
+                            <option value="Left adnexal tenderness / fullness">Left adnexal tenderness</option>
+                            <option value="Bilateral adnexal tenderness (PID)">Bilateral tenderness (PID)</option>
+                            <option value="Palpable adnexal mass / cyst">Adnexal mass / cyst</option>
+                            <option value="Pouch of Douglas nodularity / tenderness">POD nodularity (Endometriosis)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Findings summary field -->
+            <div class="oh-pelvic-notes-row">
+                <label class="oh-pelvic-lbl" for="oh-pelvic-summary-input">P/S &amp; P/V Summary Note</label>
+                <input type="text" class="oh-pelvic-input" id="oh-pelvic-summary-input" placeholder="e.g. P/S: Healthy cervix, no discharge. P/V: Uterus AV normal size, mobile, fornices free." autocomplete="off">
+            </div>
+        </div>
     </div>
 
     <template id="oh-row-template">

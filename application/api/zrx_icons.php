@@ -51,7 +51,12 @@ class ZimRxIcon {
         'pin' => '<line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path>',
         'pin-off' => '<line x1="2" y1="2" x2="22" y2="22"></line><line x1="12" y1="17" x2="12" y2="22"></line><path d="M9 9v1.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17h12"></path><path d="M15 9.34V6h1a2 2 0 0 0 0-4H7.89"></path>',
         'target' => '<circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle>',
-        'shield' => '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>'
+        'shield' => '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>',
+        'flame' => '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"></path>',
+        'tooth' => '<path d="M12 2C8 2 6 5 6 9c0 3 1.5 6.5 2.5 10 .5 1.8 1.5 3 2.5 3s1.5-2 1.5-4c0-1.5-.5-2-.5-3.5 0-1.5 1-1.5 1-1.5s1 0 1 1.5c0 1.5-.5 2-.5 3.5 0 2 .5 4 1.5 4s2-1.2 2.5-3c1-3.5 2.5-7 2.5-10 0-4-2-7-6-7z"></path>',
+        'ear' => '<path d="M6 8.5a6.5 6.5 0 1 1 13 0c0 3-1.5 5-2.5 6.5-.8 1.2-1.5 2.5-1.5 4a2 2 0 0 1-4 0c0-1-.5-2-1.5-3A6 6 0 0 1 6 8.5Z"></path><path d="M10 8.5a2.5 2.5 0 1 1 5 0c0 1-.5 2-1 2.5"></path>',
+        'grid' => '<rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>',
+        'layers' => '<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline>'
     ];
 
     public static function svg(string $name, int $size = 14, array $attrs = []): string {
