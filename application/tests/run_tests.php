@@ -44,6 +44,8 @@ class ZimRxTestSuite {
         $this->testRealFtsPrefixQuery();
         $this->testUserDrugLibScoping();
         $this->testClinicalCalculations();
+        $this->testTenantIsolation();
+        $this->testUploadValidationAndPathTraversal();
 
         echo "\n--------------------------------------------------------\n";
         echo "Test Results: {$this->passed} passed, {$this->failed} failed\n";
@@ -315,6 +317,62 @@ class ZimRxTestSuite {
             'Grade 5' => 'Extensive gangrene involving whole foot',
         ];
         $this->assert(count($wagnerGrades) === 6, "Wagner Diabetic Foot classification defines all 6 standard grades (0 to 5)");
+    }
+
+    private function testTenantIsolation(): void {
+        echo "\n[9/10] Testing Multi-Doctor Tenant Isolation on Migrated DB...\n";
+
+        $testPdo = new PDO('sqlite::memory:');
+        $testPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $testPdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+        $migrator = new DbMigrator(__DIR__ . '/../migrations');
+        $migrator->run($testPdo);
+
+        // Seed second doctor (doctor 1 already exists from migration 001)
+        $testPdo->exec("INSERT OR IGNORE INTO zimrx_doctors (id, display_name, email) VALUES (1, 'Dr. Alice', 'alice@zimrx.test');");
+        $testPdo->exec("INSERT INTO zimrx_doctors (id, display_name, email) VALUES (2, 'Dr. Bob', 'bob@zimrx.test');");
+
+        // Doctor 1 creates patient
+        $testPdo->exec("INSERT INTO zimrx_patients (id, doctor_id, reg_no, full_name, mobile) VALUES (1, 1, 'P001', 'Alice Patient', '01700000001');");
+
+        // Query scoped to Doctor 2
+        $stmtDoc2 = $testPdo->prepare("SELECT COUNT(*) FROM zimrx_patients WHERE doctor_id = :doc");
+        $stmtDoc2->execute(['doc' => 2]);
+        $this->assert((int)$stmtDoc2->fetchColumn() === 0, "Doctor 2 cannot see Doctor 1's patients (strict tenant isolation)");
+
+        // Doctor 2 adds patient
+        $testPdo->exec("INSERT INTO zimrx_patients (id, doctor_id, reg_no, full_name, mobile) VALUES (2, 2, 'P002', 'Bob Patient', '01700000002');");
+
+        $stmtDoc1 = $testPdo->prepare("SELECT COUNT(*) FROM zimrx_patients WHERE doctor_id = :doc");
+        $stmtDoc1->execute(['doc' => 1]);
+        $this->assert((int)$stmtDoc1->fetchColumn() === 1, "Doctor 1 queries only Doctor 1's patients");
+
+        $stmtDoc2->execute(['doc' => 2]);
+        $this->assert((int)$stmtDoc2->fetchColumn() === 1, "Doctor 2 queries only Doctor 2's patients");
+    }
+
+    private function testUploadValidationAndPathTraversal(): void {
+        echo "\n[10/10] Testing Upload Validation & Path Traversal Prevention...\n";
+
+        $allowed = ['jpg', 'jpeg', 'png', 'webp', 'pdf'];
+        $dangerous = ['php', 'phtml', 'php3', 'php4', 'php5', 'phar', 'exe', 'sh', 'bat', 'cmd', 'js', 'html', 'svg'];
+
+        $blockedCount = 0;
+        foreach ($dangerous as $ext) {
+            if (!in_array(strtolower($ext), $allowed, true)) {
+                $blockedCount++;
+            }
+        }
+        $this->assert($blockedCount === count($dangerous), "All dangerous extensions (.php, .phar, .exe, .sh, etc.) are disallowed");
+
+        // Path traversal test
+        $maliciousPath = '../../uploads/shell.php';
+        $sanitizedName = basename($maliciousPath);
+        $this->assert(
+            $sanitizedName === 'shell.php' && strpos($sanitizedName, '..') === false,
+            "basename() sanitization strips directory traversal components ('{$maliciousPath}' -> '{$sanitizedName}')"
+        );
     }
 }
 

@@ -236,7 +236,7 @@ include 'header.php';
 $default_left_layout = [
   "P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination",
   "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology", "Psychiatry", "Orthopaedics", "Urology", "Neurology", "Cardiology", "Pulmonology", "Endocrinology",
-  "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter"
+  "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History"
 ];
 
 $default_right_layout = [

@@ -196,17 +196,10 @@ try {
     );
     $pcStmt->execute(['doc' => $doctorId]);
     $topPc = $pcStmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (Throwable $e) {}
-if (empty($topPc)) {
-    $topPc = [
-        ['pc_name' => 'Fever', 'use_count' => 12],
-        ['pc_name' => 'Cough & Cold', 'use_count' => 9],
-        ['pc_name' => 'Abdominal Pain', 'use_count' => 7],
-        ['pc_name' => 'Headache', 'use_count' => 6],
-        ['pc_name' => 'Generalized Weakness', 'use_count' => 4],
-    ];
+} catch (Throwable $e) {
+    error_log('[ZimRx] Performance dashboard top complaints query error: ' . $e->getMessage());
 }
-$maxPcCount = max(1, max(array_column($topPc, 'use_count')));
+$maxPcCount = !empty($topPc) ? max(1, max(array_column($topPc, 'use_count'))) : 1;
 
 // 7. Monthly Performance Ledger Table
 $ledgerStmt = $pdo->prepare(
@@ -533,19 +526,25 @@ require_once __DIR__ . '/header.php';
             </div>
             <div class="dash-card-body">
                 <div class="bar-metric-list">
-                    <?php foreach ($topPc as $pc): 
-                        $pct = round(($pc['use_count'] / $maxPcCount) * 100);
-                    ?>
-                    <div class="bar-metric-row">
-                        <div class="bar-metric-label-row">
-                            <span class="bar-metric-label"><?= htmlspecialchars($pc['pc_name']) ?></span>
-                            <span class="bar-metric-value"><?= (int)$pc['use_count'] ?> cases</span>
+                    <?php if (empty($topPc)): ?>
+                        <div style="text-align: center; color: #94a3b8; padding: 2.5rem 1rem; font-size: 0.85rem;">
+                            No presenting complaints recorded yet.
                         </div>
-                        <div class="bar-metric-track">
-                            <div class="bar-metric-fill" style="width: <?= max(5, $pct) ?>%; background: #8b5cf6;"></div>
+                    <?php else: ?>
+                        <?php foreach ($topPc as $pc): 
+                            $pct = round(($pc['use_count'] / $maxPcCount) * 100);
+                        ?>
+                        <div class="bar-metric-row">
+                            <div class="bar-metric-label-row">
+                                <span class="bar-metric-label"><?= htmlspecialchars($pc['pc_name']) ?></span>
+                                <span class="bar-metric-value"><?= (int)$pc['use_count'] ?> cases</span>
+                            </div>
+                            <div class="bar-metric-track">
+                                <div class="bar-metric-fill" style="width: <?= max(5, $pct) ?>%; background: #8b5cf6;"></div>
+                            </div>
                         </div>
-                    </div>
-                    <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
