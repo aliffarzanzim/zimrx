@@ -77,31 +77,56 @@ if (is_logged_in()) {
 $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
+    $username = trim((string)($_POST['username'] ?? ''));
+    $password = (string)($_POST['password'] ?? '');
+    $csrfToken = $_POST['csrf_token'] ?? null;
 
-    $stmt = $pdo->prepare(
-        "SELECT id, username, password_hash, display_name, role, doctor_id
-         FROM zimrx_user_accounts
-         WHERE username = :username AND is_active = 1
-         LIMIT 1"
-    );
-    $stmt->execute(['username' => $username]);
-    $user = $stmt->fetch();
-
-    if ($user && hash_equals($user['password_hash'], zimrx_password_hash($password))) {
-        $_SESSION['user_id'] = (int)$user['id'];
-        $_SESSION['user_role'] = strtolower($user['role']);
-        $_SESSION['user_name'] = $user['display_name'];
-        $_SESSION['doctor_id'] = max(1, (int)($user['doctor_id'] ?? 1));
-        if ($redirect !== '') {
-            header("Location: " . $redirect);
-            exit();
-        }
-        header("Location: " . ($_SESSION['user_role'] === 'admin' ? 'admin.php' : ($_SESSION['user_role'] === 'assistant' ? 'appointments.php' : 'prescription.php')));
-        exit();
+    if ($csrfToken !== null && !zimrx_verify_csrf((string)$csrfToken)) {
+        $error = "Session expired or invalid security token. Please refresh and try again.";
     } else {
-        $error = "Invalid username or password.";
+        $stmt = $pdo->prepare(
+            "SELECT id, username, password_hash, display_name, role, doctor_id
+             FROM zimrx_user_accounts
+             WHERE username = :username AND is_active = 1
+             LIMIT 1"
+        );
+        $stmt->execute(['username' => $username]);
+        $user = $stmt->fetch();
+
+        if ($user && zimrx_password_verify($password, (string)$user['password_hash'])) {
+            // Automatic upgrade: migrate legacy SHA-256 or weak hashes to modern PASSWORD_DEFAULT
+            $currentHash = (string)$user['password_hash'];
+            if (password_needs_rehash($currentHash, PASSWORD_DEFAULT) || !str_starts_with($currentHash, '$2y$')) {
+                try {
+                    $upgradedHash = zimrx_password_hash($password);
+                    $rehashStmt = $pdo->prepare(
+                        "UPDATE zimrx_user_accounts
+                         SET password_hash = :hash, updated_at = CURRENT_TIMESTAMP
+                         WHERE id = :id"
+                    );
+                    $rehashStmt->execute(['hash' => $upgradedHash, 'id' => (int)$user['id']]);
+                } catch (Throwable $e) {
+                    error_log('[ZimRx] Password hash auto-upgrade error: ' . $e->getMessage());
+                }
+            }
+
+            // Prevent session fixation attack
+            session_regenerate_id(true);
+
+            $_SESSION['user_id'] = (int)$user['id'];
+            $_SESSION['user_role'] = strtolower((string)$user['role']);
+            $_SESSION['user_name'] = $user['display_name'];
+            $_SESSION['doctor_id'] = max(1, (int)($user['doctor_id'] ?? 1));
+
+            if ($redirect !== '') {
+                header("Location: " . $redirect);
+                exit();
+            }
+            header("Location: " . ($_SESSION['user_role'] === 'admin' ? 'admin.php' : ($_SESSION['user_role'] === 'assistant' ? 'appointments.php' : 'prescription.php')));
+            exit();
+        } else {
+            $error = "Invalid username or password.";
+        }
     }
 }
 ?>
@@ -238,6 +263,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php endif; ?>
 
         <form method="POST">
+            <?= zimrx_csrf_field() ?>
             <?php if ($redirect !== ''): ?>
                 <input type="hidden" name="redirect" value="<?= htmlspecialchars($redirect, ENT_QUOTES, 'UTF-8') ?>">
             <?php endif; ?>

@@ -92,6 +92,7 @@ $zrx_dd_theme = $_COOKIE['zimrx_dropdown_theme'] ?? 'subtle-tint';
     <script>
     window.ZimRxIconsMap = <?= json_encode(ZimRxIcon::getAll(), JSON_UNESCAPED_SLASHES) ?>;
     window.ZimRxSavedTableColumns = <?= json_encode($zrx_saved_tbl_cols, JSON_UNESCAPED_SLASHES) ?>;
+    window.ZimRxCsrfToken = <?= json_encode(function_exists('zimrx_csrf_token') ? zimrx_csrf_token() : '') ?>;
     </script>
     <script src="assets/js/layout/zrx_icons.js?v=<?= file_exists(__DIR__ . '/assets/js/layout/zrx_icons.js') ? filemtime(__DIR__ . '/assets/js/layout/zrx_icons.js') : '1' ?>"></script>
     <script src="assets/js/layout/zrx_dropdown.js?v=<?= file_exists(__DIR__ . '/assets/js/layout/zrx_dropdown.js') ? filemtime(__DIR__ . '/assets/js/layout/zrx_dropdown.js') : '1' ?>"></script>

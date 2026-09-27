@@ -78,6 +78,7 @@ function zimrx_get_db_conn(string $dbPath): Connection {
             $nativePdo->exec('PRAGMA journal_mode = WAL;');
             $nativePdo->exec('PRAGMA synchronous = NORMAL;');
             $nativePdo->exec('PRAGMA foreign_keys = ON;');
+            $nativePdo->exec('PRAGMA busy_timeout = 5000;');
         }
     }
 
