@@ -39,6 +39,7 @@ const moduleFileMap = {
   "Breast Examination": "breast_exam.php",
   "Local Examination": "local_exam.php",
   "Burn Assessment": "burn_assessment.php",
+  "ENT Examination": "ent_exam.php",
   "Dx": "dx.php",
   "Ix": "ix.php",
   "Plan": "plan.php",
