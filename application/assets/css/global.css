@@ -8676,3 +8676,11 @@ html[data-dropdown-theme="subtle-tint"] .patient-lookup-option:not(.new-patient-
     display: none !important;
 }
 
+/* =======================================================
+   Orthopaedics & Musculoskeletal Examination Styles
+======================================================= */
+.zrx-ortho-pane[hidden] {
+    display: none !important;
+}
+
+
