@@ -1,6 +1,7 @@
 const availableLeftModules =[
-  "P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Dx", "Ix",
-  "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter", ""
+  "P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination",
+  "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology", "Psychiatry",
+  "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter", ""
 ];
 
 const availableRightModules =[
@@ -9,8 +10,9 @@ const availableRightModules =[
 ];
 
 const defaultLeftLayout =[
-  "P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Dx", "Ix",
-  "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter"
+  "P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination",
+  "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology", "Psychiatry",
+  "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter"
 ];
 
 const defaultRightLayout =[
@@ -43,6 +45,7 @@ const moduleFileMap = {
   "Dental Chart": "dental_chart.php",
   "Diabetic Foot": "diabetic_foot.php",
   "Dermatology": "dermatology.php",
+  "Psychiatry": "psychiatry.php",
   "Dx": "dx.php",
   "Ix": "ix.php",
   "Plan": "plan.php",

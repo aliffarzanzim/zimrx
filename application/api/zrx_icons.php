@@ -56,7 +56,8 @@ class ZimRxIcon {
         'tooth' => '<path d="M12 2C8 2 6 5 6 9c0 3 1.5 6.5 2.5 10 .5 1.8 1.5 3 2.5 3s1.5-2 1.5-4c0-1.5-.5-2-.5-3.5 0-1.5 1-1.5 1-1.5s1 0 1 1.5c0 1.5-.5 2-.5 3.5 0 2 .5 4 1.5 4s2-1.2 2.5-3c1-3.5 2.5-7 2.5-10 0-4-2-7-6-7z"></path>',
         'ear' => '<path d="M6 8.5a6.5 6.5 0 1 1 13 0c0 3-1.5 5-2.5 6.5-.8 1.2-1.5 2.5-1.5 4a2 2 0 0 1-4 0c0-1-.5-2-1.5-3A6 6 0 0 1 6 8.5Z"></path><path d="M10 8.5a2.5 2.5 0 1 1 5 0c0 1-.5 2-1 2.5"></path>',
         'grid' => '<rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>',
-        'layers' => '<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline>'
+        'layers' => '<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline>',
+        'brain' => '<path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"></path><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"></path>'
     ];
 
     public static function svg(string $name, int $size = 14, array $attrs = []): string {

@@ -8669,6 +8669,10 @@ html[data-dropdown-theme="subtle-tint"] .patient-lookup-option:not(.new-patient-
     }
 }
 
-
-
+/* =======================================================
+   Psychiatry & Mental State Examination (MSE) Styles
+======================================================= */
+.zrx-psych-pane[hidden] {
+    display: none !important;
+}
 

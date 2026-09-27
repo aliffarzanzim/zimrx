@@ -5,10 +5,10 @@ require_once 'db.php';
 $page_title = "ZimRx - Layout Configurator";
 
 // --- Read layout from cookie (same source as prescription.php pre-rendering) ---
-$availableLeftModules  = ["P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology", "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter", ""];
+$availableLeftModules  = ["P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology", "Psychiatry", "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter", ""];
 $availableRightModules = ["Rx", "Drug Summary & Interaction", "Advice", "Report Entry", "Upload Reports & Documents", "Calculators", "Ophthalmology", "Text Pad", "OT Note", "Font Format", ""];
 
-$defaultLeftLayout  = ["P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology", "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter"];
+$defaultLeftLayout  = ["P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology", "Psychiatry", "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter"];
 $defaultRightLayout = ["Rx", "Drug Summary & Interaction", "Advice", "Report Entry", "Upload Reports & Documents", "Calculators", "Ophthalmology", "Text Pad", "OT Note", "Font Format"];
 
 function decode_layout_cookie(string $name, array $default): array {
@@ -33,11 +33,11 @@ $defaultHistoryLayout = ['medical', 'treatment', 'habits', 'diet-hypersensitivit
 $historyLayout = decode_layout_cookie('zimrx_history_layout', $defaultHistoryLayout);
 while (count($historyLayout) < 5) $historyLayout[] = '';
 
-// Pad to 20 slots
-while (count($leftLayout)  < 20) $leftLayout[]  = '';
-while (count($rightLayout) < 20) $rightLayout[] = '';
+// Pad to 22 slots
+while (count($leftLayout)  < 22) $leftLayout[]  = '';
+while (count($rightLayout) < 22) $rightLayout[] = '';
 
-function render_setup_selects(array $layout, string $side, array $options, int $total = 20): string {
+function render_setup_selects(array $layout, string $side, array $options, int $total = 22): string {
     $html = '';
     for ($i = 0; $i < $total; $i++) {
         $current = $layout[$i] ?? '';
