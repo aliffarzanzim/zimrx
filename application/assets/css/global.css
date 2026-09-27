@@ -8704,6 +8704,14 @@ html[data-dropdown-theme="subtle-tint"] .patient-lookup-option:not(.new-patient-
     display: none !important;
 }
 
+/* =======================================================
+   Pulmonology & Respiratory Examination Styles
+======================================================= */
+.zrx-pulmo-pane[hidden] {
+    display: none !important;
+}
+
+
 
 
 
