@@ -7,9 +7,27 @@ require_once __DIR__ . '/../db.php';
 header('Content-Type: application/json');
 
 $pdo = DbConnections::userdata();
-$doctorId = max(1, (int)(function_exists('current_user_doctor_id') ? current_user_doctor_id() : 1));
+$doctorId = current_user_doctor_id();
+if ($doctorId <= 0) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'Unauthorized']);
+    exit;
+}
 
 $action = trim((string)($_GET['action'] ?? $_POST['action'] ?? ''));
+
+if (in_array($action, ['save_payment', 'create_transaction'], true)) {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        echo json_encode(['success' => false, 'error' => 'Method not allowed.']);
+        exit;
+    }
+    if (!zimrx_verify_csrf()) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'error' => 'CSRF verification failed.']);
+        exit;
+    }
+}
 
 try {
     if ($action === 'save_payment') {

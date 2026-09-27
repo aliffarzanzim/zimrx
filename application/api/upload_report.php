@@ -5,6 +5,18 @@ require_login();
 
 header('Content-Type: application/json');
 
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['error' => 'Method not allowed.']);
+    exit;
+}
+
+if (!zimrx_verify_csrf()) {
+    http_response_code(403);
+    echo json_encode(['error' => 'CSRF verification failed.']);
+    exit;
+}
+
 try {
     if (empty($_FILES['file']) || !is_array($_FILES['file'])) {
         throw new RuntimeException('No file received.');

@@ -6,6 +6,18 @@ require_once __DIR__ . '/../db.php';
 
 header('Content-Type: application/json');
 
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['ok' => false, 'error' => 'Method not allowed.']);
+    exit;
+}
+
+if (!zimrx_verify_csrf()) {
+    http_response_code(403);
+    echo json_encode(['ok' => false, 'error' => 'CSRF verification failed.']);
+    exit;
+}
+
 try {
     if (empty($_FILES['image_body']) || !is_array($_FILES['image_body'])) {
         throw new RuntimeException('প্রথমে ফাইল সিলেক্ট করুন এরপর আপলোড বাটন চাপুন।');

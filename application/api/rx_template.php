@@ -445,6 +445,16 @@ try {
         rx_template_json(rx_template_payload($type, $doctorId));
     }
 
+    if (strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+        http_response_code(405);
+        rx_template_json(['error' => 'Method not allowed.']);
+    }
+
+    if (!zimrx_verify_csrf()) {
+        http_response_code(403);
+        rx_template_json(['error' => 'CSRF verification failed.']);
+    }
+
     $payload = json_decode(file_get_contents('php://input'), true);
     if (!is_array($payload)) {
         rx_template_json(['error' => 'Invalid payload.']);

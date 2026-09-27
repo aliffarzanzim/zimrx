@@ -125,6 +125,14 @@ try {
 
     // 2. Desktop publishes current active patient
     if ($action === 'update_active_patient') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            throw new RuntimeException('Invalid request method.');
+        }
+        if (!zimrx_verify_csrf()) {
+            http_response_code(403);
+            echo json_encode(['ok' => false, 'error' => 'CSRF verification failed.']);
+            exit();
+        }
         $patientName = trim($_POST['patient_name'] ?? '');
         $patientReg = trim($_POST['patient_reg'] ?? '');
         $patientAge = trim($_POST['patient_age'] ?? '');

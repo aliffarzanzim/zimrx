@@ -19,7 +19,13 @@ try {
     $userPdo = rx_user_pdo();
 
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
         rx_json(['error' => 'POST required.']);
+    }
+
+    if (!zimrx_verify_csrf()) {
+        http_response_code(403);
+        rx_json(['error' => 'CSRF verification failed.']);
     }
 
     if (!rx_table_exists($userPdo, 'zimrx_user_pc')) {
@@ -29,6 +35,10 @@ try {
     $payload = json_decode(file_get_contents('php://input'), true);
     $complaints = is_array($payload['complaints'] ?? null) ? $payload['complaints'] : [];
     $doctorId = current_user_doctor_id();
+    if ($doctorId <= 0) {
+        http_response_code(401);
+        rx_json(['error' => 'Unauthorized']);
+    }
 
     $stmt = $userPdo->prepare(
         "INSERT INTO zimrx_user_pc (

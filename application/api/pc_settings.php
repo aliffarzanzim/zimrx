@@ -272,6 +272,10 @@ if (realpath((string)($_SERVER['SCRIPT_FILENAME'] ?? '')) !== realpath(__FILE__)
 
 try {
     $doctorId = current_user_doctor_id();
+    if ($doctorId <= 0) {
+        http_response_code(401);
+        rx_json(['error' => 'Unauthorized']);
+    }
     $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
 
     if ($method === 'GET') {
@@ -286,7 +290,13 @@ try {
     }
 
     if ($method !== 'POST') {
+        http_response_code(405);
         rx_json(['error' => 'Unsupported request method.']);
+    }
+
+    if (!zimrx_verify_csrf()) {
+        http_response_code(403);
+        rx_json(['error' => 'CSRF verification failed.']);
     }
 
     $payload = json_decode(file_get_contents('php://input'), true);

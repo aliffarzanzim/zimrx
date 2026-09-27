@@ -291,7 +291,13 @@ try {
     }
 
     if ($method !== 'POST') {
+        http_response_code(405);
         rx_json(['error' => 'Unsupported request method.']);
+    }
+
+    if (!zimrx_verify_csrf()) {
+        http_response_code(403);
+        rx_json(['error' => 'CSRF verification failed.']);
     }
 
     $payload = json_decode(file_get_contents('php://input'), true);

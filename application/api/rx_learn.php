@@ -10,7 +10,13 @@ try {
     $userPdo = rx_user_pdo();
 
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
         rx_json(['error' => 'POST required.']);
+    }
+
+    if (!zimrx_verify_csrf()) {
+        http_response_code(403);
+        rx_json(['error' => 'CSRF verification failed.']);
     }
 
     if (!rx_table_exists($userPdo, 'zimrx_user_drugs')) {
@@ -20,6 +26,10 @@ try {
     $payload = json_decode(file_get_contents('php://input'), true);
     $drugs = is_array($payload['drugs'] ?? null) ? $payload['drugs'] : [];
     $doctorId = current_user_doctor_id();
+    if ($doctorId <= 0) {
+        http_response_code(401);
+        rx_json(['error' => 'Unauthorized']);
+    }
 
     $learned = 0;
     $skipped = 0;

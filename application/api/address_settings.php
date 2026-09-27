@@ -4,6 +4,7 @@ declare(strict_types=1);
 header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/../auth.php';
+require_login();
 require_once __DIR__ . '/../db.php';
 
 function respond(array $data): void {
@@ -15,8 +16,11 @@ try {
     $pdo_static = DbConnections::staticDb();
     $pdo_user = DbConnections::userdata();
 
-    $doctorId = function_exists('current_user_doctor_id') ? current_user_doctor_id() : (int)($_SESSION['doctor_id'] ?? 1);
-    if ($doctorId <= 0) $doctorId = 1;
+    $doctorId = current_user_doctor_id();
+    if ($doctorId <= 0) {
+        http_response_code(401);
+        respond(['ok' => false, 'error' => 'Unauthorized']);
+    }
 
     $rawInput = file_get_contents('php://input');
     $jsonInput = json_decode($rawInput, true);
@@ -25,6 +29,16 @@ try {
     }
 
     $action = $_POST['action'] ?? $_GET['action'] ?? $jsonInput['action'] ?? 'list';
+    if ($action !== 'list') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            respond(['ok' => false, 'error' => 'Method not allowed.']);
+        }
+        if (!zimrx_verify_csrf()) {
+            http_response_code(403);
+            respond(['ok' => false, 'error' => 'CSRF verification failed.']);
+        }
+    }
     $name = trim((string)($_POST['name'] ?? $jsonInput['name'] ?? ''));
     $newName = trim((string)($_POST['new_name'] ?? $jsonInput['new_name'] ?? ''));
 

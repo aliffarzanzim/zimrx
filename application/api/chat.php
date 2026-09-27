@@ -45,6 +45,23 @@ function get_chat_tick(string $tickFile): array {
 
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
+$mutatingActions = [
+    'send_message', 'delete_message', 'hide_message', 'toggle_pin',
+    'start_direct', 'save_quick_message', 'delete_quick_message'
+];
+if (in_array($action, $mutatingActions, true)) {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        echo json_encode(['ok' => false, 'error' => 'Method not allowed.']);
+        exit;
+    }
+    if (!zimrx_verify_csrf()) {
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'error' => 'CSRF verification failed.']);
+        exit;
+    }
+}
+
 try {
     // -------------------------------------------------------------------------
     // 1. List Conversations for Current User

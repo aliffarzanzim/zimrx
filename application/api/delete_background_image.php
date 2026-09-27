@@ -5,6 +5,18 @@ require_login();
 
 header('Content-Type: application/json');
 
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['ok' => false, 'error' => 'Method not allowed.']);
+    exit;
+}
+
+if (!zimrx_verify_csrf()) {
+    http_response_code(403);
+    echo json_encode(['ok' => false, 'error' => 'CSRF verification failed.']);
+    exit;
+}
+
 try {
     $filename = basename(trim((string)($_POST['filename'] ?? '')));
     if ($filename === '') throw new RuntimeException('No filename provided.');

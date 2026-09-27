@@ -1019,9 +1019,12 @@ function save_patient(PDO $pdo, array $payload, string $date, int $doctorId): ar
 }
 
 try {
-    ensure_appointment_schema($pdo);
     $payload = [];
     if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        if (!zimrx_verify_csrf()) {
+            http_response_code(403);
+            respond(['error' => 'CSRF verification failed.']);
+        }
         $payload = json_decode(file_get_contents('php://input'), true);
         if (!is_array($payload)) {
             $payload = $_POST;

@@ -14,6 +14,15 @@ function emr_json_response(array $data, int $status = 200): void {
     exit;
 }
 
+function emr_enforce_mutation(): void {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        emr_json_response(['success' => false, 'message' => 'Method not allowed'], 405);
+    }
+    if (!zimrx_verify_csrf()) {
+        emr_json_response(['success' => false, 'message' => 'CSRF verification failed'], 403);
+    }
+}
+
 try {
     global $pdo;
     $pdo = $pdo instanceof PDO ? $pdo : DbConnections::userdata();
@@ -309,6 +318,7 @@ switch ($action) {
         break;
 
     case 'start_new_visit':
+        emr_enforce_mutation();
         $patientId = (int)($_POST['patient_id'] ?? 0);
         $regNo = trim((string)($_POST['reg_no'] ?? ''));
 
@@ -352,6 +362,7 @@ switch ($action) {
         break;
 
     case 'update_patient_demographics':
+        emr_enforce_mutation();
         $patientId = (int)($_POST['patient_id'] ?? 0);
         if ($patientId <= 0) {
             emr_json_response(['success' => false, 'message' => 'Invalid patient ID'], 400);
@@ -422,7 +433,6 @@ switch ($action) {
         break;
 
     case 'get_patient_trajectories':
-        ensure_trajectories_schema($pdo);
         $patientId = (int)($_GET['patient_id'] ?? $_POST['patient_id'] ?? 0);
         if ($patientId <= 0) {
             emr_json_response(['success' => false, 'message' => 'Invalid patient ID'], 400);
@@ -645,7 +655,7 @@ switch ($action) {
         break;
 
     case 'save_metric_reading':
-        ensure_trajectories_schema($pdo);
+        emr_enforce_mutation();
         $patientId = (int)($_POST['patient_id'] ?? 0);
         $metricType = trim((string)($_POST['metric_type'] ?? ''));
         $readingValue = trim((string)($_POST['reading_value'] ?? ''));
@@ -697,9 +707,9 @@ switch ($action) {
         break;
 
     case 'delete_metric_reading':
-        ensure_trajectories_schema($pdo);
-        $readingId = (int)($_POST['id'] ?? $_GET['id'] ?? 0);
-        $patientId = (int)($_POST['patient_id'] ?? $_GET['patient_id'] ?? 0);
+        emr_enforce_mutation();
+        $readingId = (int)($_POST['id'] ?? 0);
+        $patientId = (int)($_POST['patient_id'] ?? 0);
         if ($readingId <= 0 || $patientId <= 0) {
             emr_json_response(['success' => false, 'message' => 'Invalid reading ID or patient ID'], 400);
         }
@@ -710,7 +720,7 @@ switch ($action) {
         break;
 
     case 'update_tracked_metrics':
-        ensure_trajectories_schema($pdo);
+        emr_enforce_mutation();
         $patientId = (int)($_POST['patient_id'] ?? 0);
         if ($patientId <= 0) {
             emr_json_response(['success' => false, 'message' => 'Invalid patient ID'], 400);
@@ -731,26 +741,4 @@ switch ($action) {
     default:
         emr_json_response(['success' => false, 'message' => 'Invalid or missing action parameter'], 400);
         break;
-}
-
-function ensure_trajectories_schema(PDO $pdo): void {
-    if (!DbSchema::columnExists($pdo, 'zimrx_patients', 'tracked_metrics_json')) {
-        $pdo->exec("ALTER TABLE zimrx_patients ADD COLUMN tracked_metrics_json TEXT DEFAULT '[\"weight\"]'");
-    }
-    $pdo->exec(
-        "CREATE TABLE IF NOT EXISTS zimrx_patient_metric_readings (
-            id " . DbSql::autoIncrement() . ",
-            patient_id INTEGER NOT NULL,
-            metric_type TEXT NOT NULL,
-            reading_value TEXT NOT NULL,
-            secondary_value TEXT,
-            reading_date TEXT NOT NULL,
-            reading_time TEXT,
-            source TEXT NOT NULL DEFAULT 'clinic',
-            notes TEXT,
-            created_by INTEGER,
-            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )"
-    );
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_metric_pt ON zimrx_patient_metric_readings(patient_id, metric_type, reading_date)");
 }

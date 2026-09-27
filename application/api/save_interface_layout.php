@@ -5,27 +5,32 @@ require_once __DIR__ . '/../db.php';
 
 header('Content-Type: application/json');
 
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['error' => 'Method not allowed']);
+    exit;
+}
+
+if (!zimrx_verify_csrf()) {
+    http_response_code(403);
+    echo json_encode(['error' => 'CSRF verification failed']);
+    exit;
+}
+
 $payload = json_decode(file_get_contents('php://input'), true);
 if (!is_array($payload)) {
+    http_response_code(400);
     echo json_encode(['error' => 'Invalid JSON payload']);
     exit;
 }
 
 try {
     $doctorId = current_user_doctor_id();
-
-    // Ensure table exists
-    $pdo->exec(
-        "CREATE TABLE IF NOT EXISTS zimrx_interface_settings (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            doctor_id INTEGER NOT NULL,
-            setting_scope TEXT NOT NULL DEFAULT 'global',
-            setting_key TEXT NOT NULL,
-            setting_value TEXT,
-            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE(doctor_id, setting_scope, setting_key)
-        )"
-    );
+    if ($doctorId <= 0) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Unauthorized']);
+        exit;
+    }
 
     $keys = ['left_layout', 'right_layout', 'history_layout', 'dropdown_theme', 'dropdown_hover_bg', 'dropdown_hover_text'];
     $pdo->beginTransaction();

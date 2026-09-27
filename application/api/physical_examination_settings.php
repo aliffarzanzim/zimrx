@@ -12,7 +12,12 @@ require_once __DIR__ . '/physical_examination_lib.php';
 header('Content-Type: application/json; charset=utf-8');
 
 try {
-    $doctorId = max(1, (int)(function_exists('current_user_doctor_id') ? current_user_doctor_id() : 1));
+    $doctorId = current_user_doctor_id();
+    if ($doctorId <= 0) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'error' => 'Unauthorized']);
+        exit;
+    }
     $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
 
     if ($method === 'GET') {
@@ -24,6 +29,11 @@ try {
     }
 
     if ($method === 'POST') {
+        if (!zimrx_verify_csrf()) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'CSRF verification failed.']);
+            exit;
+        }
         $input = file_get_contents('php://input');
         $payload = json_decode($input, true);
 

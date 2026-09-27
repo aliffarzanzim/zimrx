@@ -46,6 +46,7 @@ class ZimRxTestSuite {
         $this->testClinicalCalculations();
         $this->testTenantIsolation();
         $this->testUploadValidationAndPathTraversal();
+        $this->testEndpointMutationGuards();
 
         echo "\n--------------------------------------------------------\n";
         echo "Test Results: {$this->passed} passed, {$this->failed} failed\n";
@@ -353,7 +354,7 @@ class ZimRxTestSuite {
     }
 
     private function testUploadValidationAndPathTraversal(): void {
-        echo "\n[10/10] Testing Upload Validation & Path Traversal Prevention...\n";
+        echo "\n[10/11] Testing Upload Validation & Path Traversal Prevention...\n";
 
         $allowed = ['jpg', 'jpeg', 'png', 'webp', 'pdf'];
         $dangerous = ['php', 'phtml', 'php3', 'php4', 'php5', 'phar', 'exe', 'sh', 'bat', 'cmd', 'js', 'html', 'svg'];
@@ -373,6 +374,41 @@ class ZimRxTestSuite {
             $sanitizedName === 'shell.php' && strpos($sanitizedName, '..') === false,
             "basename() sanitization strips directory traversal components ('{$maliciousPath}' -> '{$sanitizedName}')"
         );
+    }
+
+    private function testEndpointMutationGuards(): void {
+        echo "\n[11/11] Testing Write Endpoint Mutation Guard Patterns (Method & CSRF Enforcement)...\n";
+
+        // Setup session token
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $validToken = zimrx_csrf_token();
+
+        // 1. Valid token passes
+        $this->assert(
+            zimrx_verify_csrf($validToken),
+            "zimrx_verify_csrf() approves genuine CSRF token matching active session"
+        );
+
+        // 2. Forged token fails
+        $forgedToken = bin2hex(random_bytes(32));
+        $this->assert(
+            !zimrx_verify_csrf($forgedToken),
+            "zimrx_verify_csrf() rejects forged CSRF token"
+        );
+
+        // 3. Current user doctor ID when unauthenticated is 0, avoiding default Doctor 1
+        $savedSession = $_SESSION;
+        unset($_SESSION['user_id'], $_SESSION['doctor_id'], $_SESSION['role']);
+        $unauthDocId = function_exists('current_user_doctor_id') ? current_user_doctor_id() : 0;
+        $this->assert(
+            $unauthDocId === 0,
+            "current_user_doctor_id() returns 0 for unauthenticated requests, preventing unauthorized Doctor 1 fallback"
+        );
+
+        // Restore session
+        $_SESSION = $savedSession;
     }
 }
 
