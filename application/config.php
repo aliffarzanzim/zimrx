@@ -7,10 +7,14 @@
  * - Database engine and connection settings
  * - System-wide settings
  *
- * DATABASE MIGRATION NOTE:
- * To switch database engines (SQLite → MySQL/MariaDB):
- * 1. Update DB_DRIVER and connection configs below
- * 2. No code changes needed in any API files
+ * DATABASE ARCHITECTURE NOTE:
+ * ZimRx connects through a unified PDO abstraction layer (DbConnections,
+ * DbSql, DbSchema, and DbMigrator).
+ *
+ * - SQLite 3 is the primary, actively tested, and production-supported engine,
+ *   optimized with Write-Ahead Logging (WAL), 5000ms busy timeouts, and FTS5 search.
+ * - Centralizing PDO connections establishes the abstraction target for multi-engine
+ *   portability (MySQL/PostgreSQL), with full engine driver parity planned on the roadmap.
  */
 
 // =====================================================================

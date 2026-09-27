@@ -93,6 +93,32 @@ $zrx_dd_theme = $_COOKIE['zimrx_dropdown_theme'] ?? 'subtle-tint';
     window.ZimRxIconsMap = <?= json_encode(ZimRxIcon::getAll(), JSON_UNESCAPED_SLASHES) ?>;
     window.ZimRxSavedTableColumns = <?= json_encode($zrx_saved_tbl_cols, JSON_UNESCAPED_SLASHES) ?>;
     window.ZimRxCsrfToken = <?= json_encode(function_exists('zimrx_csrf_token') ? zimrx_csrf_token() : '') ?>;
+    (function() {
+        if (!window.fetch || !window.ZimRxCsrfToken) return;
+        const _origFetch = window.fetch;
+        window.fetch = function(resource, init) {
+            init = init || {};
+            const method = (init.method || 'GET').toUpperCase();
+            if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
+                if (!init.headers) {
+                    init.headers = { 'X-CSRF-TOKEN': window.ZimRxCsrfToken };
+                } else if (init.headers instanceof Headers) {
+                    if (!init.headers.has('X-CSRF-TOKEN')) {
+                        init.headers.set('X-CSRF-TOKEN', window.ZimRxCsrfToken);
+                    }
+                } else if (Array.isArray(init.headers)) {
+                    if (!init.headers.some(h => (h[0] || '').toLowerCase() === 'x-csrf-token')) {
+                        init.headers.push(['X-CSRF-TOKEN', window.ZimRxCsrfToken]);
+                    }
+                } else if (typeof init.headers === 'object') {
+                    if (!init.headers['X-CSRF-TOKEN'] && !init.headers['x-csrf-token']) {
+                        init.headers['X-CSRF-TOKEN'] = window.ZimRxCsrfToken;
+                    }
+                }
+            }
+            return _origFetch.call(this, resource, init);
+        };
+    })();
     </script>
     <script src="assets/js/layout/zrx_icons.js?v=<?= file_exists(__DIR__ . '/assets/js/layout/zrx_icons.js') ? filemtime(__DIR__ . '/assets/js/layout/zrx_icons.js') : '1' ?>"></script>
     <script src="assets/js/layout/zrx_dropdown.js?v=<?= file_exists(__DIR__ . '/assets/js/layout/zrx_dropdown.js') ? filemtime(__DIR__ . '/assets/js/layout/zrx_dropdown.js') : '1' ?>"></script>

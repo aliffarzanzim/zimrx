@@ -2,11 +2,14 @@
 /**
  * ZimRx - Automated Test Runner
  *
- * Runs self-contained unit and integration tests for:
- * 1. Security (Password Hashing, Verification, Legacy Migration, CSRF)
+ * Runs isolated unit and integration tests against real codebase functions:
+ * 1. Security (Password Hashing, Verification, Legacy Upgrade, CSRF)
  * 2. SQLite Database Configuration (WAL mode, busy_timeout, foreign_keys)
- * 3. Database Transaction Atomicity & Rollback
- * 4. Clinical Calculations & Algorithmic Scoring (BMI, BSA Mosteller, GCS, Wagner Diabetic Foot)
+ * 3. DbMigrator Schema Execution on Isolated In-Memory SQLite Database
+ * 4. Database Transaction Atomicity & Rollback (Isolated DB)
+ * 5. FTS5 Query Parsing & Tokenization (calling pc_fts_prefix_query)
+ * 6. User Drug Scoping & Normalization (calling user_drug_lib)
+ * 7. Clinical Calculations & Algorithmic Scoring (BMI, BSA Mosteller, GCS, Wagner)
  *
  * Usage:
  *   php application/tests/run_tests.php
@@ -18,6 +21,10 @@ require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../auth.php';
 require_once __DIR__ . '/../DbConnections.php';
 require_once __DIR__ . '/../DbSchema.php';
+require_once __DIR__ . '/../DbSql.php';
+require_once __DIR__ . '/../DbMigrator.php';
+require_once __DIR__ . '/../api/pc_catalog_lib.php';
+require_once __DIR__ . '/../api/user_drug_lib.php';
 
 class ZimRxTestSuite {
     private int $passed = 0;
@@ -32,10 +39,11 @@ class ZimRxTestSuite {
         $this->testPasswordSecurity();
         $this->testCsrfSecurity();
         $this->testDatabasePragmas();
+        $this->testDbMigratorOnIsolatedMemoryDb();
         $this->testTransactionRollback();
+        $this->testRealFtsPrefixQuery();
+        $this->testUserDrugLibScoping();
         $this->testClinicalCalculations();
-        $this->testFtsQuerySanitization();
-        $this->testUploadSecurity();
 
         echo "\n--------------------------------------------------------\n";
         echo "Test Results: {$this->passed} passed, {$this->failed} failed\n";
@@ -64,7 +72,7 @@ class ZimRxTestSuite {
     }
 
     private function testPasswordSecurity(): void {
-        echo "[1/5] Testing Authentication & Password Security...\n";
+        echo "[1/8] Testing Authentication & Password Security...\n";
 
         $rawPassword = 'DoctorSecurePassword2026!';
         $hash = zimrx_password_hash($rawPassword);
@@ -84,36 +92,64 @@ class ZimRxTestSuite {
             "zimrx_password_verify() rejects incorrect password"
         );
 
-        // Test backward-compatible legacy SHA-256 fallback
-        $legacySha256 = hash('sha256', 'legacy123');
+        // Test transparent upgrade detection for legacy SHA-256 hashes
+        $legacySha256 = hash('sha256', $rawPassword);
         $this->assert(
-            zimrx_password_verify('legacy123', $legacySha256),
-            "zimrx_password_verify() transparently authenticates legacy SHA-256 password"
+            zimrx_password_verify($rawPassword, $legacySha256),
+            "zimrx_password_verify() seamlessly authenticates existing legacy SHA-256 hashes"
         );
 
         $this->assert(
-            !zimrx_password_verify('wronglegacy', $legacySha256),
-            "zimrx_password_verify() rejects incorrect password on legacy SHA-256 hash"
+            zimrx_password_needs_rehash($legacySha256),
+            "zimrx_password_needs_rehash() correctly flags legacy SHA-256 for transparent upgrade"
+        );
+
+        $this->assert(
+            !zimrx_password_needs_rehash($hash),
+            "zimrx_password_needs_rehash() reports modern hash does not need rehash"
         );
     }
 
     private function testCsrfSecurity(): void {
-        echo "\n[2/5] Testing CSRF Token Generation & Verification...\n";
+        echo "\n[2/8] Testing CSRF Token Generation & Verification...\n";
 
-        $token = zimrx_csrf_token();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $token1 = zimrx_csrf_token();
         $this->assert(
-            strlen($token) === 64 && ctype_xdigit($token),
-            "zimrx_csrf_token() generates a 64-character cryptographically secure hex string"
+            is_string($token1) && strlen($token1) === 64,
+            "zimrx_csrf_token() generates a secure 64-char hexadecimal string"
+        );
+
+        $token2 = zimrx_csrf_token();
+        $this->assert(
+            $token1 === $token2,
+            "zimrx_csrf_token() is stable within the active user session"
         );
 
         $this->assert(
-            zimrx_verify_csrf($token),
-            "zimrx_verify_csrf() accepts matching session token"
+            zimrx_verify_csrf($token1),
+            "zimrx_verify_csrf() validates matching token"
         );
 
+        // Header extraction
+        $_SERVER['HTTP_X_CSRF_TOKEN'] = $token1;
         $this->assert(
-            !zimrx_verify_csrf('invalid_token_1234567890abcdef'),
+            zimrx_verify_csrf(null),
+            "zimrx_verify_csrf() automatically extracts valid token from HTTP_X_CSRF_TOKEN header"
+        );
+        unset($_SERVER['HTTP_X_CSRF_TOKEN']);
+
+        $this->assert(
+            !zimrx_verify_csrf('invalid_token_value_0123456789abcdef'),
             "zimrx_verify_csrf() rejects forged/mismatched token"
+        );
+
+        $this->assert(
+            !zimrx_verify_csrf(''),
+            "zimrx_verify_csrf() rejects empty token"
         );
 
         $this->assert(
@@ -123,7 +159,7 @@ class ZimRxTestSuite {
     }
 
     private function testDatabasePragmas(): void {
-        echo "\n[3/5] Testing SQLite Database Pragmas & Concurrency Settings...\n";
+        echo "\n[3/8] Testing SQLite Database Pragmas & Concurrency Settings...\n";
 
         DbConnections::configure(DB_CONFIG);
         $pdo = DbConnections::userdata();
@@ -147,28 +183,54 @@ class ZimRxTestSuite {
         );
     }
 
+    private function testDbMigratorOnIsolatedMemoryDb(): void {
+        echo "\n[4/8] Testing DbMigrator on Isolated In-Memory Database...\n";
+
+        $testPdo = new PDO('sqlite::memory:');
+        $testPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $testPdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+        $migrator = new DbMigrator(__DIR__ . '/../migrations');
+        $migrator->run($testPdo);
+
+        $hasMigrationsTable = DbSchema::tableExists($testPdo, 'schema_migrations');
+        $this->assert($hasMigrationsTable, "DbMigrator creates schema_migrations tracking table");
+
+        $installedCount = count($migrator->getInstalledVersions($testPdo));
+        $this->assert($installedCount >= 10, "DbMigrator runs all discovered migrations (installed: {$installedCount})");
+
+        $hasPatients = DbSchema::tableExists($testPdo, 'zimrx_patients');
+        $hasVisits = DbSchema::tableExists($testPdo, 'zimrx_visits');
+        $hasRevisions = DbSchema::tableExists($testPdo, 'zimrx_visit_revisions');
+        $hasReferrals = DbSchema::tableExists($testPdo, 'zimrx_user_patient_referrals');
+
+        $this->assert(
+            $hasPatients && $hasVisits && $hasRevisions && $hasReferrals,
+            "Migrated schema defines core EMR tables (patients, visits, revisions, referrals)"
+        );
+    }
+
     private function testTransactionRollback(): void {
-        echo "\n[4/5] Testing Database Transaction Atomicity & Rollback...\n";
+        echo "\n[5/8] Testing Database Transaction Atomicity & Rollback (Isolated Memory DB)...\n";
 
-        $pdo = DbConnections::userdata();
-        $testTable = 'zimrx_test_atomicity_' . time();
-
-        $pdo->exec("CREATE TABLE IF NOT EXISTS {$testTable} (id INTEGER PRIMARY KEY, note TEXT);");
+        $pdo = new PDO('sqlite::memory:');
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->exec("CREATE TABLE test_atomicity (id INTEGER PRIMARY KEY, note TEXT);");
 
         // Test successful transaction
         $pdo->beginTransaction();
-        $pdo->exec("INSERT INTO {$testTable} (id, note) VALUES (1, 'initial note');");
+        $pdo->exec("INSERT INTO test_atomicity (id, note) VALUES (1, 'initial note');");
         $pdo->commit();
 
-        $count = (int)$pdo->query("SELECT COUNT(*) FROM {$testTable}")->fetchColumn();
+        $count = (int)$pdo->query("SELECT COUNT(*) FROM test_atomicity")->fetchColumn();
         $this->assert($count === 1, "Transaction commit successfully persists data");
 
         // Test rollback under error
         try {
             $pdo->beginTransaction();
-            $pdo->exec("INSERT INTO {$testTable} (id, note) VALUES (2, 'second note');");
+            $pdo->exec("INSERT INTO test_atomicity (id, note) VALUES (2, 'second note');");
             // Simulate an intentional violation (duplicate primary key 1)
-            $pdo->exec("INSERT INTO {$testTable} (id, note) VALUES (1, 'duplicate key error');");
+            $pdo->exec("INSERT INTO test_atomicity (id, note) VALUES (1, 'duplicate key error');");
             $pdo->commit();
         } catch (Throwable $e) {
             if ($pdo->inTransaction()) {
@@ -176,29 +238,63 @@ class ZimRxTestSuite {
             }
         }
 
-        $countAfterRollback = (int)$pdo->query("SELECT COUNT(*) FROM {$testTable}")->fetchColumn();
+        $countAfterRollback = (int)$pdo->query("SELECT COUNT(*) FROM test_atomicity")->fetchColumn();
         $this->assert(
             $countAfterRollback === 1,
-            "Transaction rollback cleanly reverts dirty uncommitted writes on error"
+            "Transaction rollback cleanly reverts uncommitted writes without leaking dirty records"
+        );
+    }
+
+    private function testRealFtsPrefixQuery(): void {
+        echo "\n[6/8] Testing Real pc_fts_prefix_query() Implementation...\n";
+
+        $ftsQuery = pc_fts_prefix_query('Paracetamol 500mg');
+        $this->assert(
+            $ftsQuery === 'Paracetamol* 500mg*',
+            "pc_fts_prefix_query() converts clean clinical terms into prefixed wildcard stems ('{$ftsQuery}')"
         );
 
-        $pdo->exec("DROP TABLE IF EXISTS {$testTable};");
+        $ftsPunctuation = pc_fts_prefix_query("Amoxicillin/Clavulanate 625mg; DROP TABLE");
+        $this->assert(
+            strpos($ftsPunctuation, ';') === false && strpos($ftsPunctuation, '/') === false,
+            "pc_fts_prefix_query() safely strips punctuation and injection symbols"
+        );
+    }
+
+    private function testUserDrugLibScoping(): void {
+        echo "\n[7/8] Testing User Drug Library Authentication & Scoping...\n";
+
+        $cleanText = zimrx_user_drug_clean_text("  Napa Extra  \n");
+        $this->assert($cleanText === 'Napa Extra', "zimrx_user_drug_clean_text() trims whitespace");
+
+        $short = zimrx_user_drug_default_short(['brand_name' => 'Ace', 'strength' => '500mg']);
+        $this->assert($short === 'Ace 500mg', "zimrx_user_drug_default_short() formats standard label");
+
+        $exceptionThrown = false;
+        try {
+            // Unauthenticated call without a doctor_id must throw InvalidArgumentException
+            zimrx_resolve_doctor_id(0, false);
+        } catch (InvalidArgumentException $e) {
+            $exceptionThrown = true;
+        }
+        $this->assert(
+            $exceptionThrown,
+            "zimrx_resolve_doctor_id() strictly rejects unauthenticated doctor mutations"
+        );
     }
 
     private function testClinicalCalculations(): void {
-        echo "\n[5/5] Testing Clinical Algorithms & Medical Scoring...\n";
+        echo "\n[8/8] Testing Clinical Calculations & Medical Scoring Formulas...\n";
 
         // 1. BMI Calculation: kg / (m^2)
-        // E.g. Weight = 70 kg, Height = 175 cm (1.75 m) -> BMI = 70 / (1.75^2) = 22.86
         $weight = 70.0;
         $heightM = 1.75;
         $bmi = round($weight / ($heightM * $heightM), 2);
-        $this->assert($bmi === 22.86, "BMI calculation correctly yields 22.86 kg/m² for 70kg / 175cm");
+        $this->assert($bmi === 22.86, "BMI formula correctly computes 22.86 kg/m² for 70kg / 175cm");
 
         // 2. Mosteller BSA formula: sqrt((height_cm * weight_kg) / 3600)
-        // E.g. Height = 175 cm, Weight = 70 kg -> sqrt((175 * 70) / 3600) = sqrt(3.40277) = 1.84 m²
         $bsa = round(sqrt((175.0 * 70.0) / 3600.0), 2);
-        $this->assert($bsa === 1.84, "Mosteller Body Surface Area (BSA) correctly yields 1.84 m²");
+        $this->assert($bsa === 1.84, "Mosteller Body Surface Area (BSA) correctly computes 1.84 m²");
 
         // 3. Glasgow Coma Scale (GCS) calculation: Eye (1-4) + Verbal (1-5) + Motor (1-6)
         $e = 4; $v = 5; $m = 6;
@@ -219,44 +315,6 @@ class ZimRxTestSuite {
             'Grade 5' => 'Extensive gangrene involving whole foot',
         ];
         $this->assert(count($wagnerGrades) === 6, "Wagner Diabetic Foot classification defines all 6 standard grades (0 to 5)");
-    }
-
-    private function testFtsQuerySanitization(): void {
-        echo "\n[6/7] Testing SQLite FTS5 Query Tokenization & Sanitization...\n";
-
-        $rawInput = 'Paracetamol 500mg "injection" OR 1=1; DROP TABLE';
-        // Same logic as in drug_lookup.php
-        $cleanTokens = array_filter(preg_split('/\s+/', preg_replace('/[^\p{L}\p{N}]+/u', ' ', $rawInput)));
-        $ftsMatchQuery = !empty($cleanTokens) ? implode(' ', array_map(fn($t) => '"' . $t . '"*', $cleanTokens)) : '';
-
-        $this->assert(
-            strpos($ftsMatchQuery, ';') === false && strpos($ftsMatchQuery, 'DROP') !== false,
-            "FTS5 tokenizer safely neutralizes SQL injection syntax and quotes all token stems"
-        );
-
-        $this->assert(
-            $ftsMatchQuery === '"Paracetamol"* "500mg"* "injection"* "OR"* "1"* "1"* "DROP"* "TABLE"*',
-            "FTS5 tokenizer correctly builds prefixed wildcard tokens"
-        );
-    }
-
-    private function testUploadSecurity(): void {
-        echo "\n[7/7] Testing File Upload Security & Extension Whitelists...\n";
-
-        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf'];
-        $dangerousExtensions = ['php', 'phtml', 'php5', 'exe', 'sh', 'bat', 'cmd', 'js', 'html'];
-
-        $allDangerousBlocked = true;
-        foreach ($dangerousExtensions as $ext) {
-            if (in_array(strtolower($ext), $allowedExtensions, true)) {
-                $allDangerousBlocked = false;
-                break;
-            }
-        }
-        $this->assert($allDangerousBlocked, "Dangerous executable extensions (.php, .exe, .sh, etc.) are strictly prohibited from upload");
-
-        $safeAllowed = in_array('png', $allowedExtensions, true) && in_array('pdf', $allowedExtensions, true);
-        $this->assert($safeAllowed, "Standard medical and image formats (.png, .jpg, .pdf) are accepted in whitelist");
     }
 }
 

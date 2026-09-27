@@ -1,18 +1,43 @@
 <?php
 define('ZIMRX_DB_LIGHTWEIGHT', true);
 require_once __DIR__ . '/../db.php';
-header('Content-Type: application/json');
+require_once __DIR__ . '/../auth.php';
+require_login();
+
+header('Content-Type: application/json; charset=utf-8');
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['ok' => false, 'error' => 'Method Not Allowed. POST required.']);
+    exit;
+}
 
 // Read JSON POST data
 $input = json_decode(file_get_contents('php://input'), true);
-$full_address = isset($input['address']) ? trim($input['address']) : '';
+if (!is_array($input)) {
+    $input = $_POST;
+}
+
+$csrfToken = $input['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
+if (!zimrx_verify_csrf(is_string($csrfToken) ? $csrfToken : null)) {
+    http_response_code(403);
+    echo json_encode(['ok' => false, 'error' => 'CSRF verification failed.']);
+    exit;
+}
+
+$full_address = isset($input['address']) ? trim((string)$input['address']) : '';
 
 if (!$full_address) { echo json_encode(['status' => 'empty']); exit; }
 
 try {
     $pdo_user = DbConnections::userdata();
     $pdo_static = DbConnections::staticDb();
-    $doctor_id = (int)($_SESSION['doctor_id'] ?? 1);
+    $doctor_id = current_user_doctor_id();
+    if ($doctor_id <= 0) {
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'error' => 'Valid doctor account required.']);
+        exit;
+    }
 
     // Clean and normalize parts
     $raw_parts = explode(',', $full_address);

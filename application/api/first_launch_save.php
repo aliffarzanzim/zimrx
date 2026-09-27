@@ -100,7 +100,11 @@ try {
 
     // Generate recovery key and save to userdata/
     $recoveryKey = strtoupper(bin2hex(random_bytes(16)));
-    $recoveryPath = __DIR__ . '/../../userdata/recovery.key';
+    $recoveryDir = defined('ZIMRX_USERDATA_DIR') ? ZIMRX_USERDATA_DIR : dirname(__DIR__) . '/userdata';
+    if (!is_dir($recoveryDir)) {
+        @mkdir($recoveryDir, 0755, true);
+    }
+    $recoveryPath = $recoveryDir . '/recovery.key';
     file_put_contents($recoveryPath, $recoveryKey);
 
     // Start session and log in

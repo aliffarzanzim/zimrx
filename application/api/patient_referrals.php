@@ -22,54 +22,6 @@ function referral_category(string $value): string {
     };
 }
 
-function ensure_patient_referrals_schema(PDO $pdo): void {
-    $pdo->exec(
-        "CREATE TABLE IF NOT EXISTS zimrx_user_patient_referrals (
-            id " . DbSql::autoIncrement() . ",
-            doctor_id INTEGER NOT NULL DEFAULT 1,
-            patient_reg_no TEXT,
-            visit_record_id INTEGER,
-            visit_id TEXT,
-            category TEXT NOT NULL DEFAULT 'self',
-            referral_name TEXT,
-            normalized_name TEXT,
-            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )"
-    );
-
-    foreach ([
-        'doctor_id' => 'INTEGER NOT NULL DEFAULT 1',
-        'patient_reg_no' => 'TEXT',
-        'visit_record_id' => 'INTEGER',
-        'visit_id' => 'TEXT',
-        'category' => "TEXT NOT NULL DEFAULT 'self'",
-        'referral_name' => 'TEXT',
-        'normalized_name' => 'TEXT',
-        'created_at' => 'TEXT',
-        'updated_at' => 'TEXT',
-    ] as $column => $definition) {
-        zimrx_db_ensure_column($pdo, 'zimrx_user_patient_referrals', $column, $definition);
-    }
-
-    zimrx_ensure_visit_identity_schema($pdo);
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_patient_referrals_suggestions ON zimrx_user_patient_referrals(doctor_id, category, normalized_name)");
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_patient_referrals_visit_record ON zimrx_user_patient_referrals(doctor_id, visit_record_id)");
-    $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS uid_patient_referrals_doctor_visit_record ON zimrx_user_patient_referrals(doctor_id, visit_record_id) WHERE visit_record_id IS NOT NULL");
-
-    if (DbSchema::tableExists($pdo, 'zimrx_appointments')) {
-        zimrx_db_ensure_column($pdo, 'zimrx_appointments', 'referral_category', 'TEXT');
-        zimrx_db_ensure_column($pdo, 'zimrx_appointments', 'referral_name', 'TEXT');
-        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_appointments_referrals ON zimrx_appointments(doctor_id, referral_category, referral_name)");
-    }
-
-    if (DbSchema::tableExists($pdo, 'zimrx_visits')) {
-        zimrx_db_ensure_column($pdo, 'zimrx_visits', 'referral_category', "TEXT NOT NULL DEFAULT 'self'");
-        zimrx_db_ensure_column($pdo, 'zimrx_visits', 'referral_name', 'TEXT');
-        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_visits_referrals ON zimrx_visits(doctor_id, referral_category, referral_name)");
-    }
-}
-
 function resolve_referral_doctor_id(PDO $pdo): int {
     $requestedDoctorId = (int)($_GET['doctor_id'] ?? 0);
     $fallbackDoctorId = current_user_doctor_id();
@@ -99,8 +51,6 @@ function visit_referral_source_available(PDO $pdo): bool {
 }
 
 try {
-    ensure_patient_referrals_schema($pdo);
-
     $action = strtolower(trim((string)($_GET['action'] ?? 'suggestions')));
     if (!in_array($action, ['suggestions', 'recent'], true)) {
         referral_json(['error' => 'Unsupported action.']);

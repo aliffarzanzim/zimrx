@@ -36,8 +36,13 @@ function current_user_id(): int {
 }
 
 function current_user_doctor_id(): int {
-    $doctorId = (int)($_SESSION['doctor_id'] ?? 1);
-    return $doctorId > 0 ? $doctorId : 1;
+    if (isset($_SESSION['doctor_id']) && (int)$_SESSION['doctor_id'] > 0) {
+        return (int)$_SESSION['doctor_id'];
+    }
+    if (is_logged_in()) {
+        return 1;
+    }
+    return 0;
 }
 
 function is_admin_user(): bool {
@@ -66,6 +71,16 @@ function zimrx_password_verify(string $password, string $storedHash): bool {
 }
 
 /**
+ * Check if a stored password hash needs rehash/upgrade to modern bcrypt/argon2.
+ */
+function zimrx_password_needs_rehash(string $storedHash): bool {
+    if (strlen($storedHash) === 64 && ctype_xdigit($storedHash)) {
+        return true;
+    }
+    return password_needs_rehash($storedHash, PASSWORD_DEFAULT);
+}
+
+/**
  * CSRF Protection Helpers
  */
 function zimrx_csrf_token(): string {
@@ -82,7 +97,10 @@ function zimrx_csrf_field(): string {
 
 function zimrx_verify_csrf(?string $token = null): bool {
     if ($token === null) {
-        $token = $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
+        $token = $_POST['csrf_token']
+            ?? $_SERVER['HTTP_X_CSRF_TOKEN']
+            ?? $_SERVER['HTTP_X_XSRF_TOKEN']
+            ?? null;
     }
     if (!is_string($token) || $token === '') {
         return false;
@@ -92,20 +110,21 @@ function zimrx_verify_csrf(?string $token = null): bool {
 }
 
 /**
- * Require login for a page
+ * Require login for a page or API endpoint
  */
 function require_login() {
     if (!is_logged_in()) {
+        $script = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? $_SERVER['PHP_SELF'] ?? '');
+        if (strpos($script, '/api/') !== false) {
+            http_response_code(401);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['ok' => false, 'error' => 'Authentication required.'], JSON_UNESCAPED_UNICODE);
+            exit();
+        }
         $currentUri = $_SERVER['REQUEST_URI'] ?? '';
         $redirectParam = $currentUri ? '?redirect=' . urlencode($currentUri) : '';
         header("Location: index.php" . $redirectParam);
         exit();
-    }
-
-    // Never redirect API requests to HTML pages
-    $script = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? $_SERVER['PHP_SELF'] ?? '');
-    if (strpos($script, '/api/') !== false) {
-        return;
     }
 
     $page = basename($_SERVER['PHP_SELF'] ?? '');

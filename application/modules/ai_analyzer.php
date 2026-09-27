@@ -226,17 +226,23 @@
             <div>
                 <label class="ai-label">Provider</label>
                 <select id="ai-provider" class="ai-inp">
-                    <option value="https://api.openai.com/v1">OpenAI</option>
-                    <option value="https://generativelanguage.googleapis.com/v1beta/openai">Google Gemini</option>
-                    <option value="https://api.x.ai/v1">xAI (Grok)</option>
-                    <option value="https://api.deepseek.com/v1">DeepSeek</option>
-                    <option value="custom">Custom URL</option>
+                    <option value="http://localhost:11434/v1">Local Ollama (100% Offline & Private)</option>
+                    <option value="http://localhost:1234/v1">LM Studio (Local Offline)</option>
+                    <option value="https://api.openai.com/v1">OpenAI (Cloud)</option>
+                    <option value="https://generativelanguage.googleapis.com/v1beta/openai">Google Gemini (Cloud)</option>
+                    <option value="https://api.x.ai/v1">xAI Grok (Cloud)</option>
+                    <option value="https://api.deepseek.com/v1">DeepSeek (Cloud)</option>
+                    <option value="custom">Custom Endpoint</option>
                 </select>
             </div>
             <div id="custom-url-group" style="display: none;">
                 <label class="ai-label">Custom Base URL</label>
-                <input type="text" id="ai-base-url" class="ai-inp" placeholder="https://...">
+                <input type="text" id="ai-base-url" class="ai-inp" placeholder="http://localhost:11434/v1">
             </div>
+        </div>
+
+        <div style="font-size: 0.72rem; color: #475569; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px 10px; margin-bottom: 8px; line-height: 1.4;">
+            <strong>Privacy &amp; Data Sovereignty:</strong> Local Ollama/LM Studio processes clinical queries entirely offline with <em>zero external network transmission</em>. Cloud providers transmit de-identified prompts (patient names and contacts are never sent) over the internet.
         </div>
 
         <div class="ai-settings-grid">
@@ -354,9 +360,10 @@
     fetchModelsBtn.addEventListener('click', async () => {
         const apiKey = apiKeyInput.value.trim();
         const finalBaseUrl = (providerSelect.value === 'custom') ? baseUrlInput.value.trim() : providerSelect.value;
+        const isLocal = finalBaseUrl.includes('localhost') || finalBaseUrl.includes('127.0.0.1');
 
-        if (!apiKey || !finalBaseUrl) {
-            alert('Please enter an API Key and select a Provider to fetch models.');
+        if (!finalBaseUrl || (!apiKey && !isLocal)) {
+            alert('Please select a Provider (and enter an API Key for cloud providers) to fetch models.');
             return;
         }
 
@@ -364,12 +371,13 @@
         fetchModelsBtn.style.opacity = '0.5';
 
         try {
+            const reqHeaders = { "Content-Type": "application/json" };
+            if (apiKey) {
+                reqHeaders["Authorization"] = `Bearer ${apiKey}`;
+            }
             const response = await fetch(`${finalBaseUrl.replace(/\/$/, '')}/models`, {
                 method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${apiKey}`,
-                    "Content-Type": "application/json"
-                }
+                headers: reqHeaders
             });
 
             if (!response.ok) throw new Error("Failed to fetch models (Check API Key or CORS restrictions)");
@@ -527,9 +535,10 @@
         const apiKey = apiKeyInput.value.trim();
         const finalBaseUrl = (providerSelect.value === 'custom') ? baseUrlInput.value.trim() : providerSelect.value;
         const modelName = modelNameInput.value.trim();
+        const isLocal = finalBaseUrl.includes('localhost') || finalBaseUrl.includes('127.0.0.1');
 
-        if (!apiKey || !finalBaseUrl || !modelName) {
-            alert('Please configure Provider, Model Name, and API Key in the settings first.');
+        if (!finalBaseUrl || !modelName || (!apiKey && !isLocal)) {
+            alert('Please configure Provider and Model Name in the settings. (Cloud providers also require an API Key)');
             settingsPanel.classList.add('active');
             return;
         }
@@ -554,12 +563,13 @@
         };
 
         try {
+            const reqHeaders = { "Content-Type": "application/json" };
+            if (apiKey) {
+                reqHeaders["Authorization"] = `Bearer ${apiKey}`;
+            }
             const response = await fetch(`${finalBaseUrl.replace(/\/$/, '')}/chat/completions`, {
                 method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${apiKey}`,
-                    "Content-Type": "application/json"
-                },
+                headers: reqHeaders,
                 body: JSON.stringify(payload)
             });
 

@@ -2,11 +2,12 @@
 /**
  * ZimRx Database Connection Manager
  * 
- * Provides a unified, abstracted database connection layer that supports
- * multiple database engines (SQLite, MySQL, MariaDB, PostgreSQL, etc.)
+ * Provides a unified database connection layer that centralizes PDO instantiation
+ * and driver configuration across the application.
  * 
- * To migrate databases (e.g., SQLite to MySQL), only modify config.php
- * No changes needed in any API or application code.
+ * - SQLite 3 is currently the primary supported, audited, and production-tested engine.
+ * - Multi-engine drivers (MySQL, MariaDB, PostgreSQL) serve as architectural blueprints
+ *   for planned cross-engine deployments.
  * 
  * Usage:
  *   DbConnections::userdata()   // Get PDO for userdata database

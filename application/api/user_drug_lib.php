@@ -65,6 +65,27 @@ function zimrx_user_drug_ensure_schema(PDO $pdo): void {
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_user_drug_active ON zimrx_user_drug_prescribe_index(is_active, source_type)");
 }
 
+function zimrx_resolve_doctor_id(?int $doctorId = null, bool $allowGuestRead = false): int {
+    if ($doctorId !== null) {
+        if ($doctorId > 0) {
+            return $doctorId;
+        }
+        if (!$allowGuestRead) {
+            throw new InvalidArgumentException('Authenticated doctor context is required for this drug operation.');
+        }
+    }
+    if (function_exists('current_user_doctor_id')) {
+        $id = current_user_doctor_id();
+        if ($id > 0) {
+            return $id;
+        }
+    }
+    if ($allowGuestRead) {
+        return 1;
+    }
+    throw new InvalidArgumentException('Authenticated doctor context is required for this drug operation.');
+}
+
 function zimrx_user_drug_clean_text($value): string {
     return trim((string)($value ?? ''));
 }
@@ -88,7 +109,8 @@ function zimrx_user_drug_default_long(array $data): string {
     ])));
 }
 
-function zimrx_user_drug_save(array $data, int $doctorId = 1): array {
+function zimrx_user_drug_save(array $data, ?int $doctorId = null): array {
+    $doctorId = zimrx_resolve_doctor_id($doctorId, false);
     $pdo = zimrx_user_drug_pdo();
     $sourceType = zimrx_user_drug_clean_text($data['source_type'] ?? 'custom') === 'override' ? 'override' : 'custom';
     $systemBrandId = zimrx_user_drug_clean_text($data['system_brand_id'] ?? '');
@@ -381,7 +403,8 @@ function zimrx_user_drug_override_rows(string $query = '', int $doctorId = 1): a
     return array_map('zimrx_user_drug_index_to_catalog_row', $stmt->fetchAll() ?: []);
 }
 
-function zimrx_user_drug_remove_override(string $systemBrandId, int $doctorId = 1): void {
+function zimrx_user_drug_remove_override(string $systemBrandId, ?int $doctorId = null): void {
+    $doctorId = zimrx_resolve_doctor_id($doctorId, false);
     $pdo = zimrx_user_drug_pdo();
     $stmt = $pdo->prepare(
         "UPDATE zimrx_user_drug_prescribe_index
@@ -399,7 +422,8 @@ function zimrx_user_drug_remove_override(string $systemBrandId, int $doctorId = 
     $stmt->execute(['doctor_id' => $doctorId, 'system_brand_id' => $systemBrandId]);
 }
 
-function zimrx_user_drug_merge_search(array $systemRows, string $query = '', int $limit = 50, int $doctorId = 1): array {
+function zimrx_user_drug_merge_search(array $systemRows, string $query = '', int $limit = 50, ?int $doctorId = null): array {
+    $doctorId = zimrx_resolve_doctor_id($doctorId, true);
     $rows = array_merge(
         zimrx_user_drug_search_rows($query, min(20, max(1, $limit)), $doctorId),
         zimrx_user_drug_filter_system_rows($systemRows, $doctorId)
@@ -467,7 +491,8 @@ function zimrx_user_drug_index_to_catalog_row(array $row): array {
     ];
 }
 
-function zimrx_user_drug_hide(string $id, array $snapshot = [], int $doctorId = 1): void {
+function zimrx_user_drug_hide(string $id, array $snapshot = [], ?int $doctorId = null): void {
+    $doctorId = zimrx_resolve_doctor_id($doctorId, false);
     $pdo = zimrx_user_drug_pdo();
     $userRow = zimrx_user_drug_fetch_index($id, $doctorId);
     if ($userRow && (string)($userRow['local_drug_id'] ?? '') === $id && ($userRow['source_type'] ?? '') === 'custom') {
@@ -495,7 +520,8 @@ function zimrx_user_drug_hide(string $id, array $snapshot = [], int $doctorId = 
     ]);
 }
 
-function zimrx_user_drug_restore(string $id, int $doctorId = 1): void {
+function zimrx_user_drug_restore(string $id, ?int $doctorId = null): void {
+    $doctorId = zimrx_resolve_doctor_id($doctorId, false);
     $pdo = zimrx_user_drug_pdo();
     $stmt = $pdo->prepare("UPDATE zimrx_user_drug_hidden SET is_active = 0, restored_at = CURRENT_TIMESTAMP WHERE doctor_id = :doctor_id AND system_brand_id = :id");
     $stmt->execute(['doctor_id' => $doctorId, 'id' => $id]);
@@ -504,7 +530,8 @@ function zimrx_user_drug_restore(string $id, int $doctorId = 1): void {
     $stmt->execute(['doctor_id' => $doctorId, 'id' => $id]);
 }
 
-function zimrx_user_drug_hidden_list(string $query = '', int $doctorId = 1): array {
+function zimrx_user_drug_hidden_list(string $query = '', ?int $doctorId = null): array {
+    $doctorId = zimrx_resolve_doctor_id($doctorId, true);
     $pdo = zimrx_user_drug_pdo();
     $stmt = $pdo->prepare(
         "SELECT system_brand_id, brand_snapshot, hidden_at

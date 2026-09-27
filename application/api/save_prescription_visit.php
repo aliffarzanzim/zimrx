@@ -61,87 +61,6 @@ function visit_no_is_free(PDO $pdo, int $patientId, int $visitNo, int $doctorId)
     return (int)$stmt->fetchColumn() === 0;
 }
 
-function ensure_visit_schema(PDO $pdo): void {
-    ensure_column($pdo, 'zimrx_appointments', 'doctor_id', 'INTEGER NOT NULL DEFAULT 1');
-    ensure_column($pdo, 'zimrx_appointments', 'visit_record_id', 'INTEGER');
-    ensure_column($pdo, 'zimrx_appointments', 'visit_id', 'TEXT');
-    ensure_column($pdo, 'zimrx_appointments', 'referral_category', "TEXT NOT NULL DEFAULT 'self'");
-    ensure_column($pdo, 'zimrx_appointments', 'referral_name', 'TEXT');
-    ensure_column($pdo, 'zimrx_visits', 'doctor_id', 'INTEGER NOT NULL DEFAULT 1');
-    ensure_column($pdo, 'zimrx_visits', 'appointment_id', 'INTEGER');
-    ensure_column($pdo, 'zimrx_visits', 'referral_category', "TEXT NOT NULL DEFAULT 'self'");
-    ensure_column($pdo, 'zimrx_visits', 'referral_name', 'TEXT');
-    ensure_column($pdo, 'zimrx_visits', 'prescription_html', 'TEXT');
-    ensure_column($pdo, 'zimrx_visits', 'clinical_snapshot_json', 'TEXT');
-    zimrx_ensure_visit_identity_schema($pdo);
-    $visitIndexTable = 'zimrx_visits';
-    $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_visits_appointment_id ON $visitIndexTable(appointment_id) WHERE appointment_id IS NOT NULL");
-    $pdo->exec("DROP INDEX IF EXISTS idx_visits_patient_visit_no");
-    $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_visits_doctor_patient_visit_no ON $visitIndexTable(doctor_id, patient_id, visit_no) WHERE visit_no IS NOT NULL");
-    $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_visits_visit_id ON $visitIndexTable(visit_id) WHERE visit_id IS NOT NULL");
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_visits_doctor_patient ON $visitIndexTable(doctor_id, patient_id, visit_no)");
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_visits_referrals ON zimrx_visits(doctor_id, referral_category, referral_name)");
-}
-
-function ensure_patient_referrals_schema(PDO $pdo): void {
-    $pdo->exec(
-        "CREATE TABLE IF NOT EXISTS zimrx_user_patient_referrals (
-            id " . DbSql::autoIncrement() . ",
-            doctor_id INTEGER NOT NULL DEFAULT 1,
-            patient_reg_no TEXT,
-            visit_record_id INTEGER,
-            visit_id TEXT,
-            category TEXT NOT NULL DEFAULT 'self',
-            referral_name TEXT,
-            normalized_name TEXT,
-            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )"
-    );
-
-    foreach ([
-        'doctor_id' => 'INTEGER NOT NULL DEFAULT 1',
-        'patient_reg_no' => 'TEXT',
-        'visit_record_id' => 'INTEGER',
-        'visit_id' => 'TEXT',
-        'category' => "TEXT NOT NULL DEFAULT 'self'",
-        'referral_name' => 'TEXT',
-        'normalized_name' => 'TEXT',
-        'created_at' => 'TEXT',
-        'updated_at' => 'TEXT',
-    ] as $column => $definition) {
-        zimrx_db_ensure_column($pdo, 'zimrx_user_patient_referrals', $column, $definition);
-    }
-
-    zimrx_ensure_visit_identity_schema($pdo);
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_patient_referrals_visit_record ON zimrx_user_patient_referrals(doctor_id, visit_record_id)");
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_patient_referrals_suggestions ON zimrx_user_patient_referrals(doctor_id, category, normalized_name)");
-    $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS uid_patient_referrals_doctor_visit_record ON zimrx_user_patient_referrals(doctor_id, visit_record_id) WHERE visit_record_id IS NOT NULL");
-}
-
-function ensure_visit_revisions_schema(PDO $pdo): void {
-    $pdo->exec(
-        "CREATE TABLE IF NOT EXISTS zimrx_visit_revisions (
-            id " . DbSql::autoIncrement() . ",
-            visit_record_id INTEGER NOT NULL,
-            doctor_id INTEGER NOT NULL DEFAULT 1,
-            revision_no INTEGER NOT NULL DEFAULT 1,
-            patient_id INTEGER,
-            patient_reg_no TEXT,
-            visit_no INTEGER,
-            visit_id TEXT,
-            clinical_snapshot_json TEXT,
-            prescription_html TEXT,
-            rich_text_json TEXT,
-            billing_json TEXT,
-            reason TEXT,
-            created_by INTEGER,
-            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )"
-    );
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_visit_revisions_lookup ON zimrx_visit_revisions(doctor_id, visit_record_id, revision_no)");
-}
-
 function archive_visit_revision_if_changed(PDO $pdo, array $existingVisit, ?string $newSnapshotJson, ?string $newHtml, ?string $newRichText, int $doctorId, ?int $userId): void {
     $oldSnapshot = (string)($existingVisit['clinical_snapshot_json'] ?? '');
     $oldHtml = (string)($existingVisit['prescription_html'] ?? '');
@@ -290,46 +209,6 @@ function save_patient_referral(PDO $pdo, int $doctorId, string $regNo, int $visi
     $stmt->execute($params);
 }
 
-function backfill_visit_referrals(PDO $pdo): void {
-    if (!DbSchema::tableExists($pdo, 'zimrx_user_patient_referrals')) {
-        return;
-    }
-
-    $pdo->exec(
-        "UPDATE zimrx_visits
-         SET referral_category = COALESCE((
-                 SELECT r.category
-                 FROM zimrx_user_patient_referrals r
-                 WHERE r.doctor_id = zimrx_visits.doctor_id
-                   AND r.visit_record_id = zimrx_visits.id
-                 LIMIT 1
-             ), referral_category),
-             referral_name = COALESCE((
-                 SELECT r.referral_name
-                 FROM zimrx_user_patient_referrals r
-                 WHERE r.doctor_id = zimrx_visits.doctor_id
-                   AND r.visit_record_id = zimrx_visits.id
-                 LIMIT 1
-             ), referral_name)
-         WHERE (referral_name IS NULL OR referral_name = '')
-           AND EXISTS (
-               SELECT 1
-               FROM zimrx_user_patient_referrals r
-               WHERE r.doctor_id = zimrx_visits.doctor_id
-                 AND r.visit_record_id = zimrx_visits.id
-                 AND COALESCE(r.referral_name, '') <> ''
-           )"
-    );
-
-    $pdo->exec(
-        "UPDATE zimrx_visits
-         SET referral_category = 'doctor',
-             referral_name = referred_by
-         WHERE COALESCE(referral_name, '') = ''
-           AND COALESCE(referred_by, '') <> ''"
-    );
-}
-
 function load_appointment(PDO $pdo, int $appointmentId, int $doctorId): ?array {
     if ($appointmentId <= 0) {
         return null;
@@ -379,16 +258,23 @@ function load_patient(PDO $pdo, int $patientId, int $doctorId): ?array {
     return $row ?: null;
 }
 
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    respond(['ok' => false, 'error' => 'Method Not Allowed. POST required.']);
+}
+
 $payload = json_decode(file_get_contents('php://input'), true);
 if (!is_array($payload)) {
     $payload = $_POST;
 }
 
+$csrfToken = $payload['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
+if (!zimrx_verify_csrf(is_string($csrfToken) ? $csrfToken : null)) {
+    http_response_code(403);
+    respond(['ok' => false, 'error' => 'CSRF verification failed.']);
+}
+
 try {
-    ensure_visit_schema($pdo);
-    ensure_visit_revisions_schema($pdo);
-    ensure_patient_referrals_schema($pdo);
-    backfill_visit_referrals($pdo);
     $doctorId = current_user_doctor_id();
     $userId = current_user_id();
     $doctorCode = doctor_code_for_visit($pdo, $doctorId);

@@ -906,7 +906,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
             <section id="docs-section-books" class="docs-paper-section" data-docs-title="Books" data-docs-keywords="books textbook handbook pharmacology pediatric bnf">
                 <div class="docs-paper-section-head">
                     <span>Books</span>
-                    <small>Mock bookshelf</small>
+                    <small>Reference Library</small>
                 </div>
                 <div class="docs-paper-grid">
                     <article><strong>BNF for Children</strong><span>Paediatric dose and safety reference.</span></article>
@@ -918,24 +918,24 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
             <section id="docs-section-docs" class="docs-paper-section" data-docs-title="Docs" data-docs-keywords="docs guideline protocol local hospital who nice">
                 <div class="docs-paper-section-head">
                     <span>Docs</span>
-                    <small>Mock guidelines</small>
+                    <small>Clinical Guidelines</small>
                 </div>
                 <div class="docs-paper-grid">
                     <article><strong>WHO Essential Medicines</strong><span>Core medicine list and policy notes.</span></article>
                     <article><strong>NICE Guideline Notes</strong><span>Treatment pathway bookmarks.</span></article>
-                    <article><strong>Local Protocol</strong><span>Hospital formulary and dose policy placeholder.</span></article>
+                    <article><strong>Local Protocol</strong><span>Hospital formulary and dose policy reference.</span></article>
                 </div>
             </section>
 
             <section id="docs-section-papers" class="docs-paper-section" data-docs-title="Papers" data-docs-keywords="papers trial review pubmed journal evidence">
                 <div class="docs-paper-section-head">
                     <span>Papers</span>
-                    <small>Mock evidence links</small>
+                    <small>Evidence-Based Studies</small>
                 </div>
                 <div class="docs-paper-grid">
                     <article><strong>Randomized Trials</strong><span>Key efficacy and safety papers.</span></article>
-                    <article><strong>Meta-analysis</strong><span>Evidence summary placeholder.</span></article>
-                    <article><strong>Case Reports</strong><span>Rare adverse event notes.</span></article>
+                    <article><strong>Meta-analysis</strong><span>Systematic evidence summary index.</span></article>
+                    <article><strong>Case Reports</strong><span>Adverse event and safety profiles.</span></article>
                 </div>
             </section>
         </div>

@@ -2,10 +2,29 @@
 define('ZIMRX_DB_LIGHTWEIGHT', true);
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/../auth.php';
+require_login();
 require_once __DIR__ . '/../particulars_audit_lib.php';
-header('Content-Type: application/json');
+
+header('Content-Type: application/json; charset=utf-8');
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['ok' => false, 'error' => 'Method Not Allowed. POST required.']);
+    exit;
+}
 
 $input = json_decode(file_get_contents('php://input'), true);
+if (!is_array($input)) {
+    $input = $_POST;
+}
+
+$csrfToken = $input['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
+if (!zimrx_verify_csrf(is_string($csrfToken) ? $csrfToken : null)) {
+    http_response_code(403);
+    echo json_encode(['ok' => false, 'error' => 'CSRF verification failed.']);
+    exit;
+}
+
 $occupation = isset($input['occupation']) ? trim((string)$input['occupation']) : '';
 
 if (!$occupation || strlen($occupation) < 2) {
@@ -14,7 +33,12 @@ if (!$occupation || strlen($occupation) < 2) {
 }
 
 try {
-    $doctorId = function_exists('current_user_doctor_id') ? current_user_doctor_id() : 1;
+    $doctorId = current_user_doctor_id();
+    if ($doctorId <= 0) {
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'error' => 'Valid doctor account required.']);
+        exit;
+    }
     $pdo_user = DbConnections::userdata();
 
     zimrx_record_user_occupation($pdo_user, $doctorId, $occupation);
