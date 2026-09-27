@@ -235,7 +235,7 @@ include 'header.php';
 // Central Central Module Configurations & Mappings
 $default_left_layout = [
   "P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination",
-  "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology", "Psychiatry", "Orthopaedics", "Urology", "Neurology",
+  "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology", "Psychiatry", "Orthopaedics", "Urology", "Neurology", "Cardiology",
   "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter"
 ];
 
@@ -261,6 +261,7 @@ $module_file_map = [
   "Orthopaedics" => "orthopaedics.php",
   "Urology" => "urology.php",
   "Neurology" => "neurology.php",
+  "Cardiology" => "cardiology.php",
   "Dx" => "dx.php",
   "Ix" => "ix.php",
   "Plan" => "plan.php",
@@ -344,7 +345,8 @@ if (in_array('P/E', $left_layout, true)) {
         'Psychiatry',
         'Orthopaedics',
         'Urology',
-        'Neurology'
+        'Neurology',
+        'Cardiology'
     ];
     $leftInsert = [];
     foreach ($specialtyModules as $specMod) {

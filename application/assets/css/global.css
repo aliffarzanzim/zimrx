@@ -8697,6 +8697,14 @@ html[data-dropdown-theme="subtle-tint"] .patient-lookup-option:not(.new-patient-
     display: none !important;
 }
 
+/* =======================================================
+   Cardiology & Hemodynamic Assessment Styles
+======================================================= */
+.zrx-cardio-pane[hidden] {
+    display: none !important;
+}
+
+
 
 
 
