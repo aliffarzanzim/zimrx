@@ -253,6 +253,7 @@ $module_file_map = [
   "Local Examination" => "local_exam.php",
   "Burn Assessment" => "burn_assessment.php",
   "ENT Examination" => "ent_exam.php",
+  "Dental Chart" => "dental_chart.php",
   "Dx" => "dx.php",
   "Ix" => "ix.php",
   "Plan" => "plan.php",
