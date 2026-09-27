@@ -8690,5 +8690,13 @@ html[data-dropdown-theme="subtle-tint"] .patient-lookup-option:not(.new-patient-
     display: none !important;
 }
 
+/* =======================================================
+   Neurology & Stroke Assessment Styles
+======================================================= */
+.zrx-neuro-pane[hidden] {
+    display: none !important;
+}
+
+
 
 
