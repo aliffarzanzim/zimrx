@@ -5,7 +5,7 @@ require_once 'db.php';
 $page_title = "ZimRx - Layout Configurator";
 
 // --- Read layout from cookie (same source as prescription.php pre-rendering) ---
-$availableLeftModules  = ["P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter", ""];
+$availableLeftModules  = ["P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Burn Assessment", "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter", ""];
 $availableRightModules = ["Rx", "Drug Summary & Interaction", "Advice", "Report Entry", "Upload Reports & Documents", "Calculators", "Ophthalmology", "Text Pad", "OT Note", "Font Format", ""];
 
 $defaultLeftLayout  = ["P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter"];

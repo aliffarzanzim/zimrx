@@ -251,6 +251,7 @@ $module_file_map = [
   "O/E" => "p_e.php",
   "Breast Examination" => "breast_exam.php",
   "Local Examination" => "local_exam.php",
+  "Burn Assessment" => "burn_assessment.php",
   "Dx" => "dx.php",
   "Ix" => "ix.php",
   "Plan" => "plan.php",

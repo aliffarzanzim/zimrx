@@ -7950,6 +7950,199 @@ html[data-dropdown-theme="subtle-tint"] .patient-lookup-option:not(.new-patient-
     gap: 0.15rem;
 }
 
+/* =======================================================
+   Burn Assessment & Resuscitation Styles
+======================================================= */
+.zrx-burn-metrics-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.55rem;
+    margin-bottom: 0.65rem;
+}
+@media (max-width: 768px) {
+    .zrx-burn-metrics-bar {
+        grid-template-columns: 1fr;
+    }
+}
+.zrx-burn-metric-chip {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0.45rem 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+.zrx-burn-metric-lbl {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: #64748b;
+}
+.zrx-burn-metric-val {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.2;
+}
+.zrx-burn-metric-status {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #10b981;
+}
+.zrx-burn-metric-status.moderate { color: #f59e0b; }
+.zrx-burn-metric-status.major { color: #dc2626; }
+
+.zrx-burn-diagram-section {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0.65rem;
+    margin-bottom: 0.65rem;
+}
+.zrx-burn-diagrams-grid {
+    display: grid;
+    grid-template-columns: 180px 180px 1fr;
+    gap: 0.75rem;
+    align-items: start;
+}
+@media (max-width: 950px) {
+    .zrx-burn-diagrams-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+@media (max-width: 650px) {
+    .zrx-burn-diagrams-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.zrx-burn-diagram-card {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0.45rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.zrx-burn-card-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 0.3rem;
+}
+.zrx-burn-svg-wrap {
+    width: 160px;
+    height: 250px;
+}
+.zrx-burn-svg {
+    width: 100%;
+    height: 100%;
+    user-select: none;
+}
+.zrx-burn-segment {
+    fill: #ffffff;
+    stroke: #94a3b8;
+    stroke-width: 1.5;
+    cursor: pointer;
+    transition: fill 0.12s, stroke 0.12s;
+}
+.zrx-burn-segment:hover {
+    fill: #fee2e2;
+    stroke: #ef4444;
+}
+.zrx-burn-segment.active {
+    fill: #dc2626;
+    stroke: #991b1b;
+    stroke-width: 2;
+}
+.zrx-burn-label {
+    font-size: 8px;
+    font-weight: 700;
+    fill: #475569;
+    pointer-events: none;
+    text-anchor: middle;
+}
+.zrx-burn-segment.active + .zrx-burn-label,
+.zrx-burn-segment.active ~ .zrx-burn-label {
+    fill: #ffffff;
+}
+
+.zrx-burn-calc-card {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.zrx-burn-calc-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+.zrx-burn-calc-badge {
+    background: #fee2e2;
+    color: #b91c1c;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 4px;
+}
+.zrx-burn-calc-formula {
+    font-size: 0.72rem;
+    color: #64748b;
+    font-family: monospace;
+    font-weight: 600;
+}
+.zrx-burn-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+.zrx-burn-infusion-card {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    padding: 0.5rem 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+.zrx-burn-infusion-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.76rem;
+}
+.zrx-burn-infusion-period {
+    color: #1e40af;
+    font-weight: 600;
+}
+.zrx-burn-infusion-val {
+    color: #0f172a;
+    font-weight: 800;
+}
+.zrx-burn-infusion-rate {
+    color: #2563eb;
+    font-weight: 600;
+}
+.zrx-burn-infusion-target {
+    border-top: 1px dashed #bfdbfe;
+    padding-top: 0.3rem;
+    font-size: 0.7rem;
+    color: #1e3a8a;
+}
+.zrx-burn-risk-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35rem;
+}
+
 
 
 
