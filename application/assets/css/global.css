@@ -8711,8 +8711,9 @@ html[data-dropdown-theme="subtle-tint"] .patient-lookup-option:not(.new-patient-
     display: none !important;
 }
 
-
-
-
-
-
+/* =======================================================
+   Endocrinology & Metabolic Assessment Styles
+======================================================= */
+.zrx-endo-pane[hidden] {
+    display: none !important;
+}
