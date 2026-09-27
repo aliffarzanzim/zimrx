@@ -234,8 +234,9 @@ include 'header.php';
 <?php
 // Central Central Module Configurations & Mappings
 $default_left_layout = [
-  "P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Dx", "Ix",
-  "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter"
+  "P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination",
+  "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology",
+  "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter"
 ];
 
 $default_right_layout = [
@@ -328,12 +329,20 @@ if (isset($_COOKIE['zimrx_left_layout'])) {
 $left_layout = normalize_left_history_layout($left_layout);
 if (in_array('P/E', $left_layout, true)) {
     $peIndex = array_search('P/E', $left_layout, true);
+    $specialtyModules = [
+        'Breast Examination',
+        'Local Examination',
+        'Burn Assessment',
+        'ENT Examination',
+        'Dental Chart',
+        'Diabetic Foot',
+        'Dermatology'
+    ];
     $leftInsert = [];
-    if (!in_array('Breast Examination', $left_layout, true)) {
-        $leftInsert[] = 'Breast Examination';
-    }
-    if (!in_array('Local Examination', $left_layout, true)) {
-        $leftInsert[] = 'Local Examination';
+    foreach ($specialtyModules as $specMod) {
+        if (!in_array($specMod, $left_layout, true)) {
+            $leftInsert[] = $specMod;
+        }
     }
     if (!empty($leftInsert)) {
         array_splice($left_layout, $peIndex + 1, 0, $leftInsert);

@@ -8,7 +8,7 @@ $page_title = "ZimRx - Layout Configurator";
 $availableLeftModules  = ["P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology", "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter", ""];
 $availableRightModules = ["Rx", "Drug Summary & Interaction", "Advice", "Report Entry", "Upload Reports & Documents", "Calculators", "Ophthalmology", "Text Pad", "OT Note", "Font Format", ""];
 
-$defaultLeftLayout  = ["P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter"];
+$defaultLeftLayout  = ["P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology", "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter"];
 $defaultRightLayout = ["Rx", "Drug Summary & Interaction", "Advice", "Report Entry", "Upload Reports & Documents", "Calculators", "Ophthalmology", "Text Pad", "OT Note", "Font Format"];
 
 function decode_layout_cookie(string $name, array $default): array {
@@ -33,11 +33,11 @@ $defaultHistoryLayout = ['medical', 'treatment', 'habits', 'diet-hypersensitivit
 $historyLayout = decode_layout_cookie('zimrx_history_layout', $defaultHistoryLayout);
 while (count($historyLayout) < 5) $historyLayout[] = '';
 
-// Pad to 16 slots
-while (count($leftLayout)  < 16) $leftLayout[]  = '';
-while (count($rightLayout) < 16) $rightLayout[] = '';
+// Pad to 20 slots
+while (count($leftLayout)  < 20) $leftLayout[]  = '';
+while (count($rightLayout) < 20) $rightLayout[] = '';
 
-function render_setup_selects(array $layout, string $side, array $options, int $total = 16): string {
+function render_setup_selects(array $layout, string $side, array $options, int $total = 20): string {
     $html = '';
     for ($i = 0; $i < $total; $i++) {
         $current = $layout[$i] ?? '';
@@ -87,14 +87,14 @@ include 'header.php';
 
         <div class="setup-grid">
             <div class="setup-section">
-                <h2>Left Panel Elements (16 Max)</h2>
+                <h2>Left Panel Elements (20 Max)</h2>
                 <div id="left-side-setup">
                     <?= render_setup_selects($leftLayout, 'left', $availableLeftModules) ?>
                 </div>
             </div>
 
             <div class="setup-section">
-                <h2>Right Panel Elements (16 Max)</h2>
+                <h2>Right Panel Elements (20 Max)</h2>
                 <div id="right-side-setup">
                     <?= render_setup_selects($rightLayout, 'right', $availableRightModules) ?>
                 </div>
