@@ -8612,6 +8612,63 @@ html[data-dropdown-theme="subtle-tint"] .patient-lookup-option:not(.new-patient-
     gap: 0.5rem;
 }
 
+/* =======================================================
+   Dermatology & Lesion Morphology Styles
+======================================================= */
+.zrx-derma-top-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.65rem;
+    margin-bottom: 0.65rem;
+}
+@media (max-width: 800px) {
+    .zrx-derma-top-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.zrx-derma-sites-card {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0.55rem 0.65rem;
+    margin-bottom: 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+.zrx-derma-card-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #334155;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.zrx-derma-sites-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+.zrx-derma-signs-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.55rem;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0.6rem;
+    margin-bottom: 0.65rem;
+}
+@media (max-width: 900px) {
+    .zrx-derma-signs-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+@media (max-width: 600px) {
+    .zrx-derma-signs-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 
 
 

@@ -255,6 +255,7 @@ $module_file_map = [
   "ENT Examination" => "ent_exam.php",
   "Dental Chart" => "dental_chart.php",
   "Diabetic Foot" => "diabetic_foot.php",
+  "Dermatology" => "dermatology.php",
   "Dx" => "dx.php",
   "Ix" => "ix.php",
   "Plan" => "plan.php",
