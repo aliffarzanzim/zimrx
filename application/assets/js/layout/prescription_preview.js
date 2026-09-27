@@ -835,6 +835,10 @@ function learnCurrentPcAutocompletes() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ complaints }),
     keepalive: true
+  }).then(() => {
+    if (typeof window.clearPcSuggestCache === 'function') {
+      window.clearPcSuggestCache();
+    }
   }).catch(() => {});
 }
 

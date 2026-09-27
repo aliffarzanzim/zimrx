@@ -29,7 +29,6 @@ define('ZIMRX_DB_USERDATA', ZIMRX_DB_DIR . '/zimrx_userdata.db');
 define('ZIMRX_DB_SYSTEMDATA', ZIMRX_ASSETS_DB_DIR . '/zimrx_drugs.db');
 define('ZIMRX_DB_STATIC', ZIMRX_ASSETS_DB_DIR . '/zimrx_static.db');
 define('ZIMRX_DB_ICD11', ZIMRX_ASSETS_DB_DIR . '/zimrx_icd11_dx.db');
-define('ZIMRX_DB_SNOMED', ZIMRX_ASSETS_DB_DIR . '/zimrx_snomed_pc.db');
 define('ZIMRX_DB_ADDRESSES', ZIMRX_DB_STATIC);
 
 // =====================================================================
