@@ -424,7 +424,22 @@ if ($reportsIndex !== false) {
     <script src="assets/js/modules/o_h_module.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/o_h_module.js') ?>"></script>
     <script src="assets/js/data/growth_chart_data.js?v=<?= filemtime(__DIR__ . '/assets/js/data/growth_chart_data.js') ?>"></script>
     <script src="assets/js/modules/paediatric_module.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/paediatric_module.js') ?>"></script>
-    <script src="assets/js/modules/clinical_exam_modules.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/clinical_exam_modules.js') ?>"></script>
+    <script src="assets/js/modules/exam_presets.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/exam_presets.js') ?>"></script>
+    <script src="assets/js/modules/exam_breast.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/exam_breast.js') ?>"></script>
+    <script src="assets/js/modules/exam_local.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/exam_local.js') ?>"></script>
+    <script src="assets/js/modules/exam_ophthalmology.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/exam_ophthalmology.js') ?>"></script>
+    <script src="assets/js/modules/exam_burn.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/exam_burn.js') ?>"></script>
+    <script src="assets/js/modules/exam_ent.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/exam_ent.js') ?>"></script>
+    <script src="assets/js/modules/exam_dental.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/exam_dental.js') ?>"></script>
+    <script src="assets/js/modules/exam_diabetic_foot.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/exam_diabetic_foot.js') ?>"></script>
+    <script src="assets/js/modules/exam_dermatology.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/exam_dermatology.js') ?>"></script>
+    <script src="assets/js/modules/exam_psychiatry.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/exam_psychiatry.js') ?>"></script>
+    <script src="assets/js/modules/exam_orthopaedics.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/exam_orthopaedics.js') ?>"></script>
+    <script src="assets/js/modules/exam_urology.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/exam_urology.js') ?>"></script>
+    <script src="assets/js/modules/exam_neurology.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/exam_neurology.js') ?>"></script>
+    <script src="assets/js/modules/exam_cardiology.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/exam_cardiology.js') ?>"></script>
+    <script src="assets/js/modules/exam_pulmonology.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/exam_pulmonology.js') ?>"></script>
+    <script src="assets/js/modules/exam_endocrinology.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/exam_endocrinology.js') ?>"></script>
     <script src="assets/js/pages/prescription_preview.js?v=<?= filemtime(__DIR__ . '/assets/js/pages/prescription_preview.js') ?>"></script>
     <script src="assets/js/modules/ho_diet_dropdown.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/ho_diet_dropdown.js') ?>"></script>
     <script src="assets/js/modules/history_module.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/history_module.js') ?>"></script>
