@@ -427,6 +427,7 @@ if ($reportsIndex !== false) {
     <script src="assets/js/layout/clinical_exam_modules.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/clinical_exam_modules.js') ?>"></script>
     <script src="assets/js/layout/prescription_preview.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/prescription_preview.js') ?>"></script>
     <script src="assets/js/layout/ho_diet_dropdown.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/ho_diet_dropdown.js') ?>"></script>
+    <script src="assets/js/layout/history_module.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/history_module.js') ?>"></script>
     <script src="assets/js/layout/boot.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/boot.js') ?>"></script>
 
 

@@ -10,7 +10,7 @@
     padding: 20px 22px;
     background: #ffffff;
     border: 1px solid #cbd5e1;
-    border-radius: 8px;
+    border-radius: 10px;
     box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
 }
 
@@ -154,8 +154,13 @@
 .appointment-list-card {
     background: #ffffff;
     border: 1px solid #cbd5e1;
-    border-radius: 8px;
+    border-radius: 10px;
     box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.appointment-list-card {
+    overflow: hidden;
+    margin-top: 1rem;
 }
 
 .appointment-form {
@@ -191,10 +196,6 @@
     justify-content: flex-end;
     gap: 10px;
     margin-top: 16px;
-}
-
-.appointment-list-card {
-    overflow: hidden;
 }
 
 .appointment-list-header {
@@ -438,9 +439,6 @@
 
 /* Patient-particulars appointment desk */
 
-.appointment-hero {
-    border-radius: 10px;
-}
 
 .appointment-patient-card.patient-particulars {
     width: 100%;
@@ -527,11 +525,6 @@
 
 .appointment-lookup-list {
     z-index: 1100;
-}
-
-.appointment-list-card {
-    margin-top: 1rem;
-    border-radius: 10px;
 }
 
 .appointment-table th,
@@ -1104,7 +1097,6 @@
     color: #ffffff;
 }
 
-
 /* ── Follow-up KPI Cards ──────────────────────────────────────────────── */
 .followup-kpi-grid {
     display: grid;
@@ -1344,6 +1336,4 @@
 .whatsapp-reminder-btn:hover {
     transform: scale(1.15);
 }
-
-
 
