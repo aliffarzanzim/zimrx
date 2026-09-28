@@ -15,11 +15,6 @@ function med_history_static_pdo(): PDO {
     return DbConnections::staticDb();
 }
 
-function med_history_ensure_schema(?PDO $userPdo = null): void {
-    $pdo = $userPdo ?: med_history_user_pdo();
-    zimrx_db_ensure_medical_history_settings_schema($pdo);
-}
-
 function med_history_static_rows(): array {
     static $cached = null;
     if ($cached !== null) {
@@ -45,8 +40,6 @@ function med_history_static_rows(): array {
 function med_history_get_doctor_config(?int $doctorId = null): array {
     $doctorId = max(1, (int)($doctorId ?: (function_exists('current_user_doctor_id') ? current_user_doctor_id() : 1)));
     $userPdo = med_history_user_pdo();
-    med_history_ensure_schema($userPdo);
-
     $userRows = [];
     if (zimrx_db_table_exists($userPdo, 'zimrx_user_medical_history_settings')) {
         $stmt = $userPdo->prepare(
@@ -153,8 +146,6 @@ function med_history_get_doctor_config(?int $doctorId = null): array {
 function med_history_save_config(int $doctorId, array $items): array {
     $doctorId = max(1, $doctorId);
     $userPdo = med_history_user_pdo();
-    med_history_ensure_schema($userPdo);
-
     $userPdo->beginTransaction();
     try {
         $deleteStmt = $userPdo->prepare("DELETE FROM zimrx_user_medical_history_settings WHERE doctor_id = :doctor_id");
@@ -228,8 +219,6 @@ function med_history_save_config(int $doctorId, array $items): array {
 function med_history_reset_to_default(int $doctorId): array {
     $doctorId = max(1, $doctorId);
     $userPdo = med_history_user_pdo();
-    med_history_ensure_schema($userPdo);
-
     $stmt = $userPdo->prepare("DELETE FROM zimrx_user_medical_history_settings WHERE doctor_id = :doctor_id");
     $stmt->execute(['doctor_id' => $doctorId]);
 

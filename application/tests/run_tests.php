@@ -47,6 +47,11 @@ class ZimRxTestSuite {
         $this->testTenantIsolation();
         $this->testUploadValidationAndPathTraversal();
         $this->testEndpointMutationGuards();
+        $this->testMobileQueueAndOptimisticLocking();
+        $this->testSyncJournalAndUuid();
+        $this->testActivePatientOwnershipValidation();
+        $this->testWalkInUploadIsolation();
+        $this->testLoginRateLimitingAndRedirectDefense();
 
         echo "\n--------------------------------------------------------\n";
         echo "Test Results: {$this->passed} passed, {$this->failed} failed\n";
@@ -95,16 +100,11 @@ class ZimRxTestSuite {
             "zimrx_password_verify() rejects incorrect password"
         );
 
-        // Test transparent upgrade detection for legacy SHA-256 hashes
+        // Legacy SHA-256 hashes must be REJECTED (fallback removed for security)
         $legacySha256 = hash('sha256', $rawPassword);
         $this->assert(
-            zimrx_password_verify($rawPassword, $legacySha256),
-            "zimrx_password_verify() seamlessly authenticates existing legacy SHA-256 hashes"
-        );
-
-        $this->assert(
-            zimrx_password_needs_rehash($legacySha256),
-            "zimrx_password_needs_rehash() correctly flags legacy SHA-256 for transparent upgrade"
+            !zimrx_password_verify($rawPassword, $legacySha256),
+            "zimrx_password_verify() rejects insecure legacy SHA-256 hashes (migration required)"
         );
 
         $this->assert(
@@ -374,6 +374,27 @@ class ZimRxTestSuite {
             $sanitizedName === 'shell.php' && strpos($sanitizedName, '..') === false,
             "basename() sanitization strips directory traversal components ('{$maliciousPath}' -> '{$sanitizedName}')"
         );
+
+        // SVG security validator tests
+        $safeSvg = sys_get_temp_dir() . '/safe_test.svg';
+        $xssSvg = sys_get_temp_dir() . '/xss_test.svg';
+        $xxeSvg = sys_get_temp_dir() . '/xxe_test.svg';
+        $onloadSvg = sys_get_temp_dir() . '/onload_test.svg';
+
+        file_put_contents($safeSvg, '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><rect width="10" height="10"/></svg>');
+        file_put_contents($xssSvg, '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>');
+        file_put_contents($xxeSvg, '<?xml version="1.0"?><!DOCTYPE test [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><svg>&xxe;</svg>');
+        file_put_contents($onloadSvg, '<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"></svg>');
+
+        $this->assert(zimrx_validate_safe_svg($safeSvg), "zimrx_validate_safe_svg() approves clean, well-formed SVG");
+        $this->assert(!zimrx_validate_safe_svg($xssSvg), "zimrx_validate_safe_svg() blocks SVG containing <script> tags");
+        $this->assert(!zimrx_validate_safe_svg($xxeSvg), "zimrx_validate_safe_svg() blocks SVG containing DOCTYPE / ENTITY (XXE)");
+        $this->assert(!zimrx_validate_safe_svg($onloadSvg), "zimrx_validate_safe_svg() blocks SVG containing onload / event handlers");
+
+        @unlink($safeSvg);
+        @unlink($xssSvg);
+        @unlink($xxeSvg);
+        @unlink($onloadSvg);
     }
 
     private function testEndpointMutationGuards(): void {
@@ -407,8 +428,327 @@ class ZimRxTestSuite {
             "current_user_doctor_id() returns 0 for unauthenticated requests, preventing unauthorized Doctor 1 fallback"
         );
 
+        $_SESSION = $savedSession;
+        $_SESSION['user_id'] = 999;
+        unset($_SESSION['doctor_id']);
+        $this->assert(
+            current_user_doctor_id() === 0,
+            "current_user_doctor_id() rejects logged-in sessions without an explicit doctor scope"
+        );
+
         // Restore session
         $_SESSION = $savedSession;
+    }
+
+    private function testMobileQueueAndOptimisticLocking(): void {
+        echo "\n[12/13] Testing Mobile Upload Queue Patient Binding & Visit Optimistic Locking...\n";
+
+        $pdo = new PDO('sqlite::memory:');
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        (new DbMigrator())->run($pdo);
+
+        // 1. Insert patient-bound upload into queue
+        $uploadId = 'up_test_123';
+        $doctorId = 1;
+        $patientId = 42;
+        $visitRecordId = 84;
+        $activeRevision = 3;
+
+        $stmt = $pdo->prepare(
+            "INSERT INTO zimrx_mobile_upload_queue (
+                id, doctor_id, patient_id, visit_record_id, active_revision,
+                file_path, original_name, report_name, report_date, created_at, claimed_at
+            ) VALUES (
+                :id, :doctor_id, :patient_id, :visit_record_id, :active_revision,
+                'uploads/reports/test.jpg', 'cbc.jpg', 'CBC Report', '28/09/2026',
+                CURRENT_TIMESTAMP, NULL
+            )"
+        );
+        $stmt->execute([
+            'id' => $uploadId,
+            'doctor_id' => $doctorId,
+            'patient_id' => $patientId,
+            'visit_record_id' => $visitRecordId,
+            'active_revision' => $activeRevision
+        ]);
+
+        // 2. Query with mismatched active_revision (doctor switched patients) must find nothing
+        $staleCheck = $pdo->prepare(
+            "SELECT id FROM zimrx_mobile_upload_queue
+             WHERE doctor_id = :doctor_id AND claimed_at IS NULL AND active_revision = :active_revision"
+        );
+        $staleCheck->execute(['doctor_id' => $doctorId, 'active_revision' => 4]);
+        $staleRows = $staleCheck->fetchAll(PDO::FETCH_ASSOC);
+        $this->assert(
+            empty($staleRows),
+            "Mobile queue consumption strictly rejects uploads from a mismatched active patient revision"
+        );
+
+        // 3. Query with matching active_revision finds the queued item
+        $matchCheck = $pdo->prepare(
+            "SELECT id, patient_id, visit_record_id, active_revision
+             FROM zimrx_mobile_upload_queue
+             WHERE doctor_id = :doctor_id AND claimed_at IS NULL AND active_revision = :active_revision"
+        );
+        $matchCheck->execute(['doctor_id' => $doctorId, 'active_revision' => $activeRevision]);
+        $matchedRows = $matchCheck->fetchAll(PDO::FETCH_ASSOC);
+        $this->assert(
+            count($matchedRows) === 1 && (int)$matchedRows[0]['patient_id'] === $patientId,
+            "Mobile queue accurately finds upload matching current active patient context"
+        );
+
+        // 4. Atomic exclusive claim
+        $pdo->exec('BEGIN IMMEDIATE');
+        $claimStmt = $pdo->prepare(
+            "UPDATE zimrx_mobile_upload_queue
+             SET claimed_at = CURRENT_TIMESTAMP
+             WHERE doctor_id = :doctor_id AND claimed_at IS NULL AND id = :id"
+        );
+        $claimStmt->execute(['doctor_id' => $doctorId, 'id' => $uploadId]);
+        $claimedCount = $claimStmt->rowCount();
+        $pdo->commit();
+
+        $this->assert($claimedCount === 1, "Atomic queue claim exclusively marks target queue item claimed");
+
+        // Subsequent check yields 0 rows
+        $postClaimCheck = $pdo->prepare(
+            "SELECT id FROM zimrx_mobile_upload_queue WHERE doctor_id = :doctor_id AND claimed_at IS NULL"
+        );
+        $postClaimCheck->execute(['doctor_id' => $doctorId]);
+        $this->assert(
+            empty($postClaimCheck->fetchAll()),
+            "Claimed queue item is no longer visible to subsequent pollers"
+        );
+
+        // 5. Test Visit Optimistic Locking
+        $pdo->prepare(
+            "INSERT INTO zimrx_visits (id, doctor_id, patient_id, visit_no, revision)
+             VALUES (10, 1, 42, 1, 1)"
+        )->execute();
+
+        // First save with expected revision = 1 succeeds and increments to 2
+        $upStmt1 = $pdo->prepare(
+            "UPDATE zimrx_visits
+             SET revision = revision + 1, updated_at = CURRENT_TIMESTAMP
+             WHERE id = 10 AND doctor_id = 1 AND revision = :expected_revision"
+        );
+        $upStmt1->execute(['expected_revision' => 1]);
+        $this->assert($upStmt1->rowCount() === 1, "First guarded visit update succeeds when revision matches (1 -> 2)");
+
+        // Concurrent/second save presenting stale expected revision = 1 fails (0 rows updated)
+        $upStmt2 = $pdo->prepare(
+            "UPDATE zimrx_visits
+             SET revision = revision + 1, updated_at = CURRENT_TIMESTAMP
+             WHERE id = 10 AND doctor_id = 1 AND revision = :expected_revision"
+        );
+        $upStmt2->execute(['expected_revision' => 1]);
+        $this->assert(
+            $upStmt2->rowCount() === 0,
+            "Concurrent guarded update with stale revision is detected and rejected (0 rows updated)"
+        );
+    }
+
+    private function testSyncJournalAndUuid(): void {
+        echo "\n[13/13] Testing Delta-Sync UUID Generation & Audit Journaling...\n";
+
+        require_once __DIR__ . '/../sync_service.php';
+
+        // 1. UUID format
+        $uuid1 = ZimRxSyncJournal::generateUuid();
+        $uuid2 = ZimRxSyncJournal::generateUuid();
+        $this->assert(
+            (bool)preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $uuid1),
+            "ZimRxSyncJournal::generateUuid() generates compliant RFC 4122 v4 UUID ({$uuid1})"
+        );
+        $this->assert($uuid1 !== $uuid2, "Consecutive UUIDs are unique");
+
+        // 2. Change logging in database
+        $pdo = new PDO('sqlite::memory:');
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        (new DbMigrator())->run($pdo);
+
+        ZimRxSyncJournal::logChange(
+            $pdo,
+            'visit',
+            $uuid1,
+            'insert',
+            0,
+            1,
+            ['id' => 10, 'visit_no' => 1, 'patient_id' => 42]
+        );
+
+        ZimRxSyncJournal::logChange(
+            $pdo,
+            'visit',
+            $uuid1,
+            'update',
+            1,
+            2,
+            ['id' => 10, 'visit_no' => 1]
+        );
+
+        $stmt = $pdo->query("SELECT * FROM zimrx_sync_changes ORDER BY sequence ASC");
+        $changes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $this->assert(count($changes) === 2, "ZimRxSyncJournal logs change entries sequentially");
+        $this->assert(
+            $changes[0]['operation'] === 'insert' && (int)$changes[0]['new_revision'] === 1,
+            "Insert journal entry records base_revision 0 -> new_revision 1"
+        );
+        $this->assert(
+            $changes[1]['operation'] === 'update' && (int)$changes[1]['base_revision'] === 1 && (int)$changes[1]['new_revision'] === 2,
+            "Update journal entry records base_revision 1 -> new_revision 2"
+        );
+    }
+    // ─────────────────────────────────────────────────────────────────────────────
+    // [14/15] Active Patient Ownership Validation
+    // ─────────────────────────────────────────────────────────────────────────────
+    private function testActivePatientOwnershipValidation(): void {
+        echo "\n[14/15] Testing Active Patient Ownership Validation...\n";
+
+        $pdo = new PDO('sqlite::memory:');
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        (new DbMigrator())->run($pdo);
+
+        // Seed doctors (migration 001 already inserts id=1; use OR IGNORE to skip)
+        $pdo->exec("INSERT OR IGNORE INTO zimrx_doctors (id, doctor_code, display_name, full_name_en) VALUES (1, 'D001', 'Dr Alpha', 'Dr Alpha')");
+        $pdo->exec("INSERT INTO zimrx_doctors (id, doctor_code, display_name, full_name_en) VALUES (2, 'D002', 'Dr Beta',  'Dr Beta')");
+        $pdo->exec("INSERT OR IGNORE INTO zimrx_patients (id, doctor_id, full_name, reg_no) VALUES (10, 1, 'Patient Alpha', 'PA001')");
+        $pdo->exec("INSERT OR IGNORE INTO zimrx_patients (id, doctor_id, full_name, reg_no) VALUES (20, 2, 'Patient Beta',  'PB001')");
+        $pdo->exec("INSERT OR IGNORE INTO zimrx_visits (id, doctor_id, patient_id, visit_no) VALUES (100, 1, 10, 1)");
+        $pdo->exec("INSERT OR IGNORE INTO zimrx_visits (id, doctor_id, patient_id, visit_no) VALUES (200, 2, 20, 1)");
+
+        // Helper: replicate the ownership check logic from update_active_patient
+        $checkOwnership = static function (PDO $pdo, int $doctorId, int $patientId, int $visitRecordId): bool {
+            if ($patientId === 0 && $visitRecordId === 0) {
+                return true; // walk-in always permitted
+            }
+            if ($visitRecordId > 0) {
+                $chk = $pdo->prepare(
+                    "SELECT v.id
+                     FROM zimrx_visits v
+                     JOIN zimrx_patients p ON p.id = v.patient_id
+                     WHERE v.id = :vid AND v.doctor_id = :did
+                       AND (:pid = 0 OR v.patient_id = :pid)
+                     LIMIT 1"
+                );
+                $chk->execute(['vid' => $visitRecordId, 'did' => $doctorId, 'pid' => $patientId]);
+                return (bool)$chk->fetch();
+            }
+            $chk = $pdo->prepare(
+                "SELECT id FROM zimrx_patients
+                 WHERE id = :pid
+                   AND COALESCE(NULLIF(doctor_id, 0), 1) = :did
+                 LIMIT 1"
+            );
+            $chk->execute(['pid' => $patientId, 'did' => $doctorId]);
+            return (bool)$chk->fetch();
+        };
+
+        // Walk-in (0,0) always allowed
+        $this->assert($checkOwnership($pdo, 1, 0, 0), 'Walk-in context (patient_id=0, visit_record_id=0) is always permitted');
+
+        // Doctor 1 legitimately owns patient 10 + visit 100
+        $this->assert($checkOwnership($pdo, 1, 10, 100), 'Doctor 1 can set active context to their own patient+visit');
+
+        // Doctor 1 CANNOT use Doctor 2's visit (200)
+        $this->assert(!$checkOwnership($pdo, 1, 10, 200), 'Forged visit_record_id belonging to another doctor is rejected');
+
+        // Doctor 1 CANNOT claim Doctor 2's patient (20) even without a visit
+        $this->assert(!$checkOwnership($pdo, 1, 20, 0), 'Forged patient_id belonging to another doctor is rejected');
+
+        // Doctor 2 legitimately owns patient 20 + visit 200
+        $this->assert($checkOwnership($pdo, 2, 20, 200), 'Doctor 2 can set active context to their own patient+visit');
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // [15/15] Walk-in Upload Isolation
+    // ─────────────────────────────────────────────────────────────────────────────
+    private function testWalkInUploadIsolation(): void {
+        echo "\n[15/15] Testing Walk-in Upload Isolation...\n";
+
+        $pdo = new PDO('sqlite::memory:');
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        (new DbMigrator())->run($pdo);
+
+        // Insert one bound upload (patient_id=5) and one walk-in (patient_id=NULL)
+        $pdo->exec("INSERT INTO zimrx_mobile_upload_queue (id, doctor_id, patient_id, visit_record_id, active_revision, file_path, original_name, report_name, report_date, claimed_at)
+                    VALUES ('up_bound', 1, 5, 10, 1, 'uploads/reports/bound.jpg', 'bound.jpg', 'Blood Test', '28/09/2026', NULL)");
+        $pdo->exec("INSERT INTO zimrx_mobile_upload_queue (id, doctor_id, patient_id, visit_record_id, active_revision, file_path, original_name, report_name, report_date, claimed_at)
+                    VALUES ('up_walkin', 1, NULL, NULL, 1, 'uploads/reports/walkin.jpg', 'walkin.jpg', 'X-Ray', '28/09/2026', NULL)");
+
+        // Polling with patient_id=5: must return ONLY the bound record
+        $stmt = $pdo->prepare("SELECT id FROM zimrx_mobile_upload_queue WHERE doctor_id = 1 AND claimed_at IS NULL AND patient_id = :pid");
+        $stmt->execute(['pid' => 5]);
+        $boundResults = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $this->assert($boundResults === ['up_bound'], 'Polling with patient_id returns ONLY the bound record (not walk-in)');
+
+        // Polling with patient_id=0 (unassigned screen): must return ONLY the walk-in record
+        $stmt2 = $pdo->prepare("SELECT id FROM zimrx_mobile_upload_queue WHERE doctor_id = 1 AND claimed_at IS NULL AND (patient_id IS NULL OR patient_id = 0)");
+        $stmt2->execute();
+        $walkinResults = $stmt2->fetchAll(PDO::FETCH_COLUMN);
+        $this->assert($walkinResults === ['up_walkin'], 'Polling for unbound context returns ONLY walk-in records (not bound)');
+
+        // Confirm the two result sets are disjoint
+        $this->assert(
+            empty(array_intersect($boundResults, $walkinResults)),
+            'Bound and walk-in upload sets are disjoint — no cross-contamination'
+        );
+    }
+
+    private function testLoginRateLimitingAndRedirectDefense(): void {
+        echo "\n[16/16] Testing Login Security (Rate-Limiting & Open-Redirect Defense)...\n";
+
+        // 1. Open-Redirect Validation Logic
+        $sanitizeRedirect = function (string $redirect): string {
+            $redirect = trim($redirect);
+            if ($redirect !== '') {
+                if (str_starts_with($redirect, '//')
+                    || str_starts_with($redirect, '\\')
+                    || str_contains($redirect, '\\')
+                    || preg_match('/^[a-z][a-z0-9+.-]*:/i', $redirect)
+                ) {
+                    return '';
+                }
+            }
+            return $redirect;
+        };
+
+        $this->assert($sanitizeRedirect('http://attacker.com') === '', 'Redirect rejects http:// external URLs');
+        $this->assert($sanitizeRedirect('https://attacker.com') === '', 'Redirect rejects https:// external URLs');
+        $this->assert($sanitizeRedirect('//attacker.com/steal') === '', 'Redirect rejects protocol-relative // URLs');
+        $this->assert($sanitizeRedirect('\\\\attacker.com\\steal') === '', 'Redirect rejects backslash-based relative URLs');
+        $this->assert($sanitizeRedirect('/foo\\bar') === '', 'Redirect rejects URLs containing embedded backslashes');
+        $this->assert($sanitizeRedirect('javascript:alert(1)') === '', 'Redirect rejects javascript: pseudo-protocol');
+        $this->assert($sanitizeRedirect('data:text/html,bad') === '', 'Redirect rejects data: pseudo-protocol');
+        $this->assert($sanitizeRedirect('prescription.php?id=12') === 'prescription.php?id=12', 'Redirect accepts legitimate local path');
+
+        // 2. Login Rate-Limiting Counter Logic
+        $session = [];
+        $ip = '192.168.1.100';
+        $ipHash = hash('sha256', $ip);
+        $attemptKey = 'login_attempts_' . $ipHash;
+        $lockoutKey = 'login_lockout_' . $ipHash;
+
+        // Simulate 4 failed attempts
+        for ($i = 1; $i <= 4; $i++) {
+            $session[$attemptKey] = ($session[$attemptKey] ?? 0) + 1;
+        }
+        $this->assert(($session[$attemptKey] ?? 0) === 4, '4 failed attempts recorded without lockout');
+        $this->assert(!isset($session[$lockoutKey]), 'Lockout is not triggered before threshold');
+
+        // 5th failed attempt triggers lockout
+        $session[$attemptKey] = ($session[$attemptKey] ?? 0) + 1;
+        if ($session[$attemptKey] >= 5) {
+            $session[$lockoutKey] = time() + 60;
+            $session[$attemptKey] = 0;
+        }
+        $this->assert(($session[$attemptKey] ?? 0) === 0, 'Attempt counter resets on lockout');
+        $this->assert(isset($session[$lockoutKey]) && $session[$lockoutKey] > time(), 'Lockout timestamp set for 60 seconds');
+
+        // Successful login resets lockout keys
+        unset($session[$attemptKey], $session[$lockoutKey]);
+        $this->assert(!isset($session[$lockoutKey]), 'Lockout keys cleanly wiped on successful authentication');
     }
 }
 

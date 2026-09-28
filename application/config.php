@@ -141,7 +141,17 @@ TO MIGRATE FROM SQLITE TO MYSQL:
 */
 
 // =====================================================================
-// 3. ENVIRONMENT (Optional)
+// 3. ENVIRONMENT & PUBLIC ORIGIN
 // =====================================================================
 
 // define('ZIMRX_ENV', 'development');
+
+/**
+ * Public Origin for QR Codes and Mobile Document Upload
+ * Set to a trusted origin (e.g. 'https://zimrx.clinic:8080' or via env var).
+ * If null, mobile QR code defaults to the verified server LAN IP.
+ */
+if (!defined('ZIMRX_PUBLIC_ORIGIN')) {
+    $envOrigin = getenv('ZIMRX_PUBLIC_ORIGIN');
+    define('ZIMRX_PUBLIC_ORIGIN', ($envOrigin !== false && $envOrigin !== '') ? $envOrigin : null);
+}

@@ -15,11 +15,6 @@ function physical_exam_static_pdo(): PDO {
     return DbConnections::staticDb();
 }
 
-function physical_exam_ensure_schema(?PDO $userPdo = null): void {
-    $pdo = $userPdo ?: physical_exam_user_pdo();
-    zimrx_db_ensure_physical_examination_settings_schema($pdo);
-}
-
 function physical_exam_static_rows(): array {
     static $cached = null;
     if ($cached !== null) {
@@ -46,8 +41,6 @@ function physical_exam_static_rows(): array {
 function physical_exam_get_doctor_config(?int $doctorId = null): array {
     $doctorId = max(1, (int)($doctorId ?: (function_exists('current_user_doctor_id') ? current_user_doctor_id() : 1)));
     $userPdo = physical_exam_user_pdo();
-    physical_exam_ensure_schema($userPdo);
-
     $userRows = [];
     if (zimrx_db_table_exists($userPdo, 'zimrx_user_physical_examination_settings')) {
         $stmt = $userPdo->prepare(
@@ -165,8 +158,6 @@ function physical_exam_get_doctor_config(?int $doctorId = null): array {
 function physical_exam_save_doctor_config(int $doctorId, array $items): array {
     $doctorId = max(1, $doctorId);
     $userPdo = physical_exam_user_pdo();
-    physical_exam_ensure_schema($userPdo);
-
     $userPdo->beginTransaction();
     try {
         $deleteStmt = $userPdo->prepare("DELETE FROM zimrx_user_physical_examination_settings WHERE doctor_id = :doctor_id");
@@ -223,8 +214,6 @@ function physical_exam_save_doctor_config(int $doctorId, array $items): array {
 function physical_exam_reset_doctor_config(int $doctorId): array {
     $doctorId = max(1, $doctorId);
     $userPdo = physical_exam_user_pdo();
-    physical_exam_ensure_schema($userPdo);
-
     $stmt = $userPdo->prepare("DELETE FROM zimrx_user_physical_examination_settings WHERE doctor_id = :doctor_id");
     $stmt->execute(['doctor_id' => $doctorId]);
 

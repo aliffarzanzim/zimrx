@@ -800,7 +800,9 @@ if (!defined('ZIMRX_DB_LIGHTWEIGHT')) {
     try {
         (new DbMigrator())->run($pdo);
     } catch (Throwable $e) {
-        error_log('[ZimRx] DbMigrator::run() error: ' . $e->getMessage());
+        error_log('[ZimRx] Migration failure: ' . $e->getMessage());
+        http_response_code(503);
+        exit('Database upgrade failed. Clinical operations are unavailable until migrations complete successfully.');
     }
 
     // Legacy path: runs ensure_doctor_scope for databases that were already

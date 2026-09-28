@@ -10,64 +10,25 @@ function fl_config_get(PDO $pdo, string $key): string {
     return (string)($stmt->fetchColumn() ?? '');
 }
 
-// ── Quick Demo Mode Trigger ────────────────────────────────────────────────
-if (!empty($_GET['quick_demo'])) {
-    if (zimrx_db_table_exists($pdo, 'zimrx_app_config')) {
-        $configs = [
-            'setup_complete' => '1',
-            'practice_type'  => 'solo',
-            'install_type'   => 'local',
-            'auto_login'     => '1',
-            'recovery_email' => '',
-        ];
-        $cfgStmt = $pdo->prepare(
-            "INSERT INTO zimrx_app_config (config_key, config_value, updated_at)
-             VALUES (:key, :val, CURRENT_TIMESTAMP)
-             ON CONFLICT(config_key) DO UPDATE SET config_value = :val, updated_at = CURRENT_TIMESTAMP"
-        );
-        foreach ($configs as $k => $v) {
-            $cfgStmt->execute(['key' => $k, 'val' => $v]);
-        }
-    }
 
-    // Populate standard sample doctor profile if empty
-    if (zimrx_db_table_exists($pdo, 'zimrx_doctors')) {
-        $doc = $pdo->query("SELECT id, name_en FROM zimrx_doctors WHERE id = 1 LIMIT 1")->fetch();
-        if ($doc && empty(trim($doc['name_en'] ?? ''))) {
-            $pdo->prepare(
-                "UPDATE zimrx_doctors
-                 SET name_en = 'Prof. Dr. M. A. Karim',
-                     name_bn = 'প্রফেসর ডাঃ মোঃ আব্দুল করিম',
-                     degrees_en = 'MBBS (DMC), FCPS (Medicine), MD (Internal Medicine)',
-                     degrees_bn = 'এমবিবিএস (ডিএমসি), এফসিপিএস (মেডিসিন), এমডি (ইন্টারনাল মেডিসিন)',
-                     designation_en = 'Professor & Head of Department of Medicine',
-                     designation_bn = 'অধ্যাপক ও বিভাগীয় প্রধান, মেডিসিন বিভাগ',
-                     hospital_en = 'Dhaka Medical College & Hospital',
-                     hospital_bn = 'ঢাকা মেডিকেল কলেজ ও হাসপাতাল',
-                     bmdc_reg_no = 'A-12345',
-                     phone = '+8801700000000',
-                     updated_at = CURRENT_TIMESTAMP
-                 WHERE id = 1"
-            )->execute();
-        }
-    }
-
-    // Ensure active session for default solo doctor
-    $user = zimrx_db_table_exists($pdo, 'zimrx_user_accounts')
-        ? $pdo->query("SELECT id, display_name FROM zimrx_user_accounts WHERE role = 'doctor' AND doctor_id = 1 LIMIT 1")->fetch()
-        : null;
-
-    $_SESSION['user_id']   = $user ? (int)$user['id'] : 1;
-    $_SESSION['user_role'] = 'doctor';
-    $_SESSION['user_name'] = $user && !empty($user['display_name']) ? $user['display_name'] : 'Dr. M. A. Karim';
-    $_SESSION['doctor_id'] = 1;
-
-    header('Location: prescription.php');
-    exit();
-}
 
 $setupComplete = fl_config_get($pdo, 'setup_complete') === '1';
 $step = (int)($_GET['step'] ?? 1);
+
+$remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
+$isLoopback = in_array($remoteAddr, ['127.0.0.1', '::1', ''], true)
+    || str_starts_with($remoteAddr, '127.')
+    || (isset($_SERVER['SERVER_ADDR']) && $remoteAddr === $_SERVER['SERVER_ADDR']);
+
+$setupTokenFile = ZIMRX_USERDATA_DIR . '/setup_token.txt';
+if (!$isLoopback && !$setupComplete) {
+    if (!file_exists($setupTokenFile)) {
+        $initialToken = bin2hex(random_bytes(16));
+        @file_put_contents($setupTokenFile, $initialToken);
+        @chmod($setupTokenFile, 0600);
+    }
+}
+$queryToken = trim((string)($_GET['setup_token'] ?? ''));
 
 // If setup complete and not on step 3 (doctor onboarding), redirect to login
 if ($setupComplete && $step !== 3) {
@@ -428,11 +389,7 @@ if ($step === 3 && !is_logged_in()) {
                 </p>
                 <button class="btn btn-primary btn-full" onclick="goStep2()">Get Started →</button>
 
-                <div style="margin-top: 1rem; text-align: center;">
-                    <a href="first_launch.php?quick_demo=1" class="btn-demo-link" title="Skip all setup wizards and immediately launch the prescription interface with demo defaults">
-                        ⚡ Skip All (Quick Demo) →
-                    </a>
-                </div>
+
             </div>
 
             <?php elseif ($step === 2): ?>
@@ -478,15 +435,24 @@ if ($step === 3 && !is_logged_in()) {
                     </div>
                 </div>
 
+                <?php if (!$isLoopback): ?>
+                <div class="section-label" style="color: #fbbf24;">Server Setup Token</div>
+                <div class="field" style="margin-bottom: 1.25rem;">
+                    <label>Setup Token <span style="color:#64748b;font-weight:400">(from userdata/setup_token.txt)</span></label>
+                    <input type="text" id="setupToken" value="<?= htmlspecialchars($queryToken, ENT_QUOTES, 'UTF-8') ?>" placeholder="Paste setup token generated on server host" autocomplete="off" style="font-family: monospace;">
+                    <small style="color: #94a3b8; display: block; margin-top: 0.35rem;">Because this setup wizard is accessed over the network, please enter the security token found in <code>userdata/setup_token.txt</code> on the server to claim administration.</small>
+                </div>
+                <?php endif; ?>
+
                 <div class="section-label">Security</div>
                 <div class="field-row">
                     <div class="field">
-                        <label>Password</label>
-                        <input type="password" id="password" placeholder="••••••••">
+                        <label>Password <span style="color:#64748b;font-weight:400">(min 14 chars)</span></label>
+                        <input type="password" id="password" placeholder="At least 14 characters">
                     </div>
                     <div class="field">
                         <label>Confirm Password</label>
-                        <input type="password" id="confirmPassword" placeholder="••••••••">
+                        <input type="password" id="confirmPassword" placeholder="••••••••••••••">
                     </div>
                 </div>
 
@@ -511,11 +477,7 @@ if ($step === 3 && !is_logged_in()) {
                     <button class="btn btn-primary" id="btnSaveSetup" onclick="saveSetup()">Continue →</button>
                 </div>
 
-                <div style="margin-top: 1rem; text-align: center;">
-                    <a href="first_launch.php?quick_demo=1" class="btn-demo-link" title="Skip all setup wizards and immediately launch the prescription interface with demo defaults">
-                        ⚡ Skip All (Quick Demo) →
-                    </a>
-                </div>
+
             </div>
 
             <?php elseif ($step === 3): ?>
@@ -675,12 +637,14 @@ function saveSetup() {
     const adminUser = document.getElementById('adminUsername')?.value ?? '';
 
     if (!password) { showError('Please enter a password.'); return; }
-    if (password.length < 4) { showError('Password must be at least 4 characters.'); return; }
+    if (password.length < 14) { showError('Password must be at least 14 characters.'); return; }
     if (password !== confirm) { showError('Passwords do not match.'); return; }
 
     const btn = document.getElementById('btnSaveSetup');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>Setting up…';
+
+    const setupToken = document.getElementById('setupToken')?.value.trim() || new URLSearchParams(window.location.search).get('setup_token') || '';
 
     fetch('api/first_launch_save.php', {
         method: 'POST',
@@ -690,7 +654,8 @@ function saveSetup() {
             install_type: install,
             password, email,
             auto_login: autoLogin,
-            admin_username: adminUser
+            admin_username: adminUser,
+            setup_token: setupToken
         })
     })
     .then(r => r.json())

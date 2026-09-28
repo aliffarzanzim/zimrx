@@ -186,7 +186,6 @@ function instruction_template_normalize_row(array $row, array $staticMap, int $d
 
 function instruction_template_save_all(int $doctorId, array $rows, array $settings): array {
     $userPdo = rx_user_pdo();
-    rx_instruction_template_ensure_schema($userPdo);
     $table = rx_instruction_usage_table($userPdo);
     $staticMap = rx_static_instruction_map();
 
@@ -235,13 +234,8 @@ function instruction_template_save_all(int $doctorId, array $rows, array $settin
 
 function instruction_template_reset_full(int $doctorId): array {
     $userPdo = rx_user_pdo();
-    rx_instruction_template_ensure_schema($userPdo);
     $settingsTable = rx_instruction_template_settings_table();
-    $instructionTables = [
-        'zimrx_user_drug_instructionss',
-        'zimrx_user_drug_instructions',
-        'zimrx_user_instructions',
-    ];
+    $instructionTables = ['zimrx_user_drug_instructions'];
 
     $userPdo->beginTransaction();
     try {
@@ -279,7 +273,6 @@ function instruction_template_reset_full(int $doctorId): array {
 try {
     $doctorId = rx_active_doctor_id();
     $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
-    rx_instruction_template_ensure_schema(rx_user_pdo());
 
     if ($method === 'GET') {
         $action = strtolower(rx_clean($_GET['action'] ?? ''));

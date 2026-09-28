@@ -174,12 +174,6 @@ function rx_active_doctor_id(): int {
 }
 
 function rx_instruction_usage_table(PDO $userPdo): string {
-    if (rx_table_exists($userPdo, 'zimrx_user_drug_instructionss')) {
-        return 'zimrx_user_drug_instructionss';
-    }
-    if (rx_table_exists($userPdo, 'zimrx_user_instructions')) {
-        return 'zimrx_user_instructions';
-    }
     return 'zimrx_user_drug_instructions';
 }
 
@@ -191,80 +185,7 @@ function rx_instruction_template_default_settings(): array {
 }
 
 function rx_instruction_template_settings_table(): string {
-    return 'zimrx_user_drug_instructionss_settings';
-}
-
-function rx_instruction_template_ensure_schema(?PDO $userPdo = null): void {
-    $userPdo = $userPdo ?: rx_user_pdo();
-    $instructionTable = rx_instruction_usage_table($userPdo);
-
-    if ($instructionTable === 'zimrx_user_drug_instructionss' || $instructionTable === 'zimrx_user_instructions') {
-        $userPdo->exec(
-            "CREATE TABLE IF NOT EXISTS {$instructionTable} (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                usage_count INTEGER NOT NULL DEFAULT 0,
-                static_id INTEGER,
-                doctor_id INTEGER NOT NULL DEFAULT 1,
-                instruction_en TEXT,
-                instruction_bn TEXT,
-                search_alias TEXT,
-                is_pinned INTEGER NOT NULL DEFAULT 0,
-                is_hidden INTEGER NOT NULL DEFAULT 0,
-                sort_order INTEGER NOT NULL DEFAULT 0,
-                default_dosage_form TEXT NOT NULL DEFAULT '[]',
-                default_instruction_in_another_row INTEGER NOT NULL DEFAULT 0,
-                is_edited INTEGER NOT NULL DEFAULT 0,
-                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-            )"
-        );
-
-        $columns = [
-            'usage_count' => "INTEGER NOT NULL DEFAULT 0",
-            'static_id' => 'INTEGER',
-            'doctor_id' => "INTEGER NOT NULL DEFAULT 1",
-            'instruction_en' => 'TEXT',
-            'instruction_bn' => 'TEXT',
-            'search_alias' => 'TEXT',
-            'is_pinned' => "INTEGER NOT NULL DEFAULT 0",
-            'is_hidden' => "INTEGER NOT NULL DEFAULT 0",
-            'sort_order' => "INTEGER NOT NULL DEFAULT 0",
-            'default_dosage_form' => "TEXT NOT NULL DEFAULT '[]'",
-            'default_instruction_in_another_row' => "INTEGER NOT NULL DEFAULT 0",
-            'is_edited' => "INTEGER NOT NULL DEFAULT 0",
-            'created_at' => "TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP",
-            'updated_at' => "TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP",
-        ];
-
-        foreach ($columns as $name => $definition) {
-            if (!DbSchema::columnExists($userPdo, $instructionTable, $name)) {
-                $userPdo->exec("ALTER TABLE {$instructionTable} ADD COLUMN {$name} {$definition}");
-            }
-        }
-
-        $userPdo->exec("UPDATE {$instructionTable} SET doctor_id = 1 WHERE doctor_id IS NULL OR doctor_id <= 0");
-        $userPdo->exec("UPDATE {$instructionTable} SET usage_count = 0 WHERE usage_count IS NULL");
-        $userPdo->exec("UPDATE {$instructionTable} SET search_alias = '' WHERE search_alias IS NULL");
-        $userPdo->exec("UPDATE {$instructionTable} SET default_dosage_form = '[]' WHERE COALESCE(default_dosage_form, '') = ''");
-        $userPdo->exec("UPDATE {$instructionTable} SET default_instruction_in_another_row = 0 WHERE default_instruction_in_another_row IS NULL");
-        $userPdo->exec("UPDATE {$instructionTable} SET static_id = 0 WHERE static_id IS NULL");
-        $userPdo->exec("UPDATE {$instructionTable} SET is_edited = 1 WHERE static_id = 0 AND COALESCE(is_edited, 0) = 0");
-        $userPdo->exec("CREATE INDEX IF NOT EXISTS idx_rx_instruction_doctor_static ON {$instructionTable}(doctor_id, static_id)");
-        $userPdo->exec("CREATE INDEX IF NOT EXISTS idx_rx_instruction_doctor_usage ON {$instructionTable}(doctor_id, usage_count DESC, sort_order ASC, id ASC)");
-    }
-
-    $settingsTable = rx_instruction_template_settings_table();
-    $userPdo->exec(
-        "CREATE TABLE IF NOT EXISTS {$settingsTable} (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            doctor_id INTEGER NOT NULL DEFAULT 1,
-            instruction_id INTEGER NOT NULL DEFAULT 0,
-            setting_key TEXT NOT NULL,
-            setting_value TEXT,
-            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE(doctor_id, instruction_id, setting_key)
-        )"
-    );
+    return 'zimrx_user_drug_instructions_settings';
 }
 
 function rx_static_instruction_rows(): array {
@@ -299,7 +220,6 @@ function rx_static_instruction_map(): array {
 function rx_instruction_template_settings(?int $doctorId = null): array {
     $doctorId = $doctorId ?: rx_active_doctor_id();
     $userPdo = rx_user_pdo();
-    rx_instruction_template_ensure_schema($userPdo);
 
     $defaults = rx_instruction_template_default_settings();
     $table = rx_instruction_template_settings_table();
@@ -356,7 +276,6 @@ function rx_instruction_template_system_is_edited(array $row, array $staticRow):
 function rx_instruction_template_rows(?int $doctorId = null, bool $includeHidden = true): array {
     $doctorId = $doctorId ?: rx_active_doctor_id();
     $userPdo = rx_user_pdo();
-    rx_instruction_template_ensure_schema($userPdo);
     $settings = rx_instruction_template_settings($doctorId);
     $table = rx_instruction_usage_table($userPdo);
     $usageRows = [];

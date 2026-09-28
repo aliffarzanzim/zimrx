@@ -833,10 +833,10 @@ function initRxAutocomplete() {
 
             li.innerHTML = `
                 ${iconHtml}
-                <strong class="rx-dd-brand">${item.pres_new_upper || ''}</strong>
-                <span class="rx-dd-generic">${item.generic || ''}</span>
-                <span class="rx-dd-man">${item.man_short ? '-' + item.man_short : ''}</span>
-                <span class="rx-dd-price">${priceText ? '৳' + priceText : ''}</span>
+                <strong class="rx-dd-brand">${escapeRxHtml(item.pres_new_upper || '')}</strong>
+                <span class="rx-dd-generic">${escapeRxHtml(item.generic || '')}</span>
+                <span class="rx-dd-man">${item.man_short ? '-' + escapeRxHtml(item.man_short) : ''}</span>
+                <span class="rx-dd-price">${priceText ? '৳' + escapeRxHtml(priceText) : ''}</span>
             `;
 
             li.addEventListener('mousedown', (ev) => {
@@ -889,8 +889,8 @@ function initRxAutocomplete() {
                         li.className = 'zrx-dropdown-item rx-dropdown-item' + (index === 0 ? ' active' : '');
                         li.innerHTML = `
                             <div style="display:flex; align-items:center; justify-content:space-between; width: 100%;">
-                                <strong>${item.name}</strong>
-                                <span style="color:#64748b; font-size:0.8rem; margin-left:6px;">${item.row_count || 0} rows</span>
+                                <strong>${escapeRxHtml(item.name)}</strong>
+                                <span style="color:#64748b; font-size:0.8rem; margin-left:6px;">${escapeRxHtml(item.row_count || 0)} rows</span>
                             </div>
                         `;
 
@@ -971,7 +971,7 @@ function initRxAutocomplete() {
                         li.innerHTML = `
                             ${pinHtml}
                             <div style="display:flex; align-items:center; width: 100%;">
-                                <strong>${item.label}</strong>
+                                <strong>${escapeRxHtml(item.label)}</strong>
                             </div>
                         `;
 

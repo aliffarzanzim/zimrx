@@ -59,7 +59,6 @@ const moduleFileMap = {
   "O/H": "o_h.php",
   "M/H": "m_h.php",
   "Paediatric History": "paediatric_history.php",
-  "Bangla Converter": "bangla_converter.php",
   "Rx": "rx.php",
   "Drug Summary & Interaction": "drug_summary_interaction.php",
   "Advice": "advice.php",

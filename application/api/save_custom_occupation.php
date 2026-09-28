@@ -45,5 +45,6 @@ try {
 
     echo json_encode(['status' => 'success']);
 } catch (Exception $e) {
-    echo json_encode(['error' => $e->getMessage()]);
+    error_log('[ZimRx] save_custom_occupation error: ' . $e->getMessage());
+    echo json_encode(['error' => 'Failed to save custom occupation.']);
 }

@@ -52,5 +52,6 @@ try {
     echo json_encode($results, JSON_UNESCAPED_UNICODE);
 } catch (Throwable $e) {
     http_response_code(500);
-    echo json_encode(['error' => $e->getMessage()], JSON_UNESCAPED_UNICODE);
+    error_log('[ZimRx] search_ix_param error: ' . $e->getMessage());
+    echo json_encode(['error' => 'Failed to search investigation parameters.'], JSON_UNESCAPED_UNICODE);
 }

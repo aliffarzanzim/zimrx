@@ -3,66 +3,7 @@
 function zimrx_user_drug_pdo(): PDO {
     $pdo = DbConnections::userdata();
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-    zimrx_user_drug_ensure_schema($pdo);
     return $pdo;
-}
-
-function zimrx_user_drug_ensure_schema(PDO $pdo): void {
-    $pdo->exec(
-        "CREATE TABLE IF NOT EXISTS zimrx_user_drug_hidden (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            doctor_id INTEGER NOT NULL DEFAULT 1,
-            system_brand_id TEXT NOT NULL,
-            brand_snapshot TEXT,
-            is_active INTEGER NOT NULL DEFAULT 1,
-            hidden_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            restored_at TEXT
-        )"
-    );
-
-    $pdo->exec(
-        "CREATE TABLE IF NOT EXISTS zimrx_user_drug_override (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            doctor_id INTEGER NOT NULL DEFAULT 1,
-            system_brand_id TEXT NOT NULL,
-            local_drug_id TEXT NOT NULL,
-            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )"
-    );
-
-    $pdo->exec(
-        "CREATE TABLE IF NOT EXISTS zimrx_user_drug_prescribe_index (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            doctor_id INTEGER NOT NULL DEFAULT 1,
-            source_type TEXT NOT NULL DEFAULT 'custom',
-            local_drug_id TEXT NOT NULL,
-            system_brand_id TEXT,
-            generic_id TEXT,
-            brand_name TEXT NOT NULL,
-            generic_name TEXT,
-            manufacturer_name TEXT,
-            strength TEXT,
-            form TEXT,
-            std_form TEXT,
-            price TEXT,
-            packsize TEXT,
-            prescribe_brand_short TEXT,
-            prescribe_brand_full TEXT,
-            short_prescription TEXT,
-            long_prescription TEXT,
-            is_active INTEGER NOT NULL DEFAULT 1,
-            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )"
-    );
-
-    $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS uid_user_drug_hidden_brand ON zimrx_user_drug_hidden(doctor_id, system_brand_id)");
-    $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS uid_user_drug_override_brand ON zimrx_user_drug_override(doctor_id, system_brand_id)");
-    $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS uid_user_drug_local_id ON zimrx_user_drug_prescribe_index(local_drug_id)");
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_user_drug_brand_name ON zimrx_user_drug_prescribe_index(brand_name)");
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_user_drug_generic_name ON zimrx_user_drug_prescribe_index(generic_name)");
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_user_drug_system_brand_id ON zimrx_user_drug_prescribe_index(system_brand_id)");
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_user_drug_active ON zimrx_user_drug_prescribe_index(is_active, source_type)");
 }
 
 function zimrx_resolve_doctor_id(?int $doctorId = null, bool $allowGuestRead = false): int {

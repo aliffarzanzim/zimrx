@@ -54,108 +54,6 @@ function rx_phrase_default_settings(): array {
     return ['show_mode' => 'serial', 'show_custom_typed' => 1];
 }
 
-function rx_phrase_ensure_schema(string $type, ?PDO $userPdo = null): void {
-    $config = rx_template_config($type);
-    $userPdo = $userPdo ?: rx_user_pdo();
-    $table = $config['user_table'];
-    $bn = $config['bn_column'];
-    $en = $config['en_column'];
-
-    if ($type === 'advice') {
-        $userPdo->exec(
-            "CREATE TABLE IF NOT EXISTS {$table} (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                doctor_id INTEGER NOT NULL DEFAULT 1,
-                name TEXT NOT NULL DEFAULT '',
-                body TEXT,
-                usage_count INTEGER NOT NULL DEFAULT 0,
-                is_pinned INTEGER NOT NULL DEFAULT 0,
-                is_hidden INTEGER NOT NULL DEFAULT 0,
-                sort_order INTEGER NOT NULL DEFAULT 0,
-                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                static_id INTEGER NOT NULL DEFAULT 0,
-                is_edited INTEGER NOT NULL DEFAULT 0
-            )"
-        );
-    } else {
-        $userPdo->exec(
-            "CREATE TABLE IF NOT EXISTS {$table} (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                doctor_id INTEGER NOT NULL DEFAULT 1,
-                {$bn} TEXT,
-                {$en} TEXT,
-                usage_count INTEGER NOT NULL DEFAULT 0,
-                is_pinned INTEGER NOT NULL DEFAULT 0,
-                is_hidden INTEGER NOT NULL DEFAULT 0,
-                sort_order INTEGER NOT NULL DEFAULT 0,
-                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                static_id INTEGER NOT NULL DEFAULT 0,
-                search_alias TEXT,
-                default_dosage_form TEXT NOT NULL DEFAULT '[]',
-                is_edited INTEGER NOT NULL DEFAULT 0
-            )"
-        );
-    }
-
-    $columns = [
-        'doctor_id' => 'INTEGER NOT NULL DEFAULT 1',
-        $bn => 'TEXT',
-        $en => 'TEXT',
-        'usage_count' => 'INTEGER NOT NULL DEFAULT 0',
-        'is_pinned' => 'INTEGER NOT NULL DEFAULT 0',
-        'is_hidden' => 'INTEGER NOT NULL DEFAULT 0',
-        'sort_order' => 'INTEGER NOT NULL DEFAULT 0',
-        'created_at' => 'TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP',
-        'updated_at' => 'TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP',
-        'static_id' => 'INTEGER NOT NULL DEFAULT 0',
-        'is_edited' => 'INTEGER NOT NULL DEFAULT 0',
-    ];
-    if ($type !== 'advice') {
-        $columns['search_alias'] = 'TEXT';
-    }
-    if ($type === 'advice') {
-        $columns['name'] = "TEXT NOT NULL DEFAULT ''";
-        $columns['category_bn'] = "TEXT NOT NULL DEFAULT ''";
-        $columns['category_en'] = "TEXT NOT NULL DEFAULT ''";
-        $columns['category_search_alias'] = 'TEXT';
-    }
-    if ($config['has_default_form']) {
-        $columns['default_dosage_form'] = "TEXT NOT NULL DEFAULT '[]'";
-    }
-
-    foreach ($columns as $column => $definition) {
-        if (!DbSchema::columnExists($userPdo, $table, $column)) {
-            $userPdo->exec("ALTER TABLE {$table} ADD COLUMN {$column} {$definition}");
-        }
-    }
-
-    $settingsTable = $config['settings_table'];
-    $settingsIdColumn = $config['settings_id_column'];
-    $userPdo->exec(
-        "CREATE TABLE IF NOT EXISTS {$settingsTable} (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            doctor_id INTEGER NOT NULL DEFAULT 1,
-            {$settingsIdColumn} INTEGER NOT NULL DEFAULT 0,
-            setting_key TEXT NOT NULL,
-            setting_value TEXT,
-            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE(doctor_id, {$settingsIdColumn}, setting_key)
-        )"
-    );
-    if (!DbSchema::columnExists($userPdo, $settingsTable, $settingsIdColumn)) {
-        $userPdo->exec("ALTER TABLE {$settingsTable} ADD COLUMN {$settingsIdColumn} INTEGER NOT NULL DEFAULT 0");
-    }
-    $userPdo->exec(
-        "CREATE UNIQUE INDEX IF NOT EXISTS idx_{$settingsTable}_doctor_setting
-         ON {$settingsTable}(doctor_id, {$settingsIdColumn}, setting_key)"
-    );
-
-    $userPdo->exec("CREATE INDEX IF NOT EXISTS idx_{$table}_doctor_static ON {$table}(doctor_id, static_id)");
-    $userPdo->exec("CREATE INDEX IF NOT EXISTS idx_{$table}_doctor_usage ON {$table}(doctor_id, usage_count DESC, sort_order ASC, id ASC)");
-}
-
 function rx_phrase_static_rows(string $type): array {
     $config = rx_template_config($type);
     $staticPdo = rx_static_pdo();
@@ -203,7 +101,6 @@ function rx_phrase_settings(string $type, ?int $doctorId = null): array {
     $doctorId = $doctorId ?: rx_active_doctor_id();
     $config = rx_template_config($type);
     $userPdo = rx_user_pdo();
-    rx_phrase_ensure_schema($type, $userPdo);
     $defaults = rx_phrase_default_settings();
     $settingsIdColumn = $config['settings_id_column'];
 
@@ -270,7 +167,6 @@ function rx_phrase_rows(string $type, ?int $doctorId = null, bool $includeHidden
     $doctorId = $doctorId ?: rx_active_doctor_id();
     $config = rx_template_config($type);
     $userPdo = rx_user_pdo();
-    rx_phrase_ensure_schema($type, $userPdo);
     $settings = rx_phrase_settings($type, $doctorId);
     $bn = $config['bn_column'];
     $en = $config['en_column'];
@@ -436,7 +332,6 @@ function rx_phrase_learn(string $type, string $value, int $doctorId): void {
 
     $config = rx_template_config($type);
     $userPdo = rx_user_pdo();
-    rx_phrase_ensure_schema($type, $userPdo);
     $table = $config['user_table'];
     $bn = $config['bn_column'];
     $en = $config['en_column'];

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 require_once __DIR__ . '/../auth.php';
 require_login();
 require_once __DIR__ . '/../db.php';
@@ -44,7 +46,6 @@ function rx_template_shift_sort(PDO $pdo, string $table, int $doctorId, int $fro
 function rx_template_save_row(string $type, int $doctorId, array $row): array {
     $config = rx_template_config($type);
     $pdo = rx_user_pdo();
-    rx_phrase_ensure_schema($type, $pdo);
     $table = $config['user_table'];
     $bn = $config['bn_column'];
     $en = $config['en_column'];
@@ -195,7 +196,6 @@ function rx_template_upsert_system_row(PDO $pdo, string $type, int $doctorId, in
 function rx_template_row_action(string $type, int $doctorId, array $payload): array {
     $config = rx_template_config($type);
     $pdo = rx_user_pdo();
-    rx_phrase_ensure_schema($type, $pdo);
     $table = $config['user_table'];
     $action = rx_clean($payload['action'] ?? '');
     $id = (int)($payload['id'] ?? 0);
@@ -233,7 +233,6 @@ function rx_template_row_action(string $type, int $doctorId, array $payload): ar
 function rx_template_bulk_action(string $type, int $doctorId, string $action): array {
     $config = rx_template_config($type);
     $pdo = rx_user_pdo();
-    rx_phrase_ensure_schema($type, $pdo);
     $table = $config['user_table'];
 
     if ($action === 'reset_all' || $action === 'reset_full') {
@@ -353,7 +352,6 @@ function rx_template_normalize_row(string $type, array $row, array $staticMap, i
 function rx_template_save_all(string $type, int $doctorId, array $rows, array $settings): array {
     $config = rx_template_config($type);
     $pdo = rx_user_pdo();
-    rx_phrase_ensure_schema($type, $pdo);
     $table = $config['user_table'];
     $staticMap = rx_phrase_static_map($type);
     $bn = $config['bn_column'];
@@ -439,7 +437,6 @@ try {
     $type = $type ?: 'dose';
     $doctorId = rx_active_doctor_id();
     rx_template_config($type);
-    rx_phrase_ensure_schema($type);
 
     if (strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') {
         rx_template_json(rx_template_payload($type, $doctorId));

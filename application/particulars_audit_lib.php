@@ -3,22 +3,17 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
 
+/**
+ * Fail clearly if migration 014 has not created the audit table.
+ * No DDL is executed at request time.
+ */
 function ensure_patient_particulars_audit_schema(PDO $pdo): void {
-    $pdo->exec(
-        "CREATE TABLE IF NOT EXISTS zimrx_patient_particulars_audit (
-            id " . DbSql::autoIncrement() . ",
-            patient_id INTEGER NOT NULL,
-            patient_reg_no TEXT,
-            action_source TEXT NOT NULL,
-            changed_by_user_id INTEGER,
-            changed_by_role TEXT,
-            changed_by_name TEXT,
-            changes_json TEXT NOT NULL,
-            summary_text TEXT,
-            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )"
-    );
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_audit_patient ON zimrx_patient_particulars_audit(patient_id, created_at)");
+    if (!DbSchema::tableExists($pdo, 'zimrx_patient_particulars_audit')) {
+        throw new RuntimeException(
+            'zimrx_patient_particulars_audit table is missing. ' .
+            'Run database migrations before serving clinical requests.'
+        );
+    }
 }
 
 function log_patient_particulars_audit(
@@ -30,7 +25,7 @@ function log_patient_particulars_audit(
     string $source = 'appointment'
 ): void {
     if ($patientId <= 0) return;
-    ensure_patient_particulars_audit_schema($pdo);
+    ensure_patient_particulars_audit_schema($pdo); // fail-closed assertion
 
     $fieldsToCheck = [
         'full_name' => 'Name',
@@ -98,7 +93,9 @@ function log_patient_particulars_audit(
             $uStmt->execute(['id' => $userId]);
             $uRow = $uStmt->fetch(PDO::FETCH_ASSOC);
             if ($uRow) $userName = $uRow['name'] ?: $uRow['username'] ?: $userName;
-        } catch (Throwable $e) {}
+        } catch (Throwable $e) {
+            error_log('[ZimRx] Unable to resolve audit user name: ' . $e->getMessage());
+        }
     }
 
     $summaryText = implode(', ', $summaryParts);
@@ -125,7 +122,7 @@ function log_patient_particulars_audit(
 
 function get_patient_particulars_audit_history(PDO $pdo, int $patientId): array {
     if ($patientId <= 0) return [];
-    ensure_patient_particulars_audit_schema($pdo);
+    ensure_patient_particulars_audit_schema($pdo); // fail-closed assertion
 
     $stmt = $pdo->prepare(
         "SELECT *

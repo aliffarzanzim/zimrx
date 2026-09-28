@@ -86,7 +86,9 @@ $zrx_dd_theme = $_COOKIE['zimrx_dropdown_theme'] ?? 'subtle-tint';
                     }
                 }
             }
-        } catch (Throwable $e) {}
+        } catch (Throwable $e) {
+            error_log('[ZimRx] Unable to load saved table-column settings: ' . $e->getMessage());
+        }
     }
     ?>
     <script>

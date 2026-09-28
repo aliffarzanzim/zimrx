@@ -6,6 +6,8 @@
 (function() {
   'use strict';
 
+  const escapeAttr = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+
   // In-memory state for placed breast lesions
   const breastMarkers = {
     RT: [],
@@ -105,7 +107,7 @@
         <div class="zrx-lesion-body">
           <div class="zrx-lesion-field">
             <label class="zrx-exam-lbl">Size</label>
-            <input type="text" class="zrx-exam-input zrx-lesion-size" value="${m.size || '2.0x1.5 cm'}" placeholder="e.g. 2x1.5 cm">
+            <input type="text" class="zrx-exam-input zrx-lesion-size" value="${escapeAttr(m.size || '2.0x1.5 cm')}" placeholder="e.g. 2x1.5 cm">
           </div>
           <div class="zrx-lesion-field">
             <label class="zrx-exam-lbl">Consistency</label>
@@ -127,7 +129,7 @@
           </div>
           <div class="zrx-lesion-field">
             <label class="zrx-exam-lbl">Tenderness / Notes</label>
-            <input type="text" class="zrx-exam-input zrx-lesion-notes" value="${m.notes || ''}" placeholder="e.g. Non-tender, well-defined">
+            <input type="text" class="zrx-exam-input zrx-lesion-notes" value="${escapeAttr(m.notes || '')}" placeholder="e.g. Non-tender, well-defined">
           </div>
         </div>
       `;

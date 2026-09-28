@@ -91,6 +91,7 @@ try {
     echo json_encode(['status' => 'success', 'learned_items' => $inserted]);
 
 } catch (Exception $e) {
-    echo json_encode(['error' => $e->getMessage()]);
+    error_log('[ZimRx] save_custom_address error: ' . $e->getMessage());
+    echo json_encode(['error' => 'Failed to save custom address.']);
 }
 ?>

@@ -116,7 +116,9 @@ try {
     if (is_array($stored)) {
         $currentSettings = array_merge($defaultSettings, $stored);
     }
-} catch (Throwable $e) {}
+} catch (Throwable $e) {
+    error_log('[ZimRx] Unable to load appointment settings: ' . $e->getMessage());
+}
 
 $page_title = "ZimRx - Appointment Settings";
 $extra_css = ['assets/css/print_layout_editor.css'];

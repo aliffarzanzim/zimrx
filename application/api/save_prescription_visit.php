@@ -16,15 +16,6 @@ function value(array $data, string $key): string {
     return trim((string)($data[$key] ?? ''));
 }
 
-function column_exists(PDO $pdo, string $table, string $column): bool {
-    return DbSchema::columnExists($pdo, $table, $column);
-}
-
-function ensure_column(PDO $pdo, string $table, string $column, string $definition): void {
-    if (!column_exists($pdo, $table, $column)) {
-        $pdo->exec("ALTER TABLE $table ADD COLUMN $column $definition");
-    }
-}
 
 function doctor_code_for_visit(PDO $pdo, int $doctorId): string {
     $stmt = $pdo->prepare("SELECT doctor_code FROM zimrx_doctors WHERE id = :id LIMIT 1");
@@ -287,57 +278,36 @@ try {
 
     $appointmentId = (int)value($payload, 'appointment_id');
     $appointment = load_appointment($pdo, $appointmentId, $doctorId);
+    $expectedRevision = isset($payload['revision']) ? (int)$payload['revision'] : 0;
+
+    require_once __DIR__ . '/../sync_service.php';
 
     if ($appointment && !empty($appointment['visit_record_id'])) {
         $visitRecordId = (int)$appointment['visit_record_id'];
         $publicVisitId = (string)($appointment['visit_id'] ?? '');
 
+        if (DbConnections::driver() === 'sqlite') {
+            $pdo->exec('BEGIN IMMEDIATE');
+        } else {
+            $pdo->beginTransaction();
+        }
+
         $stmtEx = $pdo->prepare("SELECT * FROM zimrx_visits WHERE id = :id AND doctor_id = :doctor_id LIMIT 1");
         $stmtEx->execute(['id' => $visitRecordId, 'doctor_id' => $doctorId]);
         $currentVisitRow = $stmtEx->fetch();
         if ($currentVisitRow) {
+            $currentRevision = (int)($currentVisitRow['revision'] ?? 1);
+            if ($expectedRevision > 0 && $currentRevision !== $expectedRevision) {
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                http_response_code(409);
+                respond(['ok' => false, 'error' => 'Conflict: This visit has been updated by another session. Please reload before saving.']);
+            }
             archive_visit_revision_if_changed($pdo, $currentVisitRow, $clinicalSnapshotJson, $prescriptionHtml, $richTextJson, $doctorId, $userId);
-        }
 
-        // Update snapshots if provided
-        $updateFields = [];
-        $updateParams = ['id' => $visitRecordId, 'doctor_id' => $doctorId];
-        if ($prescriptionHtml !== '') {
-            $updateFields[] = "prescription_html = :prescription_html";
-            $updateParams['prescription_html'] = $prescriptionHtml;
-        }
-        if ($clinicalSnapshotJson !== null && $clinicalSnapshotJson !== '') {
-            $updateFields[] = "clinical_snapshot_json = :clinical_snapshot_json";
-            $updateParams['clinical_snapshot_json'] = $clinicalSnapshotJson;
-        }
-        if (!empty($rxDrugs)) {
-            $updateFields[] = "rich_text_json = :rich_text_json";
-            $updateParams['rich_text_json'] = $richTextJson;
-        }
-        if (!empty($updateFields)) {
-            $updateFields[] = "updated_at = CURRENT_TIMESTAMP";
-            $pdo->prepare("UPDATE zimrx_visits SET " . implode(', ', $updateFields) . " WHERE id = :id AND doctor_id = :doctor_id")->execute($updateParams);
-        }
-
-        respond([
-            'ok' => true,
-            'visit_record_id' => $visitRecordId,
-            'visit_id' => $publicVisitId,
-            'visit_no' => (int)($appointment['visit_no'] ?? 0),
-            'visit_code' => $publicVisitId,
-            'already_saved' => true,
-        ]);
-    }
-
-    if ($appointmentId > 0) {
-        $stmt = $pdo->prepare("SELECT * FROM zimrx_visits WHERE appointment_id = :appointment_id AND doctor_id = :doctor_id LIMIT 1");
-        $stmt->execute(['appointment_id' => $appointmentId, 'doctor_id' => $doctorId]);
-        $existingVisit = $stmt->fetch();
-        if ($existingVisit) {
-            $visitRecordId = (int)$existingVisit['id'];
-            archive_visit_revision_if_changed($pdo, $existingVisit, $clinicalSnapshotJson, $prescriptionHtml, $richTextJson, $doctorId, $userId);
-
-            $updateFields = [];
+            // Update snapshots if provided
+            $updateFields = ["revision = revision + 1", "updated_at = CURRENT_TIMESTAMP"];
             $updateParams = ['id' => $visitRecordId, 'doctor_id' => $doctorId];
             if ($prescriptionHtml !== '') {
                 $updateFields[] = "prescription_html = :prescription_html";
@@ -351,22 +321,131 @@ try {
                 $updateFields[] = "rich_text_json = :rich_text_json";
                 $updateParams['rich_text_json'] = $richTextJson;
             }
-            if (!empty($updateFields)) {
-                $updateFields[] = "updated_at = CURRENT_TIMESTAMP";
-                $pdo->prepare("UPDATE zimrx_visits SET " . implode(', ', $updateFields) . " WHERE id = :id AND doctor_id = :doctor_id")->execute($updateParams);
+
+            $whereSql = "WHERE id = :id AND doctor_id = :doctor_id";
+            if ($expectedRevision > 0) {
+                $whereSql .= " AND revision = :expected_revision";
+                $updateParams['expected_revision'] = $expectedRevision;
             }
+            $upStmt = $pdo->prepare("UPDATE zimrx_visits SET " . implode(', ', $updateFields) . " " . $whereSql);
+            $upStmt->execute($updateParams);
+            if ($expectedRevision > 0 && $upStmt->rowCount() !== 1) {
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                http_response_code(409);
+                respond(['ok' => false, 'error' => 'Conflict: Concurrent update detected.']);
+            }
+
+            $syncId = (string)($currentVisitRow['sync_id'] ?? '');
+            if ($syncId === '') {
+                $syncId = ZimRxSyncJournal::generateUuid();
+                $pdo->prepare("UPDATE zimrx_visits SET sync_id = :sync_id WHERE id = :id")->execute(['sync_id' => $syncId, 'id' => $visitRecordId]);
+            }
+            ZimRxSyncJournal::logChange($pdo, 'visit', $syncId, 'update', $currentRevision, $currentRevision + 1, [
+                'id' => $visitRecordId,
+                'visit_no' => (int)($appointment['visit_no'] ?? 0),
+            ]);
+
+            $pdo->commit();
+
+            respond([
+                'ok' => true,
+                'visit_record_id' => $visitRecordId,
+                'visit_id' => $publicVisitId,
+                'visit_no' => (int)($appointment['visit_no'] ?? 0),
+                'visit_code' => $publicVisitId,
+                'revision' => $currentRevision + 1,
+                'already_saved' => true,
+            ]);
+        } else {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+        }
+    }
+
+    if ($appointmentId > 0) {
+        if (DbConnections::driver() === 'sqlite') {
+            $pdo->exec('BEGIN IMMEDIATE');
+        } else {
+            $pdo->beginTransaction();
+        }
+
+        $stmt = $pdo->prepare("SELECT * FROM zimrx_visits WHERE appointment_id = :appointment_id AND doctor_id = :doctor_id LIMIT 1");
+        $stmt->execute(['appointment_id' => $appointmentId, 'doctor_id' => $doctorId]);
+        $existingVisit = $stmt->fetch();
+        if ($existingVisit) {
+            $visitRecordId = (int)$existingVisit['id'];
+            $currentRevision = (int)($existingVisit['revision'] ?? 1);
+            if ($expectedRevision > 0 && $currentRevision !== $expectedRevision) {
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                http_response_code(409);
+                respond(['ok' => false, 'error' => 'Conflict: This visit has been updated by another session. Please reload before saving.']);
+            }
+            archive_visit_revision_if_changed($pdo, $existingVisit, $clinicalSnapshotJson, $prescriptionHtml, $richTextJson, $doctorId, $userId);
+
+            $updateFields = ["revision = revision + 1", "updated_at = CURRENT_TIMESTAMP"];
+            $updateParams = ['id' => $visitRecordId, 'doctor_id' => $doctorId];
+            if ($prescriptionHtml !== '') {
+                $updateFields[] = "prescription_html = :prescription_html";
+                $updateParams['prescription_html'] = $prescriptionHtml;
+            }
+            if ($clinicalSnapshotJson !== null && $clinicalSnapshotJson !== '') {
+                $updateFields[] = "clinical_snapshot_json = :clinical_snapshot_json";
+                $updateParams['clinical_snapshot_json'] = $clinicalSnapshotJson;
+            }
+            if (!empty($rxDrugs)) {
+                $updateFields[] = "rich_text_json = :rich_text_json";
+                $updateParams['rich_text_json'] = $richTextJson;
+            }
+
+            $whereSql = "WHERE id = :id AND doctor_id = :doctor_id";
+            if ($expectedRevision > 0) {
+                $whereSql .= " AND revision = :expected_revision";
+                $updateParams['expected_revision'] = $expectedRevision;
+            }
+            $upStmt = $pdo->prepare("UPDATE zimrx_visits SET " . implode(', ', $updateFields) . " " . $whereSql);
+            $upStmt->execute($updateParams);
+            if ($expectedRevision > 0 && $upStmt->rowCount() !== 1) {
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                http_response_code(409);
+                respond(['ok' => false, 'error' => 'Conflict: Concurrent update detected.']);
+            }
+
+            $syncId = (string)($existingVisit['sync_id'] ?? '');
+            if ($syncId === '') {
+                $syncId = ZimRxSyncJournal::generateUuid();
+                $pdo->prepare("UPDATE zimrx_visits SET sync_id = :sync_id WHERE id = :id")->execute(['sync_id' => $syncId, 'id' => $visitRecordId]);
+            }
+            ZimRxSyncJournal::logChange($pdo, 'visit', $syncId, 'update', $currentRevision, $currentRevision + 1, [
+                'id' => $visitRecordId,
+                'visit_no' => (int)($existingVisit['visit_no'] ?? 0),
+            ]);
 
             $pdo->prepare("UPDATE zimrx_appointments SET visit_record_id = :visit_record_id WHERE id = :id AND doctor_id = :doctor_id")
                 ->execute(['visit_record_id' => $visitRecordId, 'id' => $appointmentId, 'doctor_id' => $doctorId]);
             $publicVisitId = (string)($existingVisit['visit_id'] ?? '');
+
+            $pdo->commit();
+
             respond([
                 'ok' => true,
                 'visit_record_id' => $visitRecordId,
                 'visit_id' => $publicVisitId,
                 'visit_no' => (int)($existingVisit['visit_no'] ?? 0),
                 'visit_code' => $publicVisitId,
+                'revision' => $currentRevision + 1,
                 'already_saved' => true,
             ]);
+        } else {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
         }
     }
 
@@ -418,20 +497,26 @@ try {
         ? trim((string)$appointment['appointment_date'] . ' ' . (string)($appointment['appointment_time'] ?? ''))
         : date('Y-m-d H:i:s');
 
-    $pdo->beginTransaction();
+    $syncId = ZimRxSyncJournal::generateUuid();
+
+    if (DbConnections::driver() === 'sqlite') {
+        $pdo->exec('BEGIN IMMEDIATE');
+    } else {
+        $pdo->beginTransaction();
+    }
     $stmt = $pdo->prepare(
         "INSERT INTO zimrx_visits (
             doctor_id, appointment_id, patient_id, patient_reg_no, patient_name, visit_no, visit_id,
             referral_category, referral_name, referred_by,
             visit_date, age_at_visit, height_at_visit, height_unit_at_visit,
             weight_at_visit, weight_unit_at_visit, billing_json, rich_text_json,
-            prescription_html, clinical_snapshot_json
+            prescription_html, clinical_snapshot_json, revision, sync_id
         ) VALUES (
             :doctor_id, :appointment_id, :patient_id, :patient_reg_no, :patient_name, :visit_no, :visit_id,
             :referral_category, :referral_name, :referred_by,
             :visit_date, :age_at_visit, :height_at_visit, :height_unit_at_visit,
             :weight_at_visit, :weight_unit_at_visit, :billing_json, :rich_text_json,
-            :prescription_html, :clinical_snapshot_json
+            :prescription_html, :clinical_snapshot_json, 1, :sync_id
         )"
     );
     $stmt->execute([
@@ -455,6 +540,7 @@ try {
         'rich_text_json' => $richTextJson,
         'prescription_html' => $prescriptionHtml !== '' ? $prescriptionHtml : null,
         'clinical_snapshot_json' => $clinicalSnapshotJson !== '' ? $clinicalSnapshotJson : null,
+        'sync_id' => $syncId,
     ]);
     $visitRecordId = (int)$pdo->lastInsertId();
 
@@ -486,6 +572,12 @@ try {
         zimrx_record_user_occupation($pdo, $doctorId, $savedOccupation);
     }
 
+    ZimRxSyncJournal::logChange($pdo, 'visit', $syncId, 'insert', 0, 1, [
+        'id' => $visitRecordId,
+        'visit_no' => $visitNo,
+        'patient_id' => $patientId,
+    ]);
+
     $pdo->commit();
     respond([
         'ok' => true,
@@ -493,6 +585,7 @@ try {
         'visit_id' => $publicVisitId,
         'visit_no' => $visitNo,
         'visit_code' => $publicVisitId,
+        'revision' => 1,
     ]);
 } catch (Exception $e) {
     if ($pdo->inTransaction()) {

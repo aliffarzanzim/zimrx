@@ -5,10 +5,10 @@ require_once 'db.php';
 $page_title = "ZimRx - Layout Configurator";
 
 // --- Read layout from cookie (same source as prescription.php pre-rendering) ---
-$availableLeftModules  = ["P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology", "Psychiatry", "Orthopaedics", "Urology", "Neurology", "Cardiology", "Pulmonology", "Endocrinology", "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter", ""];
+$availableLeftModules  = ["P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology", "Psychiatry", "Orthopaedics", "Urology", "Neurology", "Cardiology", "Pulmonology", "Endocrinology", "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History", ""];
 $availableRightModules = ["Rx", "Drug Summary & Interaction", "Advice", "Report Entry", "Upload Reports & Documents", "Calculators", "Ophthalmology", "Text Pad", "OT Note", "Font Format", ""];
 
-$defaultLeftLayout  = ["P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology", "Psychiatry", "Orthopaedics", "Urology", "Neurology", "Cardiology", "Pulmonology", "Endocrinology", "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History", "Bangla Converter"];
+$defaultLeftLayout  = ["P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology", "Psychiatry", "Orthopaedics", "Urology", "Neurology", "Cardiology", "Pulmonology", "Endocrinology", "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History"];
 $defaultRightLayout = ["Rx", "Drug Summary & Interaction", "Advice", "Report Entry", "Upload Reports & Documents", "Calculators", "Ophthalmology", "Text Pad", "OT Note", "Font Format"];
 
 function decode_layout_cookie(string $name, array $default): array {

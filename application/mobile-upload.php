@@ -593,6 +593,7 @@ $doctorName = current_user_name();
     </div>
 
     <script>
+    window.ZimRxCsrfToken = <?= json_encode(zimrx_csrf_token()) ?>;
     (function () {
         const cardPatientName = document.getElementById('card-patient-name');
         const cardPatientReg = document.getElementById('card-patient-reg');
@@ -627,6 +628,9 @@ $doctorName = current_user_name();
 
         let selectedFile = null;
         let lastPatientName = '';
+        let currentPatientId = 0;
+        let currentVisitRecordId = 0;
+        let currentActiveRevision = 1;
 
         // Live Poll Active Patient from Doctor's Desktop
         async function fetchActivePatient() {
@@ -635,6 +639,9 @@ $doctorName = current_user_name();
                 const data = await res.json();
                 if (data.ok && data.patient) {
                     const p = data.patient;
+                    currentPatientId = Number(p.patient_id || 0);
+                    currentVisitRecordId = Number(p.visit_record_id || 0);
+                    currentActiveRevision = Number(p.active_revision || 1);
                     const pName = p.patient_name || 'Walk-in Patient';
 
                     // Highlight change if desktop switched to another patient
@@ -752,9 +759,13 @@ $doctorName = current_user_name();
             progressFill.style.width = '25%';
 
             const formData = new FormData();
+            formData.append('csrf_token', window.ZimRxCsrfToken || '');
             formData.append('file', selectedFile);
             formData.append('report_name', name);
             formData.append('report_date', date);
+            formData.append('patient_id', currentPatientId);
+            formData.append('visit_record_id', currentVisitRecordId);
+            formData.append('active_revision', currentActiveRevision);
 
             try {
                 progressFill.style.width = '65%';

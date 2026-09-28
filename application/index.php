@@ -11,32 +11,7 @@ if (zimrx_db_table_exists($pdo, 'zimrx_app_config')) {
 }
 
 if (($appConfig['setup_complete'] ?? '0') !== '1') {
-    if (!empty($_GET['quick_demo'])) {
-        header('Location: first_launch.php?quick_demo=1');
-        exit();
-    }
     header('Location: first_launch.php');
-    exit();
-}
-
-// ── Quick Demo Mode Trigger ────────────────────────────────────────────────
-if (!empty($_GET['quick_demo'])) {
-    if (zimrx_db_table_exists($pdo, 'zimrx_app_config')) {
-        $pdo->prepare("INSERT INTO zimrx_app_config (config_key, config_value, updated_at) VALUES ('setup_complete', '1', CURRENT_TIMESTAMP) ON CONFLICT(config_key) DO UPDATE SET config_value = '1', updated_at = CURRENT_TIMESTAMP")->execute();
-        $pdo->prepare("INSERT INTO zimrx_app_config (config_key, config_value, updated_at) VALUES ('practice_type', 'solo', CURRENT_TIMESTAMP) ON CONFLICT(config_key) DO UPDATE SET config_value = 'solo', updated_at = CURRENT_TIMESTAMP")->execute();
-        $pdo->prepare("INSERT INTO zimrx_app_config (config_key, config_value, updated_at) VALUES ('install_type', 'local', CURRENT_TIMESTAMP) ON CONFLICT(config_key) DO UPDATE SET config_value = 'local', updated_at = CURRENT_TIMESTAMP")->execute();
-        $pdo->prepare("INSERT INTO zimrx_app_config (config_key, config_value, updated_at) VALUES ('auto_login', '1', CURRENT_TIMESTAMP) ON CONFLICT(config_key) DO UPDATE SET config_value = '1', updated_at = CURRENT_TIMESTAMP")->execute();
-    }
-
-    $user = zimrx_db_table_exists($pdo, 'zimrx_user_accounts')
-        ? $pdo->query("SELECT id, display_name FROM zimrx_user_accounts WHERE role = 'doctor' AND doctor_id = 1 AND is_active = 1 LIMIT 1")->fetch()
-        : null;
-
-    $_SESSION['user_id']   = $user ? (int)$user['id'] : 1;
-    $_SESSION['user_role'] = 'doctor';
-    $_SESSION['user_name'] = $user && !empty($user['display_name']) ? $user['display_name'] : 'Dr. M. A. Karim';
-    $_SESSION['doctor_id'] = 1;
-    header('Location: prescription.php');
     exit();
 }
 
@@ -60,8 +35,14 @@ if (!is_logged_in()
 }
 
 $redirect = !empty($_REQUEST['redirect']) ? trim((string)$_REQUEST['redirect']) : '';
-if ($redirect !== '' && (str_starts_with($redirect, 'http://') || str_starts_with($redirect, 'https://') || str_starts_with($redirect, '//'))) {
-    $redirect = '';
+if ($redirect !== '') {
+    if (str_starts_with($redirect, '//')
+        || str_starts_with($redirect, '\\')
+        || str_contains($redirect, '\\')
+        || preg_match('/^[a-z][a-z0-9+.-]*:/i', $redirect)
+    ) {
+        $redirect = '';
+    }
 }
 
 // If already logged in, redirect to appropriate page
@@ -76,56 +57,82 @@ if (is_logged_in()) {
 
 $error = "";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = trim((string)($_POST['username'] ?? ''));
-    $password = (string)($_POST['password'] ?? '');
-    $csrfToken = $_POST['csrf_token'] ?? null;
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $clientIp = (string)($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
+    $ipHash = hash('sha256', $clientIp);
+    $attemptKey = 'login_attempts_' . $ipHash;
+    $lockoutKey = 'login_lockout_' . $ipHash;
 
-    if ($csrfToken !== null && !zimrx_verify_csrf((string)$csrfToken)) {
-        $error = "Session expired or invalid security token. Please refresh and try again.";
+    $lockoutUntil = (int)($_SESSION[$lockoutKey] ?? 0);
+    if ($lockoutUntil > time()) {
+        $remainingSec = $lockoutUntil - time();
+        $error = "Too many failed login attempts. Please wait {$remainingSec} seconds before trying again.";
     } else {
-        $stmt = $pdo->prepare(
-            "SELECT id, username, password_hash, display_name, role, doctor_id
-             FROM zimrx_user_accounts
-             WHERE username = :username AND is_active = 1
-             LIMIT 1"
-        );
-        $stmt->execute(['username' => $username]);
-        $user = $stmt->fetch();
+        $username = trim((string)($_POST['username'] ?? ''));
+        $password = (string)($_POST['password'] ?? '');
+        $csrfToken = $_POST['csrf_token'] ?? null;
 
-        if ($user && zimrx_password_verify($password, (string)$user['password_hash'])) {
-            // Automatic upgrade: migrate legacy SHA-256 or weak hashes to modern PASSWORD_DEFAULT
-            $currentHash = (string)$user['password_hash'];
-            if (password_needs_rehash($currentHash, PASSWORD_DEFAULT) || !str_starts_with($currentHash, '$2y$')) {
-                try {
-                    $upgradedHash = zimrx_password_hash($password);
-                    $rehashStmt = $pdo->prepare(
-                        "UPDATE zimrx_user_accounts
-                         SET password_hash = :hash, updated_at = CURRENT_TIMESTAMP
-                         WHERE id = :id"
-                    );
-                    $rehashStmt->execute(['hash' => $upgradedHash, 'id' => (int)$user['id']]);
-                } catch (Throwable $e) {
-                    error_log('[ZimRx] Password hash auto-upgrade error: ' . $e->getMessage());
-                }
-            }
-
-            // Prevent session fixation attack
-            session_regenerate_id(true);
-
-            $_SESSION['user_id'] = (int)$user['id'];
-            $_SESSION['user_role'] = strtolower((string)$user['role']);
-            $_SESSION['user_name'] = $user['display_name'];
-            $_SESSION['doctor_id'] = max(1, (int)($user['doctor_id'] ?? 1));
-
-            if ($redirect !== '') {
-                header("Location: " . $redirect);
-                exit();
-            }
-            header("Location: " . ($_SESSION['user_role'] === 'admin' ? 'admin.php' : ($_SESSION['user_role'] === 'assistant' ? 'appointments.php' : 'prescription.php')));
-            exit();
+        if ($csrfToken !== null && !zimrx_verify_csrf((string)$csrfToken)) {
+            $error = "Session expired or invalid security token. Please refresh and try again.";
         } else {
-            $error = "Invalid username or password.";
+            $stmt = $pdo->prepare(
+                "SELECT id, username, password_hash, display_name, role, doctor_id
+                 FROM zimrx_user_accounts
+                 WHERE username = :username AND is_active = 1
+                 LIMIT 1"
+            );
+            $stmt->execute(['username' => $username]);
+            $user = $stmt->fetch();
+
+            if ($user && zimrx_password_verify($password, (string)$user['password_hash'])) {
+                // Clear lockout counters on success
+                unset($_SESSION[$attemptKey], $_SESSION[$lockoutKey]);
+
+                // Automatic upgrade: migrate legacy SHA-256 or weak hashes to modern PASSWORD_DEFAULT
+                $currentHash = (string)$user['password_hash'];
+                if (password_needs_rehash($currentHash, PASSWORD_DEFAULT) || !str_starts_with($currentHash, '$2y$')) {
+                    try {
+                        $upgradedHash = zimrx_password_hash($password);
+                        $rehashStmt = $pdo->prepare(
+                            "UPDATE zimrx_user_accounts
+                             SET password_hash = :hash, updated_at = CURRENT_TIMESTAMP
+                             WHERE id = :id"
+                        );
+                        $rehashStmt->execute(['hash' => $upgradedHash, 'id' => (int)$user['id']]);
+                    } catch (Throwable $e) {
+                        error_log('[ZimRx] Password hash auto-upgrade error: ' . $e->getMessage());
+                    }
+                }
+
+                // Prevent session fixation attack
+                session_regenerate_id(true);
+
+                $role = strtolower((string)$user['role']);
+                $_SESSION['user_id'] = (int)$user['id'];
+                $_SESSION['user_role'] = $role;
+                $_SESSION['user_name'] = $user['display_name'];
+                $_SESSION['doctor_id'] = !empty($user['doctor_id']) ? (int)$user['doctor_id'] : 0;
+
+                error_log("[ZimRx Security] Successful login for '{$username}' (ID: {$user['id']}, Role: {$role}) from {$clientIp}");
+
+                if ($redirect !== '') {
+                    header("Location: " . $redirect);
+                    exit();
+                }
+                header("Location: " . ($role === 'admin' ? 'admin.php' : ($role === 'assistant' ? 'appointments.php' : 'prescription.php')));
+                exit();
+            } else {
+                $failedCount = ((int)($_SESSION[$attemptKey] ?? 0)) + 1;
+                $_SESSION[$attemptKey] = $failedCount;
+                if ($failedCount >= 5) {
+                    $_SESSION[$lockoutKey] = time() + 60;
+                    $_SESSION[$attemptKey] = 0;
+                    $error = "Too many failed login attempts. Please wait 60 seconds before trying again.";
+                } else {
+                    $error = "Invalid username or password.";
+                }
+                error_log("[ZimRx Security] Failed login attempt #{$failedCount} for '{$username}' from {$clientIp}");
+            }
         }
     }
 }
@@ -279,12 +286,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <button type="submit" class="btn btn-primary btn-login">Sign In</button>
         </form>
-
-        <div style="margin-top: 1rem; margin-bottom: 0.5rem;">
-            <a href="index.php?quick_demo=1" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 0.75rem 1rem; background: rgba(37, 99, 235, 0.08); color: var(--primary); border: 1px dashed var(--primary-border, #93c5fd); border-radius: 8px; font-size: 0.9rem; font-weight: 600; text-decoration: none; transition: all 0.2s; box-sizing: border-box;">
-                ⚡ Skip All (Quick Demo) →
-            </a>
-        </div>
 
         <div style="margin-top: 0.75rem; margin-bottom: 0.25rem;">
             <a href="forgot_password.php" style="font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 500;">Forgot Password?</a>

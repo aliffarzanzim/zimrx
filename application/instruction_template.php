@@ -6,7 +6,6 @@ require_once __DIR__ . '/api/rx_regimen_lib.php';
 $page_title = 'Instruction Template';
 
 $instructionTemplateDoctorId = rx_active_doctor_id();
-rx_instruction_template_ensure_schema(rx_user_pdo());
 $instructionTemplateInitialPayload = [
     'settings' => rx_instruction_template_settings($instructionTemplateDoctorId),
     'rows' => rx_instruction_template_rows($instructionTemplateDoctorId, true),

@@ -173,5 +173,6 @@ try {
     $results = array_slice($results, 0, 40);
     echo json_encode($results, JSON_UNESCAPED_UNICODE);
 } catch (Throwable $e) {
-    echo json_encode(['error' => $e->getMessage()]);
+    error_log('[ZimRx] search_advice error: ' . $e->getMessage());
+    echo json_encode([]);
 }

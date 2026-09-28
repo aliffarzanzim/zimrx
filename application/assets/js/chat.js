@@ -587,17 +587,23 @@
                     </div>
                 `;
             } else {
+                function safeAttachmentPath(value) {
+                    const path = String(value || '');
+                    return /^uploads\/chat\/[A-Za-z0-9._-]+$/.test(path) ? path : '';
+                }
+
                 let attachmentHtml = '';
-                if (m.file_path) {
+                const path = safeAttachmentPath(m.file_path);
+                if (path) {
                     if (m.file_type === 'image') {
                         attachmentHtml = `
-                            <div class="chat-attachment-img-wrap" onclick="window.open('${escapeHtml(m.file_path)}', '_blank')">
-                                <img src="${escapeHtml(m.file_path)}" alt="Photo Attachment">
+                            <div class="chat-attachment-img-wrap" data-chat-preview="${escapeHtml(path)}">
+                                <img src="${escapeHtml(path)}" alt="Photo Attachment">
                             </div>
                         `;
                     } else {
                         attachmentHtml = `
-                            <a href="${escapeHtml(m.file_path)}" target="_blank" class="chat-attachment-doc-card">
+                            <a href="${escapeHtml(path)}" target="_blank" rel="noopener noreferrer" class="chat-attachment-doc-card">
                                 <div class="chat-doc-icon">PDF</div>
                                 <div class="chat-doc-details">
                                     <div class="chat-doc-name">${escapeHtml(m.file_name || 'document.pdf')}</div>
@@ -633,6 +639,16 @@
                     ${statusIcon}
                 </div>
             `;
+
+            const imgWrap = row.querySelector('.chat-attachment-img-wrap[data-chat-preview]');
+            if (imgWrap) {
+                imgWrap.addEventListener('click', () => {
+                    const previewPath = safeAttachmentPath(imgWrap.getAttribute('data-chat-preview'));
+                    if (previewPath) {
+                        window.open(previewPath, '_blank', 'noopener,noreferrer');
+                    }
+                });
+            }
 
             messagesContainerEl.appendChild(row);
             if (m.id > lastMessageId) {

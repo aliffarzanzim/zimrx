@@ -39,14 +39,32 @@ try {
         throw new RuntimeException('Only JPG, PNG, GIF, WEBP, or PDF files are allowed.');
     }
 
+    if ($ext === 'pdf') {
+        $magic = @file_get_contents($tmpPath, false, null, 0, 5);
+        if ($magic !== '%PDF-') {
+            throw new RuntimeException('Invalid PDF file content.');
+        }
+    } else {
+        $imageInfo = @getimagesize($tmpPath);
+        if (!$imageInfo) {
+            throw new RuntimeException('Invalid image file content.');
+        }
+    }
+
     $targetDir = ZIMRX_UPLOADS_DIR . '/reports';
-    if (!is_dir($targetDir) && !mkdir($targetDir, 0777, true) && !is_dir($targetDir)) {
+    if (!is_dir($targetDir) && !mkdir($targetDir, 0750, true) && !is_dir($targetDir)) {
         throw new RuntimeException('Unable to create reports directory.');
     }
 
-    $filename = sprintf('report-%d-%d.%s', current_user_id(), time(), $ext);
+    $filename = sprintf(
+        'report-%d-%d-%s.%s',
+        current_user_id(),
+        time(),
+        bin2hex(random_bytes(8)),
+        $ext
+    );
     $targetPath = $targetDir . '/' . $filename;
-    
+
     if (!move_uploaded_file($tmpPath, $targetPath)) {
         throw new RuntimeException('Could not save uploaded file.');
     }

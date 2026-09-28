@@ -46,7 +46,7 @@ $baseDir = __DIR__ . '/../assets/images/seal_and_stamps';
 $baseUrl = 'assets/images/seal_and_stamps';
 
 if (!is_dir($baseDir)) {
-    mkdir($baseDir, 0777, true);
+    mkdir($baseDir, 0750, true);
 }
 
 $categories[] = 'General';

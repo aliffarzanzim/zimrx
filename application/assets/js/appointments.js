@@ -1182,7 +1182,11 @@
                 li.style.position = 'relative';
 
                 if (isPinned) {
-                    li.innerHTML = `<img class="rx-dropdown-pin" src="assets/images/pin.svg" alt="Pinned">${name}`;
+                    const pin = document.createElement('img');
+                    pin.className = 'rx-dropdown-pin';
+                    pin.src = 'assets/images/pin.svg';
+                    pin.alt = 'Pinned';
+                    li.append(pin, document.createTextNode(name));
                 } else {
                     li.textContent = name;
                 }

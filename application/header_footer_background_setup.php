@@ -818,18 +818,43 @@ document.addEventListener('DOMContentLoaded', () => {
         if (pageHeader) pageHeader.style.backgroundColor = `#${hex}`;
     };
 
+    const sanitizePreviewHtml = (rawHtml) => {
+        if (!rawHtml || typeof rawHtml !== 'string') return '';
+        try {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(rawHtml, 'text/html');
+            const dangerousElements = doc.querySelectorAll('script, iframe, object, embed, form, link, meta, base');
+            dangerousElements.forEach(el => el.remove());
+
+            const allElements = doc.body.querySelectorAll('*');
+            allElements.forEach(el => {
+                Array.from(el.attributes).forEach(attr => {
+                    const name = attr.name.toLowerCase();
+                    const val = attr.value.trim().toLowerCase();
+                    if (name.startsWith('on') || val.startsWith('javascript:') || val.startsWith('data:text/html')) {
+                        el.removeAttribute(attr.name);
+                    }
+                });
+            });
+
+            return doc.body.innerHTML;
+        } catch (e) {
+            return '';
+        }
+    };
+
     const updatePreviewLeftHeader = (html) => {
         const doc = getPreviewDoc();
         if (!doc) return;
         const leftBox = doc.querySelector('.zrx-header-left');
-        if (leftBox) leftBox.innerHTML = html;
+        if (leftBox) leftBox.innerHTML = sanitizePreviewHtml(html);
     };
 
     const updatePreviewRightHeader = (html) => {
         const doc = getPreviewDoc();
         if (!doc) return;
         const rightBox = doc.querySelector('.zrx-header-right');
-        if (rightBox) rightBox.innerHTML = html;
+        if (rightBox) rightBox.innerHTML = sanitizePreviewHtml(html);
     };
 
     const updatePreviewFooter = (html) => {
@@ -837,7 +862,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!doc) return;
         const footerBox = doc.querySelector('#preview-footer');
         if (footerBox) {
-            footerBox.innerHTML = html;
+            footerBox.innerHTML = sanitizePreviewHtml(html);
             footerBox.style.display = 'block';
         }
     };

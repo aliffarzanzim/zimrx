@@ -24,22 +24,7 @@ function normalized_date(string $date): string {
     return date('Y-m-d');
 }
 
-function column_exists(PDO $pdo, string $table, string $column): bool {
-    return DbSchema::columnExists($pdo, $table, $column);
-}
 
-function ensure_column(PDO $pdo, string $table, string $column, string $definition): void {
-    if (!column_exists($pdo, $table, $column)) {
-        $pdo->exec("ALTER TABLE $table ADD COLUMN $column $definition");
-    }
-}
-
-function drop_column_if_exists(PDO $pdo, string $table, string $column): void {
-    if (!column_exists($pdo, $table, $column)) {
-        return;
-    }
-    $pdo->exec("ALTER TABLE $table DROP COLUMN $column");
-}
 
 function doctor_code_for_visit(PDO $pdo, int $doctorId): string {
     $stmt = $pdo->prepare("SELECT doctor_code FROM zimrx_doctors WHERE id = :id LIMIT 1");
@@ -71,227 +56,7 @@ function resolve_appointment_doctor_id(PDO $pdo, int $requestedDoctorId): int {
     return in_array($sessionDoctorId, $ids, true) ? $sessionDoctorId : 0;
 }
 
-function normalize_duplicate_appointment_serials(PDO $pdo): void {
-    $rows = $pdo->query(
-        "SELECT doctor_id, appointment_date, appointment_no, group_concat(id) AS ids, count(*) AS total
-         FROM zimrx_appointments
-         GROUP BY doctor_id, appointment_date, appointment_no
-         HAVING total > 1"
-    )->fetchAll();
 
-    foreach ($rows as $row) {
-        $ids = array_map('intval', explode(',', (string)$row['ids']));
-        sort($ids);
-        array_shift($ids); // Keep the oldest row's serial, move later duplicates.
-        foreach ($ids as $id) {
-            $nextNo = next_appointment_no($pdo, (string)$row['appointment_date'], default_appointment_settings(), (int)($row['doctor_id'] ?? 1));
-            $stmt = $pdo->prepare(
-                "UPDATE zimrx_appointments
-                 SET appointment_no = :appointment_no,
-                     updated_at = CURRENT_TIMESTAMP
-                 WHERE id = :id"
-            );
-            $stmt->execute(['appointment_no' => $nextNo, 'id' => $id]);
-        }
-    }
-}
-
-function ensure_appointment_schema(PDO $pdo): void {
-    $pdo->exec(
-        "CREATE TABLE IF NOT EXISTS zimrx_patients (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            doctor_id INTEGER NOT NULL DEFAULT 1,
-            reg_no TEXT UNIQUE,
-            full_name TEXT NOT NULL,
-            age TEXT,
-            age_unit TEXT,
-            dob TEXT,
-            gender TEXT,
-            blood_group TEXT,
-            address TEXT,
-            mobile TEXT,
-            occupation TEXT,
-            weight TEXT,
-            weight_unit TEXT,
-            height TEXT,
-            height_unit TEXT,
-            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )"
-    );
-
-    $pdo->exec(
-        "CREATE TABLE IF NOT EXISTS zimrx_appointments (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            doctor_id INTEGER NOT NULL DEFAULT 1,
-            appointment_no INTEGER NOT NULL,
-            appointment_date TEXT NOT NULL,
-            appointment_time TEXT,
-            patient_id INTEGER,
-            reg_no TEXT,
-            patient_name TEXT NOT NULL,
-            age TEXT,
-            age_unit TEXT,
-            dob TEXT,
-            gender TEXT,
-            blood_group TEXT,
-            mobile TEXT,
-            occupation TEXT,
-            address TEXT,
-            weight TEXT,
-            weight_unit TEXT,
-            height TEXT,
-            height_unit TEXT,
-            referral_category TEXT,
-            referral_name TEXT,
-            visit_record_id INTEGER,
-            visit_no INTEGER,
-            visit_id TEXT,
-            visit_fee REAL,
-            discount REAL,
-            discount_note TEXT,
-            paid_amount REAL,
-            payment_updated_at TEXT,
-            bp TEXT,
-            pulse TEXT,
-            temperature TEXT,
-            spo2 TEXT,
-            resp_rate TEXT,
-            vitals_note TEXT,
-            vitals_entered_by INTEGER,
-            vitals_entered_at TEXT,
-            status TEXT NOT NULL DEFAULT 'Pending',
-            notes TEXT,
-            created_by INTEGER,
-            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )"
-    );
-
-    foreach ([
-        'age' => 'TEXT',
-        'age_unit' => 'TEXT',
-        'doctor_id' => 'INTEGER NOT NULL DEFAULT 1',
-        'weight' => 'TEXT',
-        'weight_unit' => 'TEXT',
-        'height' => 'TEXT',
-        'height_unit' => 'TEXT',
-    ] as $column => $definition) {
-        ensure_column($pdo, 'zimrx_patients', $column, $definition);
-    }
-
-    foreach ([
-        'patient_id' => 'INTEGER',
-        'doctor_id' => 'INTEGER NOT NULL DEFAULT 1',
-        'reg_no' => 'TEXT',
-        'age_unit' => 'TEXT',
-        'dob' => 'TEXT',
-        'blood_group' => 'TEXT',
-        'occupation' => 'TEXT',
-        'weight' => 'TEXT',
-        'weight_unit' => 'TEXT',
-        'height' => 'TEXT',
-        'height_unit' => 'TEXT',
-        'referral_category' => 'TEXT',
-        'referral_name' => 'TEXT',
-        'visit_record_id' => 'INTEGER',
-        'visit_no' => 'INTEGER',
-        'visit_id' => 'TEXT',
-        'visit_fee' => 'REAL',
-        'discount' => 'REAL',
-        'discount_note' => 'TEXT',
-        'paid_amount' => 'REAL',
-        'payment_updated_at' => 'TEXT',
-        'bp' => 'TEXT',
-        'pulse' => 'TEXT',
-        'temperature' => 'TEXT',
-        'spo2' => 'TEXT',
-        'resp_rate' => 'TEXT',
-        'vitals_note' => 'TEXT',
-        'vitals_entered_by' => 'INTEGER',
-        'vitals_entered_at' => 'TEXT',
-    ] as $column => $definition) {
-        ensure_column($pdo, 'zimrx_appointments', $column, $definition);
-    }
-    drop_column_if_exists($pdo, 'zimrx_appointments', 'reason');
-
-    $pdo->exec(
-        "CREATE TABLE IF NOT EXISTS zimrx_visits (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            doctor_id INTEGER NOT NULL DEFAULT 1,
-            patient_id INTEGER NOT NULL,
-            appointment_id INTEGER,
-            patient_reg_no TEXT,
-            patient_name TEXT,
-            visit_no INTEGER,
-            visit_id TEXT,
-            visit_date TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            next_visit TEXT,
-            referred_by TEXT,
-            referral_category TEXT NOT NULL DEFAULT 'self',
-            referral_name TEXT,
-            age_at_visit TEXT,
-            height_at_visit TEXT,
-            height_unit_at_visit TEXT,
-            weight_at_visit TEXT,
-            weight_unit_at_visit TEXT,
-            metrics_json TEXT,
-            billing_json TEXT,
-            rich_text_json TEXT,
-            print_settings TEXT,
-            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )"
-    );
-
-    foreach ([
-        'patient_reg_no' => 'TEXT',
-        'doctor_id' => 'INTEGER NOT NULL DEFAULT 1',
-        'appointment_id' => 'INTEGER',
-        'patient_name' => 'TEXT',
-        'visit_no' => 'INTEGER',
-        'visit_id' => 'TEXT',
-        'height_at_visit' => 'TEXT',
-        'height_unit_at_visit' => 'TEXT',
-        'weight_at_visit' => 'TEXT',
-        'weight_unit_at_visit' => 'TEXT',
-        'referral_category' => "TEXT NOT NULL DEFAULT 'self'",
-        'referral_name' => 'TEXT',
-    ] as $column => $definition) {
-        ensure_column($pdo, 'zimrx_visits', $column, $definition);
-    }
-
-    zimrx_ensure_visit_identity_schema($pdo);
-
-    $patientIndexTable = 'zimrx_patients';
-    $appointmentIndexTable = 'zimrx_appointments';
-    $visitIndexTable = 'zimrx_visits';
-
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_patients_reg_no ON $patientIndexTable(reg_no)");
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_patients_mobile ON $patientIndexTable(mobile)");
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_appointments_date_no ON $appointmentIndexTable(appointment_date, appointment_no)");
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_appointments_doctor_date ON $appointmentIndexTable(doctor_id, appointment_date)");
-    normalize_duplicate_appointment_serials($pdo);
-    $pdo->exec("DROP INDEX IF EXISTS uid_appointments_date_no");
-    $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS uid_appointments_doctor_date_no ON $appointmentIndexTable(doctor_id, appointment_date, appointment_no)");
-    $pdo->exec("DROP INDEX IF EXISTS idx_visits_patient_visit_no");
-    $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_visits_doctor_patient_visit_no ON $visitIndexTable(doctor_id, patient_id, visit_no) WHERE visit_no IS NOT NULL");
-    $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_visits_visit_id ON $visitIndexTable(visit_id) WHERE visit_id IS NOT NULL");
-
-    $pdo->exec(
-        "CREATE TABLE IF NOT EXISTS zimrx_appointment_settings (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            doctor_id INTEGER NOT NULL DEFAULT 1,
-            settings_json TEXT NOT NULL,
-            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE(doctor_id)
-        )"
-    );
-    ensure_column($pdo, 'zimrx_appointment_settings', 'doctor_id', 'INTEGER NOT NULL DEFAULT 1');
-
-    // Note: general_discount_causes is now stored in zimrx_static.db
-    // See ZIMRX_DB_STATIC constant in config.php
-}
 
 function default_appointment_settings(): array {
     return [
@@ -741,7 +506,8 @@ function appointment_detail(PDO $pdo, int $appointmentId, array $settings, int $
             coalesce(nullif(a.height_unit, ''), p.height_unit, 'inch') AS height_unit,
             coalesce(nullif(a.referral_category, ''), 'self') AS referral_category,
             coalesce(a.referral_name, '') AS referral_name,
-            a.visit_record_id,
+            coalesce(a.visit_record_id, v.id, 0) AS visit_record_id,
+            coalesce(v.revision, 1) AS revision,
             a.visit_no,
             a.visit_id,
             a.visit_id AS visit_code,
@@ -763,14 +529,15 @@ function appointment_detail(PDO $pdo, int $appointmentId, array $settings, int $
             a.created_at,
             a.updated_at,
             (
-                SELECT max(v.visit_date)
-                FROM zimrx_visits v
-                WHERE v.patient_id = a.patient_id
-                  AND v.doctor_id = a.doctor_id
-                  AND date(v.visit_date) < date(a.appointment_date)
+                SELECT max(v2.visit_date)
+                FROM zimrx_visits v2
+                WHERE v2.patient_id = a.patient_id
+                  AND v2.doctor_id = a.doctor_id
+                  AND date(v2.visit_date) < date(a.appointment_date)
             ) AS last_visit_date
          FROM zimrx_appointments a
          LEFT JOIN zimrx_patients p ON p.id = a.patient_id
+         LEFT JOIN zimrx_visits v ON (v.id = a.visit_record_id OR (a.visit_record_id IS NULL AND v.appointment_id = a.id AND v.doctor_id = a.doctor_id))
          WHERE a.id = :id
            AND a.doctor_id = :doctor_id
          LIMIT 1"

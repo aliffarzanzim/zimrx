@@ -33,5 +33,6 @@ try {
 
     echo json_encode(['ok' => true]);
 } catch (Exception $e) {
-    echo json_encode(['error' => $e->getMessage()]);
+    error_log('[ZimRx] save_print_setup error: ' . $e->getMessage());
+    echo json_encode(['error' => 'Failed to save print setup.']);
 }

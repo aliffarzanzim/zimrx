@@ -43,7 +43,9 @@ function zimrx_calculate_current_age(?string $dob, ?string $fallbackAge, ?string
                     }
                 }
             }
-        } catch (Throwable $e) {}
+        } catch (Throwable $e) {
+            error_log('[ZimRx] Invalid patient date of birth: ' . $e->getMessage());
+        }
     }
     $age = $fallbackAge ?: '--';
     $unit = $fallbackUnit ?: 'Years';
@@ -52,10 +54,10 @@ function zimrx_calculate_current_age(?string $dob, ?string $fallbackAge, ?string
 
 $userRole = current_user_role();
 $isNonClinical = ($userRole === 'assistant' || $userRole === 'admin');
-$currentDoctorId = function_exists('current_user_doctor_id') ? current_user_doctor_id() : (int)($_SESSION['doctor_id'] ?? 1);
+$currentDoctorId = current_user_doctor_id();
 if ($currentDoctorId <= 0) {
-    $stmtDoc = $pdo->query("SELECT id FROM zimrx_doctors ORDER BY id ASC LIMIT 1");
-    $currentDoctorId = $stmtDoc ? (int)$stmtDoc->fetchColumn() : 1;
+    http_response_code(403);
+    exit('A doctor scope is required to access the EMR.');
 }
 
 // ── Routing Logic based on URL Parameters ──
@@ -75,11 +77,11 @@ if ($requestedVisit !== '' || $requestedVisitRecordId > 0) {
     // ── Active EMR Encounter Mode ──
     $viewMode = 'ACTIVE';
     if ($requestedVisitRecordId > 0) {
-        $stmtV = $pdo->prepare("SELECT * FROM zimrx_visits WHERE id = :id LIMIT 1");
-        $stmtV->execute(['id' => $requestedVisitRecordId]);
+        $stmtV = $pdo->prepare("SELECT * FROM zimrx_visits WHERE id = :id AND doctor_id = :did LIMIT 1");
+        $stmtV->execute(['id' => $requestedVisitRecordId, 'did' => $currentDoctorId]);
     } else {
-        $stmtV = $pdo->prepare("SELECT * FROM zimrx_visits WHERE visit_id = :vid LIMIT 1");
-        $stmtV->execute(['vid' => $requestedVisit]);
+        $stmtV = $pdo->prepare("SELECT * FROM zimrx_visits WHERE visit_id = :vid AND doctor_id = :did LIMIT 1");
+        $stmtV->execute(['vid' => $requestedVisit, 'did' => $currentDoctorId]);
     }
     $activeVisit = $stmtV->fetch(PDO::FETCH_ASSOC);
 
@@ -90,18 +92,18 @@ if ($requestedVisit !== '' || $requestedVisitRecordId > 0) {
             exit;
         }
 
-        $stmtP = $pdo->prepare("SELECT * FROM zimrx_patients WHERE id = :id LIMIT 1");
-        $stmtP->execute(['id' => (int)$activeVisit['patient_id']]);
+        $stmtP = $pdo->prepare("SELECT * FROM zimrx_patients WHERE id = :id AND doctor_id = :did LIMIT 1");
+        $stmtP->execute(['id' => (int)$activeVisit['patient_id'], 'did' => $currentDoctorId]);
         $patient = $stmtP->fetch(PDO::FETCH_ASSOC);
 
         // Fetch previous visits for the Past Rx Reference Drawer
         $stmtPast = $pdo->prepare(
             "SELECT v.id, v.visit_id, v.visit_no, v.visit_date, v.clinical_snapshot_json, v.prescription_html AS print_html, v.rich_text_json
              FROM zimrx_visits v
-             WHERE v.patient_id = :pid AND v.id != :curr_id
+             WHERE v.patient_id = :pid AND v.id != :curr_id AND v.doctor_id = :did
              ORDER BY v.visit_date DESC, v.id DESC LIMIT 15"
         );
-        $stmtPast->execute(['pid' => (int)$activeVisit['patient_id'], 'curr_id' => (int)$activeVisit['id']]);
+        $stmtPast->execute(['pid' => (int)$activeVisit['patient_id'], 'curr_id' => (int)$activeVisit['id'], 'did' => $currentDoctorId]);
         $pastVisitsForDrawer = $stmtPast->fetchAll(PDO::FETCH_ASSOC);
     } elseif ($isNonClinical) {
         header('Location: emr.php');
@@ -111,11 +113,11 @@ if ($requestedVisit !== '' || $requestedVisitRecordId > 0) {
     // ── Patient Master Profile Mode ──
     $viewMode = 'MASTER';
     if ($requestedPatientId > 0) {
-        $stmtP = $pdo->prepare("SELECT * FROM zimrx_patients WHERE id = :id LIMIT 1");
-        $stmtP->execute(['id' => $requestedPatientId]);
+        $stmtP = $pdo->prepare("SELECT * FROM zimrx_patients WHERE id = :id AND doctor_id = :did LIMIT 1");
+        $stmtP->execute(['id' => $requestedPatientId, 'did' => $currentDoctorId]);
     } else {
-        $stmtP = $pdo->prepare("SELECT * FROM zimrx_patients WHERE reg_no = :reg LIMIT 1");
-        $stmtP->execute(['reg' => $requestedReg]);
+        $stmtP = $pdo->prepare("SELECT * FROM zimrx_patients WHERE reg_no = :reg AND doctor_id = :did LIMIT 1");
+        $stmtP->execute(['reg' => $requestedReg, 'did' => $currentDoctorId]);
     }
     $patient = $stmtP->fetch(PDO::FETCH_ASSOC);
 
@@ -128,34 +130,37 @@ if ($requestedVisit !== '' || $requestedVisitRecordId > 0) {
                     v.age_at_visit, v.weight_at_visit, v.weight_unit_at_visit, v.metrics_json,
                     v.id as prescription_id, v.clinical_snapshot_json, v.prescription_html AS print_html, v.rich_text_json
              FROM zimrx_visits v
-             WHERE v.patient_id = :pid
+             WHERE v.patient_id = :pid AND v.doctor_id = :did
              ORDER BY v.visit_date DESC, v.id DESC"
         );
-        $stmtVisits->execute(['pid' => $patientId]);
+        $stmtVisits->execute(['pid' => $patientId, 'did' => $currentDoctorId]);
         $timeline = $stmtVisits->fetchAll(PDO::FETCH_ASSOC);
 
-        // Get Allergies
+        // Get Allergies (scoped to this doctor's patients only)
         $stmtAllergies = $pdo->prepare(
-            "SELECT DISTINCT generic_name
-             FROM zimrx_prescription_drugs
-             WHERE patient_id = :pid AND is_history = 1"
+            "SELECT DISTINCT pd.generic_name
+             FROM zimrx_prescription_drugs pd
+             INNER JOIN zimrx_patients p ON p.id = pd.patient_id AND p.doctor_id = :did
+             WHERE pd.patient_id = :pid AND pd.is_history = 1"
         );
-        $stmtAllergies->execute(['pid' => $patientId]);
+        $stmtAllergies->execute(['pid' => $patientId, 'did' => $currentDoctorId]);
         while ($rowA = $stmtAllergies->fetch(PDO::FETCH_ASSOC)) {
             if (!empty($rowA['generic_name'])) $allergies[] = $rowA['generic_name'];
         }
     }
 }
 
-// If Hub mode, load recent patients
+// If Hub mode, load recent patients scoped to this doctor
 $recentPatients = [];
 if ($viewMode === 'HUB') {
-    $stmtRecent = $pdo->query(
+    $stmtRecent = $pdo->prepare(
         "SELECT id, reg_no, full_name, mobile, gender, age, age_unit, blood_group, address, updated_at
          FROM zimrx_patients
+         WHERE doctor_id = :did
          ORDER BY id DESC LIMIT 12"
     );
-    $recentPatients = $stmtRecent ? $stmtRecent->fetchAll(PDO::FETCH_ASSOC) : [];
+    $stmtRecent->execute(['did' => $currentDoctorId]);
+    $recentPatients = $stmtRecent->fetchAll(PDO::FETCH_ASSOC);
 }
 
 require_once __DIR__ . '/header.php';
@@ -173,7 +178,9 @@ if ($patient && !empty($patient['id'])) {
         $stmtAC = $pdo->prepare("SELECT count(*) FROM zimrx_patient_particulars_audit WHERE patient_id = :pid");
         $stmtAC->execute(['pid' => (int)$patient['id']]);
         $auditCount = (int)$stmtAC->fetchColumn();
-    } catch (Throwable $e) {}
+    } catch (Throwable $e) {
+        error_log('[ZimRx] Unable to load patient audit count: ' . $e->getMessage());
+    }
 }
 ?>
 
@@ -816,49 +823,79 @@ function openPastRxDrawer(visitIdentifier) {
     if (drawer && overlay) {
         drawer.classList.add('open');
         overlay.classList.add('open');
-        content.innerHTML = '<div style="text-align: center; color: #94a3b8; padding: 2rem;">Loading encounter data...</div>';
+        content.replaceChildren();
+        const loadingDiv = document.createElement('div');
+        loadingDiv.style.cssText = 'text-align: center; color: #94a3b8; padding: 2rem;';
+        loadingDiv.textContent = 'Loading encounter data...';
+        content.appendChild(loadingDiv);
 
         fetch('api/emr_api.php?action=get_visit_details&visit_id=' + encodeURIComponent(visitIdentifier))
             .then(res => res.json())
             .then(data => {
                 if (!data.success || !data.visit) {
-                    content.innerHTML = '<div style="color: #dc2626; padding: 1.5rem;">Could not load past prescription details.</div>';
+                    content.replaceChildren();
+                    const errDiv = document.createElement('div');
+                    errDiv.style.cssText = 'color: #dc2626; padding: 1.5rem;';
+                    errDiv.textContent = 'Could not load past prescription details.';
+                    content.appendChild(errDiv);
                     return;
                 }
 
-                let html = '<div style="margin-bottom: 1.25rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.85rem;">' +
-                    '<h4 style="margin: 0 0 0.35rem; font-size: 1.1rem; color: #0f172a;">Encounter ' + (data.visit.visit_id || ('V' + data.visit.id)) + '</h4>' +
-                    '<div style="font-size: 0.82rem; color: #64748b;">Date: ' + data.visit.visit_date + '</div>' +
-                    '</div>';
+                content.replaceChildren();
 
-                if (data.drugs && data.drugs.length > 0) {
-                    html += '<h5 style="font-size: 0.85rem; text-transform: uppercase; color: #475569; margin: 1rem 0 0.5rem;">Prescribed Medications (Rx)</h5>';
-                    html += '<ul style="padding-left: 1.25rem; font-size: 0.88rem; line-height: 1.6;">';
-                    data.drugs.forEach(d => {
-                        html += '<li><strong>' + (d.drug_name || d.brand_name || d.generic_name) + '</strong> (' + (d.form || '') + ' ' + (d.strength || '') + ')<br>' +
-                                '<span style="color: #64748b; font-size: 0.82rem;">' + (d.dosage || d.dose || '') + ' - ' + (d.duration || '') + ' - ' + (d.instructions || d.instruction || '') + '</span></li>';
-                    });
-                    html += '</ul>';
+                const appendText = (parent, tag, value, className = '', style = '') => {
+                    const node = document.createElement(tag);
+                    if (className) node.className = className;
+                    if (style) node.style.cssText = style;
+                    node.textContent = String(value ?? '');
+                    parent.appendChild(node);
+                    return node;
+                };
+
+                const visit = data.visit ?? {};
+                const heading = document.createElement('div');
+                heading.style.cssText = 'margin-bottom: 1.25rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.85rem;';
+                appendText(heading, 'h4', 'Encounter ' + (visit.visit_id || ('V' + (visit.id ?? ''))), '', 'margin: 0 0 0.35rem; font-size: 1.1rem; color: #0f172a;');
+                appendText(heading, 'div', 'Date: ' + (visit.visit_date ?? ''), '', 'font-size: 0.82rem; color: #64748b;');
+                content.appendChild(heading);
+
+                if (Array.isArray(data.drugs) && data.drugs.length > 0) {
+                    appendText(content, 'h5', 'Prescribed Medications (Rx)', '', 'font-size: 0.85rem; text-transform: uppercase; color: #475569; margin: 1rem 0 0.5rem;');
+                    const list = document.createElement('ul');
+                    list.style.cssText = 'padding-left: 1.25rem; font-size: 0.88rem; line-height: 1.6;';
+
+                    for (const drug of data.drugs) {
+                        const item = document.createElement('li');
+                        appendText(item, 'strong', drug.drug_name || drug.brand_name || drug.generic_name || '');
+                        appendText(item, 'span', ' (' + (drug.form || '') + ' ' + (drug.strength || '') + ')');
+                        item.appendChild(document.createElement('br'));
+                        appendText(item, 'span', (drug.dosage || drug.dose || '') + ' - ' + (drug.duration || '') + ' - ' + (drug.instructions || drug.instruction || ''), '', 'color: #64748b; font-size: 0.82rem;');
+                        list.appendChild(item);
+                    }
+
+                    content.appendChild(list);
                 }
 
                 if (data.prescription && data.prescription.module_json) {
                     try {
                         const mod = JSON.parse(data.prescription.module_json);
-                        if (mod.chief_complaints && mod.chief_complaints.length > 0) {
-                            html += '<h5 style="font-size: 0.85rem; text-transform: uppercase; color: #475569; margin: 1rem 0 0.5rem;">Chief Complaints</h5>';
-                            html += '<p style="font-size: 0.86rem; color: #1e293b;">' + mod.chief_complaints.map(c => c.name).join(', ') + '</p>';
+                        if (Array.isArray(mod.chief_complaints) && mod.chief_complaints.length > 0) {
+                            appendText(content, 'h5', 'Chief Complaints', '', 'font-size: 0.85rem; text-transform: uppercase; color: #475569; margin: 1rem 0 0.5rem;');
+                            appendText(content, 'p', mod.chief_complaints.map(c => c.name || '').filter(Boolean).join(', '), '', 'font-size: 0.86rem; color: #1e293b;');
                         }
-                        if (mod.diagnosis && mod.diagnosis.length > 0) {
-                            html += '<h5 style="font-size: 0.85rem; text-transform: uppercase; color: #475569; margin: 1rem 0 0.5rem;">Diagnosis</h5>';
-                            html += '<p style="font-size: 0.86rem; color: #1e293b;">' + mod.diagnosis.map(d => d.name).join(', ') + '</p>';
+                        if (Array.isArray(mod.diagnosis) && mod.diagnosis.length > 0) {
+                            appendText(content, 'h5', 'Diagnosis', '', 'font-size: 0.85rem; text-transform: uppercase; color: #475569; margin: 1rem 0 0.5rem;');
+                            appendText(content, 'p', mod.diagnosis.map(d => d.name || '').filter(Boolean).join(', '), '', 'font-size: 0.86rem; color: #1e293b;');
                         }
                     } catch(e) {}
                 }
-
-                content.innerHTML = html;
             })
             .catch(err => {
-                content.innerHTML = '<div style="color: #dc2626; padding: 1.5rem;">Error fetching encounter: ' + err.message + '</div>';
+                content.replaceChildren();
+                const errDiv = document.createElement('div');
+                errDiv.style.cssText = 'color: #dc2626; padding: 1.5rem;';
+                errDiv.textContent = 'Error fetching encounter: ' + err.message;
+                content.appendChild(errDiv);
             });
     }
 }

@@ -1,6 +1,20 @@
 <?php
 declare(strict_types=1);
 
+$remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
+$isLoopback = in_array($remoteAddr, ['127.0.0.1', '::1', ''], true)
+    || str_starts_with($remoteAddr, '127.')
+    || (isset($_SERVER['SERVER_ADDR']) && $remoteAddr === $_SERVER['SERVER_ADDR']);
+$isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
+
+if (php_sapi_name() !== 'cli' && !$isLoopback && !$isHttps) {
+    http_response_code(403);
+    header('Content-Type: text/html; charset=utf-8');
+    echo '<!DOCTYPE html><html><head><title>HTTPS Required</title><style>body{font-family:sans-serif;padding:2rem;text-align:center;color:#1e293b;background:#f8fafc;}h1{color:#dc2626;}p{max-width:600px;margin:1rem auto;line-height:1.6;}</style></head><body><h1>Security Requirement: HTTPS Required</h1><p>ZimRx manages sensitive medical and patient health data. Access over a local area network (LAN) or public network requires an encrypted HTTPS connection to safeguard session integrity and patient privacy.</p><p>Please access the system via <strong>localhost</strong> on this machine, or enable HTTPS (TLS/SSL) on your server.</p></body></html>';
+    exit();
+}
+
 if (session_status() !== PHP_SESSION_ACTIVE) {
     if (ini_get('session.use_cookies')) {
         $currentParams = session_get_cookie_params();
@@ -8,7 +22,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
             'lifetime' => $currentParams['lifetime'] ?? 0,
             'path'     => '/',
             'domain'   => $currentParams['domain'] ?? '',
-            'secure'   => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+            'secure'   => $isHttps,
             'httponly' => true,
             'samesite' => 'Lax',
         ]);
@@ -39,9 +53,6 @@ function current_user_doctor_id(): int {
     if (isset($_SESSION['doctor_id']) && (int)$_SESSION['doctor_id'] > 0) {
         return (int)$_SESSION['doctor_id'];
     }
-    if (is_logged_in()) {
-        return 1;
-    }
     return 0;
 }
 
@@ -57,26 +68,16 @@ function zimrx_password_hash(string $password): string {
 }
 
 /**
- * Verify a password against a hash with backward-compatible legacy SHA-256 fallback.
+ * Verify a password against a modern cryptographically secure hash (Bcrypt/Argon2id).
  */
 function zimrx_password_verify(string $password, string $storedHash): bool {
-    if (password_verify($password, $storedHash)) {
-        return true;
-    }
-    // Backward compatibility fallback for legacy unsalted SHA-256
-    if (hash_equals($storedHash, hash('sha256', $password))) {
-        return true;
-    }
-    return false;
+    return password_verify($password, $storedHash);
 }
 
 /**
  * Check if a stored password hash needs rehash/upgrade to modern bcrypt/argon2.
  */
 function zimrx_password_needs_rehash(string $storedHash): bool {
-    if (strlen($storedHash) === 64 && ctype_xdigit($storedHash)) {
-        return true;
-    }
     return password_needs_rehash($storedHash, PASSWORD_DEFAULT);
 }
 
@@ -152,5 +153,36 @@ function require_admin(): void {
         header("Location: index.php");
         exit();
     }
+}
+
+/**
+ * Safely validate an SVG file to ensure it is valid XML and contains no scripts or active payloads.
+ */
+function zimrx_validate_safe_svg(string $filePath): bool {
+    $content = @file_get_contents($filePath);
+    if ($content === false || strlen($content) < 10) {
+        return false;
+    }
+    $disallowedPatterns = [
+        '/<\s*script/i',
+        '/javascript\s*:/i',
+        '/vbscript\s*:/i',
+        '/data\s*:\s*text\/html/i',
+        '/<!DOCTYPE/i',
+        '/<!ENTITY/i',
+        '/<\s*foreignObject/i',
+        '/\bon[a-z]+\s*=/i',
+        '/<\s*use\s+[^>]*href\s*=\s*["\'](?!#)/i',
+    ];
+    foreach ($disallowedPatterns as $pattern) {
+        if (preg_match($pattern, $content)) {
+            return false;
+        }
+    }
+    $prevErrors = libxml_use_internal_errors(true);
+    $xml = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NONET);
+    libxml_clear_errors();
+    libxml_use_internal_errors($prevErrors);
+    return ($xml !== false && strtolower($xml->getName()) === 'svg');
 }
 ?>

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * ZimRx Clinical Internal Messaging API
  * High-performance, scalable communication system supporting direct messages,
@@ -19,7 +20,7 @@ $currentUserRole = current_user_role();
 
 $cacheDir = ZIMRX_USERDATA_DIR . '/cache';
 if (!is_dir($cacheDir)) {
-    @mkdir($cacheDir, 0777, true);
+    @mkdir($cacheDir, 0750, true);
 }
 $tickFile = $cacheDir . '/chat_tick.json';
 
@@ -326,18 +327,40 @@ try {
             if (($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
                 $tmpPath = (string)($file['tmp_name'] ?? '');
                 if ($tmpPath !== '' && is_uploaded_file($tmpPath)) {
-                    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-                    $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'heic', 'heif'];
-                    if (!in_array($ext, $allowed, true)) {
-                        throw new RuntimeException('Allowed file types: Images (JPG, PNG, GIF, WEBP) and PDF documents.');
+                    $fileSize = (int)($file['size'] ?? 0);
+                    if ($fileSize < 1 || $fileSize > 15 * 1024 * 1024) {
+                        throw new RuntimeException('Attachment must be between 1 byte and 15 MB.');
+                    }
+
+                    $finfo = new finfo(FILEINFO_MIME_TYPE);
+                    $mime = $finfo->file($tmpPath);
+
+                    $allowedMimes = [
+                        'image/jpeg' => ['extension' => 'jpg', 'type' => 'image'],
+                        'image/png' => ['extension' => 'png', 'type' => 'image'],
+                        'image/webp' => ['extension' => 'webp', 'type' => 'image'],
+                        'application/pdf' => ['extension' => 'pdf', 'type' => 'pdf'],
+                    ];
+
+                    if (!isset($allowedMimes[$mime])) {
+                        throw new RuntimeException('Unsupported attachment type.');
                     }
 
                     $chatUploadsDir = ZIMRX_UPLOADS_DIR . '/chat';
-                    if (!is_dir($chatUploadsDir) && !mkdir($chatUploadsDir, 0777, true) && !is_dir($chatUploadsDir)) {
-                        throw new RuntimeException('Failed to access chat uploads directory.');
+                    if (!is_dir($chatUploadsDir)
+                        && !mkdir($chatUploadsDir, 0750, true)
+                        && !is_dir($chatUploadsDir)) {
+                        throw new RuntimeException('Failed to create private attachment storage.');
                     }
 
-                    $savedFilename = sprintf('chat-%d-%d-%s.%s', $convId, time(), bin2hex(random_bytes(3)), $ext);
+                    $attachment = $allowedMimes[$mime];
+                    $savedFilename = sprintf(
+                        'chat-%d-%d-%s.%s',
+                        $convId,
+                        time(),
+                        bin2hex(random_bytes(8)),
+                        $attachment['extension']
+                    );
                     $targetLocation = $chatUploadsDir . '/' . $savedFilename;
 
                     if (!move_uploaded_file($tmpPath, $targetLocation)) {
@@ -346,8 +369,7 @@ try {
 
                     $filePath = 'uploads/chat/' . $savedFilename;
                     $fileName = $file['name'];
-                    $fileType = in_array($ext, ['pdf'], true) ? 'pdf' : 'image';
-                    $fileSize = (int)$file['size'];
+                    $fileType = $attachment['type'];
 
                     if ($messageType === 'text') {
                         $messageType = $fileType;

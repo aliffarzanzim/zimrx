@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 // No require_login() — this runs before any account exists
 require_once __DIR__ . '/../auth.php';
 require_once __DIR__ . '/../db.php';
@@ -21,14 +23,9 @@ function app_config_set(PDO $pdo, string $key, string $value): void {
 }
 
 try {
-    // Guard: if already set up, reject
-    if (app_config_get($pdo, 'setup_complete') === '1') {
-        echo json_encode(['error' => 'Setup already complete.']);
-        exit;
-    }
-
     $payload = json_decode(file_get_contents('php://input'), true);
     if (!is_array($payload)) {
+        http_response_code(400);
         echo json_encode(['error' => 'Invalid request.']);
         exit;
     }
@@ -44,17 +41,71 @@ try {
     $password     = trim($payload['password'] ?? '');
     $adminUser    = trim($payload['admin_username'] ?? 'doctor');
 
+    $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
+    $isLoopback = in_array($remoteAddr, ['127.0.0.1', '::1', ''], true)
+        || str_starts_with($remoteAddr, '127.')
+        || (isset($_SERVER['SERVER_ADDR']) && $remoteAddr === $_SERVER['SERVER_ADDR']);
+
+    $setupTokenFile = ZIMRX_USERDATA_DIR . '/setup_token.txt';
+
+    if (!$isLoopback) {
+        if (!file_exists($setupTokenFile)) {
+            $token = bin2hex(random_bytes(16));
+            @file_put_contents($setupTokenFile, $token);
+            @chmod($setupTokenFile, 0600);
+        } else {
+            $token = trim((string)@file_get_contents($setupTokenFile));
+        }
+
+        $providedToken = trim((string)($payload['setup_token'] ?? $_SERVER['HTTP_X_SETUP_TOKEN'] ?? ''));
+        if ($providedToken === '' || !hash_equals($token, $providedToken)) {
+            http_response_code(403);
+            echo json_encode([
+                'error' => 'Remote installation setup requires the initial security token located in userdata/setup_token.txt on the server.'
+            ]);
+            exit;
+        }
+    }
+
     if ($password === '') {
+        http_response_code(422);
         echo json_encode(['error' => 'Password is required.']);
         exit;
     }
-    if (strlen($password) < 4) {
-        echo json_encode(['error' => 'Password must be at least 4 characters.']);
+    if (mb_strlen($password) < 14) {
+        http_response_code(422);
+        echo json_encode(['error' => 'Password must contain at least 14 characters.']);
+        exit;
+    }
+
+    // Ensure setup_complete key exists
+    $pdo->prepare(
+        "INSERT INTO zimrx_app_config (config_key, config_value, updated_at)
+         VALUES ('setup_complete', '0', CURRENT_TIMESTAMP)
+         ON CONFLICT(config_key) DO NOTHING"
+    )->execute();
+
+    $pdo->beginTransaction();
+
+    // Atomically claim setup state to prevent race conditions
+    $claim = $pdo->prepare(
+        "UPDATE zimrx_app_config
+         SET config_value = 'initializing', updated_at = CURRENT_TIMESTAMP
+         WHERE config_key = 'setup_complete'
+           AND config_value = '0'"
+    );
+    $claim->execute();
+
+    if ($claim->rowCount() !== 1) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        http_response_code(409);
+        echo json_encode(['error' => 'Setup has already been claimed or completed.']);
         exit;
     }
 
     $passwordHash = zimrx_password_hash($password);
-    $pdo->beginTransaction();
 
     if ($practiceType === 'solo') {
         // Update the default doctor account password
@@ -98,6 +149,11 @@ try {
 
     $pdo->commit();
 
+    // Clean up one-time network setup token if it existed
+    if (isset($setupTokenFile) && file_exists($setupTokenFile)) {
+        @unlink($setupTokenFile);
+    }
+
     // Generate recovery key and save to userdata/
     $recoveryKey = strtoupper(bin2hex(random_bytes(16)));
     $recoveryDir = defined('ZIMRX_USERDATA_DIR') ? ZIMRX_USERDATA_DIR : dirname(__DIR__) . '/userdata';
@@ -129,7 +185,7 @@ try {
             $_SESSION['user_id']   = (int)$admin['id'];
             $_SESSION['user_role'] = 'admin';
             $_SESSION['user_name'] = $admin['display_name'];
-            $_SESSION['doctor_id'] = 1;
+            $_SESSION['doctor_id'] = 0;
         }
         echo json_encode(['ok' => true, 'redirect' => 'admin.php', 'recovery_key' => $recoveryKey]);
     }
@@ -138,5 +194,6 @@ try {
     if (isset($pdo) && $pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    echo json_encode(['error' => $e->getMessage()]);
+    error_log('[ZimRx] first_launch_save error: ' . $e->getMessage());
+    echo json_encode(['error' => 'An error occurred while saving the initial configuration. Please try again.']);
 }

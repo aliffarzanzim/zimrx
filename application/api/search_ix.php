@@ -44,5 +44,6 @@ try {
     $stmt->execute($params);
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 } catch (Throwable $e) {
-    echo json_encode(['error' => $e->getMessage()]);
+    error_log('[ZimRx] search_ix error: ' . $e->getMessage());
+    echo json_encode([]);
 }

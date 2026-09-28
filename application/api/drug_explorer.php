@@ -343,5 +343,6 @@ try {
 
     echo json_encode($results, JSON_UNESCAPED_UNICODE);
 } catch (PDOException $e) {
-    echo json_encode(['error' => $e->getMessage()]);
+    error_log('[ZimRx] drug_explorer error: ' . $e->getMessage());
+    echo json_encode(['error' => 'A database error occurred while searching drugs.']);
 }

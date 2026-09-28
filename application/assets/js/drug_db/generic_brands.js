@@ -15,9 +15,9 @@ function loadGenericBrands(gid, gname) {
             $('#midCountLabel').text(allGenericBrands.length + ' Brands Found');
             
             // Populate Form Filter
-            const options = '<option value="">All Dosage Forms</option>' + data.forms.map(f => `<option value="${f}">${f}</option>`).join('');
+            const options = '<option value="">All Dosage Forms</option>' + data.forms.map(f => `<option value="${escapeHtml(f)}">${escapeHtml(f)}</option>`).join('');
             $('#midFormFilter').html(options);
-            $('#modalFormFilter').html('<option value="">All Forms</option>' + data.forms.map(f => `<option value="${f}">${f}</option>`).join(''));
+            $('#modalFormFilter').html('<option value="">All Forms</option>' + data.forms.map(f => `<option value="${escapeHtml(f)}">${escapeHtml(f)}</option>`).join(''));
 
             renderGenericBrands(allGenericBrands);
         });
@@ -31,16 +31,16 @@ function loadGenericBrands(gid, gname) {
             const iconHtml = iconPath ? `<img src="${iconPath}" class="mid-icon">` : '<div class="mid-icon" style="color:#cbd5e1;"><i class="fas fa-capsules"></i></div>';
             
             const row = `
-                <div class="mid-row ${activeCls}" id="mid_row_${b.id}" onclick="loadBrand('${b.id}')">
+                <div class="mid-row ${activeCls}" id="mid_row_${escapeHtml(b.id)}" onclick="loadBrand('${escapeHtml(b.id)}')">
                     ${iconHtml}
                     <div class="mid-info">
                         <div class="mid-line-1">
-                            <div class="mid-brand">${b.brand_name}</div>
-                            <div class="mid-price">৳${b.price}</div>
+                            <div class="mid-brand">${escapeHtml(b.brand_name)}</div>
+                            <div class="mid-price">৳${escapeHtml(b.price)}</div>
                         </div>
-                        <div class="mid-line-2">${b.generic}</div>
-                        <div class="mid-line-3">${b.strength} | ${b.form}</div>
-                        <div class="mid-line-4">${b.manufacturer}</div>
+                        <div class="mid-line-2">${escapeHtml(b.generic)}</div>
+                        <div class="mid-line-3">${escapeHtml(b.strength)} | ${escapeHtml(b.form)}</div>
+                        <div class="mid-line-4">${escapeHtml(b.manufacturer)}</div>
                     </div>
                 </div>
             `;
@@ -90,12 +90,12 @@ function loadGenericBrands(gid, gname) {
         $('#altTableBody').empty();
         brands.forEach(item => {
             const row = `
-                <tr class="alt-row" onclick="loadBrand('${item.id}'); closeModal();">
-                    <td style="font-weight:700; color:var(--navy-dark); cursor:pointer;">${item.pres_new_upper}</td>
-                    <td>${item.strength}</td>
-                    <td>${item.form_new}</td>
-                    <td>${item.manufacturer}</td>
-                    <td style="font-weight:700;">TK. ${item.price}</td>
+                <tr class="alt-row" onclick="loadBrand('${escapeHtml(item.id)}'); closeModal();">
+                    <td style="font-weight:700; color:var(--navy-dark); cursor:pointer;">${escapeHtml(item.pres_new_upper)}</td>
+                    <td>${escapeHtml(item.strength)}</td>
+                    <td>${escapeHtml(item.form_new)}</td>
+                    <td>${escapeHtml(item.manufacturer)}</td>
+                    <td style="font-weight:700;">TK. ${escapeHtml(item.price)}</td>
                 </tr>
             `;
             $('#altTableBody').append(row);
@@ -113,11 +113,12 @@ function loadGenericBrands(gid, gname) {
         rows.forEach(item => {
             const preview = item.brand_preview ? `<div class="moa-brand-summary">${escapeHtml(item.brand_preview)}</div>` : '';
             const moaText = item.mode_of_action ? formatMoaText(item.mode_of_action) : '<span style="color:#94a3b8;">No mode of action available.</span>';
+            const attrName = encodeURIComponent(item.name || '');
             const row = `
-                <tr class="alt-row" onclick="selectMoaGeneric('${item.id}', '${item.name.replace(/'/g, "\\'")}')">
+                <tr class="alt-row" onclick="selectMoaGeneric('${escapeHtml(item.id)}', decodeURIComponent('${attrName}'))">
                     <td class="moa-generic">${escapeHtml(item.name)}</td>
                     <td>
-                        <div class="moa-count">${item.brand_count} Brands</div>
+                        <div class="moa-count">${escapeHtml(item.brand_count)} Brands</div>
                         ${preview}
                     </td>
                     <td class="moa-text">${moaText}</td>

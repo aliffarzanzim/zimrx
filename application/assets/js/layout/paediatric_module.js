@@ -846,7 +846,11 @@ function initPaediatricModule() {
     const noteArea = document.querySelector('#note-textarea, .note-textarea, textarea[name="note"], .js-note-module textarea, .nicEdit-main');
     if (noteArea) {
       if (noteArea.isContentEditable) {
-        noteArea.innerHTML += (noteArea.innerHTML ? '<br>' : '') + fullText.replace(/\n/g, '<br>');
+        if (noteArea.textContent.trim()) noteArea.appendChild(document.createElement('br'));
+        fullText.split('\n').forEach((line, i, arr) => {
+          noteArea.appendChild(document.createTextNode(line));
+          if (i < arr.length - 1) noteArea.appendChild(document.createElement('br'));
+        });
       } else {
         noteArea.value = (noteArea.value ? noteArea.value + '\n\n' : '') + fullText;
       }

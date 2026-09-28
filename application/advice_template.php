@@ -7,7 +7,6 @@ require_once __DIR__ . '/api/rx_template_lib.php';
 $phraseTemplateType = 'advice';
 $phraseConfig = rx_template_config($phraseTemplateType);
 $phraseDoctorId = rx_active_doctor_id();
-rx_phrase_ensure_schema($phraseTemplateType);
 $phrasePayload = [
     'config' => [
         'type' => $phraseConfig['type'],

@@ -5,30 +5,45 @@ require_once 'db.php';
 require_once 'print_setup_lib.php';
 
 $serverSnapshotJson = 'null';
-$revisionId = (int)($_GET['revision_id'] ?? 0);
-$visitParam = trim((string)($_GET['visit_id'] ?? $_GET['visit_record_id'] ?? ''));
+$revisionId  = (int)($_GET['revision_id'] ?? 0);
+$visitParam  = trim((string)($_GET['visit_id'] ?? $_GET['visit_record_id'] ?? ''));
+
+$doctorId = current_user_doctor_id();
+if ($doctorId <= 0) {
+    http_response_code(403);
+    exit;
+}
 
 if ($revisionId > 0) {
     try {
-        $stmtR = $pdo->prepare("SELECT clinical_snapshot_json, prescription_html FROM zimrx_visit_revisions WHERE id = :id LIMIT 1");
-        $stmtR->execute(['id' => $revisionId]);
+        // JOIN through zimrx_visits to verify ownership before returning data.
+        $stmtR = $pdo->prepare(
+            'SELECT r.clinical_snapshot_json, r.prescription_html
+             FROM zimrx_visit_revisions r
+             INNER JOIN zimrx_visits v ON v.id = r.visit_record_id AND v.doctor_id = :doctor_id
+             WHERE r.id = :id
+             LIMIT 1'
+        );
+        $stmtR->execute(['id' => $revisionId, 'doctor_id' => $doctorId]);
         $revRow = $stmtR->fetch(PDO::FETCH_ASSOC);
         if ($revRow && !empty($revRow['clinical_snapshot_json'])) {
             $serverSnapshotJson = json_encode(json_decode($revRow['clinical_snapshot_json'], true), JSON_UNESCAPED_UNICODE);
         }
     } catch (Throwable $e) {
+        error_log('[ZimRx] Unable to load prescription revision preview: ' . $e->getMessage());
     }
 } elseif ($visitParam !== '') {
     try {
         $stmtS = is_numeric($visitParam)
-            ? $pdo->prepare("SELECT clinical_snapshot_json, prescription_html FROM zimrx_visits WHERE id = :id LIMIT 1")
-            : $pdo->prepare("SELECT clinical_snapshot_json, prescription_html FROM zimrx_visits WHERE visit_id = :id LIMIT 1");
-        $stmtS->execute(['id' => $visitParam]);
+            ? $pdo->prepare('SELECT clinical_snapshot_json, prescription_html FROM zimrx_visits WHERE id = :id AND doctor_id = :doctor_id LIMIT 1')
+            : $pdo->prepare('SELECT clinical_snapshot_json, prescription_html FROM zimrx_visits WHERE visit_id = :id AND doctor_id = :doctor_id LIMIT 1');
+        $stmtS->execute(['id' => $visitParam, 'doctor_id' => $doctorId]);
         $visitRow = $stmtS->fetch(PDO::FETCH_ASSOC);
         if ($visitRow && !empty($visitRow['clinical_snapshot_json'])) {
             $serverSnapshotJson = json_encode(json_decode($visitRow['clinical_snapshot_json'], true), JSON_UNESCAPED_UNICODE);
         }
     } catch (Throwable $e) {
+        error_log('[ZimRx] Unable to load prescription visit preview: ' . $e->getMessage());
     }
 }
 

@@ -271,7 +271,6 @@ $module_file_map = [
   "O/H" => "o_h.php",
   "M/H" => "m_h.php",
   "Paediatric History" => "paediatric_history.php",
-  "Bangla Converter" => "bangla_converter.php",
   "Rx" => "rx.php",
   "Drug Summary & Interaction" => "drug_summary_interaction.php",
   "Advice" => "advice.php",
@@ -434,6 +433,7 @@ if ($reportsIndex !== false) {
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            let currentVisitRevision = parseInt(document.getElementById('visit-revision')?.value || '1', 10) || 1;
 
             // ==========================================
             // 1. FLATPICKR
@@ -840,6 +840,11 @@ if ($reportsIndex !== false) {
                 fillSelect('height_unit', 'patient-height-unit', 'inch');
                 fillInput('visit_no', 'visit-no');
                 fillInput('visit_code', 'visit-code');
+                fillInput('visit_record_id', 'visit-record-id');
+                fillInput('revision', 'visit-revision');
+                if (has('revision') && appointment.revision !== undefined) {
+                    currentVisitRevision = Number(appointment.revision || 1);
+                }
                 fillDate('appointment_date', 'patient-date');
 
                 const refType = document.getElementById('patient-ref-type');
@@ -1191,6 +1196,7 @@ if ($reportsIndex !== false) {
                         reg_no: apptData.patient.reg_no,
                         visit_no: document.getElementById('visit-no').value || apptData.patient.next_visit_no,
                         visit_code: document.getElementById('visit-code').value || apptData.patient.next_visit_code,
+                        revision: currentVisitRevision,
                         referral: typeof getPatientReferralPayload === 'function' ? getPatientReferralPayload() : { category: 'self', name: '' },
                         drugs: drugs,
                         clinical_snapshot: clinicalSnapshot,
@@ -1203,7 +1209,21 @@ if ($reportsIndex !== false) {
                         body: JSON.stringify(visitData)
                     });
                     const visitResult = await visitRes.json();
+                    if (visitRes.status === 409 || (visitResult && !visitResult.ok && visitResult.error && visitResult.error.includes('Conflict'))) {
+                        alert(visitResult.error || 'Conflict: This visit has been updated by another session. Please reload before saving.');
+                        return;
+                    }
                     if (visitResult.error) throw new Error(visitResult.error);
+
+                    if (visitResult.revision !== undefined) {
+                        currentVisitRevision = Number(visitResult.revision || 0);
+                        const revEl = document.getElementById('visit-revision');
+                        if (revEl) revEl.value = currentVisitRevision;
+                    }
+                    if (visitResult.visit_record_id) {
+                        const vrEl = document.getElementById('visit-record-id');
+                        if (vrEl) vrEl.value = visitResult.visit_record_id;
+                    }
 
                     if (visitResult.visit_no) document.getElementById('visit-no').value = visitResult.visit_no;
                     if (visitResult.visit_code) document.getElementById('visit-code').value = visitResult.visit_code;

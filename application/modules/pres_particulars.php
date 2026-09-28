@@ -14,6 +14,8 @@ $pres_selected = static function (string $key, string $value, string $default = 
         <input type="hidden" id="appointment-id" value="<?= $pres_value('appointment_id') ?>">
         <input type="hidden" id="appointment-no" value="<?= $pres_value('appointment_no') ?>">
         <input type="hidden" id="appointment-time" value="<?= $pres_value('appointment_time') ?>">
+        <input type="hidden" id="visit-record-id" value="<?= $pres_value('visit_record_id', '0') ?>">
+        <input type="hidden" id="visit-revision" value="<?= $pres_value('revision', '1') ?>">
         
         <!-- ROW 1 (7 Items): Name, Age, DOB, Sex, BG, Date, Visit ID -->
         <div class="p-row p-row-1">

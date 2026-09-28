@@ -47,8 +47,12 @@ try {
         throw new RuntimeException('Only SVG, PNG, or JPG background images are allowed.');
     }
 
-    // Additional checks for raster images
-    if ($ext !== 'svg') {
+    // Additional security checks
+    if ($ext === 'svg') {
+        if (!zimrx_validate_safe_svg($tmpPath)) {
+            throw new RuntimeException('Invalid or potentially unsafe SVG file.');
+        }
+    } else {
         $imageInfo = @getimagesize($tmpPath);
         $mime = (string)($imageInfo['mime'] ?? '');
         $allowedMimes = [
@@ -62,7 +66,7 @@ try {
 
     $doctorId = current_user_doctor_id();
     $targetDir = ZIMRX_UPLOADS_DIR . '/background-images';
-    if (!is_dir($targetDir) && !mkdir($targetDir, 0777, true) && !is_dir($targetDir)) {
+    if (!is_dir($targetDir) && !mkdir($targetDir, 0750, true) && !is_dir($targetDir)) {
         throw new RuntimeException('Unable to create background-images upload directory.');
     }
 
@@ -78,6 +82,9 @@ try {
         'ok' => true,
         'url' => $publicPath,
     ]);
-} catch (Throwable $e) {
+} catch (RuntimeException $e) {
     echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+} catch (Throwable $e) {
+    error_log('[ZimRx] upload_background_image error: ' . $e->getMessage());
+    echo json_encode(['ok' => false, 'error' => 'An error occurred while uploading background image.']);
 }

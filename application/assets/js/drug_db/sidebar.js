@@ -17,44 +17,52 @@ function renderSearchResults(data, mode = currentMode) {
             const iconHtml = iconPath ? `<img src="${iconPath}" class="res-icon">` : '<span class="res-star">â˜…</span>';
 
             html = `
-                <div class="res-row" data-brand-id="${item.id}" onclick="loadBrand('${item.id}')">
+                <div class="res-row" data-brand-id="${escapeHtml(item.id)}" onclick="loadBrand('${escapeHtml(item.id)}')">
                     ${iconHtml}
                     <div class="res-info">
                         <div class="res-line-1">
-                            <span class="res-brand">${item.brand_name}</span>
-                            <span class="res-price">&#2547;${item.price}</span>
+                            <span class="res-brand">${escapeHtml(item.brand_name)}</span>
+                            <span class="res-price">&#2547;${escapeHtml(item.price)}</span>
                         </div>
-                        <div class="res-line-2">${item.generic}</div>
-                        <div class="res-line-3">${item.strength} | ${item.form}</div>
-                        <div class="res-line-4">${item.manufacturer}</div>
+                        <div class="res-line-2">${escapeHtml(item.generic)}</div>
+                        <div class="res-line-3">${escapeHtml(item.strength)} | ${escapeHtml(item.form)}</div>
+                        <div class="res-line-4">${escapeHtml(item.manufacturer)}</div>
                     </div>
                 </div>
             `;
         } else if (mode === 'generic') {
+            const escapedId = escapeHtml(item.generic_id);
+            const escapedName = escapeHtml(item.generic);
+            const attrName = encodeURIComponent(item.generic || '');
             html = `
-                <div class="res-row" onclick="loadGenericBrands('${item.generic_id}', '${item.generic.replace(/'/g, "\\'")}')">
+                <div class="res-row" onclick="loadGenericBrands('${escapedId}', decodeURIComponent('${attrName}'))">
                     <i class="fas fa-microscope" style="color:#64748b;"></i>
                     <div class="res-info">
-                        <span class="res-brand" style="color:var(--accent-blue);">${item.generic}</span>
-                        <span class="res-price">${item.brand_count} Brands</span>
+                        <span class="res-brand" style="color:var(--accent-blue);">${escapedName}</span>
+                        <span class="res-price">${escapeHtml(item.brand_count)} Brands</span>
                     </div>
                 </div>
             `;
         } else if (mode === 'class') {
+            const escapedCls = escapeHtml(item.cls);
+            const attrCls = encodeURIComponent(item.cls || '');
             html = `
-                <div class="res-row" onclick="loadClassDetail('${item.cls.replace(/'/g, "\\'")}')">
+                <div class="res-row" onclick="loadClassDetail(decodeURIComponent('${attrCls}'))">
                     <i class="fas fa-layer-group" style="color:var(--accent-blue); font-size: 1.1rem;"></i>
                     <div class="res-info">
-                        <span class="res-brand" style="color:var(--navy-dark);">${item.cls}</span>
+                        <span class="res-brand" style="color:var(--navy-dark);">${escapedCls}</span>
                     </div>
                 </div>
             `;
         } else if (mode === 'indication') {
+            const escapedIndId = escapeHtml(item.indication_id);
+            const escapedIndName = escapeHtml(item.indication_name);
+            const attrIndName = encodeURIComponent(item.indication_name || '');
             html = `
-                <div class="res-row" onclick="loadIndicationDetail('${item.indication_id}', '${item.indication_name.replace(/'/g, "\\'")}')">
+                <div class="res-row" onclick="loadIndicationDetail('${escapedIndId}', decodeURIComponent('${attrIndName}'))">
                     <i class="fas fa-stethoscope" style="color:#64748b; font-size: 1.2rem;"></i>
                     <div class="res-info">
-                        <span class="res-brand" style="color:var(--navy-dark);">${item.indication_name}</span>
+                        <span class="res-brand" style="color:var(--navy-dark);">${escapedIndName}</span>
                     </div>
                 </div>
             `;
@@ -111,11 +119,11 @@ function renderDocsBookmarks(query = '') {
 
     rows.forEach(item => {
         $('#resultsList').append(`
-            <div class="res-row docs-bookmark-row" data-target="${item.id}">
+            <div class="res-row docs-bookmark-row" data-target="${escapeHtml(item.id)}">
                 <i class="fas fa-bookmark" style="color:var(--accent-blue);"></i>
                 <div class="res-info">
-                    <span class="res-brand" style="color:var(--navy-dark);">${item.title}</span>
-                    <div class="res-line-2">Jump to ${item.title} section</div>
+                    <span class="res-brand" style="color:var(--navy-dark);">${escapeHtml(item.title)}</span>
+                    <div class="res-line-2">Jump to ${escapeHtml(item.title)} section</div>
                 </div>
             </div>
         `);
@@ -391,12 +399,14 @@ function loadIndicationDetail(id, name) {
         }
 
         data.forEach(item => {
+            const escapedName = escapeHtml(item.name);
+            const attrName = encodeURIComponent(item.name || '');
             const html = `
-                <div class="res-row" onclick="loadGenericBrands('${item.id}', '${item.name.replace(/'/g, "\\'")}')">
+                <div class="res-row" onclick="loadGenericBrands('${escapeHtml(item.id)}', decodeURIComponent('${attrName}'))">
                     <i class="fas fa-microscope" style="color:var(--accent-blue); font-size: 1.1rem;"></i>
                     <div class="res-info">
-                        <span class="res-brand" style="color:var(--accent-blue);">${item.name}</span>
-                        <span class="res-price">${item.brand_count} Brands</span>
+                        <span class="res-brand" style="color:var(--accent-blue);">${escapedName}</span>
+                        <span class="res-price">${escapeHtml(item.brand_count)} Brands</span>
                     </div>
                 </div>
             `;
@@ -426,12 +436,14 @@ function loadClassDetail(cls, autoGenericId = '', autoGenericName = '') {
         }
 
         data.forEach(item => {
+            const escapedName = escapeHtml(item.name);
+            const attrName = encodeURIComponent(item.name || '');
             const html = `
-                <div class="res-row" onclick="loadGenericBrands('${item.id}', '${item.name.replace(/'/g, "\\'")}')">
+                <div class="res-row" onclick="loadGenericBrands('${escapeHtml(item.id)}', decodeURIComponent('${attrName}'))">
                     <i class="fas fa-microscope" style="color:var(--accent-blue); font-size: 1.1rem;"></i>
                     <div class="res-info">
-                        <span class="res-brand" style="color:var(--accent-blue);">${item.name}</span>
-                        <span class="res-price">${item.brand_count} Brands</span>
+                        <span class="res-brand" style="color:var(--accent-blue);">${escapedName}</span>
+                        <span class="res-price">${escapeHtml(item.brand_count)} Brands</span>
                     </div>
                 </div>
             `;
@@ -468,11 +480,11 @@ function runDrillDown(type, id) {
             const iconPath = getDosageFormIcon(item.form, item.pres_new_upper);
             const iconHtml = iconPath ? `<img src="${iconPath}" class="res-icon">` : '<span class="res-star">â˜…</span>';
             const html = `
-                <div class="res-row" onclick="loadBrand('${item.id}')">
+                <div class="res-row" onclick="loadBrand('${escapeHtml(item.id)}')">
                      ${iconHtml}
                     <div class="res-info">
-                        <span class="res-brand">${item.pres_new_upper}</span>
-                        <span class="res-man">-${item.man_short}</span>
+                        <span class="res-brand">${escapeHtml(item.pres_new_upper)}</span>
+                        <span class="res-man">-${escapeHtml(item.man_short)}</span>
                     </div>
                 </div>
             `;

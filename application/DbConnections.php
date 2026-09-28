@@ -150,8 +150,9 @@ class DbConnections {
     private static function createSqliteConnection(array $config): PDO {
         $path = $config['path'] ?? throw new RuntimeException('SQLite path not configured');
         
-        if (!file_exists(dirname($path))) {
-            mkdir(dirname($path), 0777, true);
+        $directory = dirname($path);
+        if (!is_dir($directory) && !mkdir($directory, 0750, true) && !is_dir($directory)) {
+            throw new RuntimeException("Unable to create the database directory: {$directory}");
         }
 
         $pdo = new PDO("sqlite:$path");

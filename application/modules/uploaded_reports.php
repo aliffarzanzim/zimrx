@@ -258,12 +258,16 @@
     /* ==========================================================
        Live Patient Synchronization (Desktop -> Mobile)
     ========================================================== */
+    let currentDesktopActiveRevision = 1;
+
     function syncActivePatientToMobile() {
         const pName = document.getElementById('patient-name')?.value.trim() || 'Walk-in Patient';
         const pReg = document.getElementById('patient-reg-no')?.value.trim() || '';
         const pAge = document.getElementById('patient-age')?.value.trim() || '';
         const pGender = document.getElementById('patient-gender')?.value.trim() || '';
         const pDate = document.getElementById('patient-date')?.value.trim() || '';
+        const patientId = parseInt(document.getElementById('patient-id')?.value || '0', 10);
+        const visitRecordId = parseInt(document.getElementById('visit-record-id')?.value || '0', 10);
 
         // Update modal banner if visible
         if (pupPatientName) pupPatientName.textContent = pName;
@@ -274,23 +278,30 @@
 
         const params = new URLSearchParams({
             action: 'update_active_patient',
+            csrf_token: window.ZimRxCsrfToken || '',
             patient_name: pName,
             patient_reg: pReg,
             patient_age: pAge,
             patient_gender: pGender,
-            patient_date: pDate
+            patient_date: pDate,
+            patient_id: patientId,
+            visit_record_id: visitRecordId
         });
 
         fetch('api/mobile_sync.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: params.toString()
+        }).then(r => r.json()).then(res => {
+            if (res.ok && res.active_revision) {
+                currentDesktopActiveRevision = Number(res.active_revision);
+            }
         }).catch(() => {});
     }
 
     // Publish active patient on load and on any change
     syncActivePatientToMobile();
-    ['patient-name', 'patient-reg-no', 'patient-age', 'patient-gender', 'patient-date'].forEach(id => {
+    ['patient-name', 'patient-reg-no', 'patient-age', 'patient-gender', 'patient-date', 'patient-id', 'visit-record-id'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             el.addEventListener('input', syncActivePatientToMobile);
@@ -304,10 +315,29 @@
     ========================================================== */
     setInterval(async () => {
         try {
-            const res = await fetch('api/mobile_sync.php?action=check_uploads');
+            const patientId = parseInt(document.getElementById('patient-id')?.value || '0', 10);
+            const visitRecordId = parseInt(document.getElementById('visit-record-id')?.value || '0', 10);
+
+            const params = new URLSearchParams({
+                action: 'check_uploads',
+                csrf_token: window.ZimRxCsrfToken || '',
+                active_revision: currentDesktopActiveRevision,
+                patient_id: patientId,
+                visit_record_id: visitRecordId
+            });
+            const res = await fetch('api/mobile_sync.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
             const data = await res.json();
             if (data.ok && Array.isArray(data.uploads) && data.uploads.length > 0) {
+                const curPId = parseInt(document.getElementById('patient-id')?.value || '0', 10);
                 data.uploads.forEach(u => {
+                    const uPId = Number(u.patient_id || 0);
+                    if (curPId > 0 && uPId > 0 && curPId !== uPId) {
+                        return; // Reject report that does not match current active patient
+                    }
                     appendUploadedReportRow(u.file_path, u.original_name, u.report_name, u.date);
                 });
                 if (pupStatusText) {

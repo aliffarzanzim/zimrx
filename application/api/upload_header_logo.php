@@ -47,7 +47,7 @@ try {
 
     $doctorId = current_user_doctor_id();
     $targetDir = ZIMRX_UPLOADS_DIR . '/header-logos';
-    if (!is_dir($targetDir) && !mkdir($targetDir, 0777, true) && !is_dir($targetDir)) {
+    if (!is_dir($targetDir) && !mkdir($targetDir, 0750, true) && !is_dir($targetDir)) {
         throw new RuntimeException('Unable to create header logo directory.');
     }
 
@@ -87,6 +87,9 @@ try {
         'ok' => true,
         'logo_path' => $publicPath,
     ]);
-} catch (Throwable $e) {
+} catch (RuntimeException $e) {
     echo json_encode(['error' => $e->getMessage()]);
+} catch (Throwable $e) {
+    error_log('[ZimRx] upload_header_logo error: ' . $e->getMessage());
+    echo json_encode(['error' => 'An error occurred while uploading header logo.']);
 }

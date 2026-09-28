@@ -7,6 +7,7 @@ try {
     $term = isset($_GET['term']) ? trim($_GET['term']) : '';
     echo json_encode(rx_phrase_suggestions_for_type('duration', $term, rx_active_doctor_id(), 100), JSON_UNESCAPED_UNICODE);
 } catch (Exception $e) {
-    echo json_encode(['error' => $e->getMessage()]);
+    error_log('[ZimRx] getduration error: ' . $e->getMessage());
+    echo json_encode([]);
 }
 ?>

@@ -48,8 +48,12 @@ try {
         throw new RuntimeException('Only SVG, PNG, JPG, or WEBP images are allowed.');
     }
 
-    // Additional security checks for raster images
-    if ($ext !== 'svg') {
+    // Additional security checks
+    if ($ext === 'svg') {
+        if (!zimrx_validate_safe_svg($tmpPath)) {
+            throw new RuntimeException('Invalid or potentially unsafe SVG file.');
+        }
+    } else {
         $imageInfo = @getimagesize($tmpPath);
         $mime = (string)($imageInfo['mime'] ?? '');
         $allowedMimes = [
@@ -64,7 +68,7 @@ try {
 
     $doctorId = current_user_doctor_id();
     $targetDir = ZIMRX_UPLOADS_DIR . '/full-body-headers';
-    if (!is_dir($targetDir) && !mkdir($targetDir, 0777, true) && !is_dir($targetDir)) {
+    if (!is_dir($targetDir) && !mkdir($targetDir, 0750, true) && !is_dir($targetDir)) {
         throw new RuntimeException('Unable to create full body header upload directory.');
     }
 
@@ -118,6 +122,9 @@ try {
         'full_body_header_path' => $publicPath,
         'message' => 'সফলভাবে ফুলবডি ইমেজ হেডার আপলোড সম্পন্ন হয়েছে।',
     ]);
-} catch (Throwable $e) {
+} catch (RuntimeException $e) {
     echo json_encode(['error' => $e->getMessage()]);
+} catch (Throwable $e) {
+    error_log('[ZimRx] upload_full_body_header error: ' . $e->getMessage());
+    echo json_encode(['error' => 'An error occurred while uploading full body header.']);
 }

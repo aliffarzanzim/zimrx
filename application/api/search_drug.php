@@ -146,6 +146,7 @@ try {
     echo json_encode($results);
 
 } catch (Exception $e) {
-    echo json_encode(['error' => $e->getMessage()]);
+    error_log('[ZimRx] search_drug error: ' . $e->getMessage());
+    echo json_encode([]);
 }
 ?>

@@ -30,5 +30,6 @@ try {
     ");
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 } catch (Exception $e) {
-    echo json_encode(['error' => $e->getMessage()]);
+    error_log('[ZimRx] get_static_advice error: ' . $e->getMessage());
+    echo json_encode([]);
 }
