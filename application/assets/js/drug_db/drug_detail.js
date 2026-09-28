@@ -522,11 +522,11 @@ function loadBrand(id, preloadedData = null) {
                     </label>
                     <label>
                         <span>Weight (kg)</span>
-                        <input type="number" min="0" step="0.1" class="paed-weight" placeholder="kg">
+                        <input type="number" min="1" max="200" step="0.1" class="paed-weight" placeholder="kg (1-200)">
                     </label>
                     <label>
                         <span>Height (cm)</span>
-                        <input type="number" min="0" step="0.1" class="paed-height" placeholder="cm">
+                        <input type="number" min="30" max="250" step="0.1" class="paed-height" placeholder="cm (30-250)">
                     </label>
                     <label>
                         <span>BSA (m2)</span>
@@ -724,6 +724,20 @@ function loadBrand(id, preloadedData = null) {
         return lines.join('');
     }
 
+    /**
+     * Mosteller formula: BSA (m2) = sqrt( Height(cm) * Weight(kg) / 3600 )
+     * Reference: Mosteller RD. N Engl J Med. 1987;317:1098.
+     * Inputs MUST be in centimetres and kilograms.
+     * Valid physiological range: 0.10 - 3.00 m2.
+     */
+    function computeBsaMosteller(heightCm, weightKg) {
+        if (!Number.isFinite(heightCm) || heightCm <= 0 || heightCm > 300) return null;
+        if (!Number.isFinite(weightKg) || weightKg <= 0 || weightKg > 300) return null;
+        const bsa = Math.sqrt((heightCm * weightKg) / 3600);
+        if (bsa < 0.10 || bsa > 3.00) return null;
+        return Math.round(bsa * 1000) / 1000;
+    }
+
     function runPaediatricCalculator(container) {
         const data = paediatricCalcStore.get(container.dataset.paedCalcId) || [];
         const ageValue = numberOrNull(container.querySelector('.paed-age-value')?.value);
@@ -732,7 +746,7 @@ function loadBrand(id, preloadedData = null) {
         const weight = numberOrNull(container.querySelector('.paed-weight')?.value);
         const height = numberOrNull(container.querySelector('.paed-height')?.value);
         const manualBsa = numberOrNull(container.querySelector('.paed-bsa')?.value);
-        const autoBsa = Number.isFinite(weight) && Number.isFinite(height) ? Math.sqrt((height * weight) / 3600) : null;
+        const autoBsa = computeBsaMosteller(height, weight);
         const bsa = manualBsa ?? autoBsa;
         const doseInput = container.querySelector('.paed-dose-entry');
         const strengthType = String(container.querySelector('.paed-strength-type')?.value || '').trim();
@@ -742,6 +756,15 @@ function loadBrand(id, preloadedData = null) {
         const groupValue = container.querySelector('.paed-group')?.value || '';
         const output = container.querySelector('.paed-calc-output');
         if (!output) return;
+
+        if (Number.isFinite(height) && (height < 30 || height > 250)) {
+            output.textContent = 'Height must be in centimetres (30-250 cm).';
+            return;
+        }
+        if (Number.isFinite(weight) && (weight < 1 || weight > 200)) {
+            output.textContent = 'Weight must be in kilograms (1-200 kg).';
+            return;
+        }
 
         const matches = data
             .map((rule, index) => ({ rule, index }))

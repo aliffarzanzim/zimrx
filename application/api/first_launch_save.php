@@ -157,36 +157,43 @@ try {
     // Generate recovery key and save to userdata/
     $recoveryKey = strtoupper(bin2hex(random_bytes(16)));
     $recoveryDir = defined('ZIMRX_USERDATA_DIR') ? ZIMRX_USERDATA_DIR : dirname(__DIR__) . '/userdata';
-    if (!is_dir($recoveryDir)) {
-        @mkdir($recoveryDir, 0755, true);
+    if (!is_dir($recoveryDir) && !@mkdir($recoveryDir, 0750, true) && !is_dir($recoveryDir)) {
+        throw new RuntimeException('Cannot create userdata directory.');
     }
     $recoveryPath = $recoveryDir . '/recovery.key';
-    file_put_contents($recoveryPath, $recoveryKey);
+    if (file_put_contents($recoveryPath, $recoveryKey, LOCK_EX) === false) {
+        throw new RuntimeException('Cannot write recovery key.');
+    }
+    @chmod($recoveryPath, 0600); // owner read-only — no group, no world
 
     // Start session and log in
     if ($practiceType === 'solo') {
-        $user = $pdo->query(
-            "SELECT id, display_name FROM zimrx_user_accounts WHERE role = 'doctor' AND doctor_id = 1 LIMIT 1"
-        )->fetch();
-        if ($user) {
-            $_SESSION['user_id']   = (int)$user['id'];
-            $_SESSION['user_role'] = 'doctor';
-            $_SESSION['user_name'] = $user['display_name'];
-            $_SESSION['doctor_id'] = 1;
+        $stmt = $pdo->prepare(
+            'SELECT id, display_name FROM zimrx_user_accounts WHERE role = :role AND doctor_id = :did LIMIT 1'
+        );
+        $stmt->execute([':role' => 'doctor', ':did' => 1]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$user) {
+            throw new RuntimeException('Doctor account not found after first launch setup.');
         }
+        $_SESSION['user_id']   = (int)$user['id'];
+        $_SESSION['user_role'] = 'doctor';
+        $_SESSION['user_name'] = $user['display_name'];
+        $_SESSION['doctor_id'] = 1;
         echo json_encode(['ok' => true, 'redirect' => 'first_launch.php?step=3', 'recovery_key' => $recoveryKey]);
     } else {
         $adminUser = $pdo->prepare(
             "SELECT id, display_name FROM zimrx_user_accounts WHERE role = 'admin' LIMIT 1"
         );
         $adminUser->execute();
-        $admin = $adminUser->fetch();
-        if ($admin) {
-            $_SESSION['user_id']   = (int)$admin['id'];
-            $_SESSION['user_role'] = 'admin';
-            $_SESSION['user_name'] = $admin['display_name'];
-            $_SESSION['doctor_id'] = 0;
+        $admin = $adminUser->fetch(PDO::FETCH_ASSOC);
+        if (!$admin) {
+            throw new RuntimeException('Admin account not found after first launch setup.');
         }
+        $_SESSION['user_id']   = (int)$admin['id'];
+        $_SESSION['user_role'] = 'admin';
+        $_SESSION['user_name'] = $admin['display_name'];
+        $_SESSION['doctor_id'] = 0;
         echo json_encode(['ok' => true, 'redirect' => 'admin.php', 'recovery_key' => $recoveryKey]);
     }
 

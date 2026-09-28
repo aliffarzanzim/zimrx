@@ -57,14 +57,15 @@ class DbMigrator {
             $class     = $this->fileToClassName($file);
             $migration = new $class();
 
-            $pdo->beginTransaction();
             try {
+                $pdo->exec('BEGIN IMMEDIATE');
                 $migration->up($pdo);
                 $this->markInstalled($pdo, $version);
-                $pdo->commit();
+                $pdo->exec('COMMIT');
             } catch (Throwable $e) {
-                if ($pdo->inTransaction()) {
-                    $pdo->rollBack();
+                try {
+                    $pdo->exec('ROLLBACK');
+                } catch (Throwable $rbEx) {
                 }
                 throw new RuntimeException(
                     "Migration $version failed: " . $e->getMessage(),

@@ -720,6 +720,9 @@ function showHelpGuidelineModal(type) {
 
   document.getElementById('zrx-help-modal-title').textContent = data.title;
   document.getElementById('zrx-help-modal-badge').textContent = data.badge;
+  // SAFETY: data.body is always a developer-defined static string from the hardcoded
+  // `guidelines` object above. NEVER assign server-fetched or user-supplied content
+  // here without DOMPurify sanitization first.
   document.getElementById('zrx-help-modal-body').innerHTML = data.body;
   overlay.classList.add('active');
 
@@ -748,37 +751,39 @@ function showHelpGuidelineModal(type) {
           tbody.innerHTML = list.map(occ => {
             const isPinned = Number(occ.is_pinned) === 1;
             const isHidden = Number(occ.is_hidden) === 1;
+            const kind = escapeHtml(String(occ.kind ?? ''));
+            const name = escapeHtml(String(occ.name ?? ''));
             const isSystem = occ.kind === 'system';
             const moveIcon = typeof ZimRxIcon !== 'undefined' 
               ? ZimRxIcon.render('move', 14) 
               : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="19 9 22 12 19 15"></polyline><polyline points="9 19 12 22 15 19"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>';
             
             return `
-              <tr class="pc-row phrase-row ${isPinned ? 'pinned' : ''} ${isHidden ? 'hidden' : ''}" data-name="${escapeHtml(occ.name)}" draggable="true">
+              <tr class="pc-row phrase-row ${isPinned ? 'pinned' : ''} ${isHidden ? 'hidden' : ''}" data-name="${name}" draggable="true">
                 <td class="pc-action pc-move phrase-handle" style="position: relative; width: 44px; text-align: center; padding: 0 !important; height: 100%;">
                   ${isPinned ? '<img class="phrase-handle-pin" src="assets/images/pin.svg" alt="Pinned" style="position:absolute;top:4px;left:4px;width:14px;height:14px;object-fit:contain;pointer-events:none;z-index:2;">' : ''}
                   <button type="button" class="pc-row-move-btn zrx-drag-handle" title="Move Row">${moveIcon}</button>
                 </td>
                 <td style="text-align: center;">
                   <div class="phrase-actions" style="display:flex;gap:4px;justify-content:center;">
-                    <button type="button" class="phrase-btn ${isPinned ? 'active' : ''}" data-occ-action="pin" data-name="${escapeHtml(occ.name)}" style="${isPinned ? 'background:#fef3c7;border-color:#f59e0b;color:#b45309;font-weight:700;' : ''}">${isPinned ? 'Unpin' : 'Pin'}</button>
-                    <button type="button" class="phrase-btn" data-occ-action="edit" data-name="${escapeHtml(occ.name)}">Edit</button>
+                    <button type="button" class="phrase-btn ${isPinned ? 'active' : ''}" data-occ-action="pin" data-name="${name}" style="${isPinned ? 'background:#fef3c7;border-color:#f59e0b;color:#b45309;font-weight:700;' : ''}">${isPinned ? 'Unpin' : 'Pin'}</button>
+                    <button type="button" class="phrase-btn" data-occ-action="edit" data-name="${name}">Edit</button>
                     ${isSystem
                       ? (isHidden
-                          ? `<button type="button" class="phrase-btn primary" data-occ-action="toggle_hide" data-name="${escapeHtml(occ.name)}">Restore</button>`
-                          : `<button type="button" class="phrase-btn danger" data-occ-action="toggle_hide" data-name="${escapeHtml(occ.name)}">Remove</button>`)
-                      : `<button type="button" class="phrase-btn danger" data-occ-action="delete" data-name="${escapeHtml(occ.name)}">Delete</button>`
+                          ? `<button type="button" class="phrase-btn primary" data-occ-action="toggle_hide" data-name="${name}">Restore</button>`
+                          : `<button type="button" class="phrase-btn danger" data-occ-action="toggle_hide" data-name="${name}">Remove</button>`)
+                      : `<button type="button" class="phrase-btn danger" data-occ-action="delete" data-name="${name}">Delete</button>`
                     }
                   </div>
                 </td>
                 <td style="text-align: center;">
                   <div class="phrase-tags" style="justify-content: center;">
-                    <span class="phrase-tag ${isSystem ? 'system' : 'custom'}">${isSystem ? 'System' : 'Custom'}</span>
+                    <span class="phrase-tag ${isSystem ? 'system' : (kind || 'custom')}">${isSystem ? 'System' : (kind ? kind.charAt(0).toUpperCase() + kind.slice(1) : 'Custom')}</span>
                     ${isHidden ? '<span class="phrase-tag hidden" style="background:#fee2e2;color:#b91c1c;margin-left:4px;">Hidden</span>' : ''}
                   </div>
                 </td>
                 <td>
-                  <div class="phrase-text" style="font-weight:600;color:${isHidden ? '#94a3b8' : '#0f172a'};">${escapeHtml(occ.name)}</div>
+                  <div class="phrase-text" style="font-weight:600;color:${isHidden ? '#94a3b8' : '#0f172a'};">${name}</div>
                 </td>
                 <td class="phrase-usage" style="text-align: center; font-weight: 700; color: #1d4ed8;">
                   ${Number(occ.usage_count || 0)}
@@ -974,16 +979,18 @@ function showHelpGuidelineModal(type) {
           tbody.innerHTML = list.map(addr => {
             const isPinned = Number(addr.is_pinned) === 1;
             const isHidden = Number(addr.is_hidden) === 1;
+            const kind = escapeHtml(String(addr.kind ?? ''));
+            const name = escapeHtml(String(addr.name ?? ''));
             const isSystem = addr.kind === 'system';
 
             const actionsHtml = isSystem
               ? `<span style="color:#94a3b8;font-size:0.75rem;font-style:italic;">National Database</span>`
               : `
                 <div class="phrase-actions" style="display:flex;gap:4px;justify-content:center;">
-                  <button type="button" class="phrase-btn ${isPinned ? 'active' : ''}" data-addr-action="pin" data-name="${escapeHtml(addr.name)}" style="${isPinned ? 'background:#fef3c7;border-color:#f59e0b;color:#b45309;font-weight:700;' : ''}">${isPinned ? 'Unpin' : 'Pin'}</button>
-                  <button type="button" class="phrase-btn" data-addr-action="edit" data-name="${escapeHtml(addr.name)}">Edit</button>
-                  <button type="button" class="phrase-btn ${isHidden ? 'primary' : ''}" data-addr-action="toggle_hide" data-name="${escapeHtml(addr.name)}">${isHidden ? 'Unhide' : 'Hide'}</button>
-                  <button type="button" class="phrase-btn danger" data-addr-action="delete" data-name="${escapeHtml(addr.name)}">Delete</button>
+                  <button type="button" class="phrase-btn ${isPinned ? 'active' : ''}" data-addr-action="pin" data-name="${name}" style="${isPinned ? 'background:#fef3c7;border-color:#f59e0b;color:#b45309;font-weight:700;' : ''}">${isPinned ? 'Unpin' : 'Pin'}</button>
+                  <button type="button" class="phrase-btn" data-addr-action="edit" data-name="${name}">Edit</button>
+                  <button type="button" class="phrase-btn ${isHidden ? 'primary' : ''}" data-addr-action="toggle_hide" data-name="${name}">${isHidden ? 'Unhide' : 'Hide'}</button>
+                  <button type="button" class="phrase-btn danger" data-addr-action="delete" data-name="${name}">Delete</button>
                 </div>
               `;
 
@@ -994,12 +1001,12 @@ function showHelpGuidelineModal(type) {
                 </td>
                 <td style="text-align: center;">
                   <div class="phrase-tags" style="justify-content: center;">
-                    <span class="phrase-tag ${isSystem ? 'system' : 'custom'}">${isSystem ? 'System' : 'Custom'}</span>
+                    <span class="phrase-tag ${isSystem ? 'system' : (kind || 'custom')}">${isSystem ? 'System' : (kind ? kind.charAt(0).toUpperCase() + kind.slice(1) : 'Custom')}</span>
                     ${isHidden ? '<span class="phrase-tag hidden" style="background:#fee2e2;color:#b91c1c;margin-left:4px;">Hidden</span>' : ''}
                   </div>
                 </td>
                 <td>
-                  <div class="phrase-text" style="font-weight:600;color:${isHidden ? '#94a3b8' : '#0f172a'};">${escapeHtml(addr.name)}</div>
+                  <div class="phrase-text" style="font-weight:600;color:${isHidden ? '#94a3b8' : '#0f172a'};">${name}</div>
                 </td>
                 <td style="text-align: center; font-weight: 700; color: #1d4ed8;">
                   ${isSystem ? '—' : Number(addr.usage_count || 0)}
