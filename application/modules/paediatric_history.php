@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <div class="oh-wrapper js-ph-module" id="ph-module-wrapper">
     <div class="oh-table-container">
         <table class="oh-table" id="ph-table">

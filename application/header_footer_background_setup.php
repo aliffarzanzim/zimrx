@@ -14,8 +14,8 @@ $page_title = 'ZimRx - Header, Footer & Background Setup';
 $extra_css = ['assets/css/pages/header_footer_background_setup.css'];
 $doctorId = current_user_doctor_id();
 
-$header = zimrx_bridge_load_header_settings($pdo, $doctorId);
-$options = zimrx_bridge_load_print_options($pdo, $doctorId);
+$header = zimrx_print_load_header_settings($pdo, $doctorId);
+$options = zimrx_print_load_options($pdo, $doctorId);
 $hasOnboarded = (int)($options['has_onboarded'] ?? 0);
 
 // Existing doctor check: if not onboarded in settings, but already has a custom header, auto-onboard them
@@ -35,8 +35,8 @@ if ($hasOnboarded === 0 && (trim((string)($header['left_block_html'] ?? '')) !==
 }
 
 $pageWidth = isset($options['page_width']) && is_numeric($options['page_width']) ? (float)$options['page_width'] : 21.0;
-$leftLines = zimrx_bridge_header_lines($header, 'left');
-$rightLines = zimrx_bridge_header_lines($header, 'right');
+$leftLines = zimrx_print_header_lines($header, 'left');
+$rightLines = zimrx_print_header_lines($header, 'right');
 $displayLogo = strtolower((string)($header['display_logo'] ?? 'yes')) === 'no' ? 'no' : 'yes';
 $bgColor = strtoupper(ltrim((string)($header['bg_color'] ?? 'FFFFFF'), '#'));
 $logoPath = trim((string)($header['logo_path'] ?? ''));
@@ -64,8 +64,8 @@ if ($stampColor === '') $stampColor = '#000000';
 $stampColorEnable = trim((string)($options['stamp_color_enable'] ?? 'no'));
 if ($stampColorEnable === '') $stampColorEnable = 'no';
 
-$leftBlockHtml = zimrx_bridge_visual_block_html($header, 'left', $leftLines);
-$rightBlockHtml = zimrx_bridge_visual_block_html($header, 'right', $rightLines);
+$leftBlockHtml = zimrx_print_visual_block_html($header, 'left', $leftLines);
+$rightBlockHtml = zimrx_print_visual_block_html($header, 'right', $rightLines);
 
 
 include 'header.php';

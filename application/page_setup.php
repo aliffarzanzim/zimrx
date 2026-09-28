@@ -9,16 +9,16 @@ require_once __DIR__ . '/lib/print_setup_lib.php';
 $page_title = 'ZimRx - Page Setup';
 $extra_css = ['assets/css/pages/page_setup.css'];
 $doctorId = current_user_doctor_id();
-$options = zimrx_bridge_load_print_options($pdo, $doctorId);
+$options = zimrx_print_load_options($pdo, $doctorId);
 
-$header = zimrx_bridge_load_header_settings($pdo, $doctorId);
-$headerPayload = zimrx_bridge_header_preview_payload($header);
+$header = zimrx_print_load_header_settings($pdo, $doctorId);
+$headerPayload = zimrx_print_header_preview_payload($header);
 $displayLogo = strtolower((string)($header['display_logo'] ?? (!empty($header['logo_path']) ? 'yes' : 'yes'))) === 'no' ? 'no' : 'yes';
 $headerLogoUrl = trim((string)($header['logo_path'] ?? ''));
 $leftHeaderLines = array_values($headerPayload['bn'] ?? []);
 $rightHeaderLines = array_values($headerPayload['en'] ?? []);
 $options['bgcolor'] = strtoupper(ltrim((string)($header['bg_color'] ?? 'FFFFFF'), '#'));
-$footerHtml = zimrx_bridge_footer_html($header);
+$footerHtml = zimrx_print_footer_html($header);
 
 if (trim((string)($options['header_width'] ?? '')) === '') {
     $options['header_width'] = (string)($options['page_width'] ?? '21');
@@ -132,7 +132,7 @@ include 'header.php';
                         <div id="pageHeader" class="zps-preview-header" data-preview-part="header" style="background: #<?= preview_escape($options['bgcolor']) ?>; border-bottom: <?= ($options['dec_line_top_1'] ?? 'yes') === 'yes' ? '1px solid #000' : 'none' ?>;">
                             <div class="zrx-header-layout <?= ($displayLogo === 'yes' && $headerLogoUrl !== '') ? 'zrx-has-logo' : 'zrx-no-logo' ?>">
                                 <div class="zrx-header-text zrx-header-left">
-                                    <?= zimrx_bridge_visual_block_html($header, 'left', $leftHeaderLines) ?>
+                                    <?= zimrx_print_visual_block_html($header, 'left', $leftHeaderLines) ?>
                                 </div>
 
                                 <?php if ($displayLogo === 'yes' && $headerLogoUrl !== ''): ?>
@@ -142,7 +142,7 @@ include 'header.php';
                                 <?php endif; ?>
 
                                 <div class="zrx-header-text zrx-header-right">
-                                    <?= zimrx_bridge_visual_block_html($header, 'right', $rightHeaderLines) ?>
+                                    <?= zimrx_print_visual_block_html($header, 'right', $rightHeaderLines) ?>
                                 </div>
                             </div>
                         </div>

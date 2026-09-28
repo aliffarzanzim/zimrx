@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <div id="reports-wrapper" class="reports-wrapper">
 
     <!-- Top Section: Manual Report Entry -->

@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <div class="pc-wrapper" id="dh-wrapper">
     <div class="pc-table-container">
         <table class="pc-table" id="dh-table">

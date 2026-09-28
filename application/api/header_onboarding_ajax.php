@@ -133,7 +133,7 @@ try {
     ];
 
     // Save using standard bridge function (which updates print layout + header settings)
-    zimrx_bridge_save_print_setup($pdo, $doctorId, $payload);
+    zimrx_print_save_setup($pdo, $doctorId, $payload);
     
     echo '1';
 } catch (Throwable $e) {

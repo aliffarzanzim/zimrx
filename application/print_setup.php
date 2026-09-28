@@ -34,9 +34,9 @@ function bridge_render_font_options(string $selectedFont, array $fontOptions, ar
 $page_title = 'ZimRx - Print Setup';
 $extra_css = ['assets/css/pages/print_layout_editor.css'];
 $doctorId = current_user_doctor_id();
-$options = zimrx_bridge_load_print_options($pdo, $doctorId);
+$options = zimrx_print_load_options($pdo, $doctorId);
 
-// Force right_width default to 11.0 (overriding the old legacy bridge default of 12.0)
+// Standard right_width default to 11.0 (recommended layout balance)
 if (empty($options['right_width']) || (float)$options['right_width'] === 12.0) {
     $options['right_width'] = '11.0';
 }

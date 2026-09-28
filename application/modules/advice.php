@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <div class="advice-wrapper" id="advice-wrapper">
     <div class="advice-left">
         <div class="advice-header-row">

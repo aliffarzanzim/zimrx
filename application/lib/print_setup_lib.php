@@ -4,7 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../auth.php';
 require_once __DIR__ . '/../db.php';
 
-function zimrx_bridge_normalize_header_line(string $value): string {
+function zimrx_print_normalize_header_line(string $value): string {
     return trim(preg_replace('/\s+/', ' ', $value));
 }
 
@@ -12,7 +12,7 @@ function preview_escape(?string $value): string {
     return htmlspecialchars((string)($value ?? ''), ENT_QUOTES, 'UTF-8');
 }
 
-function zimrx_bridge_default_print_options(): array {
+function zimrx_print_default_options(): array {
     return [
         'page_width' => '21',
         'page_height' => '29.7',
@@ -185,28 +185,28 @@ function zimrx_bridge_default_print_options(): array {
     ];
 }
 
-function zimrx_bridge_legacy_right_lines(array $header): array {
+function zimrx_print_right_lines(array $header): array {
     $addressLines = preg_split('/\r\n|\r|\n/', trim((string)($header['chamber_address'] ?? '')));
-    $addressLines = array_values(array_filter(array_map('zimrx_bridge_normalize_header_line', $addressLines), static fn($line) => $line !== ''));
+    $addressLines = array_values(array_filter(array_map('zimrx_print_normalize_header_line', $addressLines), static fn($line) => $line !== ''));
 
-    $bmdc = zimrx_bridge_normalize_header_line((string)($header['bmdc_no'] ?? ''));
+    $bmdc = zimrx_print_normalize_header_line((string)($header['bmdc_no'] ?? ''));
     if ($bmdc !== '' && stripos($bmdc, 'bmdc') === false) {
         $bmdc = 'BMDC Reg No ' . $bmdc;
     }
 
-    $phone = zimrx_bridge_normalize_header_line((string)($header['chamber_phone'] ?? ''));
+    $phone = zimrx_print_normalize_header_line((string)($header['chamber_phone'] ?? ''));
     if ($phone !== '' && stripos($phone, 'mobile') === false && stripos($phone, 'phone') === false) {
         $phone = 'Mobile: ' . $phone;
     }
 
     $noteLines = preg_split('/\r\n|\r|\n/', trim((string)($header['header_note'] ?? '')));
-    $noteLines = array_values(array_filter(array_map('zimrx_bridge_normalize_header_line', $noteLines), static fn($line) => $line !== ''));
+    $noteLines = array_values(array_filter(array_map('zimrx_print_normalize_header_line', $noteLines), static fn($line) => $line !== ''));
 
     return [
-        1 => zimrx_bridge_normalize_header_line((string)($header['doctor_name'] ?? current_user_name())),
-        2 => zimrx_bridge_normalize_header_line((string)($header['qualifications'] ?? '')),
-        3 => zimrx_bridge_normalize_header_line((string)($header['specialty'] ?? '')),
-        4 => $addressLines[0] ?? zimrx_bridge_normalize_header_line((string)($header['chamber_name'] ?? '')),
+        1 => zimrx_print_normalize_header_line((string)($header['doctor_name'] ?? current_user_name())),
+        2 => zimrx_print_normalize_header_line((string)($header['qualifications'] ?? '')),
+        3 => zimrx_print_normalize_header_line((string)($header['specialty'] ?? '')),
+        4 => $addressLines[0] ?? zimrx_print_normalize_header_line((string)($header['chamber_name'] ?? '')),
         5 => $addressLines[1] ?? '',
         6 => $addressLines[2] ?? '',
         7 => $bmdc,
@@ -216,7 +216,7 @@ function zimrx_bridge_legacy_right_lines(array $header): array {
     ];
 }
 
-function zimrx_bridge_default_left_lines(): array {
+function zimrx_print_default_left_lines(): array {
     return [
         1 => 'ডা. শাফায়েত মাহমুদ',
         2 => 'এমবিবিএস, এমডি (কার্ডিওলজি), এফসিপিএস (মেডিসিন), বিসিএস(স্বাস্থ্য)',
@@ -231,7 +231,7 @@ function zimrx_bridge_default_left_lines(): array {
     ];
 }
 
-function zimrx_bridge_default_right_lines(): array {
+function zimrx_print_default_right_lines(): array {
     return [
         1 => 'Dr. Shafayet Mahmud',
         2 => 'MBBS, MD (Cardiology), FCPS (Medicine), BCS (Health)',
@@ -246,13 +246,13 @@ function zimrx_bridge_default_right_lines(): array {
     ];
 }
 
-function zimrx_bridge_header_lines(array $header, string $side): array {
+function zimrx_print_header_lines(array $header, string $side): array {
     $lines = [];
 
     // Check if the user has explicitly saved this side of the header.
     $isCustomized = array_key_exists($side . '_block_html', $header) && $header[$side . '_block_html'] !== null;
 
-    $fallback = ($side === 'left') ? zimrx_bridge_default_left_lines() : zimrx_bridge_default_right_lines();
+    $fallback = ($side === 'left') ? zimrx_print_default_left_lines() : zimrx_print_default_right_lines();
 
     for ($i = 1; $i <= 10; $i++) {
         $key = $side . '_line_' . $i;
@@ -269,17 +269,17 @@ function zimrx_bridge_header_lines(array $header, string $side): array {
     return $lines;
 }
 
-function zimrx_bridge_get_other_qualification(array $header, string $side): string {
+function zimrx_print_get_other_qualification(array $header, string $side): string {
     $otherSide = ($side === 'left') ? 'right' : 'left';
     $key = $otherSide . '_line_2';
     if (isset($header[$key]) && trim((string)$header[$key]) !== '') {
         return trim((string)$header[$key]);
     }
-    $fallback = ($otherSide === 'left') ? zimrx_bridge_default_left_lines() : zimrx_bridge_default_right_lines();
+    $fallback = ($otherSide === 'left') ? zimrx_print_default_left_lines() : zimrx_print_default_right_lines();
     return (string)($fallback[2] ?? '');
 }
 
-function zimrx_bridge_format_qualifications(string $text, string $otherText): string {
+function zimrx_print_format_qualifications(string $text, string $otherText): string {
     $text = trim($text);
     $otherText = trim($otherText);
     $items = array_map('trim', explode(',', $text));
@@ -304,7 +304,7 @@ function zimrx_bridge_format_qualifications(string $text, string $otherText): st
     }
 }
 
-function zimrx_bridge_visual_block_html(array $header, string $side, array $lines): string {
+function zimrx_print_visual_block_html(array $header, string $side, array $lines): string {
     $field = $side . '_block_html';
     $html = trim((string)($header[$field] ?? ''));
     if ($html !== '') {
@@ -323,8 +323,8 @@ function zimrx_bridge_visual_block_html(array $header, string $side, array $line
             : "zrx-header-line zrx-header-right-line-{$lineNumber}";
 
         if ($lineNumber === 2) {
-            $otherText = zimrx_bridge_get_other_qualification($header, $side);
-            $escaped = zimrx_bridge_format_qualifications($content, $otherText);
+            $otherText = zimrx_print_get_other_qualification($header, $side);
+            $escaped = zimrx_print_format_qualifications($content, $otherText);
         } else {
             $escaped = htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
             $escaped = preg_replace('/(\S+)\s+(\([^)]+\))/', '$1&nbsp;$2', $escaped);
@@ -376,7 +376,7 @@ function zimrx_bridge_visual_block_html(array $header, string $side, array $line
     return implode('', $chunks);
 }
 
-function zimrx_bridge_load_header_settings(PDO $pdo, int $doctorId): array {
+function zimrx_print_load_header_settings(PDO $pdo, int $doctorId): array {
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM zimrx_prescription_header_settings WHERE doctor_id = :doctor_id");
     $stmt->execute(['doctor_id' => $doctorId]);
     $exists = (int)$stmt->fetchColumn() > 0;
@@ -405,8 +405,8 @@ function zimrx_bridge_load_header_settings(PDO $pdo, int $doctorId): array {
     return $header;
 }
 
-function zimrx_bridge_load_print_options(PDO $pdo, int $doctorId): array {
-    $defaults = zimrx_bridge_default_print_options();
+function zimrx_print_load_options(PDO $pdo, int $doctorId): array {
+    $defaults = zimrx_print_default_options();
 
     $pdo->prepare(DbSql::insertIgnore('zimrx_prescription_print_layout_settings', 'doctor_id', ':doctor_id'))
         ->execute(['doctor_id' => $doctorId]);
@@ -490,7 +490,7 @@ function zimrx_bridge_load_print_options(PDO $pdo, int $doctorId): array {
         }
     }
 
-    $legacyAliases = [
+    $fieldAliases = [
         'display_visit_no' => 'visit_number',
         'display_signature' => 'disp_signature',
         'display_generic_name' => 'disp_generic',
@@ -506,7 +506,7 @@ function zimrx_bridge_load_print_options(PDO $pdo, int $doctorId): array {
         'otnote_name' => 'edd_name',
     ];
 
-    foreach ($legacyAliases as $current => $legacy) {
+    foreach ($fieldAliases as $current => $legacy) {
         if (array_key_exists($current, $advanced) && $advanced[$current] !== '') {
             $options[$legacy] = (string)$advanced[$current];
         }
@@ -547,7 +547,7 @@ function zimrx_bridge_load_print_options(PDO $pdo, int $doctorId): array {
     return $options;
 }
 
-function zimrx_bridge_legacy_form_to_payload(array $input): array {
+function zimrx_print_form_to_payload(array $input): array {
     $payload = [];
 
     $coreMap = [
@@ -602,7 +602,7 @@ function zimrx_bridge_legacy_form_to_payload(array $input): array {
         }
     }
 
-    $legacyAliases = [
+    $fieldAliases = [
         'visit_number' => 'display_visit_no',
         'disp_signature' => 'display_signature',
         'disp_generic' => 'display_generic_name',
@@ -617,7 +617,7 @@ function zimrx_bridge_legacy_form_to_payload(array $input): array {
         'barcode_position' => 'revisit_date',
         'edd_name' => 'otnote_name',
     ];
-    foreach ($legacyAliases as $legacy => $current) {
+    foreach ($fieldAliases as $legacy => $current) {
         if (array_key_exists($legacy, $input)) {
             $payload[$current] = trim((string)$input[$legacy]);
         }
@@ -633,7 +633,7 @@ function zimrx_bridge_legacy_form_to_payload(array $input): array {
     return $payload;
 }
 
-function zimrx_bridge_save_print_setup(PDO $pdo, int $doctorId, array $data): void {
+function zimrx_print_save_setup(PDO $pdo, int $doctorId, array $data): void {
     $layoutFields = [
         'page_width_cm', 'page_height_cm', 'header_height_cm', 'patient_info_height_cm',
         'left_width_cm', 'footer_height_cm', 'body_font_size_pt', 'rx_font_size_pt',
@@ -785,9 +785,9 @@ function zimrx_bridge_save_print_setup(PDO $pdo, int $doctorId, array $data): vo
     }
 }
 
-function zimrx_bridge_reset_print_setup(PDO $pdo, int $doctorId): void {
-    $currentOptions = zimrx_bridge_load_print_options($pdo, $doctorId);
-    $defaultOptions = zimrx_bridge_default_print_options();
+function zimrx_print_reset_setup(PDO $pdo, int $doctorId): void {
+    $currentOptions = zimrx_print_load_options($pdo, $doctorId);
+    $defaultOptions = zimrx_print_default_options();
 
     // Preserve Page Setup dimensions & Stamp settings when resetting print layout options
     $preservedKeys = [
@@ -807,13 +807,13 @@ function zimrx_bridge_reset_print_setup(PDO $pdo, int $doctorId): void {
         }
     }
 
-    $payload = zimrx_bridge_legacy_form_to_payload($defaultOptions);
-    zimrx_bridge_save_print_setup($pdo, $doctorId, $payload);
+    $payload = zimrx_print_form_to_payload($defaultOptions);
+    zimrx_print_save_setup($pdo, $doctorId, $payload);
 }
 
-function zimrx_bridge_header_preview_payload(array $header): array {
-    $leftLines = zimrx_bridge_header_lines($header, 'left');
-    $rightLines = zimrx_bridge_header_lines($header, 'right');
+function zimrx_print_header_preview_payload(array $header): array {
+    $leftLines = zimrx_print_header_lines($header, 'left');
+    $rightLines = zimrx_print_header_lines($header, 'right');
 
     return [
         'bn' => array_values($leftLines),
@@ -822,7 +822,7 @@ function zimrx_bridge_header_preview_payload(array $header): array {
     ];
 }
 
-function zimrx_bridge_footer_html(array $header): string {
+function zimrx_print_footer_html(array $header): string {
     $footerHtml = trim((string)($header['footer_html'] ?? ''));
     if ($footerHtml === '') {
         $footerHtml = nl2br(htmlspecialchars((string)($header['footer_note'] ?? ''), ENT_QUOTES, 'UTF-8'));
@@ -830,9 +830,9 @@ function zimrx_bridge_footer_html(array $header): string {
     return $footerHtml;
 }
 
-function zimrx_bridge_sample_preview_data(array $header): array {
+function zimrx_print_sample_preview_data(array $header): array {
     return [
-        'header' => zimrx_bridge_header_preview_payload($header),
+        'header' => zimrx_print_header_preview_payload($header),
         'patient' => [
             'name' => 'Sample Patient',
             'age' => '36Y',
@@ -915,6 +915,6 @@ function zimrx_bridge_sample_preview_data(array $header): array {
             'advice' => ['Take medicines regularly.', 'Return for review if symptoms worsen.'],
             'revisit' => '',
         ],
-        'footer' => zimrx_bridge_footer_html($header),
+        'footer' => zimrx_print_footer_html($header),
     ];
 }

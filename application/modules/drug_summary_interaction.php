@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <div class="drug-summary-wrapper" id="drug-summary-module">
     <div class="drug-summary-header">
         <div>

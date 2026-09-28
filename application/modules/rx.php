@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <div class="rx-wrapper">
     <!-- Top Info Bar -->
     <div id="rx-info-bar" class="rx-info-bar" title="Drug details will appear here">

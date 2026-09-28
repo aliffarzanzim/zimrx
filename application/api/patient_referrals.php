@@ -130,7 +130,7 @@ try {
           AND referral_category = :category
           AND COALESCE(referral_name, '') <> ''
     ";
-    $legacyVisitSql = "
+    $userReferralSql = "
         SELECT category, referral_name AS name, updated_at, id
         FROM zimrx_user_patient_referrals
         WHERE doctor_id = :doctor_id
@@ -148,7 +148,7 @@ try {
 
     if ($q !== '') {
         $visitSql .= " AND " . DbSql::ilike('referral_name', ':q');
-        $legacyVisitSql .= " AND " . DbSql::ilike('referral_name', ':q');
+        $userReferralSql .= " AND " . DbSql::ilike('referral_name', ':q');
         $appointmentSql .= " AND " . DbSql::ilike('referral_name', ':q');
         $params['q'] = '%' . $q . '%';
     }
@@ -157,7 +157,7 @@ try {
     if ($hasVisitReferralSource) {
         $sources[] = $visitSql;
     }
-    $sources[] = $legacyVisitSql;
+    $sources[] = $userReferralSql;
     if ($hasAppointmentReferralSource) {
         $sources[] = $appointmentSql;
     }

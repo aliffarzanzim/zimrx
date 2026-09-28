@@ -894,15 +894,15 @@ function zrx_render_advice(array $items, array $options): string {
 }
 
 $doctorId = current_user_doctor_id();
-$header = zimrx_bridge_load_header_settings($pdo, $doctorId);
-$options = zimrx_bridge_load_print_options($pdo, $doctorId);
-$sampleData = zimrx_bridge_sample_preview_data($header);
-$headerPayload = zimrx_bridge_header_preview_payload($header);
+$header = zimrx_print_load_header_settings($pdo, $doctorId);
+$options = zimrx_print_load_options($pdo, $doctorId);
+$sampleData = zimrx_print_sample_preview_data($header);
+$headerPayload = zimrx_print_header_preview_payload($header);
 
 $options['display_logo'] = strtolower((string)($header['display_logo'] ?? (!empty($header['logo_path']) ? 'yes' : 'yes'))) === 'no' ? 'no' : 'yes';
 $options['bgcolor'] = strtoupper(ltrim((string)($header['bg_color'] ?? 'FFFFFF'), '#'));
 $options['header_logo_url'] = trim((string)($header['logo_path'] ?? ''));
-$options['footer_text'] = zimrx_bridge_footer_html($header);
+$options['footer_text'] = zimrx_print_footer_html($header);
 
 $options['bullet_text'] = zrx_trim_text($options['bullet_text'] ?? '') === 'â—‹' ? '○' : ($options['bullet_text'] ?? '○');
 $options['drug_bullet'] = zrx_trim_text($options['drug_bullet'] ?? '') === 'â€¢' ? '•' : ($options['drug_bullet'] ?? '•');
@@ -1207,7 +1207,7 @@ $revisit = trim((string)($clinical['revisit'] ?? ''));
     <div id="pageHeader" class="zrx-print-header">
         <div class="zrx-header-layout <?= ($options['display_logo'] === 'yes' && $options['header_logo_url'] !== '') ? 'zrx-has-logo' : 'zrx-no-logo' ?>">
             <div class="zrx-header-text zrx-header-left" style="width: <?= preview_escape($options['header_left_width'] ?? ($options['display_logo'] === 'yes' ? '40' : '49')) ?>%;">
-                <?= zimrx_bridge_visual_block_html($header, 'left', $leftHeaderLines) ?>
+                <?= zimrx_print_visual_block_html($header, 'left', $leftHeaderLines) ?>
             </div>
 
             <?php if ($options['display_logo'] === 'yes' && $options['header_logo_url'] !== ''): ?>
@@ -1217,7 +1217,7 @@ $revisit = trim((string)($clinical['revisit'] ?? ''));
             <?php endif; ?>
 
             <div class="zrx-header-text zrx-header-right" style="width: <?= preview_escape($options['header_right_width'] ?? ($options['display_logo'] === 'yes' ? '40' : '49')) ?>%;">
-                <?= zimrx_bridge_visual_block_html($header, 'right', $rightHeaderLines) ?>
+                <?= zimrx_print_visual_block_html($header, 'right', $rightHeaderLines) ?>
             </div>
         </div>
     </div>

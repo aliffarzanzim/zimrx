@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <div id="report-entry-wrapper" class="reports-wrapper reports-single-wrapper">
     <section class="reports-section reports-entry-section">
         <div class="reports-section-header">

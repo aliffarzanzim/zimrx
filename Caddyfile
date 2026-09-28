@@ -17,7 +17,7 @@
 	}
 
 	# Never expose local data stores or old import dumps through the browser.
-	@privateData path /userdata/* /obsolete/*
+	@privateData path /userdata/* /obsolete/* /migrations/* /tests/* /lib/* /db/*
 	respond @privateData 404
 
 	@databaseFiles path *.db *.db3 *.sqlite *.sqlite3 *.sql *.mdb *.accdb *.db-wal *.db-shm *.sqlite-wal *.sqlite-shm

@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <div class="ai-wrapper">
     <!-- Header -->
     <div class="ai-header">

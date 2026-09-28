@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <div id="calculators-wrapper" style="background: #e2e8f0; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; height: 100%;">
     
     <div style="display: flex; flex-direction: column;">

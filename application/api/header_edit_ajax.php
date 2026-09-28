@@ -100,7 +100,7 @@ try {
         $payload['stamp_color_enable'] = trim((string)$_POST['stamp_color_enable']);
     }
 
-    zimrx_bridge_save_print_setup($pdo, current_user_doctor_id(), $payload);
+    zimrx_print_save_setup($pdo, current_user_doctor_id(), $payload);
     echo '1';
 } catch (Throwable $e) {
     http_response_code(500);

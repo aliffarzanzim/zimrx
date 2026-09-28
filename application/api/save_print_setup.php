@@ -31,7 +31,7 @@ try {
         echo json_encode(['error' => 'Unauthorized']);
         exit;
     }
-    zimrx_bridge_save_print_setup($pdo, $doctorId, $data);
+    zimrx_print_save_setup($pdo, $doctorId, $data);
 
     echo json_encode(['ok' => true]);
 } catch (Exception $e) {

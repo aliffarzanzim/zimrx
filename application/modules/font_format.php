@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <div id="font-format-wrapper" style="background: #e2e8f0; padding: 1.5rem; display: flex; flex-direction: column; height: 100%; border-radius: 0;">
     
     <h3 style="text-align: center; font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-top: 0; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'SolaimanLipi', sans-serif;">

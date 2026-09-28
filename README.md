@@ -68,6 +68,14 @@ Patient health records should **never** be monetized, tracked, or leaked to cent
 * **Zero Cloud Lock-in**: All patient encounters, appointments, and billing data stay strictly inside `application/userdata/`.
 * **Zero Telemetry**: No tracking pixels, no analytics backdoors, and no remote surveillance.
 
+### Directory Architecture & Security Boundaries
+
+To deliver a portable, single-folder appliance that runs offline while enforcing strict server security:
+* **`application/userdata/`**: Isolated clinic state vault (SQLite databases, cache, uploads). The entire clinic database, backups, and user uploads reside here; copying this single folder enables full backup and restoration across devices. Non-media subdirectories (`database/`, `cache/`, `backups/`) are strictly protected by defense-in-depth `.htaccess` deny rules and Caddy HTTP blocks.
+* **`application/lib/` & `application/db/`**: Central PDO abstractions, query builders, and migration engines. Direct HTTP invocation is denied by server configuration.
+* **`application/api/`**: JSON RPC and AJAX endpoints with mandatory session authentication, CSRF verification, and tenant doctor isolation guards.
+* **`application/assets/`**: Clean 3-tier presentation layer (`layout/`, `modules/`, `pages/`) separating design tokens, reusable UI components, and page-specific logic.
+
 ---
 
 ## Quick Start (Windows)

@@ -4,9 +4,20 @@
 
 # 1. User Data & Private Clinic Storage
 application/userdata/*
+!application/userdata/**/.htaccess
 !application/userdata/database/
 application/userdata/database/*
+!application/userdata/database/.htaccess
 !application/userdata/database/zimrx_userdata_schema_only.sql
+!application/userdata/cache/
+application/userdata/cache/*
+!application/userdata/cache/.htaccess
+!application/userdata/backups/
+application/userdata/backups/*
+!application/userdata/backups/.htaccess
+!application/userdata/uploads/
+application/userdata/uploads/*
+!application/userdata/uploads/.htaccess
 !application/userdata/**/.gitkeep
 
 # 2. Binary Database Files

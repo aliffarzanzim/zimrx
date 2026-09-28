@@ -1,3 +1,4 @@
+<?php declare(strict_types=1); ?>
 <div class="module-header">
     <span>Bangla Phonetic Converter</span>
     <span style="font-size:0.7rem; color:#64748b;">Clinical Notes</span>

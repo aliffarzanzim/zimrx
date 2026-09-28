@@ -324,7 +324,7 @@ try {
             'term' => $term,
         ]);
 
-        // Clean up legacy 'custom' row if present
+        // Clean up ad-hoc 'custom' row if present
         $userPdo->prepare(
             "DELETE FROM zimrx_user_pc
              WHERE doctor_id = :doctor_id
@@ -447,7 +447,7 @@ try {
             'term' => $term,
         ]);
 
-        // Clean up legacy 'custom_duration' row if present
+        // Clean up ad-hoc 'custom_duration' row if present
         $userPdo->prepare(
             "DELETE FROM zimrx_user_pc
              WHERE doctor_id = :doctor_id
@@ -541,7 +541,7 @@ try {
             'term' => $term,
         ]);
 
-        // Clean up legacy 'custom_unit' row if present
+        // Clean up ad-hoc 'custom_unit' row if present
         $userPdo->prepare(
             "DELETE FROM zimrx_user_pc
              WHERE doctor_id = :doctor_id
