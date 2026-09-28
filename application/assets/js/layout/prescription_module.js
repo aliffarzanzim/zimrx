@@ -1041,3 +1041,26 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
         });
+
+// ── Prescription Page Reveal Guard ────────────────────────────
+(function () {
+    let revealed = false;
+
+    function revealPrescriptionPage() {
+        if (revealed || !document.body) {
+            return;
+        }
+
+        revealed = true;
+        requestAnimationFrame(function () {
+            document.body.classList.add('zimrx-prescription-ready');
+        });
+    }
+
+    if (document.readyState === 'complete') {
+        revealPrescriptionPage();
+    } else {
+        window.addEventListener('load', revealPrescriptionPage, { once: true });
+        window.setTimeout(revealPrescriptionPage, 2500);
+    }
+})();

@@ -433,29 +433,6 @@ if ($reportsIndex !== false) {
 
 
     <script src="assets/js/layout/prescription_module.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/prescription_module.js') ?>"></script>
-    <script>
-        (function () {
-            let revealed = false;
-
-            function revealPrescriptionPage() {
-                if (revealed || !document.body) {
-                    return;
-                }
-
-                revealed = true;
-                requestAnimationFrame(function () {
-                    document.body.classList.add('zimrx-prescription-ready');
-                });
-            }
-
-            if (document.readyState === 'complete') {
-                revealPrescriptionPage();
-            } else {
-                window.addEventListener('load', revealPrescriptionPage, { once: true });
-                window.setTimeout(revealPrescriptionPage, 2500);
-            }
-        })();
-    </script>
 <?php include 'footer.php'; ?>
 <?php
 if (ob_get_level() > $zimrx_prescription_ob_level) {
