@@ -574,7 +574,8 @@ try {
 
     throw new RuntimeException('Unknown action.');
 } catch (Throwable $e) {
+    error_log('[ZimRx] mobile_sync error: ' . $e->getMessage());
     http_response_code(400);
-    echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+    echo json_encode(['ok' => false, 'error' => 'An internal error occurred. Please try again.']);
     exit();
 }

@@ -1,3 +1,15 @@
+// Defined locally to avoid dependency on external load order.
+// SAFETY: Never assign server-fetched or user-supplied content to innerHTML without this.
+const escapeRxHtml = (str) => {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+};
+
 function initRxAutocomplete() {
     let activeDropdown = null;
     let rxFocus = -1;

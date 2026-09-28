@@ -115,7 +115,8 @@ try {
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
     echo json_encode($results, JSON_UNESCAPED_UNICODE);
 } catch (Throwable $e) {
+    error_log('[ZimRx] search_dx error: ' . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['error' => 'Diagnosis search failed: ' . $e->getMessage()], JSON_UNESCAPED_UNICODE);
+    echo json_encode(['error' => 'Diagnosis search failed. Please try again.'], JSON_UNESCAPED_UNICODE);
 }
 

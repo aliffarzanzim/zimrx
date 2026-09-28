@@ -35,5 +35,6 @@ try {
 
     echo json_encode(['ok' => true]);
 } catch (Throwable $e) {
-    echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+    error_log('[ZimRx] delete_header_logo error: ' . $e->getMessage());
+    echo json_encode(['ok' => false, 'error' => 'An error occurred while deleting the file.']);
 }

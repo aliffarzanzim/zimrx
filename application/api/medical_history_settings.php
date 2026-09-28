@@ -71,8 +71,9 @@ try {
 
     echo json_encode(['success' => false, 'error' => 'Method not allowed.']);
 } catch (Throwable $e) {
+    error_log('[ZimRx] medical_history_settings error: ' . $e->getMessage());
     echo json_encode([
         'success' => false,
-        'error' => $e->getMessage()
+        'error' => 'An internal error occurred. Please try again.'
     ]);
 }

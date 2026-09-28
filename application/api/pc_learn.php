@@ -113,5 +113,6 @@ try {
 
     rx_json(['learned' => $learned, 'skipped' => $skipped]);
 } catch (Exception $e) {
-    rx_json(['error' => $e->getMessage()]);
+    error_log('[ZimRx] pc_learn error: ' . $e->getMessage());
+    rx_json(['error' => 'An internal error occurred. Please try again.']);
 }

@@ -88,7 +88,8 @@ try {
         'logo_path' => $publicPath,
     ]);
 } catch (RuntimeException $e) {
-    echo json_encode(['error' => $e->getMessage()]);
+    error_log('[ZimRx] upload_header_logo error: ' . $e->getMessage());
+    echo json_encode(['error' => 'An error occurred while uploading header logo.']);
 } catch (Throwable $e) {
     error_log('[ZimRx] upload_header_logo error: ' . $e->getMessage());
     echo json_encode(['error' => 'An error occurred while uploading header logo.']);

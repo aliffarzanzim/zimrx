@@ -182,5 +182,6 @@ try {
 
     rx_json($results);
 } catch (Exception $e) {
-    rx_json(['error' => $e->getMessage()]);
+    error_log('[ZimRx] rx_phrase_suggestions error: ' . $e->getMessage());
+    rx_json(['error' => 'An internal error occurred. Please try again.']);
 }

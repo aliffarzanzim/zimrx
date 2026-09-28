@@ -106,6 +106,7 @@ try {
             break;
     }
 } catch (Throwable $e) {
+    error_log('[ZimRx] user_drugs error: ' . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+    echo json_encode(['ok' => false, 'error' => 'An internal error occurred. Please try again.']);
 }

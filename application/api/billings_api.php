@@ -43,9 +43,9 @@ try {
             exit;
         }
 
-        // Get current payment
-        $stmt = $pdo->prepare("SELECT * FROM zimrx_payments WHERE id = :id");
-        $stmt->execute(['id' => $paymentId]);
+        // Get current payment (scoped to doctor)
+        $stmt = $pdo->prepare("SELECT * FROM zimrx_payments WHERE id = :id AND doctor_id = :did");
+        $stmt->execute(['id' => $paymentId, 'did' => $doctorId]);
         $curr = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$curr) {
@@ -62,7 +62,7 @@ try {
              SET paid_amount = :paid, discount = :disc, discount_note = :disc_note, 
                  payment_method = :method, payment_status = :status, notes = :notes,
                  updated_at = CURRENT_TIMESTAMP
-             WHERE id = :id"
+             WHERE id = :id AND doctor_id = :did"
         );
         $upStmt->execute([
             'paid' => $paidAmount,
@@ -71,7 +71,8 @@ try {
             'method' => $paymentMethod,
             'status' => $status,
             'notes' => $notes,
-            'id' => $paymentId
+            'id' => $paymentId,
+            'did' => $doctorId
         ]);
 
         // Sync to appointment if linked
@@ -122,15 +123,15 @@ try {
 
         // If no existing patient ID but name provided, try to find or create
         if ($patientId <= 0 && $patientName) {
-            $fStmt = $pdo->prepare("SELECT id FROM zimrx_patients WHERE full_name = :name LIMIT 1");
-            $fStmt->execute(['name' => $patientName]);
+            $fStmt = $pdo->prepare("SELECT id FROM zimrx_patients WHERE full_name = :name AND (doctor_id = :did OR doctor_id IS NULL) LIMIT 1");
+            $fStmt->execute(['name' => $patientName, 'did' => $doctorId]);
             $foundId = $fStmt->fetchColumn();
             if ($foundId) {
                 $patientId = (int)$foundId;
             } else {
-                $regNo = 'REG-' . date('ymd') . '-' . rand(100, 999);
-                $insP = $pdo->prepare("INSERT INTO zimrx_patients (full_name, reg_no, created_at) VALUES (:name, :reg, CURRENT_TIMESTAMP)");
-                $insP->execute(['name' => $patientName, 'reg' => $regNo]);
+                $regNo = 'REG-' . date('ymd') . '-' . strtoupper(bin2hex(random_bytes(2)));
+                $insP = $pdo->prepare("INSERT INTO zimrx_patients (doctor_id, full_name, reg_no, created_at) VALUES (:did, :name, :reg, CURRENT_TIMESTAMP)");
+                $insP->execute(['did' => $doctorId, 'name' => $patientName, 'reg' => $regNo]);
                 $patientId = (int)$pdo->lastInsertId();
             }
         }
@@ -188,9 +189,9 @@ try {
              FROM zimrx_payments p
              LEFT JOIN zimrx_patients pat ON pat.id = p.patient_id
              LEFT JOIN zimrx_appointments app ON app.id = p.appointment_id
-             WHERE p.id = :id"
+             WHERE p.id = :id AND p.doctor_id = :did"
         );
-        $stmt->execute(['id' => $paymentId]);
+        $stmt->execute(['id' => $paymentId, 'did' => $doctorId]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$row) {
@@ -241,10 +242,14 @@ try {
         $stmt = $pdo->prepare(
             "SELECT id, full_name, reg_no, mobile, age, gender 
              FROM zimrx_patients 
-             WHERE full_name LIKE :q OR mobile LIKE :q OR reg_no LIKE :q
+             WHERE (full_name LIKE :q OR mobile LIKE :q OR reg_no LIKE :q)
+               AND (COALESCE(NULLIF(doctor_id, 0), 1) = :did OR EXISTS (
+                   SELECT 1 FROM zimrx_patient_doctor_access 
+                   WHERE patient_id = zimrx_patients.id AND doctor_id = :did AND can_view = 1
+               ))
              ORDER BY id DESC LIMIT 10"
         );
-        $stmt->execute(['q' => "%{$q}%"]);
+        $stmt->execute(['q' => "%{$q}%", 'did' => $doctorId]);
         $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         echo json_encode(['success' => true, 'patients' => $patients]);
@@ -253,5 +258,6 @@ try {
 
     echo json_encode(['success' => false, 'error' => 'Unknown action']);
 } catch (Throwable $e) {
-    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    error_log('[ZimRx] billings_api error: ' . $e->getMessage());
+    echo json_encode(['success' => false, 'error' => 'An error occurred while processing billing operation.']);
 }

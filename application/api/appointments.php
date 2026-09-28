@@ -1125,5 +1125,6 @@ try {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    respond(['error' => $e->getMessage()]);
+    error_log('[ZimRx] appointments error: ' . $e->getMessage());
+    respond(['error' => 'An internal error occurred. Please try again.']);
 }

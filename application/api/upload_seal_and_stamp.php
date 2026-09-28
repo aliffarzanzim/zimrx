@@ -83,7 +83,8 @@ try {
         'url' => $publicPath,
     ]);
 } catch (RuntimeException $e) {
-    echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+    error_log('[ZimRx] upload_seal_and_stamp error: ' . $e->getMessage());
+    echo json_encode(['ok' => false, 'error' => 'An error occurred while uploading seal/stamp.']);
 } catch (Throwable $e) {
     error_log('[ZimRx] upload_seal_and_stamp error: ' . $e->getMessage());
     echo json_encode(['ok' => false, 'error' => 'An error occurred while uploading seal/stamp.']);

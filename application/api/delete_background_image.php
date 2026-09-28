@@ -23,6 +23,9 @@ try {
 
     // Only allow filenames that belong to the current doctor
     $doctorId = current_user_doctor_id();
+    if ($doctorId <= 0) {
+        throw new RuntimeException('A valid doctor account is required.');
+    }
     $prefix   = 'doctor-' . $doctorId . '-';
     if (!str_starts_with($filename, $prefix)) {
         throw new RuntimeException('Not authorized to delete this file.');
@@ -35,5 +38,6 @@ try {
 
     echo json_encode(['ok' => true]);
 } catch (Throwable $e) {
-    echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+    error_log('[ZimRx] delete_background_image error: ' . $e->getMessage());
+    echo json_encode(['ok' => false, 'error' => 'An error occurred while deleting the file.']);
 }

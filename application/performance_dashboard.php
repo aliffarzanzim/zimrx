@@ -6,7 +6,19 @@ require_login();
 require_once __DIR__ . '/db.php';
 
 $pdo = DbConnections::userdata();
-$doctorId = max(1, (int)(function_exists('current_user_doctor_id') ? current_user_doctor_id() : 1));
+$allowedDoctors = zimrx_doctor_options_for_user($pdo, current_user_id(), current_user_role(), current_user_doctor_id());
+$allowedDoctorIds = array_map(fn($d) => (int)$d['id'], $allowedDoctors);
+
+$requestedDoctorId = isset($_GET['doctor_id']) ? (int)$_GET['doctor_id'] : current_user_doctor_id();
+if ($requestedDoctorId > 0 && in_array($requestedDoctorId, $allowedDoctorIds, true)) {
+    $doctorId = $requestedDoctorId;
+} elseif (!empty($allowedDoctorIds)) {
+    $doctorId = $allowedDoctorIds[0];
+} else {
+    http_response_code(403);
+    echo '<!DOCTYPE html><html><head><title>Access Denied</title></head><body style="font-family:sans-serif;padding:2rem;text-align:center;"><h2>Access Denied</h2><p>No authorized physician profile found for this account.</p><p><a href="index.php">Return to Dashboard</a></p></body></html>';
+    exit;
+}
 
 // Period Filter
 $period = trim((string)($_GET['period'] ?? '30_days'));

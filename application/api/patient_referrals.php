@@ -177,5 +177,6 @@ try {
 
     referral_json(['suggestions' => $suggestions]);
 } catch (Exception $e) {
-    referral_json(['error' => $e->getMessage()]);
+    error_log('[ZimRx] patient_referrals error: ' . $e->getMessage());
+    referral_json(['error' => 'An internal error occurred. Please try again.']);
 }

@@ -311,5 +311,6 @@ try {
     $settings = is_array($payload['settings'] ?? null) ? $payload['settings'] : [];
     rx_json(instruction_template_save_all($doctorId, $rows, $settings));
 } catch (Throwable $e) {
-    rx_json(['error' => $e->getMessage()]);
+    error_log('[ZimRx] instruction_template error: ' . $e->getMessage());
+    rx_json(['error' => 'An internal error occurred. Please try again.']);
 }

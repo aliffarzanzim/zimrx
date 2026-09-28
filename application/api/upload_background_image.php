@@ -83,7 +83,8 @@ try {
         'url' => $publicPath,
     ]);
 } catch (RuntimeException $e) {
-    echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+    error_log('[ZimRx] upload_background_image error: ' . $e->getMessage());
+    echo json_encode(['ok' => false, 'error' => 'An error occurred while uploading background image.']);
 } catch (Throwable $e) {
     error_log('[ZimRx] upload_background_image error: ' . $e->getMessage());
     echo json_encode(['ok' => false, 'error' => 'An error occurred while uploading background image.']);

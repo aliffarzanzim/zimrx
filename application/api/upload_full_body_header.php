@@ -123,7 +123,8 @@ try {
         'message' => 'সফলভাবে ফুলবডি ইমেজ হেডার আপলোড সম্পন্ন হয়েছে।',
     ]);
 } catch (RuntimeException $e) {
-    echo json_encode(['error' => $e->getMessage()]);
+    error_log('[ZimRx] upload_full_body_header error: ' . $e->getMessage());
+    echo json_encode(['error' => 'An error occurred while uploading full body header.']);
 } catch (Throwable $e) {
     error_log('[ZimRx] upload_full_body_header error: ' . $e->getMessage());
     echo json_encode(['error' => 'An error occurred while uploading full body header.']);

@@ -77,5 +77,6 @@ try {
         'original_name' => $file['name']
     ]);
 } catch (Throwable $e) {
-    echo json_encode(['error' => $e->getMessage()]);
+    error_log('[ZimRx] upload_report error: ' . $e->getMessage());
+    echo json_encode(['error' => 'An error occurred while uploading the report.']);
 }

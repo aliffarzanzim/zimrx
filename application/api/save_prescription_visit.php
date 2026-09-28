@@ -591,5 +591,6 @@ try {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    respond(['error' => $e->getMessage()]);
+    error_log('[ZimRx] save_prescription_visit error: ' . $e->getMessage());
+    respond(['error' => 'An internal error occurred. Please try again.']);
 }

@@ -234,5 +234,6 @@ try {
 
     rx_json(['found' => false]);
 } catch (Exception $e) {
-    rx_json(['error' => $e->getMessage()]);
+    error_log('[ZimRx] rx_regimen error: ' . $e->getMessage());
+    rx_json(['error' => 'An internal error occurred. Please try again.']);
 }

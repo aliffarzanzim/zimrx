@@ -676,5 +676,6 @@ try {
 
     rx_json(['error' => 'Unknown action.']);
 } catch (Exception $e) {
-    rx_json(['error' => $e->getMessage()]);
+    error_log('[ZimRx] pc_settings error: ' . $e->getMessage());
+    rx_json(['error' => 'An internal error occurred. Please try again.']);
 }

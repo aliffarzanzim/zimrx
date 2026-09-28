@@ -29,7 +29,8 @@ try {
     $pdo = $pdo instanceof PDO ? $pdo : DbConnections::userdata();
     $pdo->exec('PRAGMA busy_timeout = 5000');
 } catch (Throwable $e) {
-    emr_json_response(['success' => false, 'message' => 'Database connection failed: ' . $e->getMessage()], 500);
+    error_log('[ZimRx] emr_api DB connection error: ' . $e->getMessage());
+    emr_json_response(['success' => false, 'message' => 'Database connection failed. Please try again.'], 500);
 }
 
 $action = trim((string)($_GET['action'] ?? $_POST['action'] ?? ''));

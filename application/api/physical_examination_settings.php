@@ -72,9 +72,10 @@ try {
     http_response_code(405);
     echo json_encode(['success' => false, 'error' => 'Method not allowed.']);
 } catch (Throwable $e) {
+    error_log('[ZimRx] physical_examination_settings error: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'error' => $e->getMessage()
+        'error' => 'An internal error occurred. Please try again.'
     ]);
 }

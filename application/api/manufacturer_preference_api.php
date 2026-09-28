@@ -245,5 +245,6 @@ try {
     if ($userDb->inTransaction()) {
         $userDb->rollBack();
     }
-    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    error_log('[ZimRx] manufacturer_preference_api error: ' . $e->getMessage());
+    echo json_encode(['success' => false, 'error' => 'An internal error occurred. Please try again.']);
 }

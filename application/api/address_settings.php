@@ -279,5 +279,6 @@ try {
     respond(['ok' => false, 'error' => 'Invalid action']);
 
 } catch (Exception $e) {
-    respond(['ok' => false, 'error' => $e->getMessage()]);
+    error_log('[ZimRx] address_settings error: ' . $e->getMessage());
+    respond(['ok' => false, 'error' => 'An internal error occurred. Please try again.']);
 }

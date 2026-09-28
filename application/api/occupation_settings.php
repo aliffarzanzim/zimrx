@@ -251,5 +251,6 @@ try {
 
     respond(['status' => 'error', 'message' => 'Unknown action.']);
 } catch (Throwable $e) {
-    respond(['status' => 'error', 'message' => $e->getMessage()]);
+    error_log('[ZimRx] occupation_settings error: ' . $e->getMessage());
+    respond(['status' => 'error', 'message' => 'An internal error occurred. Please try again.']);
 }

@@ -505,6 +505,7 @@ try {
 
     rx_template_json(['error' => 'Unsupported action.']);
 } catch (Throwable $e) {
-    rx_template_json(['error' => $e->getMessage()]);
+    error_log('[ZimRx] rx_template error: ' . $e->getMessage());
+    rx_template_json(['error' => 'An internal error occurred. Please try again.']);
 }
 
