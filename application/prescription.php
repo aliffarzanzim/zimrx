@@ -419,20 +419,20 @@ if ($reportsIndex !== false) {
     <script src="assets/js/dosage_form_icons.js?v=<?= filemtime(__DIR__ . '/assets/js/dosage_form_icons.js') ?>"></script>
     <script src="assets/js/layout/config.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/config.js') ?>"></script>
     <script src="assets/js/layout/dashboard.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/dashboard.js') ?>"></script>
-    <script src="assets/js/layout/rx_autocomplete.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/rx_autocomplete.js') ?>"></script>
-    <script src="assets/js/layout/pc_autocomplete.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/pc_autocomplete.js') ?>"></script>
-    <script src="assets/js/layout/o_h_module.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/o_h_module.js') ?>"></script>
+    <script src="assets/js/modules/rx_autocomplete.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/rx_autocomplete.js') ?>"></script>
+    <script src="assets/js/modules/pc_autocomplete.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/pc_autocomplete.js') ?>"></script>
+    <script src="assets/js/modules/o_h_module.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/o_h_module.js') ?>"></script>
     <script src="assets/js/layout/growth_chart_data.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/growth_chart_data.js') ?>"></script>
-    <script src="assets/js/layout/paediatric_module.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/paediatric_module.js') ?>"></script>
-    <script src="assets/js/layout/clinical_exam_modules.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/clinical_exam_modules.js') ?>"></script>
-    <script src="assets/js/layout/prescription_preview.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/prescription_preview.js') ?>"></script>
-    <script src="assets/js/layout/ho_diet_dropdown.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/ho_diet_dropdown.js') ?>"></script>
-    <script src="assets/js/layout/history_module.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/history_module.js') ?>"></script>
+    <script src="assets/js/modules/paediatric_module.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/paediatric_module.js') ?>"></script>
+    <script src="assets/js/modules/clinical_exam_modules.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/clinical_exam_modules.js') ?>"></script>
+    <script src="assets/js/pages/prescription_preview.js?v=<?= filemtime(__DIR__ . '/assets/js/pages/prescription_preview.js') ?>"></script>
+    <script src="assets/js/modules/ho_diet_dropdown.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/ho_diet_dropdown.js') ?>"></script>
+    <script src="assets/js/modules/history_module.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/history_module.js') ?>"></script>
     <script src="assets/js/layout/boot.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/boot.js') ?>"></script>
 
 
 
-    <script src="assets/js/layout/prescription_module.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/prescription_module.js') ?>"></script>
+    <script src="assets/js/modules/prescription_module.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/prescription_module.js') ?>"></script>
 <?php include 'footer.php'; ?>
 <?php
 if (ob_get_level() > $zimrx_prescription_ob_level) {

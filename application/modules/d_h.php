@@ -59,4 +59,4 @@
     </template>
 </div>
 
-<script src="assets/js/layout/dh_module.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/layout/dh_module.js') ?>"></script>
+<script src="assets/js/modules/dh_module.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/dh_module.js') ?>"></script>

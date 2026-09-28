@@ -61,5 +61,5 @@
     </template>
 </div>
 
-<script src="assets/js/layout/dx_module.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/layout/dx_module.js') ?>"></script>
+<script src="assets/js/modules/dx_module.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/dx_module.js') ?>"></script>
 

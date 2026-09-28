@@ -74,4 +74,4 @@
     </div>
 </div>
 
-<script src="assets/js/layout/ai_analyzer.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/layout/ai_analyzer.js') ?>"></script>
+<script src="assets/js/modules/ai_analyzer.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/ai_analyzer.js') ?>"></script>

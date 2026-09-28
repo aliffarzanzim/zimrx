@@ -107,6 +107,6 @@ require_once __DIR__ . '/header.php';
     <span id="toast-message">Changes saved successfully!</span>
 </div>
 
-<script src="assets/js/layout/manufacturer_preferences.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/manufacturer_preferences.js') ?>"></script>
+<script src="assets/js/pages/manufacturer_preferences.js?v=<?= filemtime(__DIR__ . '/assets/js/pages/manufacturer_preferences.js') ?>"></script>
 
 <?php require_once __DIR__ . '/footer.php'; ?>

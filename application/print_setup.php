@@ -1008,5 +1008,5 @@ include 'header.php';
     </form>
 </div>
 
-<script src="assets/js/layout/print_setup_module.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/print_setup_module.js') ?>"></script>
+<script src="assets/js/pages/print_setup_module.js?v=<?= filemtime(__DIR__ . '/assets/js/pages/print_setup_module.js') ?>"></script>
 <?php include 'footer.php'; ?>

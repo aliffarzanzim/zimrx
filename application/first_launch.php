@@ -299,6 +299,6 @@ if ($step === 3 && !is_logged_in()) {
 
 </div><!-- wizard-wrap -->
 
-<script src="assets/js/layout/first_launch.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/first_launch.js') ?>"></script>
+<script src="assets/js/pages/first_launch.js?v=<?= filemtime(__DIR__ . '/assets/js/pages/first_launch.js') ?>"></script>
 </body>
 </html>

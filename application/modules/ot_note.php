@@ -137,4 +137,4 @@ $ot_predefined_particulars = [
 <script src="vendor/nicedit/nicEdit-latest.js?v=<?= filemtime(__DIR__ . '/../vendor/nicedit/nicEdit-latest.js') ?>"></script>
 <script src="vendor/nicedit/nicEdit-zimrx-custom.js?v=<?= filemtime(__DIR__ . '/../vendor/nicedit/nicEdit-zimrx-custom.js') ?>"></script>
 
-<script src="assets/js/layout/ot_note.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/layout/ot_note.js') ?>"></script>
+<script src="assets/js/modules/ot_note.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/ot_note.js') ?>"></script>

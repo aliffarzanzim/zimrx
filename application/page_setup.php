@@ -296,5 +296,5 @@ include 'header.php';
     </div>
 </div>
 
-<script src="assets/js/layout/page_setup.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/page_setup.js') ?>"></script>
+<script src="assets/js/pages/page_setup.js?v=<?= filemtime(__DIR__ . '/assets/js/pages/page_setup.js') ?>"></script>
 <?php include 'footer.php'; ?>

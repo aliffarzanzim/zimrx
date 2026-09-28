@@ -334,5 +334,5 @@ include 'header.php';
 </div>
 
 <script id="instructionTemplateInitialPayload" type="application/json"><?= json_encode($instructionTemplateInitialPayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
-<script src="assets/js/layout/instruction_template.js"></script>
+<script src="assets/js/pages/instruction_template.js"></script>
 <?php include 'footer.php'; ?>

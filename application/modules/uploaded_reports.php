@@ -144,4 +144,4 @@
     </div>
 </div>
 
-<script src="assets/js/layout/uploaded_reports_module.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/layout/uploaded_reports_module.js') ?>"></script>
+<script src="assets/js/modules/uploaded_reports_module.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/uploaded_reports_module.js') ?>"></script>

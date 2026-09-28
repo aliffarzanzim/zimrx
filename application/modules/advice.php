@@ -62,4 +62,4 @@
     </template>
 </div>
 
-<script src="assets/js/layout/advice_module.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/layout/advice_module.js') ?>"></script>
+<script src="assets/js/modules/advice_module.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/advice_module.js') ?>"></script>

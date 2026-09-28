@@ -239,4 +239,4 @@ $activePeItems = $peDoctorConfig['active_items'];
     </div>
 </div>
 
-<script src="assets/js/layout/pe_module.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/layout/pe_module.js') ?>"></script>
+<script src="assets/js/modules/pe_module.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/pe_module.js') ?>"></script>

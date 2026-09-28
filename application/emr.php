@@ -819,6 +819,6 @@ if ($patient && !empty($patient['id'])) {
     'firstPastVisitId' => !empty($pastVisitsForDrawer[0]['visit_id']) ? (string)$pastVisitsForDrawer[0]['visit_id'] : '',
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
 </script>
-<script src="assets/js/layout/emr.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/emr.js') ?>"></script>
+<script src="assets/js/pages/emr.js?v=<?= filemtime(__DIR__ . '/assets/js/pages/emr.js') ?>"></script>
 
 <?php require_once __DIR__ . '/footer.php'; ?>

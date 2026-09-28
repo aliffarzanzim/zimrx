@@ -1281,6 +1281,6 @@ $revisit = trim((string)($clinical['revisit'] ?? ''));
 <script id="previewOptionsData" type="application/json"><?= json_encode($options, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
 <script id="previewDefaultDataJson" type="application/json"><?= json_encode($sampleData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
 <script id="previewServerSnapshotData" type="application/json"><?= $serverSnapshotJson ?: "null" ?></script>
-<script src="assets/js/layout/prescription_preview_render.js"></script>
+<script src="assets/js/pages/prescription_preview_render.js"></script>
 </body>
 </html>

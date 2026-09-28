@@ -665,6 +665,6 @@ require_once __DIR__ . '/header.php';
     </div>
 </div>
 
-<script src="assets/js/layout/billings.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/billings.js') ?>"></script>
+<script src="assets/js/pages/billings.js?v=<?= filemtime(__DIR__ . '/assets/js/pages/billings.js') ?>"></script>
 
 <?php require_once __DIR__ . '/footer.php'; ?>

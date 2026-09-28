@@ -36,4 +36,4 @@
 
 <!-- Load NicEditor & Initialize -->
 <script src="vendor/nicedit/nicEdit-latest.js"></script>
-<script src="assets/js/layout/text_pad.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/layout/text_pad.js') ?>"></script>
+<script src="assets/js/modules/text_pad.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/text_pad.js') ?>"></script>

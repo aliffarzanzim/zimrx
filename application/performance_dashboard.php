@@ -663,7 +663,7 @@ require_once __DIR__ . '/header.php';
     </div>
 </div>
 
-<script src="assets/js/performance_dashboard.js?v=<?= file_exists(__DIR__ . '/assets/js/performance_dashboard.js') ? filemtime(__DIR__ . '/assets/js/performance_dashboard.js') : '1' ?>" defer></script>
+<script src="assets/js/pages/performance_dashboard.js?v=<?= file_exists(__DIR__ . '/assets/js/pages/performance_dashboard.js') ? filemtime(__DIR__ . '/assets/js/pages/performance_dashboard.js') : '1' ?>" defer></script>
 
 
 <?php require_once __DIR__ . '/footer.php'; ?>

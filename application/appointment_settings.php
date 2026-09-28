@@ -341,6 +341,6 @@ include 'header.php';
 
 </div>
 
-<script src="assets/js/layout/appointment_settings.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/appointment_settings.js') ?>"></script>
+<script src="assets/js/pages/appointment_settings.js?v=<?= filemtime(__DIR__ . '/assets/js/pages/appointment_settings.js') ?>"></script>
 
 <?php include 'footer.php'; ?>

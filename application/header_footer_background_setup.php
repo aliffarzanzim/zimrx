@@ -624,5 +624,5 @@ include 'header.php';
 
 <script src="vendor/nicedit/nicEdit-latest.js?v=<?= filemtime(__DIR__ . '/vendor/nicedit/nicEdit-latest.js') ?>"></script>
 <script src="vendor/nicedit/nicEdit-zimrx-custom.js?v=<?= filemtime(__DIR__ . '/vendor/nicedit/nicEdit-zimrx-custom.js') ?>"></script>
-<script src="assets/js/layout/header_footer_setup.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/header_footer_setup.js') ?>"></script>
+<script src="assets/js/pages/header_footer_setup.js?v=<?= filemtime(__DIR__ . '/assets/js/pages/header_footer_setup.js') ?>"></script>
 <?php include 'footer.php'; ?>

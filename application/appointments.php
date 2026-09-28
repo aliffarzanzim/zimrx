@@ -1105,5 +1105,5 @@ include 'header.php';
 </script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="assets/js/layout/boot.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/boot.js') ?>"></script>
-<script src="assets/js/appointments.js?v=<?= filemtime(__DIR__ . '/assets/js/appointments.js') ?>"></script>
+<script src="assets/js/pages/appointments.js?v=<?= filemtime(__DIR__ . '/assets/js/pages/appointments.js') ?>"></script>
 <?php include 'footer.php'; ?>

@@ -290,6 +290,6 @@ include 'header.php';
     'isMultiDoctorMode' => $isMultiDoctor,
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
 </script>
-<script src="assets/js/layout/emr_settings.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/emr_settings.js') ?>"></script>
+<script src="assets/js/pages/emr_settings.js?v=<?= filemtime(__DIR__ . '/assets/js/pages/emr_settings.js') ?>"></script>
 
 <?php include 'footer.php'; ?>

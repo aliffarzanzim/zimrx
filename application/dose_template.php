@@ -155,7 +155,7 @@ include 'header.php';
 </div>
 
 <script id="phrasePayloadData" type="application/json"><?= json_encode($phrasePayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
-<script src="assets/js/layout/phrase_template.js"></script>
+<script src="assets/js/pages/phrase_template.js"></script>
 
 <?php include 'footer.php'; ?>
 

@@ -65,4 +65,4 @@
     </template>
 </div>
 
-<script src="assets/js/layout/ix_module.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/layout/ix_module.js') ?>"></script>
+<script src="assets/js/modules/ix_module.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/ix_module.js') ?>"></script>
