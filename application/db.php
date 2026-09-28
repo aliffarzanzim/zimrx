@@ -17,10 +17,10 @@
 
 // 1. Include Configuration and Database Manager
 require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/db/DbConnections.php';
-require_once __DIR__ . '/db/DbSchema.php';
-require_once __DIR__ . '/db/DbSql.php';
-require_once __DIR__ . '/db/DbMigrator.php';
+require_once __DIR__ . '/db/db_connections.php';
+require_once __DIR__ . '/db/db_schema.php';
+require_once __DIR__ . '/db/db_sql.php';
+require_once __DIR__ . '/db/db_migrator.php';
 
 // 2. Initialize DbConnections with configuration
 DbConnections::configure(DB_CONFIG);

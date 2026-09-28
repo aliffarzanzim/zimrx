@@ -94,7 +94,7 @@ setup-franken-for-dev.bat
 ```
 
 ### Database Migrations
-Database schemas and versioning are managed through `DbMigrator` (`application/db/DbMigrator.php`). Run the application or execute `db.php` to apply any pending schema migrations automatically:
+Database schemas and versioning are managed through `DbMigrator` (`application/db/db_migrator.php`). Run the application or execute `db.php` to apply any pending schema migrations automatically:
 ```bash
 php -r "require_once 'application/db.php';"
 ```
