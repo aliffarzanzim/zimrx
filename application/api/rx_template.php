@@ -4,7 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../auth.php';
 require_login();
 require_once __DIR__ . '/../db.php';
-require_once __DIR__ . '/rx_template_lib.php';
+require_once __DIR__ . '/../lib/rx_template_lib.php';
 
 function rx_template_json($payload): void {
     header('Content-Type: application/json');

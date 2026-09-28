@@ -101,7 +101,7 @@ function zimrx_get_mobile_url(): string {
         if ($appPath === '/' || $appPath === '\\') {
             $appPath = '';
         }
-        return $origin . $appPath . '/mobile-upload.php';
+        return $origin . $appPath . '/mobile_upload.php';
     }
 
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
@@ -121,7 +121,7 @@ function zimrx_get_mobile_url(): string {
         $appPath = '';
     }
 
-    return $protocol . '://' . $host . $port . $appPath . '/mobile-upload.php';
+    return $protocol . '://' . $host . $port . $appPath . '/mobile_upload.php';
 }
 
 $action = $_GET['action'] ?? $_POST['action'] ?? '';

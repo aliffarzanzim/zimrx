@@ -7,7 +7,7 @@
 require_once __DIR__ . '/../auth.php';
 require_login();
 require_once __DIR__ . '/../db.php';
-require_once __DIR__ . '/medical_history_lib.php';
+require_once __DIR__ . '/../lib/medical_history_lib.php';
 
 header('Content-Type: application/json; charset=utf-8');
 

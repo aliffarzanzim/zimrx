@@ -2,7 +2,7 @@
 define('ZIMRX_DB_LIGHTWEIGHT', true);
 require_once __DIR__ . '/../auth.php';
 require_once __DIR__ . '/../db.php';
-require_once __DIR__ . '/rx_template_lib.php';
+require_once __DIR__ . '/../lib/rx_template_lib.php';
 require_login();
 
 ini_set('display_errors', '0');

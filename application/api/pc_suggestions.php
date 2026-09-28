@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../auth.php';
 require_login();
 require_once __DIR__ . '/../db.php';
-require_once __DIR__ . '/pc_catalog_lib.php';
+require_once __DIR__ . '/../lib/pc_catalog_lib.php';
 
 function pc_default_options(string $field): array {
     if ($field === 'duration') {

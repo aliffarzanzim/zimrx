@@ -1,7 +1,7 @@
 <?php
 define('ZIMRX_DB_LIGHTWEIGHT', true);
 require_once __DIR__ . '/../db.php';
-require_once __DIR__ . '/user_drug_lib.php';
+require_once __DIR__ . '/../lib/user_drug_lib.php';
 header('Content-Type: application/json');
 
 if (!function_exists('drug_lookup_user_row')) {

@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json');
 require_once __DIR__ . '/../db.php';
-require_once __DIR__ . '/rx_regimen_lib.php';
+require_once __DIR__ . '/../lib/rx_regimen_lib.php';
 
 try {
     $term = isset($_GET['term']) ? trim($_GET['term']) : '';

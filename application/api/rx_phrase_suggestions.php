@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../db.php';
-require_once __DIR__ . '/rx_regimen_lib.php';
-require_once __DIR__ . '/rx_template_lib.php';
+require_once __DIR__ . '/../lib/rx_regimen_lib.php';
+require_once __DIR__ . '/../lib/rx_template_lib.php';
 
 try {
     $userPdo = rx_user_pdo();

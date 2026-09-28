@@ -99,7 +99,7 @@ function drug_db_initial_detail() {
 
     try {
         require_once __DIR__ . '/db.php';
-        require_once __DIR__ . '/api/drug_catalog_lib.php';
+        require_once __DIR__ . '/lib/drug_catalog_lib.php';
 
         $pdo = DbConnections::systemDb();
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
@@ -141,7 +141,7 @@ function drug_db_initial_sidebar_state() {
     }
     try {
         require_once __DIR__ . '/db.php';
-        require_once __DIR__ . '/api/drug_catalog_lib.php';
+        require_once __DIR__ . '/lib/drug_catalog_lib.php';
 
         $pdo = DbConnections::systemDb();
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);

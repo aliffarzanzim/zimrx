@@ -2,7 +2,7 @@
 require_once 'auth.php';
 require_login();
 require_once __DIR__ . '/db.php';
-require_once __DIR__ . '/api/rx_regimen_lib.php';
+require_once __DIR__ . '/lib/rx_regimen_lib.php';
 $page_title = 'Instruction Template';
 
 $instructionTemplateDoctorId = rx_active_doctor_id();

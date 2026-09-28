@@ -2,7 +2,7 @@
 require_once 'auth.php';
 require_login();
 require_once __DIR__ . '/db.php';
-require_once __DIR__ . '/api/rx_template_lib.php';
+require_once __DIR__ . '/lib/rx_template_lib.php';
 
 $phraseTemplateType = 'dose';
 $phraseConfig = rx_template_config($phraseTemplateType);

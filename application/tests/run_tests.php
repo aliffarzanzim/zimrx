@@ -23,8 +23,8 @@ require_once __DIR__ . '/../db/db_connections.php';
 require_once __DIR__ . '/../db/db_schema.php';
 require_once __DIR__ . '/../db/db_sql.php';
 require_once __DIR__ . '/../db/db_migrator.php';
-require_once __DIR__ . '/../api/pc_catalog_lib.php';
-require_once __DIR__ . '/../api/user_drug_lib.php';
+require_once __DIR__ . '/../lib/pc_catalog_lib.php';
+require_once __DIR__ . '/../lib/user_drug_lib.php';
 
 class ZimRxTestSuite {
     private int $passed = 0;
