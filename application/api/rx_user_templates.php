@@ -50,11 +50,14 @@ try {
         );
         $rowsStmt->execute(['group_id' => $groupId, 'doctor_id' => $doctorId]);
 
-        $userPdo->prepare(
-            "UPDATE {$table}
-             SET usage_count = usage_count + 1, updated_at = CURRENT_TIMESTAMP
-             WHERE template_group_id = :group_id AND doctor_id = :doctor_id"
-        )->execute(['group_id' => $groupId, 'doctor_id' => $doctorId]);
+        // Maintain strict GET idempotency (RFC 7231): usage metrics incremented exclusively on verified POST mutations
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && zimrx_verify_csrf()) {
+            $userPdo->prepare(
+                "UPDATE {$table}
+                 SET usage_count = usage_count + 1, updated_at = CURRENT_TIMESTAMP
+                 WHERE template_group_id = :group_id AND doctor_id = :doctor_id"
+            )->execute(['group_id' => $groupId, 'doctor_id' => $doctorId]);
+        }
 
         $rows = array_map(function ($row) {
             $master = rx_resolve_master(null, $row['brand_id'] ?? null, $row['generic_id'] ?? null);

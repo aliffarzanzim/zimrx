@@ -2,6 +2,8 @@
 declare(strict_types=1);
 
 header('Content-Type: application/json');
+require_once __DIR__ . '/../auth.php';
+require_login();
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/../lib/rx_regimen_lib.php';
 

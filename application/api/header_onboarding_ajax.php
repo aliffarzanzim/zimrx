@@ -8,6 +8,12 @@ require_once __DIR__ . '/../lib/print_setup_lib.php';
 
 header('Content-Type: text/plain; charset=utf-8');
 
+if (!zimrx_verify_csrf()) {
+    http_response_code(403);
+    echo 'Forbidden: Invalid CSRF token.';
+    exit();
+}
+
 try {
     $doctorId = current_user_doctor_id();
 

@@ -1,4 +1,21 @@
 (function() {
+    /**
+     * ==============================================================================
+     * ZimRx Bedside Clinical Calculators & Anthropometric Analysis Engine
+     * ==============================================================================
+     * Medical Literature Grounding & Physiological Invariants:
+     * 1. BMI: WHO Technical Report Series 894 (Obesity: Preventing and Managing the
+     *    Global Epidemic) & WHO Asian BMI Expert Consultation (Lancet 2004; 363:157-163).
+     * 2. Insulin: American Diabetes Association (ADA) Standards of Medical Care in
+     *    Diabetes (2024); 2/3 morning, 1/3 evening split for standard NPH/Regular regimen.
+     * 3. BMR: Mifflin-St Jeor Equation (Mifflin MD et al., Am J Clin Nutr 1990;51:241-247).
+     * 4. eGFR (CrCl): Cockcroft DW, Gault MH. Prediction of creatinine clearance from
+     *    serum creatinine. Nephron 1976;16(1):31-41. KDIGO 2012 Clinical Practice
+     *    Guideline for the Evaluation and Management of Chronic Kidney Disease (Stages G1-G5).
+     * 5. EDD: Naegele's Rule (LMP + 280 days / 40 weeks); ACOG Committee Opinion No. 700.
+     * ==============================================================================
+     */
+
     // --- Tab Switching Logic ---
     const tabs = document.querySelectorAll('.calc-tab-btn');
     const panes = document.querySelectorAll('.calc-pane');
@@ -21,7 +38,7 @@
         return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
     }
 
-    // --- 1. BMI ---
+    // --- 1. BMI (Body Mass Index - WHO 2000 Classification) ---
     function doBmi() {
         let kg = val('bmi-kg'), ft = val('bmi-ft'), inc = val('bmi-in');
         if(kg > 0 && (ft > 0 || inc > 0)) {

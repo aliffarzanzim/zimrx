@@ -10,6 +10,12 @@ ini_set('display_errors', '0');
 
 header('Content-Type: text/plain; charset=utf-8');
 
+if (!zimrx_verify_csrf()) {
+    http_response_code(403);
+    echo 'Forbidden: Invalid CSRF token.';
+    exit();
+}
+
 try {
     $payload = zimrx_print_form_to_payload($_POST);
     zimrx_print_save_setup($pdo, current_user_doctor_id(), $payload);

@@ -802,6 +802,27 @@ class ZimRxTestSuite {
         $currentDoctor = 1;
         $reportOwner = $extractReportDoctor('report-2-1780242361.png');
         $this->assert($currentDoctor !== $reportOwner, 'Cross-doctor report access detected and blocked');
+
+        // 6. Anti-CSRF verification on layout & header mutation endpoints
+        $printSaveCode = (string)file_get_contents(__DIR__ . '/../api/print_setup_save.php');
+        $this->assert(str_contains($printSaveCode, 'zimrx_verify_csrf()'), 'api/print_setup_save.php enforces zimrx_verify_csrf()');
+
+        $headerEditCode = (string)file_get_contents(__DIR__ . '/../api/header_edit_ajax.php');
+        $this->assert(str_contains($headerEditCode, 'zimrx_verify_csrf()'), 'api/header_edit_ajax.php enforces zimrx_verify_csrf()');
+
+        $headerOnboardCode = (string)file_get_contents(__DIR__ . '/../api/header_onboarding_ajax.php');
+        $this->assert(str_contains($headerOnboardCode, 'zimrx_verify_csrf()'), 'api/header_onboarding_ajax.php enforces zimrx_verify_csrf()');
+
+        // 7. GET Idempotency verification on template endpoints (RFC 7231)
+        $rxTemplateCode = (string)file_get_contents(__DIR__ . '/../api/rx_user_templates.php');
+        $this->assert(str_contains($rxTemplateCode, "REQUEST_METHOD'] === 'POST'"), 'api/rx_user_templates.php enforces GET idempotency for usage metrics');
+
+        // 8. Authentication verification on clinic phrase & address lookups
+        $addrCode = (string)file_get_contents(__DIR__ . '/../api/search_address.php');
+        $this->assert(str_contains($addrCode, 'require_login()'), 'api/search_address.php enforces require_login()');
+
+        $phraseCode = (string)file_get_contents(__DIR__ . '/../api/rx_phrase_suggestions.php');
+        $this->assert(str_contains($phraseCode, 'require_login()'), 'api/rx_phrase_suggestions.php enforces require_login()');
     }
 }
 
