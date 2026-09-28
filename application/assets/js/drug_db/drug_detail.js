@@ -1,3 +1,29 @@
+/**
+ * ==============================================================================
+ * ZimRx Pharmaceutical Formulary & Clinical Decision Support (CDS) Inspector
+ * ==============================================================================
+ *
+ * Architecture & Lifecycle Overview:
+ * 1. State Model & Caching:
+ *    - In-memory brand & clinical data cache (drugDetailCache, paediatricCalcStore).
+ *    - Request sequencing (drugDetailRequestSeq) to prevent stale async race conditions.
+ *    - Doctor override & custom drug staging state.
+ *
+ * 2. API Communication & Data Retrieval:
+ *    - High-speed FTS lookup via api/search_drug.php and api/drug_detail.php.
+ *    - User drug customization, override, and hiding endpoints via api/user_drug_*.
+ *    - PubMed evidence query generator with external citation links.
+ *
+ * 3. Clinical Decision Support (CDS) Renderers:
+ *    - Contraindications, Black-Box Warnings, and Adverse Drug Reaction snapshots.
+ *    - Pregnancy & Lactation Safety Categories (FDA / Briggs rating system).
+ *    - Dynamic Pediatric Dosage Calculator Engine with weight/age/BSA parameters.
+ *    - Commercial formulations, brand variants, and unit-price comparison tables.
+ *
+ * 4. User Formulary Management & Event Lifecycle:
+ *    - Doctor-specific brand overrides, custom compound creation, and brand masking.
+ * ==============================================================================
+ */
 let drugDetailRequestSeq = 0;
 let drugHeaderLayoutObserver = null;
 let paediatricCalcSeq = 0;

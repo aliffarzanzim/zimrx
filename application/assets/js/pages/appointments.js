@@ -1,3 +1,31 @@
+/**
+ * ==============================================================================
+ * ZimRx Appointment & Clinic Queue Management Engine
+ * ==============================================================================
+ *
+ * Architecture & Lifecycle Overview:
+ * 1. State Model:
+ *    - Bootstrapped via embedded JSON (#zimrxAppointmentBootstrap) with role,
+ *      available doctors, active doctor ID, and initial appointment queue.
+ *    - Maintains in-memory state for patient queue, search filters, selected date,
+ *      and doctor tenant scoping.
+ *
+ * 2. API Communication:
+ *    - Centralized JSON RPC endpoints at api/appointments.php.
+ *    - Enforces CSRF token verification (HTTP_X_CSRF_TOKEN / zimrx_csrf_token).
+ *    - Scoped strictly by doctor_id (supports multi-doctor clinic delegation).
+ *
+ * 3. DOM & Queue Render Pipeline:
+ *    - Pure Vanilla JS DOM rendering with zero framework overhead.
+ *    - Dynamic queue tables with real-time status transitions (waiting, in-consult,
+ *      completed, cancelled).
+ *    - Modal management for patient lookup, rapid appointment booking, and settings.
+ *
+ * 4. Keyboard Navigation & Event Lifecycle:
+ *    - Keyboard shortcuts for rapid patient triage and booking.
+ *    - Synchronous input validation and debounced autocomplete search.
+ * ==============================================================================
+ */
 (() => {
     const bootstrapEl = document.getElementById('zimrxAppointmentBootstrap');
     if (bootstrapEl) {

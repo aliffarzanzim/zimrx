@@ -490,6 +490,11 @@ function zimrx_print_load_options(PDO $pdo, int $doctorId): array {
         }
     }
 
+    // =========================================================================
+    // One-Time Schema Migration Boundary: Canonical Settings to Render Tokens
+    // Maps canonical database configuration keys to the preview/render engine
+    // token names used by the print canvas and visual layout elements.
+    // =========================================================================
     $fieldAliases = [
         'display_visit_no' => 'visit_number',
         'display_signature' => 'disp_signature',
@@ -506,9 +511,9 @@ function zimrx_print_load_options(PDO $pdo, int $doctorId): array {
         'otnote_name' => 'edd_name',
     ];
 
-    foreach ($fieldAliases as $current => $legacy) {
-        if (array_key_exists($current, $advanced) && $advanced[$current] !== '') {
-            $options[$legacy] = (string)$advanced[$current];
+    foreach ($fieldAliases as $canonical => $renderToken) {
+        if (array_key_exists($canonical, $advanced) && $advanced[$canonical] !== '') {
+            $options[$renderToken] = (string)$advanced[$canonical];
         }
     }
 
@@ -602,6 +607,10 @@ function zimrx_print_form_to_payload(array $input): array {
         }
     }
 
+    // =========================================================================
+    // One-Time Schema Migration Boundary: Inbound Form Control Normalization
+    // Normalizes visual template form control keys into canonical DB columns.
+    // =========================================================================
     $fieldAliases = [
         'visit_number' => 'display_visit_no',
         'disp_signature' => 'display_signature',
@@ -617,9 +626,9 @@ function zimrx_print_form_to_payload(array $input): array {
         'barcode_position' => 'revisit_date',
         'edd_name' => 'otnote_name',
     ];
-    foreach ($fieldAliases as $legacy => $current) {
-        if (array_key_exists($legacy, $input)) {
-            $payload[$current] = trim((string)$input[$legacy]);
+    foreach ($fieldAliases as $formControl => $canonical) {
+        if (array_key_exists($formControl, $input)) {
+            $payload[$canonical] = trim((string)$input[$formControl]);
         }
     }
 

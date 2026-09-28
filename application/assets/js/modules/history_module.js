@@ -1,5 +1,29 @@
 /**
- * ZimRx - Medical History Module Interactive Controller
+ * ==============================================================================
+ * ZimRx Clinical Medical History & Patient Profiling Module
+ * ==============================================================================
+ *
+ * Architecture & Lifecycle Overview:
+ * 1. State Model:
+ *    - Manages structured patient medical history categories: Past Illnesses,
+ *      Surgical History, Family History, Drug Allergies, Hypersensitivities,
+ *      Dietary Habits, and Substance/Habit Quantifiers.
+ *    - Backed by doctor-specific configuration and custom category definitions.
+ *
+ * 2. API Communication & Data Persistence:
+ *    - Asynchronous persistence via api/medical_history_settings.php and
+ *      save_prescription_visit.php.
+ *    - All mutations carry CSRF tokens and tenant doctor identity.
+ *
+ * 3. Clinical Decision Support (CDS) & Calculators:
+ *    - Built-in Smoking Pack-Year Calculator (packs/day × years).
+ *    - Alcohol Unit & AUDIT-C screening calculator.
+ *    - Drug allergy auto-complete with cross-sensitivity flags.
+ *
+ * 4. DOM & Event Lifecycle:
+ *    - Accordion expand/collapse animations with persistent state.
+ *    - Auto-resizing textareas and keyboard-driven chip additions.
+ * ==============================================================================
  */
 (function() {
     function cleanText(value) {
