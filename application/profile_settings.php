@@ -2,7 +2,7 @@
 require_once 'auth.php';
 require_login();
 require_once 'db.php';
-require_once 'admin_lib.php';
+require_once __DIR__ . '/lib/admin_lib.php';
 
 $userId = current_user_id();
 $doctorId = current_user_doctor_id();

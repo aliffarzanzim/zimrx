@@ -2,7 +2,7 @@
 require_once 'auth.php';
 require_once 'db.php';
 require_once __DIR__ . '/api/zrx_icons.php';
-include_once 'coffee_modal.php';
+include_once __DIR__ . '/modules/coffee_modal.php';
 // Dynamically check which page we are on to highlight the active menu link
 $current_page = basename($_SERVER['PHP_SELF']);
 $user_role = current_user_role();

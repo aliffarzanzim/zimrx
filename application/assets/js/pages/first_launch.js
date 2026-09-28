@@ -100,7 +100,7 @@ function saveDoctor() {
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>Saving…';
 
-    fetch('header_onboarding_ajax.php', {
+    fetch('api/header_onboarding_ajax.php', {
         method: 'POST',
         body: form
     })

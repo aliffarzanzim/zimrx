@@ -2,7 +2,7 @@
 require_once 'auth.php';
 require_admin();
 require_once 'db.php';
-require_once 'admin_lib.php';
+require_once __DIR__ . '/lib/admin_lib.php';
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     try {

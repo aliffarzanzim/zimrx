@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const formData = new FormData(onboardForm);
 
             try {
-                const response = await fetch('header_onboarding_ajax.php', {
+                const response = await fetch('api/header_onboarding_ajax.php', {
                     method: 'POST',
                     body: new URLSearchParams(formData).toString(),
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
@@ -1288,7 +1288,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch('header_edit_ajax.php', {
+            const response = await fetch('api/header_edit_ajax.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams(new FormData(form)).toString()

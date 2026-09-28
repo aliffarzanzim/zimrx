@@ -2,7 +2,7 @@
 require_once 'auth.php';
 require_login();
 require_once 'db.php';
-require_once 'visit_identity.php';
+require_once __DIR__ . '/lib/visit_identity.php';
 
 zimrx_ensure_visit_identity_schema($pdo);
 

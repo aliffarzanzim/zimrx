@@ -551,7 +551,7 @@ class ZimRxTestSuite {
     private function testSyncJournalAndUuid(): void {
         echo "\n[13/13] Testing Delta-Sync UUID Generation & Audit Journaling...\n";
 
-        require_once __DIR__ . '/../sync_service.php';
+        require_once __DIR__ . '/../lib/sync_service.php';
 
         // 1. UUID format
         $uuid1 = ZimRxSyncJournal::generateUuid();

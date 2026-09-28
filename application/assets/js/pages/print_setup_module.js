@@ -640,7 +640,7 @@ document.addEventListener('DOMContentLoaded', () => {
             confirmYes.onclick = async () => {
                 confirmModal.hidden = true;
                 try {
-                    const response = await fetch('reset_print_setup.php');
+                    const response = await fetch('api/reset_print_setup.php');
                     if ((await response.text()).trim() === '1') window.location.reload();
                     else showToast('Reset failed', 'error');
                 } catch (e) { showToast('Network error', 'error'); }
@@ -663,7 +663,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         try {
             const formData = serializeFullFormData();
-            const response = await fetch('print_setup_save.php', {
+            const response = await fetch('api/print_setup_save.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: formData

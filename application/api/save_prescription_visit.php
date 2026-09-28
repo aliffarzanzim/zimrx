@@ -2,8 +2,8 @@
 require_once __DIR__ . '/../auth.php';
 require_login();
 require_once __DIR__ . '/../db.php';
-require_once __DIR__ . '/../visit_identity.php';
-require_once __DIR__ . '/../emr_identity_lib.php';
+require_once __DIR__ . '/../lib/visit_identity.php';
+require_once __DIR__ . '/../lib/emr_identity_lib.php';
 
 header('Content-Type: application/json');
 
@@ -280,7 +280,7 @@ try {
     $appointment = load_appointment($pdo, $appointmentId, $doctorId);
     $expectedRevision = isset($payload['revision']) ? (int)$payload['revision'] : 0;
 
-    require_once __DIR__ . '/../sync_service.php';
+    require_once __DIR__ . '/../lib/sync_service.php';
 
     if ($appointment && !empty($appointment['visit_record_id'])) {
         $visitRecordId = (int)$appointment['visit_record_id'];
@@ -568,7 +568,7 @@ try {
     $snapshotArr = is_array($clinicalSnapshot) ? $clinicalSnapshot : json_decode((string)$clinicalSnapshotJson, true);
     $savedOccupation = trim((string)($snapshotArr['patient_particulars']['occupation'] ?? $payload['occupation'] ?? ''));
     if ($savedOccupation !== '') {
-        require_once __DIR__ . '/../particulars_audit_lib.php';
+        require_once __DIR__ . '/../lib/particulars_audit_lib.php';
         zimrx_record_user_occupation($pdo, $doctorId, $savedOccupation);
     }
 

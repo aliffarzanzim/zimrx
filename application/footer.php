@@ -1,7 +1,7 @@
 <?php
 // footer.php — shared app footer
 // coffee_modal.php handles its own include-once guard
-include_once 'coffee_modal.php';
+include_once __DIR__ . '/modules/coffee_modal.php';
 $app_version = '1.0.0';
 ?>
 

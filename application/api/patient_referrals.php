@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../auth.php';
 require_login();
 require_once __DIR__ . '/../db.php';
-require_once __DIR__ . '/../visit_identity.php';
+require_once __DIR__ . '/../lib/visit_identity.php';
 
 header('Content-Type: application/json');
 

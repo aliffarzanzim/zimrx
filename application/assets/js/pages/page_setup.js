@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         try {
-            const response = await fetch('print_setup_save.php', {
+            const response = await fetch('api/print_setup_save.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams(new FormData(form))

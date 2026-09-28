@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../auth.php';
 require_login();
 require_once __DIR__ . '/../db.php';
-require_once __DIR__ . '/../print_setup_lib.php';
+require_once __DIR__ . '/../lib/print_setup_lib.php';
 
 ini_set('display_errors', '0');
 

@@ -2,7 +2,7 @@
 require_once 'auth.php';
 require_login();
 require_once 'db.php';
-require_once 'emr_identity_lib.php';
+require_once __DIR__ . '/lib/emr_identity_lib.php';
 
 $isMultiDoctor = zimrx_is_multi_doctor($pdo);
 

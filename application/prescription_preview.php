@@ -2,7 +2,7 @@
 require_once 'auth.php';
 require_login();
 require_once 'db.php';
-require_once 'print_setup_lib.php';
+require_once __DIR__ . '/lib/print_setup_lib.php';
 
 $serverSnapshotJson = 'null';
 $revisionId  = (int)($_GET['revision_id'] ?? 0);
