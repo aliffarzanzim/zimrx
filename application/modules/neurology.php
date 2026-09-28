@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx - Dedicated Neurology & Stroke Assessment Module
  * Glasgow Coma Scale (GCS total out of 15), Cranial Nerves (I-XII),

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Migration 013 — Backfill: Mobile queue context columns, sync UUIDs, and delta-sync journal
  *

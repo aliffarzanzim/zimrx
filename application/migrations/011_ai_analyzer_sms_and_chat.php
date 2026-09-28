@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Migration 011 — AI analyzer, SMS settings and templates, and internal chat system
  */

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Migration 004 — Presenting complaints (PC/CC) and autocomplete settings tables
  */

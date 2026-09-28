@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 // footer.php — shared app footer
 // coffee_modal.php handles its own include-once guard
 include_once __DIR__ . '/modules/coffee_modal.php';

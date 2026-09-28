@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Migration 010 — Investigations, advices, and their templates and settings
  */

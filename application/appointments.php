@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 require_once 'auth.php';
 require_login();
 require_once 'db.php';
@@ -1104,6 +1106,9 @@ include 'header.php';
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
 </script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="assets/js/layout/help_guidelines.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/help_guidelines.js') ?>"></script>
+<script src="assets/js/layout/table_column_resizer.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/table_column_resizer.js') ?>"></script>
+<script src="assets/js/layout/grid_navigation.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/grid_navigation.js') ?>"></script>
 <script src="assets/js/layout/boot.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/boot.js') ?>"></script>
 <script src="assets/js/pages/appointments.js?v=<?= filemtime(__DIR__ . '/assets/js/pages/appointments.js') ?>"></script>
 <?php include 'footer.php'; ?>

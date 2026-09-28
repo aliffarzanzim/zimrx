@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx - Pulmonology & Respiratory Examination Module
  * Breath sounds (vesicular, bronchial), wheeze & crackles (fine/coarse),

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 require_once __DIR__ . '/rx_regimen_lib.php';
 
 function pc_supported_sources(): array {

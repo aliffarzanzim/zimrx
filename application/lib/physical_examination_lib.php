@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx Physical Examination Library
  * Manages static physical examination catalog merging, doctor preferences,

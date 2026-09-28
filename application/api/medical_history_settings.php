@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx Medical History Settings API Endpoint
  * Handles GET (fetch configuration) and POST (save_config, reset_default).

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx - Local Examination Module
  * Systematic surgical & physical local examination of swellings, ulcers, wounds, and localized lesions.

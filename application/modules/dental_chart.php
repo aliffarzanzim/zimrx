@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx - Dental Specialized Examination & Interactive Odontogram Module
  * International FDI 2-digit tooth notation (Adult 11-48, Primary 51-85),

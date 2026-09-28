@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 $pcInitialSettings = null;
 if (!defined('ZIMRX_PC_SETTINGS_SEEDED')) {
     try {

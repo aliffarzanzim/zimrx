@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 function zimrx_user_drug_pdo(): PDO {
     $pdo = DbConnections::userdata();

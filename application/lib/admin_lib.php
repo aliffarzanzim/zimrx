@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 function admin_value(array $data, string $key): string {
     return trim((string)($data[$key] ?? ''));

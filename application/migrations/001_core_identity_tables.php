@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Migration 001 — Core identity, configuration, user accounts, and doctors schema
  */

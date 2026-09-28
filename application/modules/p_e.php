@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 require_once __DIR__ . '/../lib/physical_examination_lib.php';
 $peDoctorId = max(1, (int)(function_exists('current_user_doctor_id') ? current_user_doctor_id() : 1));
 $peDoctorConfig = physical_exam_get_doctor_config($peDoctorId);

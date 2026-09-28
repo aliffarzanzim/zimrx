@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx Global Icon Registry (PHP)
  * Provides crisp, centralized Feather/Lucide SVG icons across all PHP views.

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * Fail clearly if migration 014 has not applied the visit-identity schema.

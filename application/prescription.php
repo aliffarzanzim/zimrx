@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 $zimrx_prescription_ob_level = ob_get_level();
 ob_start();
 require_once 'auth.php';
@@ -443,6 +445,9 @@ if ($reportsIndex !== false) {
     <script src="assets/js/pages/prescription_preview.js?v=<?= filemtime(__DIR__ . '/assets/js/pages/prescription_preview.js') ?>"></script>
     <script src="assets/js/modules/ho_diet_dropdown.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/ho_diet_dropdown.js') ?>"></script>
     <script src="assets/js/modules/history_module.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/history_module.js') ?>"></script>
+    <script src="assets/js/layout/help_guidelines.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/help_guidelines.js') ?>"></script>
+    <script src="assets/js/layout/table_column_resizer.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/table_column_resizer.js') ?>"></script>
+    <script src="assets/js/layout/grid_navigation.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/grid_navigation.js') ?>"></script>
     <script src="assets/js/layout/boot.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/boot.js') ?>"></script>
 
 

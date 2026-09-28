@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx - Endocrinology & Metabolic Assessment Module
  * Glycemic control (HbA1c target, SMBG pattern, hypoglycemia Gold score),

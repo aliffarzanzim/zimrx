@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 $ot_predefined_particulars = [
     'Date',
     'Time',

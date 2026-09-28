@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx Mobile Sync API
  * Provides live synchronization between desktop prescription and mobile upload page

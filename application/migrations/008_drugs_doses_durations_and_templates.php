@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Migration 008 — Prescription drugs, clinical findings, custom drugs, doses, durations, templates, and sorting
  */

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 define('ZIMRX_DB_LIGHTWEIGHT', true);
 require_once __DIR__ . '/../auth.php';
 require_once __DIR__ . '/../db.php';

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 // coffee_modal.php — Buy Me a Coffee modal (include once per page)
 if (defined('ZIMRX_COFFEE_MODAL_LOADED')) return;
 define('ZIMRX_COFFEE_MODAL_LOADED', true);

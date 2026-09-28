@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx Mobile Upload Page
  * Directly adopts the doctor's active patient from the desktop in real time.

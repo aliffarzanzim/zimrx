@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 // modules/pres_particulars.php
 $prescription_prefill = is_array($prescription_prefill ?? null) ? $prescription_prefill : [];
 $pres_value = static function (string $key, string $default = '') use ($prescription_prefill): string {

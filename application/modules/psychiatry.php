@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx - Psychiatry Specialized Examination Module
  * Comprehensive Mental State Examination (MSE), Mood & Affect, Thought Form/Content,

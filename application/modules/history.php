@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 require_once __DIR__ . '/../lib/medical_history_lib.php';
 $medHistoryDoctorId = max(1, (int)(function_exists('current_user_doctor_id') ? current_user_doctor_id() : 1));
 $medHistoryDoctorConfig = med_history_get_doctor_config($medHistoryDoctorId);

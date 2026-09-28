@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx - ENT Specialized Examination Module
  * Systematic bilateral Ear (with interactive TM quadrants & tuning fork tests),

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx - Diabetic Foot Assessment & Ulcer Staging Module
  * Standard Wagner Ulcer Classification (Grade 0-5), IWGDF Risk Stratification,

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 require_once 'auth.php';
 require_login();
 require_once 'db.php';
@@ -264,5 +266,8 @@ include 'header.php';
 
     <script src="assets/js/layout/config.js"></script>
     <script src="assets/js/layout/dashboard.js"></script>
+    <script src="assets/js/layout/help_guidelines.js"></script>
+    <script src="assets/js/layout/table_column_resizer.js"></script>
+    <script src="assets/js/layout/grid_navigation.js"></script>
     <script src="assets/js/layout/boot.js"></script>
 <?php include 'footer.php'; ?>

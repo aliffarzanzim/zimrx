@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx Medical History Library
  * Manages static medical history catalog merging, doctor preferences,

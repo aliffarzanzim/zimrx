@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * DbSchema — Driver-aware database schema introspection helper
  *
@@ -251,29 +253,5 @@ class DbSchema {
              ORDER BY table_name"
         );
         return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
-    }
-
-    // ----------------------------------------------------------------
-    // CREATE TABLE SQL (SQLite only — used for legacy migration logic)
-    // ----------------------------------------------------------------
-
-    /**
-     * Return the original CREATE TABLE SQL for a SQLite table.
-     * Returns '' on non-SQLite drivers or if the table does not exist.
-     *
-     * NOTE: This is intentionally SQLite-only. It is only used by
-     * zimrx_db_rebuild_doctor_singleton_table() which is itself only
-     * required during the one-time legacy schema upgrade path.
-     * Once DbMigrator handles all migrations, this function will be removed.
-     *
-     * @internal Use only from zimrx_db_table_sql() / db.php legacy helpers.
-     */
-    public static function createTableSql(PDO $pdo, string $table): string {
-        if (DbConnections::driver() !== 'sqlite') {
-            return '';
-        }
-        $stmt = $pdo->prepare("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = ?");
-        $stmt->execute([$table]);
-        return (string)($stmt->fetchColumn() ?: '');
     }
 }

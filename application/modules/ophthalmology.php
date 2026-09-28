@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx - Ophthalmology (Eye Examination) Module
  * Comprehensive bilateral visual acuity, anterior segment, IOP, and funduscopic examination.

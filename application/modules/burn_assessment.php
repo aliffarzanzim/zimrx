@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx - Burn Assessment & Fluid Resuscitation Module
  * Interactive Wallace Rule of Nines anatomical mapping, % TBSA calculator,

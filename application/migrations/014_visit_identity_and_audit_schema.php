@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Migration 014 — Visit-identity columns and patient-particulars audit schema
  *

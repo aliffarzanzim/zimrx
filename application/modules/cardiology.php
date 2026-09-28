@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx - Cardiology & Hemodynamic Assessment Module
  * NYHA Functional Class (I-IV), Killip classification, JVP, Apex beat character,

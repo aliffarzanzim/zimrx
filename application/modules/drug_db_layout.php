@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 $initialBrand = $initialDrugDetail['brand'] ?? null;
 $initialClinical = $initialDrugDetail['clinical'] ?? [];
 $initialVariants = $initialDrugDetail['variants'] ?? [];

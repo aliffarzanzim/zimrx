@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx - Orthopaedics & Musculoskeletal Examination Module
  * Spine, Cervical/Lumbar ROM, Radiculopathy/SLR, Major Joints (Shoulder, Knee, Hip, Hand/Wrist),

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 require_once __DIR__ . '/../db.php';
 
 function zimrx_digits_from_flow(int $flow): int {

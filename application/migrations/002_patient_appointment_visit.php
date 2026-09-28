@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Migration 002 — Patient, appointment, visit, clinical, vitals, payments, and revisions schema
  */

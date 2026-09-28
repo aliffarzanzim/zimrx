@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Migration 012 — Mobile upload queue, visit revision locking, and patient sync schema
  */

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx Central Configuration
  *
@@ -28,7 +30,7 @@ define('ZIMRX_UPLOADS_DIR', ZIMRX_USERDATA_DIR . '/uploads');
 
 define('ZIMRX_ASSETS_DB_DIR', ZIMRX_BASE_DIR . '/assets/database');
 
-// Legacy path constants (for backward compatibility)
+// Standard database file paths
 define('ZIMRX_DB_USERDATA', ZIMRX_DB_DIR . '/zimrx_userdata.db');
 define('ZIMRX_DB_SYSTEMDATA', ZIMRX_ASSETS_DB_DIR . '/zimrx_drugs.db');
 define('ZIMRX_DB_STATIC', ZIMRX_ASSETS_DB_DIR . '/zimrx_static.db');

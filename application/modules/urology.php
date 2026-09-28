@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx - Urology & Nephrology Examination Module
  * Bimanual kidney palpation, renal angle punch tenderness, urinary bladder distension,

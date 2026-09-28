@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * DbSql — Driver-aware SQL dialect helper
  *

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx - Dermatology Specialized Examination & Lesion Mapping Module
  * Comprehensive primary & secondary lesion morphology, distribution,

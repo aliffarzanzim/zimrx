@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * ZimRx - Breast Examination Module
  * Modern clinical breast examination with interactive dual-breast clock diagram,

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Migration 003 — Prescription print layout, header settings, OT note settings, and interface layout
  */

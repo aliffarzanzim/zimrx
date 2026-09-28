@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Migration 009 — Medical history, physical examination, diagnosis, and notepad settings
  */
