@@ -244,19 +244,19 @@ if ($rx_popup_mode) {
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/layout/global.css?v=<?= $globalCssVersion ?>">
-    <link rel="stylesheet" href="assets/css/drug_db/base_sidebar.css?v=<?= filemtime(__DIR__ . '/assets/css/drug_db/base_sidebar.css') ?>">
-    <link rel="stylesheet" href="assets/css/drug_db/detail.css?v=<?= filemtime(__DIR__ . '/assets/css/drug_db/detail.css') ?>">
-    <link rel="stylesheet" href="assets/css/drug_db/modals_tables.css?v=<?= filemtime(__DIR__ . '/assets/css/drug_db/modals_tables.css') ?>">
-    <link rel="stylesheet" href="assets/css/drug_db/middle_sidebar_nav.css?v=<?= filemtime(__DIR__ . '/assets/css/drug_db/middle_sidebar_nav.css') ?>">
+    <link rel="stylesheet" href="assets/css/pages/drug_db_base_sidebar.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/drug_db_base_sidebar.css') ?>">
+    <link rel="stylesheet" href="assets/css/pages/drug_db_detail.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/drug_db_detail.css') ?>">
+    <link rel="stylesheet" href="assets/css/pages/drug_db_modals_tables.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/drug_db_modals_tables.css') ?>">
+    <link rel="stylesheet" href="assets/css/pages/drug_db_middle_sidebar_nav.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/drug_db_middle_sidebar_nav.css') ?>">
 </head>
 <body class="rx-popup-mode">
 <?php
 } else {
     $extra_css = [
-        'assets/css/drug_db/base_sidebar.css',
-        'assets/css/drug_db/detail.css',
-        'assets/css/drug_db/modals_tables.css',
-        'assets/css/drug_db/middle_sidebar_nav.css',
+        'assets/css/pages/drug_db_base_sidebar.css',
+        'assets/css/pages/drug_db_detail.css',
+        'assets/css/pages/drug_db_modals_tables.css',
+        'assets/css/pages/drug_db_middle_sidebar_nav.css',
     ];
     require_once 'header.php';
 }
