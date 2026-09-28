@@ -4,16 +4,16 @@
    Specialized Clinical Examination Modules
    (Modularized for independent clinical expansion)
 ======================================================= */
-@import "clinical_exams/general_ophthalmology.css";
-@import "clinical_exams/breast.css";
-@import "clinical_exams/abdominal.css";
-@import "clinical_exams/pelvic.css";
-@import "clinical_exams/burn.css";
-@import "clinical_exams/ent.css";
-@import "clinical_exams/dental.css";
-@import "clinical_exams/diabetic_foot.css";
-@import "clinical_exams/dermatology.css";
-@import "clinical_exams/specialties.css";
+@import "clinical_examinations/general_ophthalmology.css";
+@import "clinical_examinations/breast.css";
+@import "clinical_examinations/abdominal.css";
+@import "clinical_examinations/pelvic.css";
+@import "clinical_examinations/burn.css";
+@import "clinical_examinations/ent.css";
+@import "clinical_examinations/dental.css";
+@import "clinical_examinations/diabetic_foot.css";
+@import "clinical_examinations/dermatology.css";
+@import "clinical_examinations/specialties.css";
 
 @font-face {
     font-family: 'SolaimanLipi';
