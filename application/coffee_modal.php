@@ -163,6 +163,6 @@ define('ZIMRX_COFFEE_MODAL_LOADED', true);
     </div>
 </div>
 
-<link rel="stylesheet" href="assets/css/coffee_modal.css?v=<?= filemtime(__DIR__ . '/assets/css/coffee_modal.css') ?>">
+<link rel="stylesheet" href="assets/css/modules/coffee_modal.css?v=<?= filemtime(__DIR__ . '/assets/css/modules/coffee_modal.css') ?>">
 
 <script src="assets/js/layout/coffee_modal.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/coffee_modal.js') ?>"></script>

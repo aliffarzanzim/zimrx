@@ -50,7 +50,7 @@ if ($step === 3 && !is_logged_in()) {
     <title>ZimRx — Setup</title>
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/first_launch.css?v=<?= filemtime(__DIR__ . '/assets/css/first_launch.css') ?>">
+    <link rel="stylesheet" href="assets/css/pages/first_launch.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/first_launch.css') ?>">
 </head>
 <body>
 <div class="wizard-wrap">

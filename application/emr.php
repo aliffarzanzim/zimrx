@@ -166,7 +166,7 @@ if ($viewMode === 'HUB') {
 require_once __DIR__ . '/header.php';
 ?>
 
-<link rel="stylesheet" href="assets/css/emr.css">
+<link rel="stylesheet" href="assets/css/pages/emr.css">
 <script src="assets/js/emr_scanner.js" defer></script>
 
 <?php

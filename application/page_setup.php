@@ -5,7 +5,7 @@ require_once 'db.php';
 require_once 'print_setup_lib.php';
 
 $page_title = 'ZimRx - Page Setup';
-$extra_css = ['assets/css/page_setup.css'];
+$extra_css = ['assets/css/pages/page_setup.css'];
 $doctorId = current_user_doctor_id();
 $options = zimrx_bridge_load_print_options($pdo, $doctorId);
 

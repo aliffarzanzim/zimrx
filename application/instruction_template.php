@@ -114,7 +114,7 @@ function instruction_template_dosage_form_chips($value): string {
 
 include 'header.php';
 ?>
-<link rel="stylesheet" href="assets/css/instruction_template.css">
+<link rel="stylesheet" href="assets/css/pages/instruction_template.css">
 
 <div class="instruction-template-page">
     <div class="instruction-template-card">

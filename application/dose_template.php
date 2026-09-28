@@ -28,7 +28,7 @@ foreach ($phrasePayload['rows'] as $phraseTemplateRow) {
 $page_title = $phraseConfig['title'];
 include 'header.php';
 ?>
-<link rel="stylesheet" href="assets/css/phrase_template.css">
+<link rel="stylesheet" href="assets/css/pages/phrase_template.css">
 
 <div class="phrase-template-page">
     <div class="phrase-template-card">

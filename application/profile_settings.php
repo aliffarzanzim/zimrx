@@ -85,7 +85,7 @@ $userStmt->execute(['id' => $userId]);
 $userAccount = $userStmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
 $page_title = 'ZimRx - Profile Settings';
-$extra_css = ['assets/css/admin.css'];
+$extra_css = ['assets/css/pages/admin.css'];
 include 'header.php';
 ?>
 

@@ -281,7 +281,7 @@ foreach ($initialFollowups as $f) {
 
 $page_title = "ZimRx - Appointments";
 $body_class = trim(($body_class ?? '') . ' zimrx-appointments-hold');
-$extra_css = ['assets/css/appointments.css'];
+$extra_css = ['assets/css/pages/appointments.css'];
 include 'header.php';
 ?>
 

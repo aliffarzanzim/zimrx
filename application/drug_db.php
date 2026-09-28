@@ -233,7 +233,7 @@ function drug_db_initial_sidebar_state() {
 if ($rx_popup_mode) {
     require_once 'auth.php';
     $page_title = 'Drug View';
-    $globalCssVersion = filemtime(__DIR__ . '/assets/css/global.css');
+    $globalCssVersion = filemtime(__DIR__ . '/assets/css/layout/global.css');
     ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -243,7 +243,7 @@ if ($rx_popup_mode) {
     <title><?= htmlspecialchars($page_title) ?></title>
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/global.css?v=<?= $globalCssVersion ?>">
+    <link rel="stylesheet" href="assets/css/layout/global.css?v=<?= $globalCssVersion ?>">
     <link rel="stylesheet" href="assets/css/drug_db/base_sidebar.css?v=<?= filemtime(__DIR__ . '/assets/css/drug_db/base_sidebar.css') ?>">
     <link rel="stylesheet" href="assets/css/drug_db/detail.css?v=<?= filemtime(__DIR__ . '/assets/css/drug_db/detail.css') ?>">
     <link rel="stylesheet" href="assets/css/drug_db/modals_tables.css?v=<?= filemtime(__DIR__ . '/assets/css/drug_db/modals_tables.css') ?>">

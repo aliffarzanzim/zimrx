@@ -246,7 +246,7 @@ while ($lr = $ledgerRevStmt->fetch(PDO::FETCH_ASSOC)) {
 require_once __DIR__ . '/header.php';
 ?>
 
-<link rel="stylesheet" href="assets/css/dashboard.css?v=<?= filemtime(__DIR__ . '/assets/css/dashboard.css') ?>">
+<link rel="stylesheet" href="assets/css/pages/dashboard.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/dashboard.css') ?>">
 
 <div class="dash-container">
     <!-- Page Header -->

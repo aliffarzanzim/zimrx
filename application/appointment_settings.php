@@ -121,11 +121,11 @@ try {
 }
 
 $page_title = "ZimRx - Appointment Settings";
-$extra_css = ['assets/css/print_layout_editor.css'];
+$extra_css = ['assets/css/pages/print_layout_editor.css'];
 include 'header.php';
 ?>
 
-<link rel="stylesheet" href="assets/css/appointment_settings.css?v=<?= filemtime(__DIR__ . '/assets/css/appointment_settings.css') ?>">
+<link rel="stylesheet" href="assets/css/pages/appointment_settings.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/appointment_settings.css') ?>">
 
 <div class="layout-editor-page">
 

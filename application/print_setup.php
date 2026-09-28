@@ -30,7 +30,7 @@ function bridge_render_font_options(string $selectedFont, array $fontOptions, ar
 }
 
 $page_title = 'ZimRx - Print Setup';
-$extra_css = ['assets/css/print_layout_editor.css'];
+$extra_css = ['assets/css/pages/print_layout_editor.css'];
 $doctorId = current_user_doctor_id();
 $options = zimrx_bridge_load_print_options($pdo, $doctorId);
 

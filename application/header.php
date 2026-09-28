@@ -51,7 +51,7 @@ $zrx_dd_theme = $_COOKIE['zimrx_dropdown_theme'] ?? 'subtle-tint';
     <!-- Flatpickr for the Professional Date Picker -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <!-- Global Custom CSS -->
-    <link rel="stylesheet" href="assets/css/global.css?v=<?= filemtime(__DIR__ . '/assets/css/global.css') ?>">
+    <link rel="stylesheet" href="assets/css/layout/global.css?v=<?= filemtime(__DIR__ . '/assets/css/layout/global.css') ?>">
     <?php
     $zrx_dd_bg = $_COOKIE['zimrx_dropdown_hover_bg'] ?? '';
     $zrx_dd_text = $_COOKIE['zimrx_dropdown_hover_text'] ?? '';
@@ -64,7 +64,7 @@ $zrx_dd_theme = $_COOKIE['zimrx_dropdown_theme'] ?? 'subtle-tint';
     }
     </style>
     <?php endif; ?>
-    <link rel="stylesheet" href="assets/css/chat.css?v=<?= file_exists(__DIR__ . '/assets/css/chat.css') ? filemtime(__DIR__ . '/assets/css/chat.css') : '1' ?>">
+    <link rel="stylesheet" href="assets/css/pages/chat.css?v=<?= file_exists(__DIR__ . '/assets/css/pages/chat.css') ? filemtime(__DIR__ . '/assets/css/pages/chat.css') : '1' ?>">
     <?php if (!empty($extra_css) && is_array($extra_css)): ?>
         <?php foreach ($extra_css as $css_file): ?>
             <?php $css_path = __DIR__ . '/' . ltrim($css_file, '/'); ?>

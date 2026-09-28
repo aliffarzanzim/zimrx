@@ -193,7 +193,7 @@ foreach ($transactions as $t) {
 require_once __DIR__ . '/header.php';
 ?>
 
-<link rel="stylesheet" href="assets/css/billings.css?v=<?= filemtime(__DIR__ . '/assets/css/billings.css') ?>">
+<link rel="stylesheet" href="assets/css/pages/billings.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/billings.css') ?>">
 
 <div class="billings-container">
     <!-- Page Header -->

@@ -41,11 +41,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $settings = zimrx_get_emr_settings($pdo);
 
 $page_title = 'ZimRx - EMR Settings';
-$extra_css = ['assets/css/print_layout_editor.css'];
+$extra_css = ['assets/css/pages/print_layout_editor.css'];
 include 'header.php';
 ?>
 
-<link rel="stylesheet" href="assets/css/emr_settings.css?v=<?= filemtime(__DIR__ . '/assets/css/emr_settings.css') ?>">
+<link rel="stylesheet" href="assets/css/pages/emr_settings.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/emr_settings.css') ?>">
 
 <div class="layout-editor-page">
 

@@ -2,7 +2,7 @@
 require_once 'auth.php';
 require_admin();
 $page_title = 'ZimRx - Admin Settings';
-$extra_css = ['assets/css/admin.css'];
+$extra_css = ['assets/css/pages/admin.css'];
 include 'header.php';
 ?>
 <main class="admin-page">

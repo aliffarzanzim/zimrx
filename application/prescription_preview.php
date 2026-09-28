@@ -978,7 +978,7 @@ $revisit = trim((string)($clinical['revisit'] ?? ''));
     <link rel="preload" href="assets/fonts/SolaimanLipi.ttf" as="font" type="font/ttf" crossorigin>
     <link rel="preload" href="assets/fonts/KongshoOMJ.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="assets/fonts/AdorshoLipi.woff" as="font" type="font/woff" crossorigin>
-    <link rel="stylesheet" href="assets/css/print_preview.css?v=<?= filemtime(__DIR__ . '/assets/css/print_preview.css') ?>" type="text/css">
+    <link rel="stylesheet" href="assets/css/pages/print_preview.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/print_preview.css') ?>" type="text/css">
     <style>
         .zrx-print-page {
             position: relative;

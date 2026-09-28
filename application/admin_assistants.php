@@ -21,7 +21,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 $doctors = admin_all_doctors($pdo, true);
 $assistants = admin_assistant_rows($pdo);
 $page_title = 'ZimRx - Manage Assistants';
-$extra_css = ['assets/css/admin.css'];
+$extra_css = ['assets/css/pages/admin.css'];
 include 'header.php';
 $flash = admin_flash();
 ?>

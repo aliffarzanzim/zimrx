@@ -9,7 +9,7 @@ function checked_attr(string $current, string $target): string {
 }
 
 $page_title = 'ZimRx - Header, Footer & Background Setup';
-$extra_css = ['assets/css/header_footer_background_setup.css'];
+$extra_css = ['assets/css/pages/header_footer_background_setup.css'];
 $doctorId = current_user_doctor_id();
 
 $header = zimrx_bridge_load_header_settings($pdo, $doctorId);

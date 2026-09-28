@@ -21,7 +21,7 @@ $doctorName = current_user_name();
     <title>ZimRx - Mobile Document Upload</title>
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/mobile_upload.css?v=<?= filemtime(__DIR__ . '/assets/css/mobile_upload.css') ?>">
+    <link rel="stylesheet" href="assets/css/pages/mobile_upload.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/mobile_upload.css') ?>">
 </head>
 <body>
 

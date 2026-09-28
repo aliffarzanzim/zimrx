@@ -222,7 +222,7 @@ function prescription_query_prefill(): array {
 $prescription_prefill = prescription_query_prefill();
 $page_title = "ZimRx - New Prescription";
 $body_class = trim(($body_class ?? '') . ' zimrx-prescription-hold');
-$extra_css = ['assets/css/paediatric_module.css'];
+$extra_css = ['assets/css/modules/paediatric_module.css'];
 include 'header.php';
 ?>
 

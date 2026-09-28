@@ -10,7 +10,7 @@ $doctorId = max(1, (int)(function_exists('current_user_doctor_id') ? current_use
 require_once __DIR__ . '/header.php';
 ?>
 
-<link rel="stylesheet" href="assets/css/manufacturer_preferences.css?v=<?= filemtime(__DIR__ . '/assets/css/manufacturer_preferences.css') ?>">
+<link rel="stylesheet" href="assets/css/pages/manufacturer_preferences.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/manufacturer_preferences.css') ?>">
 
 <div class="mpref-container">
     <!-- Hero Header -->

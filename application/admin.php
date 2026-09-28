@@ -4,7 +4,7 @@ require_admin();
 require_once 'db.php';
 
 $page_title = 'ZimRx — Admin Dashboard';
-$extra_css = ['assets/css/admin.css'];
+$extra_css = ['assets/css/pages/admin.css'];
 
 $counts = [
     'doctors'      => (int)$pdo->query("SELECT COUNT(*) FROM zimrx_doctors WHERE is_active = 1")->fetchColumn(),
