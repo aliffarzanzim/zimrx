@@ -3,7 +3,7 @@
 This directory contains the clinical reference datasets and reproducible build tooling for ZimRx's pediatric growth chart system.
 
 The generated runtime asset is saved to:
-`application/assets/js/layout/growth_chart_data.js`
+`application/assets/js/data/growth_chart_data.js`
 
 ---
 
@@ -17,15 +17,15 @@ The generated runtime asset is saved to:
 
 ## File Contents
 
-* `who_growth_data.json` — WHO Child Growth Standards (0 to 60 Months / 0 to 5 Years) for Weight-for-Age, Height/Length-for-Age, Head Circumference-for-Age, and BMI-for-Age.
-* `cdc_growth_data.json` — CDC Growth Reference (24 to 240 Months / 2 to 20 Years) for older children and adolescents.
-* `growth_chart_engine.js` — Core calculation algorithms:
+* `who_growth_data.json` - WHO Child Growth Standards (0 to 60 Months / 0 to 5 Years) for Weight-for-Age, Height/Length-for-Age, Head Circumference-for-Age, and BMI-for-Age.
+* `cdc_growth_data.json` - CDC Growth Reference (24 to 240 Months / 2 to 20 Years) for older children and adolescents.
+* `growth_chart_engine.js` - Core calculation algorithms:
   * Cole's LMS transformation formula: $Z = \frac{(X/M)^L - 1}{L \times S}$
   * WHO 2006 restricted standard deviation adjustment for extreme Z-scores ($Z > +3$ or $Z < -3$).
   * CDC 2022 Extended BMI classifications for severe childhood obesity.
   * Abramowitz & Stegun polynomial approximation for normal cumulative distribution function (CDF).
   * WHO/UNICEF Mid-Upper Arm Circumference (MUAC) triage bands.
-* `generate_growth_chart_js.py` — The build tool that generates `application/assets/js/layout/growth_chart_data.js`.
+* `generate_growth_chart_js.py` - The build tool that generates `application/assets/js/data/growth_chart_data.js`.
 
 ---
 
@@ -38,4 +38,5 @@ To update the tables or add new regional growth references:
    ```bash
    python generate_growth_chart_js.py
    ```
-3. The script will automatically recompile and format `application/assets/js/layout/growth_chart_data.js`.
+3. The script will automatically recompile and format `application/assets/js/data/growth_chart_data.js`.
+

@@ -422,7 +422,7 @@ if ($reportsIndex !== false) {
     <script src="assets/js/modules/rx_autocomplete.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/rx_autocomplete.js') ?>"></script>
     <script src="assets/js/modules/pc_autocomplete.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/pc_autocomplete.js') ?>"></script>
     <script src="assets/js/modules/o_h_module.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/o_h_module.js') ?>"></script>
-    <script src="assets/js/layout/growth_chart_data.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/growth_chart_data.js') ?>"></script>
+    <script src="assets/js/data/growth_chart_data.js?v=<?= filemtime(__DIR__ . '/assets/js/data/growth_chart_data.js') ?>"></script>
     <script src="assets/js/modules/paediatric_module.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/paediatric_module.js') ?>"></script>
     <script src="assets/js/modules/clinical_exam_modules.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/clinical_exam_modules.js') ?>"></script>
     <script src="assets/js/pages/prescription_preview.js?v=<?= filemtime(__DIR__ . '/assets/js/pages/prescription_preview.js') ?>"></script>

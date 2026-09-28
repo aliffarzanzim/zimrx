@@ -2,7 +2,7 @@
 """
 ZimRx Growth Chart Generator
 =============================
-Generates application/assets/js/layout/growth_chart_data.js from WHO and CDC
+Generates application/assets/js/data/growth_chart_data.js from WHO and CDC
 clinical reference tables.
 
 Maintains 100% synchronous browser execution speed for instant chart plotting
@@ -17,7 +17,7 @@ import json
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 APP_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "..", "application"))
-TARGET_JS = os.path.join(APP_DIR, "assets", "js", "layout", "growth_chart_data.js")
+TARGET_JS = os.path.join(APP_DIR, "assets", "js", "data", "growth_chart_data.js")
 
 WHO_JSON_PATH = os.path.join(SCRIPT_DIR, "who_growth_data.json")
 CDC_JSON_PATH = os.path.join(SCRIPT_DIR, "cdc_growth_data.json")
