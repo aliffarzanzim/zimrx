@@ -167,7 +167,7 @@ require_once __DIR__ . '/header.php';
 ?>
 
 <link rel="stylesheet" href="assets/css/pages/emr.css">
-<script src="assets/js/emr_scanner.js" defer></script>
+<script src="assets/js/pages/emr_scanner.js" defer></script>
 
 <?php
 $patientCurrentAge = $patient ? zimrx_calculate_current_age($patient['dob'] ?? '', $patient['age'] ?? '', $patient['age_unit'] ?? 'Years') : ['formatted' => '--'];

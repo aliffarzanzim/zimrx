@@ -124,8 +124,8 @@ $zrx_dd_theme = $_COOKIE['zimrx_dropdown_theme'] ?? 'subtle-tint';
     </script>
     <script src="assets/js/layout/zrx_icons.js?v=<?= file_exists(__DIR__ . '/assets/js/layout/zrx_icons.js') ? filemtime(__DIR__ . '/assets/js/layout/zrx_icons.js') : '1' ?>"></script>
     <script src="assets/js/layout/zrx_dropdown.js?v=<?= file_exists(__DIR__ . '/assets/js/layout/zrx_dropdown.js') ? filemtime(__DIR__ . '/assets/js/layout/zrx_dropdown.js') : '1' ?>"></script>
-    <script src="assets/js/emr_scanner.js" defer></script>
-    <script src="assets/js/chat.js?v=<?= file_exists(__DIR__ . '/assets/js/chat.js') ? filemtime(__DIR__ . '/assets/js/chat.js') : '1' ?>" defer></script>
+    <script src="assets/js/pages/emr_scanner.js" defer></script>
+    <script src="assets/js/pages/chat.js?v=<?= file_exists(__DIR__ . '/assets/js/pages/chat.js') ? filemtime(__DIR__ . '/assets/js/pages/chat.js') : '1' ?>" defer></script>
 </head>
 <body<?= $body_class !== '' ? ' class="' . htmlspecialchars($body_class, ENT_QUOTES, 'UTF-8') . '"' : '' ?>>
 

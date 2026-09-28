@@ -146,6 +146,6 @@ $doctorName = current_user_name();
         </div>
     </div>
 
-    <script src="assets/js/mobile_upload.js?v=<?= filemtime(__DIR__ . '/assets/js/mobile_upload.js') ?>"></script>
+    <script src="assets/js/pages/mobile_upload.js?v=<?= filemtime(__DIR__ . '/assets/js/pages/mobile_upload.js') ?>"></script>
 </body>
 </html>

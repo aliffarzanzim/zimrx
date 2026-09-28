@@ -272,7 +272,7 @@ require __DIR__ . '/modules/drug_db_layout.php';
 window.ZIMRX_INITIAL_DRUG_DETAIL = <?= json_encode($initialDrugDetail, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: 'null' ?>;
 window.ZIMRX_INITIAL_SIDEBAR_STATE = <?= json_encode($initialSidebarState, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: 'null' ?>;
 </script>
-<script src="assets/js/dosage_form_icons.js"></script>
+<script src="assets/js/modules/dosage_form_icons.js"></script>
 <script src="assets/js/drug_db/state.js"></script>
 <script src="assets/js/drug_db/utils.js"></script>
 <script src="assets/js/drug_db/sidebar.js"></script>
