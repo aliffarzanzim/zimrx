@@ -1,0 +1,743 @@
+/* =======================================================
+   Rx / Prescription Specific Table UI
+======================================================= */
+.rx-wrapper { display: flex; flex-direction: column; background: #cbd5e1; height: auto; min-height: 0; border-radius: 0; overflow: visible; position: relative;}
+.rx-top-bar { display: flex; align-items: center; gap: 1rem; padding: 0.6rem 1rem; background: #cbd5e1; border-bottom: 2px solid #94a3b8; border-radius: 0; }
+.rx-info-bar {
+    display: grid;
+    align-content: center;
+    height: 62px;
+    min-height: 62px;
+    padding: 5px 12px;
+    background: #e2e8f0;
+    border-top: 2px solid #cbd5e1;
+    border-bottom: 1px solid #94a3b8;
+    color: #334155;
+    cursor: default;
+    font-size: 0.82rem;
+    line-height: 1.35;
+    text-align: center;
+    border-radius: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+.rx-info-empty {
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    width: 100%;
+}
+.rx-info-main,
+.rx-info-alerts {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    width: 100%;
+}
+.rx-info-main {
+    font-size: 0.83rem;
+}
+.rx-info-alerts {
+    margin-top: 4px;
+}
+.rx-info-piece {
+    display: inline-flex;
+    align-items: center;
+    min-height: 19px;
+}
+.rx-info-piece.generic { color: #334155; font-weight: 700; }
+.rx-info-piece.price { color: #ef4444; }
+.rx-info-piece.pregnancy { color: #a16207; font-weight: 700; }
+.rx-info-piece.manufacturer { color: #16a34a; }
+.rx-info-piece.class { color: #475569; }
+.rx-info-separator { color: #94a3b8; }
+.rx-info-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 22px;
+    max-width: 100%;
+    padding: 2px 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #f8fafc;
+    color: #334155;
+    font-size: 0.76rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+.rx-info-chip.warning {
+    background: #fffbeb;
+    border-color: #f59e0b;
+    color: #92400e;
+}
+.rx-info-chip.danger {
+    background: #fff1f2;
+    border-color: #fb7185;
+    color: #b91c1c;
+}
+.rx-info-chip.info {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #1e40af;
+}
+body.rx-warnings-disabled .rx-info-bar {
+    height: 38px;
+    min-height: 38px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    overflow: hidden;
+}
+body.rx-warnings-disabled .rx-info-empty {
+    min-height: 100%;
+}
+.rx-symbol { font-size: 1.8rem; font-weight: 700; font-family: serif; color: var(--text-dark); line-height: 1; padding-right: 0.2rem; text-shadow: 0 1px 1px rgba(255,255,255,0.5); }
+.rx-search-group { display: flex; gap: 0.75rem; flex: 1; margin-left: 1rem; }
+.rx-search-box { position: relative; flex: 1; }
+.rx-search-box svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #64748b; }
+.rx-search-box input { width: 100%; height: 32px; padding: 0 10px 0 30px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.85rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); outline: none; transition: var(--transition);}
+.rx-search-box input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+.rx-settings-btn {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 26px;
+    height: 26px;
+    flex: 0 0 26px;
+    border: none !important;
+    border-radius: 4px;
+    background: transparent !important;
+    color: #64748b !important;
+    opacity: 0.75;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+    box-shadow: none !important;
+    outline: none;
+    transition: color 0.15s ease, opacity 0.15s ease, background-color 0.15s ease;
+}
+.rx-settings-btn:hover {
+    background: rgba(0, 0, 0, 0.05) !important;
+    color: #0f172a !important;
+    opacity: 1;
+}
+.rx-settings-btn svg {
+    width: 15px;
+    height: 15px;
+    display: block;
+    color: currentColor;
+    stroke: currentColor;
+}
+
+.rx-table-container { flex: 0 0 auto; min-height: 0; overflow: hidden; background: transparent; padding-bottom: 0; margin: 0; }
+.rx-table { width: 100%; border-collapse: separate; border-spacing: 0; background: #ffffff; table-layout: fixed; margin: 0; padding: 0; border: none; }
+.rx-table thead { background: #cbd5e1; }
+.rx-table thead tr { background: #cbd5e1; }
+.rx-table th { background: #cbd5e1; color: var(--text-dark); font-weight: 600; font-size: 0.75rem; padding: 0 0.5rem; height: 32px; box-sizing: border-box; vertical-align: middle; border: none; border-right: var(--zrx-table-border-width, 2px) solid #94a3b8; border-bottom: var(--zrx-table-border-width, 2px) solid #94a3b8; white-space: nowrap; text-align: left; }
+.rx-table thead th:first-child { border-left: none; }
+.rx-table thead th:last-child { border-right: none; }
+.rx-table td { border: none; border-right: var(--zrx-table-border-width, 2px) solid var(--zrx-table-border, #b8c5d6); border-bottom: var(--zrx-table-border-width, 2px) solid var(--zrx-table-border, #b8c5d6); padding: 0; background: #ffffff; vertical-align: middle; }
+.rx-table td:first-child { border-left: none; }
+.rx-table td:last-child { border-right: none; }
+.rx-table tbody tr:last-child td { border-bottom: none; }
+body.rx-auto-row-size-enabled .rx-table td { vertical-align: top; }
+body.rx-auto-row-size-enabled .rx-table td.rx-action,
+.rx-table td.rx-action {
+    vertical-align: middle !important;
+}
+
+.rx-action { text-align: center !important; background: #e2e8f0 !important; color: var(--text-dark); font-size: 0.85rem; font-weight: 500; vertical-align: middle !important; padding: 0 !important; }
+.rx-no { vertical-align: middle !important; }
+.rx-drag { cursor: grab; color: #64748b; padding: 0 !important; }
+.rx-drag:hover { background: #cbd5e1 !important; color: #0f172a; }
+.rx-drag:active { cursor: grabbing; }
+.rx-drag svg { pointer-events: none; }
+.rx-del { padding: 0 !important; }
+.rx-del button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 20px !important;
+    min-height: 20px !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+    background: #ffffff;
+    border: 1px solid #94a3b8;
+    border-radius: 3px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #334155;
+    cursor: pointer;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+    line-height: 1;
+}
+.rx-del button:hover { background: #fee2e2; border-color: #ef4444; color: #dc2626; }
+
+.rx-input { width: 100%; min-height: 36px; height: 36px; border: none; padding: 6px 0.5rem; font-size: 16px; line-height: 1.35; background: transparent; outline: none; font-family: var(--font-family); color: var(--text-dark); display: block; resize: none !important; overflow: hidden; }
+.rx-input:focus { background: #f8fafc; box-shadow: inset 0 0 0 2px rgba(37,99,235,0.3); }
+td:has(> .rx-input:focus) { background: #f8fafc; box-shadow: inset 0 0 0 2px rgba(37,99,235,0.3); }
+td:has(> .rx-input:focus) > .rx-input { background: transparent; box-shadow: none; }
+body:not(.rx-auto-row-size-enabled) .rx-input { white-space: pre; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+body:not(.rx-auto-row-size-enabled) .rx-input::-webkit-scrollbar { display: none; }
+body.rx-auto-row-size-enabled .rx-input { white-space: pre-wrap; overflow: hidden; }
+
+.rx-settings-modal[hidden] { display: none !important; }
+.rx-settings-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 88px 20px 20px;
+}
+.rx-settings-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.36);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+}
+.rx-settings-panel {
+    position: relative;
+    width: min(640px, calc(100vw - 32px));
+    max-height: calc(100vh - 120px);
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.26);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+.rx-settings-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    background: #e2e8f0;
+    border-bottom: 1px solid #cbd5e1;
+    padding: 0.9rem 1rem;
+}
+.rx-settings-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: #0f172a;
+}
+.rx-settings-header p {
+    margin: 0.2rem 0 0;
+    color: #475569;
+    font-size: 0.8rem;
+}
+.rx-settings-close {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #334155;
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+}
+.rx-settings-close:hover { background: #fee2e2; border-color: #fca5a5; color: #b91c1c; }
+.rx-settings-body {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1rem;
+    overflow: auto;
+}
+.rx-settings-card {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    padding: 0.85rem;
+}
+.rx-settings-card h4 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 0.9rem;
+}
+.rx-settings-card p,
+.rx-settings-card small {
+    color: #64748b;
+    font-size: 0.78rem;
+    line-height: 1.35;
+}
+.rx-settings-card p { margin: 0.25rem 0 0.7rem; }
+.rx-segmented {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+}
+.rx-segmented label,
+.rx-toggle-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: #ffffff;
+    padding: 0.65rem;
+    cursor: pointer;
+}
+.rx-segmented label:has(input:checked),
+.rx-toggle-row:has(input:checked) {
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+.rx-segmented input,
+.rx-toggle-row input {
+    margin-top: 0.1rem;
+    accent-color: #2563eb;
+}
+.rx-segmented span,
+.rx-toggle-row span {
+    display: grid;
+    gap: 0.18rem;
+}
+.rx-segmented strong,
+.rx-toggle-row strong {
+    color: #0f172a;
+    font-size: 0.84rem;
+}
+.rx-warning-dropdown {
+    margin: 0.65rem 0;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: #ffffff;
+    overflow: hidden;
+}
+.rx-warning-dropdown summary {
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.75rem;
+    cursor: pointer;
+    color: #0f172a;
+    font-size: 0.82rem;
+    font-weight: 700;
+    list-style: none;
+}
+.rx-warning-dropdown summary::-webkit-details-marker {
+    display: none;
+}
+.rx-warning-dropdown summary::after {
+    content: "v";
+    color: #64748b;
+    font-size: 0.78rem;
+}
+.rx-warning-dropdown[open] summary {
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+.rx-warning-type-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.4rem 0.75rem;
+    padding: 0.7rem 0.75rem;
+}
+.rx-warning-type-grid label {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: #334155;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+.rx-warning-type-grid input {
+    accent-color: var(--primary);
+}
+.rx-settings-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+.rx-settings-restore-btn {
+    min-height: 32px;
+    border: 1px solid #94a3b8;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #334155;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 0 0.75rem;
+    cursor: pointer;
+}
+.rx-settings-restore-btn:hover {
+    background: #eff6ff;
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.rx-add-row { flex-shrink: 0; display: flex; justify-content: center; padding: 0.45rem 0 0.45rem; background: #e2e8f0; border-top: var(--zrx-table-border-width, 2px) solid var(--zrx-table-border, #b8c5d6); z-index: 10; }
+.rx-add-row-btn { min-width: 110px; height: 30px; border: 1px solid #94a3b8; border-radius: 8px; background: #ffffff; color: #0f172a; font: inherit; font-size: 0.84rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08); }
+.rx-add-row-btn:hover { background: #eff6ff; border-color: var(--primary); color: var(--primary); }
+
+/* =======================================================
+   Drug Summary & Interaction Module
+======================================================= */
+.drug-summary-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    background: #dbe4ef;
+    padding: 0.85rem;
+    border-radius: inherit;
+    overflow: hidden;
+}
+.drug-summary-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.6rem 0.7rem;
+    background: #cbd5e1;
+    border: 1px solid #94a3b8;
+    border-radius: 8px;
+}
+.drug-summary-header h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 0.98rem;
+    line-height: 1.2;
+}
+.drug-summary-subline {
+    margin-top: 0.15rem;
+    color: #475569;
+    font-size: 0.76rem;
+}
+.drug-interaction-open-btn,
+.drug-interaction-check-btn {
+    min-height: 31px;
+    border: 1px solid #2563eb;
+    border-radius: 7px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 0 0.75rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.drug-interaction-open-btn:hover,
+.drug-interaction-check-btn:hover {
+    background: #dbeafe;
+}
+.drug-summary-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.55rem;
+}
+.drug-summary-metric {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+    padding: 0.58rem 0.65rem;
+    border: 1px solid #b6c5d8;
+    border-radius: 8px;
+    background: #ffffff;
+}
+.drug-summary-metric span {
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.drug-summary-metric strong {
+    color: #0f172a;
+    font-size: 0.95rem;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+.drug-summary-metric strong.danger {
+    color: #b91c1c;
+}
+.drug-antibiotic-note {
+    padding: 0.55rem 0.7rem;
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+    background: #fff7ed;
+    color: #9a3412;
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+.drug-summary-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: 0.75rem;
+}
+.drug-summary-section {
+    min-width: 0;
+    border: 1px solid #b6c5d8;
+    border-radius: 8px;
+    background: linear-gradient(#eef2f7 0 34px, #ffffff 34px);
+    overflow: hidden;
+}
+.drug-summary-section-head {
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.45rem 0.65rem;
+    background: #eef2f7;
+    border-bottom: 1px solid #cbd5e1;
+    color: #0f172a;
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+.drug-summary-section-head strong {
+    min-width: 24px;
+    min-height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #94a3b8;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #334155;
+    font-size: 0.75rem;
+}
+.drug-summary-table-wrap {
+    overflow-x: auto;
+}
+.drug-summary-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed;
+}
+.drug-summary-table th,
+.drug-summary-table td {
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0.48rem 0.58rem;
+    text-align: left;
+    vertical-align: top;
+    font-size: 0.8rem;
+}
+.drug-summary-table th {
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 700;
+}
+.drug-summary-table th:nth-child(2),
+.drug-summary-table th:nth-child(3),
+.drug-summary-table td:nth-child(2),
+.drug-summary-table td:nth-child(3) {
+    width: 96px;
+    text-align: right;
+}
+.drug-summary-table td strong {
+    display: block;
+    color: #0f172a;
+    font-size: 0.82rem;
+    overflow-wrap: anywhere;
+}
+.drug-summary-table td span {
+    display: block;
+    margin-top: 0.12rem;
+    color: #64748b;
+    font-size: 0.74rem;
+    overflow-wrap: anywhere;
+}
+.drug-interaction-list {
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 0.55rem;
+    display: grid;
+    gap: 0.45rem;
+}
+.drug-interaction-item {
+    display: grid;
+    gap: 0.22rem;
+    border: 1px solid #cbd5e1;
+    border-left-width: 4px;
+    border-radius: 7px;
+    background: #f8fafc;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.8rem;
+    color: #334155;
+}
+.drug-interaction-item strong {
+    color: #0f172a;
+    font-size: 0.82rem;
+}
+.drug-interaction-item span {
+    line-height: 1.35;
+}
+.drug-interaction-item.danger {
+    border-left-color: #ef4444;
+    background: #fff7f7;
+}
+.drug-interaction-item.warning {
+    border-left-color: #f59e0b;
+    background: #fff8e6;
+}
+.drug-summary-empty {
+    padding: 0.65rem;
+    color: #64748b;
+    text-align: center;
+    font-size: 0.8rem;
+}
+.drug-interaction-modal[hidden] {
+    display: none !important;
+}
+.drug-interaction-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10004;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 84px 20px 20px;
+}
+.drug-interaction-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.42);
+}
+.drug-interaction-panel {
+    position: relative;
+    width: min(620px, calc(100vw - 32px));
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.26);
+    overflow: hidden;
+}
+.drug-interaction-header {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: #e2e8f0;
+    border-bottom: 1px solid #cbd5e1;
+    padding: 0.75rem 0.9rem;
+}
+.drug-interaction-header h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1rem;
+}
+.drug-interaction-close {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #334155;
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+}
+.drug-interaction-close:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #b91c1c;
+}
+.drug-interaction-body {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.9rem;
+}
+.drug-interaction-inputs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+.drug-interaction-inputs label {
+    display: grid;
+    gap: 0.28rem;
+    color: #334155;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+.drug-interaction-inputs input {
+    width: 100%;
+    height: 34px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0 0.55rem;
+    color: #0f172a;
+    font: inherit;
+    font-size: 0.86rem;
+    outline: none;
+}
+.drug-interaction-inputs input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+.drug-interaction-inputs small {
+    min-height: 16px;
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+.drug-interaction-result {
+    min-height: 46px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #475569;
+    padding: 0.65rem;
+    font-size: 0.83rem;
+}
+
+/* =======================================================
+   Advice Module Specific UI
+======================================================= */
+.advice-wrapper { display: flex; gap: 1.25rem; background: #e2e8f0; padding: 1rem; height: auto; position: relative; }
+.advice-left { flex: 1.25; display: flex; flex-direction: column; position: relative; min-width: 0; }
+.advice-right { flex: 0.75; display: flex; flex-direction: column; gap: 0.45rem; padding: 0.85rem; justify-content: flex-start; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; min-width: 260px; }
+
+.advice-header-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; }
+.advice-title { font-size: 1.15rem; font-weight: bold; color: var(--text-dark); font-family: 'SolaimanLipi', sans-serif; white-space: nowrap; }
+.advice-template-box { max-width: 320px; }
+
+.advice-list { display: flex; flex-direction: column; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; background: #fff; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05); }
+.advice-row { display: flex; border-bottom: 1px solid #cbd5e1; }
+.advice-row:last-child { border-bottom: none; }
+.adv-drag { width: 28px; background: #e2e8f0; display: flex; align-items: center; justify-content: center; cursor: grab; color: #64748b; border-right: 1px solid #cbd5e1; }
+.adv-drag:active { cursor: grabbing; }
+.adv-del { width: 34px; display: flex; align-items: center; justify-content: center; background: #f8fafc; border-right: 1px solid #cbd5e1; }
+.adv-del button { background: #ffffff; border: 1px solid #94a3b8; border-radius: 3px; font-size: 0.75rem; font-weight: bold; color: #334155; cursor: pointer; padding: 2px 6px; line-height: 1; }
+.adv-del button:hover { background: #fee2e2; border-color: #ef4444; color: #dc2626; }
+.adv-input { flex: 1; min-height: 38px; border: none; padding: 0.45rem 0.75rem; outline: none; font-size: 0.9rem; font-family: var(--font-family); color: var(--text-dark); }
+.adv-input:focus { background: #f0f9ff; }
+
+.advice-footer { display: flex; justify-content: center; border: 1px solid #cbd5e1; border-top: none; background: #f8fafc; border-radius: 0 0 6px 6px; padding: 0.45rem 0; }
+.adv-add-row-btn { min-width: 110px; height: 30px; border: 1px solid #94a3b8; border-radius: 8px; background: #ffffff; color: #0f172a; font: inherit; font-size: 0.84rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08); }
+.adv-add-row-btn:hover { background: #eff6ff; border-color: var(--primary); color: var(--primary); }
+
+.adv-form-group { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.4rem;}
+.adv-form-group label { width: 110px; text-align: right; font-size: 0.9rem; font-family: 'SolaimanLipi', sans-serif; color: var(--text-dark); font-weight: 500; }
+.adv-form-group input, .adv-form-group select { flex: 1; height: 32px; padding: 0 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.85rem; background: #fff; color: var(--text-dark); outline: none; transition: var(--transition); font-family: var(--font-family);}
+.adv-form-group input:focus, .adv-form-group select:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
+.rx-dropdown-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+.rx-dropdown-main span {
+    color: #64748b;
+    font-size: 0.76rem;
+}
+.rx-dropdown-item:hover .rx-dropdown-main span,
+.rx-dropdown-item.active .rx-dropdown-main span {
+    color: #ffffff !important;
+    opacity: 0.92;
+}
+

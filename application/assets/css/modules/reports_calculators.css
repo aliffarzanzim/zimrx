@@ -1,0 +1,214 @@
+/* =======================================================
+   Reports Module Specific UI
+======================================================= */
+.reports-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    height: auto;
+    padding: 0.9rem;
+    background: #dbe4ef;
+}
+.reports-single-wrapper {
+    gap: 0;
+    padding: 0;
+    background: linear-gradient(#cbd5e1 0 38px, #ffffff 38px);
+    border-radius: inherit;
+    overflow: hidden;
+}
+.reports-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    background: transparent;
+    border-radius: 0;
+    overflow: visible;
+    margin: -2px;
+    width: calc(100% + 4px);
+}
+.reports-single-wrapper .reports-section {
+    width: 100%;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+}
+.reports-single-wrapper .reports-section-header {
+    justify-content: center;
+    text-align: center;
+}
+.reports-single-wrapper .reports-section-title {
+    justify-content: center;
+}
+.reports-single-wrapper .reports-panel,
+.reports-single-wrapper .reports-table-container {
+    width: 100%;
+}
+.reports-single-wrapper .reports-upload-area {
+    padding: 0;
+}
+.reports-single-wrapper .report-upload-btn {
+    min-height: 48px;
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+.reports-section {
+    border: none;
+    border-radius: 0;
+    overflow: visible;
+    background: transparent;
+    box-shadow: none;
+}
+.reports-section-header {
+    height: 32px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0 0.75rem;
+    background: #cbd5e1;
+    border-bottom: 1px solid #94a3b8;
+    color: #0f172a;
+}
+.reports-section-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-width: 0;
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+.reports-section-title svg {
+    width: 17px;
+    height: 17px;
+    flex: 0 0 17px;
+    color: #334155;
+}
+.reports-section-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 22px;
+    padding: 0 0.55rem;
+    border-radius: 999px;
+    border: 1px solid #94a3b8;
+    background: #e2e8f0;
+    color: #334155;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+.reports-panel {
+    background: #ffffff;
+    overflow: hidden;
+}
+.reports-table-container {
+    overflow-x: auto;
+    background: #ffffff;
+}
+.reports-table-footer {
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid #cbd5e1;
+    background: #f8fafc;
+    padding: 0.45rem 0;
+}
+.reports-add-row-btn {
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+.reports-upload-table-container {
+    border-bottom: 1px solid #cbd5e1;
+}
+.reports-upload-area {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    background: #f8fafc;
+}
+.report-upload-btn {
+    width: 100%;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 0 0.85rem;
+    border: 1px solid #94a3b8;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #334155;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.86rem;
+    font-weight: 700;
+    transition: var(--transition);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+.report-upload-btn svg {
+    width: 17px;
+    height: 17px;
+    flex: 0 0 17px;
+}
+.report-upload-btn:hover {
+    background: #eff6ff;
+    border-color: var(--primary);
+    color: var(--primary);
+}
+#reports-table thead th,
+#reports-upload-table thead th {
+    background: #e2e8f0;
+    color: #0f172a;
+    border-color: #b6c5d8;
+}
+.report-wrapper { display: flex; flex-direction: column; background: #e2e8f0; padding: 1.5rem; height: 100%; position: relative; border-radius: inherit; overflow: hidden; }
+.report-header-title { text-align: center; font-size: 1.2rem; font-weight: 700; color: var(--text-dark); margin-bottom: 1rem; margin-top: 0;}
+.report-table-container { flex: 1; overflow-x: auto; background: #ffffff; border: 1px solid var(--border-color); border-radius: 0; }
+.report-table { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; }
+.report-table th { background: var(--primary); color: #ffffff; font-weight: 600; font-size: 0.85rem; padding: 0.5rem; border: 1px solid var(--primary-hover); text-align: left; }
+.report-table td { border: 1px solid #cbd5e1; padding: 0; vertical-align: middle; }
+
+.rep-action { text-align: center !important; background: #f1f5f9 !important; }
+.rep-drag { cursor: grab; color: #64748b; border-right: 1px solid #cbd5e1; }
+.rep-drag:active { cursor: grabbing; }
+.rep-del { border-right: 1px solid #cbd5e1; }
+.rep-del button { background: #ffffff; border: 1px solid #94a3b8; border-radius: 3px; font-size: 0.75rem; font-weight: bold; color: #334155; cursor: pointer; padding: 2px 6px; box-shadow: 0 1px 1px rgba(0,0,0,0.05); line-height: 1; }
+.rep-del button:hover { background: #fee2e2; border-color: #ef4444; color: #dc2626; }
+
+.rep-input { width: 100%; height: 34px; border: none; padding: 0 0.5rem; font-size: 0.85rem; background: transparent; outline: none; font-family: var(--font-family); color: var(--text-dark); }
+.rep-input:focus { background: #f0f9ff; box-shadow: inset 0 0 0 2px rgba(37,99,235,0.3); }
+
+.report-footer { display: flex; justify-content: center; margin-top: -1px; z-index: 2; position: relative; }
+.rep-expand-btn { background: var(--primary); color: #fff; border: none; border-radius: 0 0 8px 8px; width: 60px; height: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.rep-expand-btn:hover { background: var(--primary-hover); }
+
+/* =======================================================
+   Calculators Module Specific UI
+======================================================= */
+.calc-wrapper { padding: 0.5rem 0; font-family: var(--font-family); }
+.calc-tabs { display: flex; justify-content: center; gap: 4px; margin-bottom: -1px; z-index: 2; position: relative; }
+.calc-tab { background: #ffffff; border: 1px solid #cbd5e1; border-bottom: none; padding: 6px 18px; border-radius: 8px 8px 0 0; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); cursor: pointer; box-shadow: 0 -2px 4px rgba(0,0,0,0.05); transition: all 0.1s; }
+.calc-tab:hover { background: #f8fafc; }
+.calc-tab.active { background: #eab308; color: #ffffff; border-color: #ca8a04; z-index: 3; box-shadow: 0 -2px 6px rgba(0,0,0,0.15); text-shadow: 0 1px 1px rgba(0,0,0,0.2);}
+.calc-panes { background: #bbf7d0; border: 1px solid #86efac; border-radius: 4px; padding: 12px 16px; z-index: 1; position: relative; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); }
+.calc-pane { display: none; flex-direction: column; gap: 12px; }
+.calc-pane.active { display: flex; }
+.calc-row { display: flex; gap: 12px; align-items: flex-end; width: 100%; }
+.calc-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
+.calc-field label { font-size: 0.8rem; font-weight: 600; color: #1e293b; white-space: nowrap; }
+.calc-field input[type="text"],
+.calc-field input[type="number"],
+.calc-field select { height: 30px; padding: 0 8px; border: 1px solid #94a3b8; border-radius: 2px; font-size: 0.85rem; width: 100%; outline: none; background: #ffffff; color: var(--text-dark); transition: border-color 0.2s;}
+.calc-field input:focus, .calc-field select:focus { border-color: var(--primary); }
+.calc-readonly { background: #cbd5e1 !important; color: #0f172a !important; border-color: #94a3b8 !important; pointer-events: none; font-weight: 500; text-align: center;}
+.calc-radio-group { display: flex; flex-direction: column; gap: 4px; justify-content: flex-end; height: 100%; padding-bottom: 6px; }
+.calc-radio-group .r-group { display: flex; gap: 10px; align-items: center; font-size: 0.85rem; font-weight: 500; color: #1e293b; }
+.calc-radio-group-vertical { display: flex; flex-direction: column; gap: 4px; }
+.calc-radio-group-vertical .v-group { display: flex; flex-direction: column; gap: 2px; font-size: 0.8rem; color: #1e293b;}
+.calc-radio-group-vertical label { font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 4px;}
+.calc-btn { height: 30px; border-radius: 2px; background: #ffffff; border-color: #94a3b8; padding: 0 1rem; cursor: pointer; }
+.calc-btn:hover { background: #f1f5f9; border-color: var(--text-muted); }
+

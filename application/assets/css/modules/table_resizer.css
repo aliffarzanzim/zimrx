@@ -1,0 +1,215 @@
+/* =======================================================
+   Universal Excel-Style Table Column Resizer
+======================================================= */
+.zrx-table th,
+.pc-table th,
+.rx-table th,
+.oh-table th,
+.ot-table th,
+.reports-table th,
+.template-table-container th {
+    position: relative;
+    transition: border-right-color 0.15s ease;
+}
+
+.zrx-col-resizer {
+    position: absolute;
+    top: 0;
+    right: -6px;
+    width: 12px;
+    height: 100%;
+    cursor: col-resize;
+    user-select: none;
+    z-index: 50;
+    background: transparent;
+}
+
+/* Directly light up the exact border-right of th */
+th:has(> .zrx-col-resizer:hover),
+th:has(> .zrx-col-resizer.is-resizing),
+th.zrx-th-resizing {
+    border-right-color: var(--zrx-primary, #2563eb) !important;
+}
+
+/* Table Header Title Sizing Behavior: Auto-wrap & expand to fit column width */
+.zrx-th-text,
+.pc-header-flex,
+.pc-header-flex span {
+    display: block;
+    overflow: visible;
+    white-space: normal;
+    word-break: break-word;
+    max-width: 100%;
+    min-width: 0;
+    line-height: 1.25;
+}
+
+.pc-table th,
+.oh-table th,
+.ot-table th,
+.reports-table th,
+.zrx-table th {
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 32px !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    line-height: 1.25 !important;
+}
+
+/* Keep index (#, No.) and action headers single-line and centered without wrapping */
+.pc-table th:nth-child(1),
+.pc-table th:nth-child(2),
+.pc-table th:last-child,
+.rx-table th:nth-child(1),
+.rx-table th:nth-child(2),
+.rx-table th:nth-child(3),
+.rx-table th:last-child,
+.oh-table th:nth-child(1),
+.oh-table th:nth-child(2),
+.oh-table th:last-child {
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+    text-align: center !important;
+}
+
+.pc-table thead tr,
+.oh-table thead tr,
+.ot-table thead tr,
+.reports-table thead tr,
+.zrx-table thead tr {
+    height: auto !important;
+}
+
+/* Rx Table follows auto-row-size toggle */
+body.rx-auto-row-size-enabled .rx-table th {
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 32px !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    line-height: 1.25 !important;
+}
+
+body.rx-auto-row-size-enabled .rx-table thead tr {
+    height: auto !important;
+}
+
+/* Table Layout Action Toolbar (Beside Add More Button) */
+.zrx-tbl-layout-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 4px;
+}
+
+.zrx-btn-layout-save {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    height: 30px;
+    padding: 0 14px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    font-family: inherit;
+    border-radius: 8px;
+    border: 1px solid var(--zrx-primary, #2563eb);
+    background: var(--zrx-primary, #2563eb);
+    color: #ffffff;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.22);
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.zrx-btn-layout-save:hover {
+    background: var(--zrx-primary-hover, #1d4ed8);
+    border-color: var(--zrx-primary-hover, #1d4ed8);
+    box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
+}
+
+.zrx-btn-layout-save.saved {
+    background: var(--zrx-success, #16a34a) !important;
+    border-color: var(--zrx-success, #16a34a) !important;
+}
+
+.zrx-btn-layout-reset {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    height: 30px;
+    padding: 0 14px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    font-family: inherit;
+    border-radius: 8px;
+    border: 1px solid #94a3b8;
+    background: #ffffff;
+    color: #334155;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.zrx-btn-layout-reset:hover {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #f87171;
+    box-shadow: 0 3px 8px rgba(220, 38, 38, 0.15);
+}
+
+.zrx-tbl-layout-help {
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #64748b;
+    cursor: pointer;
+    margin-left: 2px;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.zrx-tbl-layout-help:hover {
+    background: #eff6ff;
+    border-color: var(--zrx-primary, #2563eb);
+    color: var(--zrx-primary, #2563eb);
+    box-shadow: 0 2px 5px rgba(37, 99, 235, 0.2);
+}
+
+.pc-footer,
+.rx-add-row,
+.oh-footer,
+.ot-footer,
+.reports-footer,
+.ph-add-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+body.zrx-column-resizing {
+    cursor: col-resize !important;
+    user-select: none !important;
+}
+
+body.zrx-column-resizing * {
+    user-select: none !important;
+    cursor: col-resize !important;
+}
+
