@@ -1,0 +1,145 @@
+/* =======================================================
+   Diabetic Foot & Ulcer Assessment Styles
+======================================================= */
+.zrx-df-metrics-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.55rem;
+    margin-bottom: 0.65rem;
+}
+@media (max-width: 768px) {
+    .zrx-df-metrics-bar {
+        grid-template-columns: 1fr;
+    }
+}
+.zrx-df-metric-chip {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0.45rem 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+.zrx-df-metric-lbl {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: #64748b;
+}
+.zrx-df-metric-val {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.25;
+}
+.zrx-df-metric-status {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: #10b981;
+}
+.zrx-df-metric-status.moderate { color: #f59e0b; }
+.zrx-df-metric-status.high { color: #dc2626; }
+
+.zrx-df-layout-grid {
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    gap: 0.75rem;
+    margin-bottom: 0.65rem;
+    align-items: start;
+}
+@media (max-width: 800px) {
+    .zrx-df-layout-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.zrx-df-map-card {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.zrx-df-map-head {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 0.35rem;
+}
+.zrx-df-card-title {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+.zrx-df-card-sub {
+    font-size: 0.66rem;
+    color: #64748b;
+}
+.zrx-df-svg-wrap {
+    width: 150px;
+    height: 240px;
+}
+.zrx-df-svg {
+    width: 100%;
+    height: 100%;
+    user-select: none;
+}
+.zrx-df-point {
+    cursor: pointer;
+    transition: all 0.12s;
+}
+.zrx-df-point.intact {
+    fill: #10b981;
+    stroke: #059669;
+    stroke-width: 1.5;
+}
+.zrx-df-point.absent {
+    fill: #ef4444;
+    stroke: #b91c1c;
+    stroke-width: 2;
+}
+.zrx-df-point:hover {
+    transform: scale(1.15);
+}
+.zrx-df-pt-text {
+    font-size: 8px;
+    font-weight: 800;
+    fill: #ffffff;
+    pointer-events: none;
+    text-anchor: middle;
+}
+.zrx-df-map-legend {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 0.4rem;
+    font-size: 0.66rem;
+    font-weight: 600;
+    color: #475569;
+}
+.zrx-df-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+.zrx-df-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    display: inline-block;
+}
+.zrx-df-dot.intact { background: #10b981; }
+.zrx-df-dot.absent { background: #ef4444; }
+
+.zrx-df-controls-card {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+

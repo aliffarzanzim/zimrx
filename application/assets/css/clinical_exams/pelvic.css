@@ -1,0 +1,161 @@
+/* =======================================================
+   O/H: Pelvic Examination (P/S & P/V) Styles
+======================================================= */
+.oh-pv-btn {
+    border: 1px solid #94a3b8;
+    background: #ffffff;
+    color: #0f172a;
+    border-radius: 6px;
+    padding: 0 0.55rem;
+    height: 24px;
+    font: inherit;
+    font-size: 0.74rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: all 0.14s ease;
+}
+.oh-pv-btn:hover {
+    background: #eff6ff;
+    border-color: #2563eb;
+    color: #2563eb;
+}
+.oh-pv-btn.active {
+    background: #2563eb;
+    border-color: #1d4ed8;
+    color: #ffffff;
+}
+
+.oh-pelvic-section {
+    margin-top: 0.6rem;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+.oh-pelvic-section[hidden] {
+    display: none !important;
+}
+.oh-pelvic-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #e2e8f0;
+    border-bottom: 1px solid #cbd5e1;
+    padding: 0.45rem 0.75rem;
+}
+.oh-pelvic-title-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+.oh-pelvic-actions {
+    display: flex;
+    gap: 0.35rem;
+}
+.oh-pelvic-quick-btn {
+    background: #ffffff;
+    border: 1px solid #94a3b8;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    color: #334155;
+    cursor: pointer;
+}
+.oh-pelvic-quick-btn:hover {
+    background: #eff6ff;
+    border-color: #2563eb;
+    color: #2563eb;
+}
+.oh-pelvic-body {
+    padding: 0.65rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    background: #f8fafc;
+}
+.oh-pelvic-dual-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+@media (max-width: 800px) {
+    .oh-pelvic-dual-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.oh-pelvic-col {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0.55rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+.oh-pelvic-col-head {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #0f172a;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+.oh-pelvic-col-tag {
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 0.66rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    letter-spacing: 0.3px;
+}
+.oh-pelvic-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+.oh-pelvic-lbl {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #475569;
+}
+.oh-pelvic-select,
+.oh-pelvic-input {
+    width: 100%;
+    height: 28px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    background: #ffffff;
+    font-size: 0.76rem;
+    color: #0f172a;
+    padding: 0 6px;
+    outline: none;
+    box-sizing: border-box;
+}
+.oh-pelvic-select:focus,
+.oh-pelvic-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+}
+.oh-pelvic-flex {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35rem;
+}
+.oh-pelvic-notes-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
