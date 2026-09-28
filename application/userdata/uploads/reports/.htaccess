@@ -1,0 +1,10 @@
+# ==============================================================================
+# ZimRx Clinical Reports Storage — Confidential Patient Data
+# Direct HTTP access is forbidden. Access exclusively via api/view_report.php
+# ==============================================================================
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Deny from all
+</IfModule>

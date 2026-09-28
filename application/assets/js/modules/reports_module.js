@@ -351,8 +351,12 @@
                     dateInput.value = `${d}/${m}/${y}`;
 
                     let cleanPath = (data.file_path || '').trim();
-                    if (cleanPath.startsWith('userdata/uploads/')) {
-                        cleanPath = cleanPath.replace('userdata/uploads/', 'uploads/');
+                    if (cleanPath.startsWith('userdata/uploads/reports/') || cleanPath.startsWith('uploads/reports/')) {
+                        const fileName = cleanPath.split('/').pop();
+                        cleanPath = 'api/view_report.php?file=' + encodeURIComponent(fileName);
+                    } else if (!cleanPath.startsWith('api/view_report.php') && cleanPath !== '') {
+                        const fileName = cleanPath.split('/').pop();
+                        cleanPath = 'api/view_report.php?file=' + encodeURIComponent(fileName);
                     }
                     tr.querySelector('.upload-view-btn').href = cleanPath;
                     tr.querySelector('.upload-file-path').value = cleanPath;

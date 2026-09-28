@@ -58,9 +58,10 @@ try {
         throw new RuntimeException('Unable to create reports directory.');
     }
 
+    $doctorId = current_user_doctor_id();
     $filename = sprintf(
         'report-%d-%d-%s.%s',
-        current_user_id(),
+        $doctorId,
         time(),
         bin2hex(random_bytes(8)),
         $ext
@@ -71,11 +72,11 @@ try {
         throw new RuntimeException('Could not save uploaded file.');
     }
 
-    $publicPath = 'uploads/reports/' . $filename;
+    $authenticatedUrl = 'api/view_report.php?file=' . rawurlencode($filename);
 
     echo json_encode([
         'ok' => true,
-        'file_path' => $publicPath,
+        'file_path' => $authenticatedUrl,
         'original_name' => $file['name']
     ]);
 } catch (Throwable $e) {

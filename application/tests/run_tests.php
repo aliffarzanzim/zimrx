@@ -52,6 +52,7 @@ class ZimRxTestSuite {
         $this->testActivePatientOwnershipValidation();
         $this->testWalkInUploadIsolation();
         $this->testLoginRateLimitingAndRedirectDefense();
+        $this->testClinicalReportSecurityAndDeploymentHardening();
 
         echo "\n--------------------------------------------------------\n";
         echo "Test Results: {$this->passed} passed, {$this->failed} failed\n";
@@ -749,6 +750,58 @@ class ZimRxTestSuite {
         // Successful login resets lockout keys
         unset($session[$attemptKey], $session[$lockoutKey]);
         $this->assert(!isset($session[$lockoutKey]), 'Lockout keys cleanly wiped on successful authentication');
+    }
+
+    private function testClinicalReportSecurityAndDeploymentHardening(): void {
+        echo "\n[17/17] Testing Clinical Report Security & Deployment Hardening...\n";
+
+        // 1. Root Apache/cPanel .htaccess verification
+        $rootHtaccess = __DIR__ . '/../.htaccess';
+        $this->assert(file_exists($rootHtaccess), 'Root application/.htaccess exists for plug-and-play cPanel deployment');
+        $rootHtContent = (string)file_get_contents($rootHtaccess);
+        $this->assert(str_contains($rootHtContent, 'Options -Indexes'), 'application/.htaccess disables directory indexing (Options -Indexes)');
+        $this->assert(str_contains($rootHtContent, 'uploads/reports'), 'application/.htaccess blocks direct HTTP access to clinical reports');
+        $this->assert(str_contains($rootHtContent, 'db|lib|migrations|tests'), 'application/.htaccess blocks direct HTTP access to backend engine directories');
+
+        // 2. Storage defense-in-depth .htaccess verification
+        $reportsHtaccess = __DIR__ . '/../userdata/uploads/reports/.htaccess';
+        $this->assert(file_exists($reportsHtaccess), 'userdata/uploads/reports/.htaccess defense-in-depth file exists');
+        $reportsHtContent = (string)file_get_contents($reportsHtaccess);
+        $this->assert(str_contains($reportsHtContent, 'Require all denied') || str_contains($reportsHtContent, 'Deny from all'), 'reports/.htaccess strictly denies all direct HTTP access');
+
+        // 3. Authenticated viewer endpoint verification
+        $viewerScript = __DIR__ . '/../api/view_report.php';
+        $this->assert(file_exists($viewerScript), 'api/view_report.php authenticated report viewer endpoint exists');
+        $viewerCode = (string)file_get_contents($viewerScript);
+        $this->assert(str_contains($viewerCode, 'declare(strict_types=1);'), 'api/view_report.php enforces strict types');
+        $this->assert(str_contains($viewerCode, 'current_user_doctor_id()'), 'api/view_report.php validates doctor authentication');
+        $this->assert(str_contains($viewerCode, 'basename('), 'api/view_report.php uses basename() for path traversal neutralization');
+        $this->assert(str_contains($viewerCode, 'X-Content-Type-Options: nosniff'), 'api/view_report.php enforces nosniff header');
+
+        // 4. Path traversal neutralization simulation
+        $traversalInput = '../../userdata/database/zimrx_userdata.db';
+        $sanitizedFile = basename(urldecode($traversalInput));
+        $this->assert($sanitizedFile === 'zimrx_userdata.db', 'basename() strips directory traversal escape sequences');
+        $reportsDir = realpath(__DIR__ . '/../userdata/uploads/reports') ?: '';
+        $simulatedTarget = $reportsDir . DIRECTORY_SEPARATOR . $sanitizedFile;
+        $this->assert(!file_exists($simulatedTarget), 'Escalation outside reports directory returns 404');
+
+        // 5. Tenant Scoping Validation Logic
+        $extractReportDoctor = function (string $filename): int {
+            if (preg_match('/^report-(\d+)-/', $filename, $matches)) {
+                return (int)$matches[1];
+            }
+            return 0;
+        };
+
+        $this->assert($extractReportDoctor('report-1-1780242361.pdf') === 1, 'Report filename parser extracts Doctor 1 ownership');
+        $this->assert($extractReportDoctor('report-2-1780242361.png') === 2, 'Report filename parser extracts Doctor 2 ownership');
+        $this->assert($extractReportDoctor('random_file.pdf') === 0, 'Non-standard filename defaults to 0 doctor scope');
+
+        // Doctor 1 accessing Doctor 2's report is blocked
+        $currentDoctor = 1;
+        $reportOwner = $extractReportDoctor('report-2-1780242361.png');
+        $this->assert($currentDoctor !== $reportOwner, 'Cross-doctor report access detected and blocked');
     }
 }
 

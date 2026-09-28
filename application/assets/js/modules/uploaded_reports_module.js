@@ -35,8 +35,12 @@
         const dateInput = tr.querySelector('.upload-date-input');
 
         let cleanPath = (filePath || '').trim();
-        if (cleanPath.startsWith('userdata/uploads/')) {
-            cleanPath = cleanPath.replace('userdata/uploads/', 'uploads/');
+        if (cleanPath.startsWith('userdata/uploads/reports/') || cleanPath.startsWith('uploads/reports/')) {
+            const fileName = cleanPath.split('/').pop();
+            cleanPath = 'api/view_report.php?file=' + encodeURIComponent(fileName);
+        } else if (!cleanPath.startsWith('api/view_report.php') && cleanPath !== '') {
+            const fileName = cleanPath.split('/').pop();
+            cleanPath = 'api/view_report.php?file=' + encodeURIComponent(fileName);
         }
 
         tr.querySelector('.upload-name-input').value = reportName || originalName || 'Lab Report';

@@ -433,9 +433,9 @@ try {
         }
 
         // ── Move the file only after all pre-conditions pass ─────────────────────────
-        $filename   = sprintf('report-%d-%d-%s.%s', $doctorId, time(), bin2hex(random_bytes(4)), $ext);
-        $targetPath = $targetDir . '/' . $filename;
-        $publicPath = 'uploads/reports/' . $filename;
+        $filename         = sprintf('report-%d-%d-%s.%s', $doctorId, time(), bin2hex(random_bytes(4)), $ext);
+        $targetPath       = $targetDir . '/' . $filename;
+        $authenticatedUrl = 'api/view_report.php?file=' . rawurlencode($filename);
 
         if (!move_uploaded_file($tmpPath, $targetPath)) {
             throw new RuntimeException('Failed to save file on server.');
@@ -462,7 +462,7 @@ try {
                 'patient_id'     => $serverPatientId     ?: null,
                 'visit_record_id'=> $serverVisitRecordId ?: null,
                 'active_revision'=> $serverActiveRevision,
-                'file_path'      => $publicPath,
+                'file_path'      => $authenticatedUrl,
                 'original_name'  => basename((string)$file['name']),
                 'report_name'    => $reportName,
                 'report_date'    => $reportDate,
@@ -477,7 +477,7 @@ try {
             'patient_id'     => $serverPatientId,
             'visit_record_id'=> $serverVisitRecordId,
             'active_revision'=> $serverActiveRevision,
-            'file_path'      => $publicPath,
+            'file_path'      => $authenticatedUrl,
             'original_name'  => basename((string)$file['name']),
             'report_name'    => $reportName,
             'date'           => $reportDate,

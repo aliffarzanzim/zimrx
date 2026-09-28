@@ -18,6 +18,9 @@ application/userdata/backups/*
 !application/userdata/uploads/
 application/userdata/uploads/*
 !application/userdata/uploads/.htaccess
+!application/userdata/uploads/reports/
+application/userdata/uploads/reports/*
+!application/userdata/uploads/reports/.htaccess
 !application/userdata/**/.gitkeep
 
 # 2. Binary Database Files
