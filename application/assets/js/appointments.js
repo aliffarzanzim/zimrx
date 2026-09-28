@@ -1,4 +1,18 @@
 (() => {
+    const bootstrapEl = document.getElementById('zimrxAppointmentBootstrap');
+    if (bootstrapEl) {
+        try {
+            const data = JSON.parse(bootstrapEl.textContent || '{}');
+            if (data.role !== undefined) window.ZIMRX_APPOINTMENT_ROLE = data.role;
+            if (data.doctors !== undefined) window.ZIMRX_APPOINTMENT_DOCTORS = data.doctors;
+            if (data.initial !== undefined) window.ZIMRX_APPOINTMENT_INITIAL = data.initial;
+        } catch (e) {
+            console.error('Failed to parse appointment bootstrap data', e);
+        }
+    }
+})();
+
+(() => {
     const field = (id) => document.getElementById(id);
     const form = field('appointment-form');
     if (!form) return;
@@ -1561,3 +1575,130 @@
         window.ZimRxDropdown.autoEnhance();
     }
 })();
+
+
+(function () {
+        let revealed = false;
+
+        function revealAppointmentsPage() {
+            if (revealed || !document.body) {
+                return;
+            }
+
+            revealed = true;
+            requestAnimationFrame(function () {
+                document.body.classList.add('zimrx-appointments-ready');
+            });
+        }
+
+        if (document.readyState === 'complete') {
+            revealAppointmentsPage();
+        } else {
+            window.addEventListener('load', revealAppointmentsPage, { once: true });
+            window.setTimeout(revealAppointmentsPage, 2500);
+        }
+    })();
+
+function switchAppointmentTab(tab) {
+    const isQueue = tab === 'queue';
+    const btnQueue = document.getElementById('btn-tab-queue');
+    const btnFollowup = document.getElementById('btn-tab-followup');
+    const panelQueue = document.getElementById('panel-tab-queue');
+    const panelFollowup = document.getElementById('panel-tab-followup');
+
+    if (btnQueue) {
+        btnQueue.classList.toggle('active', isQueue);
+        btnQueue.setAttribute('aria-selected', isQueue ? 'true' : 'false');
+    }
+    if (btnFollowup) {
+        btnFollowup.classList.toggle('active', !isQueue);
+        btnFollowup.setAttribute('aria-selected', !isQueue ? 'true' : 'false');
+    }
+    if (panelQueue) panelQueue.hidden = !isQueue;
+    if (panelFollowup) panelFollowup.hidden = isQueue;
+
+    try {
+        if (history.replaceState) {
+            history.replaceState(null, null, isQueue ? '#appointments' : '#followups');
+        }
+    } catch (e) {}
+}
+
+function getCurrentFollowupFilter() {
+    const activeChip = document.querySelector('.followup-chip-btn.active');
+    return activeChip ? (activeChip.getAttribute('data-filter') || 'all') : 'all';
+}
+
+function filterFollowupStatus(status, btn) {
+    if (btn) {
+        document.querySelectorAll('.followup-chip-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+    const targetFilter = status || getCurrentFollowupFilter();
+
+    const rows = document.querySelectorAll('#followup-table-body tr.followup-row');
+    const query = (document.getElementById('followup-search-input')?.value || '').toLowerCase().trim();
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+        const rowStatus = row.getAttribute('data-status') || '';
+        const rowText = row.textContent.toLowerCase();
+        const matchesStatus = (targetFilter === 'all' || rowStatus === targetFilter);
+        const matchesQuery = !query || rowText.includes(query);
+        const show = matchesStatus && matchesQuery;
+        row.style.display = show ? '' : 'none';
+        if (show) visibleCount++;
+    });
+
+    const countLabel = document.getElementById('followup-count-label');
+    if (countLabel) {
+        countLabel.textContent = `${visibleCount} scheduled follow-up${visibleCount === 1 ? '' : 's'}`;
+    }
+}
+
+function quickQueueFollowup(p) {
+    switchAppointmentTab('queue');
+    if (!p) return;
+
+    if (p.reg_no) {
+        const regInput = document.getElementById('patient-reg-no');
+        if (regInput) {
+            regInput.value = p.reg_no;
+            regInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+    if (p.patient_name) {
+        const nameInput = document.getElementById('patient-name');
+        if (nameInput) nameInput.value = p.patient_name;
+    }
+    if (p.mobile) {
+        const mobInput = document.getElementById('patient-mobile');
+        if (mobInput) mobInput.value = p.mobile;
+    }
+    if (p.age) {
+        const ageInput = document.getElementById('patient-age');
+        if (ageInput) ageInput.value = p.age;
+    }
+    if (p.gender) {
+        const genderSelect = document.getElementById('patient-gender');
+        if (genderSelect) genderSelect.value = p.gender;
+    }
+    if (p.address) {
+        const addrInput = document.getElementById('patient-address');
+        if (addrInput) addrInput.value = p.address;
+    }
+
+    const formCard = document.getElementById('appointment-form');
+    if (formCard) {
+        formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        formCard.style.outline = '3px solid #2563eb';
+        setTimeout(() => { formCard.style.outline = ''; }, 1800);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.location.hash === '#followups' || window.location.hash === '#followup') {
+        switchAppointmentTab('followup');
+    }
+});
+</script>

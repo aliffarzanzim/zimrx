@@ -89,66 +89,7 @@ if (isset($fields['paid'])) $rows[] = ['Paid', money_text($paid)];
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ZimRx Appointment Token</title>
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
-    <style>
-        @font-face {
-            font-family: SolaimanLipi;
-            src: url("assets/fonts/SolaimanLipi.ttf") format("truetype");
-        }
-        body {
-            margin: 0;
-            background: #fff;
-            color: #111827;
-            font-family: Arial, SolaimanLipi, sans-serif;
-        }
-        .token-wrap {
-            width: 320px;
-            margin: 12px auto;
-            font-size: 14px;
-        }
-        .token-title {
-            text-align: center;
-            font-weight: 800;
-            line-height: 1.35;
-            letter-spacing: 0.02em;
-        }
-        .token-date,
-        .token-reg {
-            margin-top: 8px;
-            text-align: center;
-            font-weight: 700;
-        }
-        table {
-            width: 100%;
-            margin-top: 10px;
-            border-collapse: collapse;
-        }
-        td {
-            padding: 3px 2px;
-            vertical-align: top;
-        }
-        .label {
-            width: 78px;
-            font-weight: 700;
-        }
-        .colon {
-            width: 8px;
-            text-align: center;
-        }
-        .serial {
-            margin-top: 12px;
-            text-align: center;
-            font-weight: 800;
-            line-height: 1.45;
-        }
-        .serial strong {
-            font-size: 34px;
-            letter-spacing: 0.08em;
-        }
-        @media print {
-            @page { size: 80mm auto; margin: 4mm; }
-            .token-wrap { margin: 0 auto; }
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/appointment_token_print.css?v=<?= filemtime(__DIR__ . '/assets/css/appointment_token_print.css') ?>">
     <script>
         window.addEventListener('load', () => window.print());
     </script>
