@@ -1,41 +1,41 @@
-@import "paediatric_module.css";
+@import "../modules/paediatric_module.css";
 
 /* =======================================================
    Core Prescription & Clinical Modules
 ======================================================= */
-@import "modules/pc_module.css";
-@import "modules/ho_module.css";
-@import "modules/oh_module.css";
-@import "modules/rx_table.css";
-@import "modules/reports_calculators.css";
-@import "modules/table_resizer.css";
-@import "modules/history_settings.css";
-@import "modules/modals_dialogs.css";
-@import "modules/ai_analyzer.css";
-@import "modules/calculators.css";
-@import "modules/ot_note.css";
-@import "modules/text_pad.css";
-@import "modules/font_format.css";
+@import "../modules/pc_module.css";
+@import "../modules/ho_module.css";
+@import "../modules/oh_module.css";
+@import "../modules/rx_table.css";
+@import "../modules/reports_calculators.css";
+@import "../modules/table_resizer.css";
+@import "../modules/history_settings.css";
+@import "../modules/modals_dialogs.css";
+@import "../modules/ai_analyzer.css";
+@import "../modules/calculators.css";
+@import "../modules/ot_note.css";
+@import "../modules/text_pad.css";
+@import "../modules/font_format.css";
 
 /* =======================================================
    Specialized Clinical Examination Modules
    (Modularized for independent clinical expansion)
 ======================================================= */
-@import "modules/exam_general_ophthalmology.css";
-@import "modules/exam_breast.css";
-@import "modules/exam_abdominal.css";
-@import "modules/exam_pelvic.css";
-@import "modules/exam_burn.css";
-@import "modules/exam_ent.css";
-@import "modules/exam_dental.css";
-@import "modules/exam_diabetic_foot.css";
-@import "modules/exam_dermatology.css";
-@import "modules/exam_specialties.css";
+@import "../modules/exam_general_ophthalmology.css";
+@import "../modules/exam_breast.css";
+@import "../modules/exam_abdominal.css";
+@import "../modules/exam_pelvic.css";
+@import "../modules/exam_burn.css";
+@import "../modules/exam_ent.css";
+@import "../modules/exam_dental.css";
+@import "../modules/exam_diabetic_foot.css";
+@import "../modules/exam_dermatology.css";
+@import "../modules/exam_specialties.css";
 
 @font-face {
     font-family: 'SolaimanLipi';
-    src: url('../fonts/SolaimanLipi.woff2') format('woff2'),
-         url('../fonts/SolaimanLipi.woff') format('woff');
+    src: url('../../fonts/SolaimanLipi.woff2') format('woff2'),
+         url('../../fonts/SolaimanLipi.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
