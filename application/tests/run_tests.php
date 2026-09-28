@@ -19,10 +19,10 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../auth.php';
-require_once __DIR__ . '/../DbConnections.php';
-require_once __DIR__ . '/../DbSchema.php';
-require_once __DIR__ . '/../DbSql.php';
-require_once __DIR__ . '/../DbMigrator.php';
+require_once __DIR__ . '/../db/DbConnections.php';
+require_once __DIR__ . '/../db/DbSchema.php';
+require_once __DIR__ . '/../db/DbSql.php';
+require_once __DIR__ . '/../db/DbMigrator.php';
 require_once __DIR__ . '/../api/pc_catalog_lib.php';
 require_once __DIR__ . '/../api/user_drug_lib.php';
 

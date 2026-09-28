@@ -17,136 +17,40 @@
 
 // 1. Include Configuration and Database Manager
 require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/DbConnections.php';
-require_once __DIR__ . '/DbSchema.php';
-require_once __DIR__ . '/DbSql.php';
-require_once __DIR__ . '/DbMigrator.php';
+require_once __DIR__ . '/db/DbConnections.php';
+require_once __DIR__ . '/db/DbSchema.php';
+require_once __DIR__ . '/db/DbSql.php';
+require_once __DIR__ . '/db/DbMigrator.php';
 
 // 2. Initialize DbConnections with configuration
 DbConnections::configure(DB_CONFIG);
 
-// =====================================================================
-// LEGACY COMPATIBILITY LAYER
-// =====================================================================
-// These functions maintain backward compatibility with existing code.
-// New code should use DbConnections directly.
-
-use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Connection;
-
-// Include Composer Autoloader (for Doctrine DBAL / other Composer packages).
-// Prefer application/vendor so the application folder can be moved by itself.
-function zimrx_composer_autoload_path(): ?string {
-    $candidates = [
-        getenv('ZIMRX_COMPOSER_AUTOLOAD') ?: null,
-        __DIR__ . '/vendor/autoload.php',
-    ];
-
-    foreach ($candidates as $candidate) {
-        if ($candidate && file_exists($candidate)) {
-            return $candidate;
-        }
-    }
-
-    return null;
-}
-
-$autoload_path = zimrx_composer_autoload_path();
-if ($autoload_path !== null) {
-    require_once $autoload_path;
-}
-
 /**
- * [LEGACY] Get a Doctrine DBAL Connection (if available)
- *
- * @deprecated Use DbConnections::userdata() instead
+ * Global PDO instance for application requests
  */
-function zimrx_get_db_conn(string $dbPath): Connection {
-    static $connections = [];
-    $key = realpath($dbPath) ?: $dbPath;
+$pdo = null;
 
-    if (!isset($connections[$key])) {
-        $connections[$key] = DriverManager::getConnection([
-            'driver' => 'pdo_sqlite',
-            'path'   => $dbPath,
-        ]);
-
-        $nativePdo = $connections[$key]->getNativeConnection();
-        if ($nativePdo instanceof PDO) {
-            $nativePdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $nativePdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-            $nativePdo->exec('PRAGMA journal_mode = WAL;');
-            $nativePdo->exec('PRAGMA synchronous = NORMAL;');
-            $nativePdo->exec('PRAGMA foreign_keys = ON;');
-            $nativePdo->exec('PRAGMA busy_timeout = 5000;');
-        }
-    }
-
-    return $connections[$key];
-}
-
-/**
- * [LEGACY] Get a native PDO connection for a specific database path
- *
- * This function now delegates to DbConnections but maintains
- * backward compatibility by detecting the database type.
- *
- * @deprecated Use DbConnections::userdata(), DbConnections::staticDb(), etc.
- */
-function zimrx_get_pdo(string $dbPath): PDO {
-    $samePath = static function (string $left, string $right): bool {
-        $leftPath = realpath($left) ?: $left;
-        $rightPath = realpath($right) ?: $right;
-        $normalize = static function (string $path): string {
-            return strtolower(str_replace('\\', '/', $path));
-        };
-
-        return $normalize($leftPath) === $normalize($rightPath);
-    };
-
-    // Map legacy paths to new DbConnections methods
-    if ($samePath($dbPath, ZIMRX_DB_USERDATA) || strpos($dbPath, 'zimrx_userdata') !== false) {
-        return DbConnections::userdata();
-    } elseif ($samePath($dbPath, ZIMRX_DB_STATIC) || strpos($dbPath, 'zimrx_static') !== false) {
-        return DbConnections::staticDb();
-    } elseif ($samePath($dbPath, ZIMRX_DB_SYSTEMDATA)
-        || strpos($dbPath, 'zimrx_drugs') !== false
-        || strpos($dbPath, 'drug_data') !== false
-    ) {
-        return DbConnections::systemDb();
-    } else {
-        // For completely custom paths, try Doctrine DBAL if available
-        if (class_exists('Doctrine\DBAL\DriverManager')) {
-            return zimrx_get_db_conn($dbPath)->getNativeConnection();
-        }
-        throw new RuntimeException("Cannot determine database connection for path: $dbPath");
-    }
-}
-
-/**
- * [LEGACY] Global PDO for backward compatibility
- *
- * @deprecated New code should use DbConnections::userdata() directly
- * For accessing specific database, use:
- *   - DbConnections::userdata()  // User data
- *   - DbConnections::staticDb()  // Static lookups
- *   - DbConnections::systemDb()  // System data
- */
-$conn = null;  // Doctrine DBAL connection (legacy)
-$pdo = null;   // PDO connection (legacy)
-
-// Initialize legacy $pdo variable if not in lightweight mode
 if (!defined('ZIMRX_DB_LIGHTWEIGHT')) {
     try {
         $pdo = DbConnections::userdata();
-        // Also set up Doctrine connection if available
-        if (class_exists('Doctrine\DBAL\DriverManager') && DB_DRIVER === 'sqlite') {
-            $conn = zimrx_get_db_conn(ZIMRX_DB_USERDATA);
-        }
     } catch (Exception $e) {
         header('Content-Type: application/json');
         die(json_encode(["error" => "Database Connection failed: " . $e->getMessage()]));
     }
+}
+
+/**
+ * Get a PDO connection for a specific database path
+ */
+function zimrx_get_pdo(string $dbPath): PDO {
+    if (strpos($dbPath, 'zimrx_userdata') !== false) {
+        return DbConnections::userdata();
+    } elseif (strpos($dbPath, 'zimrx_static') !== false) {
+        return DbConnections::staticDb();
+    } elseif (strpos($dbPath, 'zimrx_drugs') !== false || strpos($dbPath, 'drug_data') !== false) {
+        return DbConnections::systemDb();
+    }
+    return DbConnections::userdata();
 }
 
 // =====================================================================

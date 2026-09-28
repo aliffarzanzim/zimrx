@@ -36,7 +36,7 @@ class DbMigrator {
     private string $migrationsDir;
 
     public function __construct(?string $migrationsDir = null) {
-        $this->migrationsDir = $migrationsDir ?? __DIR__ . '/migrations';
+        $this->migrationsDir = $migrationsDir ?? dirname(__DIR__) . '/migrations';
     }
 
     // ----------------------------------------------------------------
