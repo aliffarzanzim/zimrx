@@ -838,9 +838,10 @@ class ZimRxTestSuite {
         // 1. Seed patient, appointment
         $memPdo->exec("INSERT OR IGNORE INTO zimrx_doctors (id, display_name, full_name_en) VALUES (1, 'Dr. Tester', 'Dr. Tester')");
         $memPdo->exec("INSERT INTO zimrx_patients (id, doctor_id, reg_no, full_name) VALUES (10, 1, 'P-001', 'Test Patient')");
+        $today = date('Y-m-d');
         $memPdo->exec(
             "INSERT INTO zimrx_appointments (id, doctor_id, patient_id, appointment_no, appointment_date, patient_name, visit_fee, discount, paid_amount)
-             VALUES (100, 1, 10, 'A-01', '2026-09-28', 'Test Patient', 500, 50, 450)"
+             VALUES (100, 1, 10, 'A-01', '{$today}', 'Test Patient', 500, 50, 450)"
         );
 
         // 2. Reconcile missing payment atomically
