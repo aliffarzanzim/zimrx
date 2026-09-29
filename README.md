@@ -25,13 +25,14 @@
 
 ---
 
-**ZimRx** is an open-source, high-performance digital prescription and Electronic Medical Record (EMR) system built for solo doctors, medical practitioners, and clinics in low-resource or bandwidth-constrained regions. Built on a strict **local-first philosophy**, ZimRx runs 100% offline, eliminates recurring SaaS subscription costs, and guarantees complete patient data privacy and sovereignty.
+**ZimRx** is an open-source, high-performance digital prescription and Electronic Medical Record (EMR) system built for solo doctors, medical practitioners, and clinics in low-resource or bandwidth-constrained regions. Built on a strict **local-first philosophy**, ZimRx is designed for **fully air-gapped and offline environments with zero external network dependencies**, eliminates recurring SaaS subscription costs, and guarantees complete patient data privacy and sovereignty.
 
 ---
 
 ## Key Features
 
-* **100% Offline & Portable**: Runs anywhere without an internet connection using a self-contained portable runtime (powered by FrankenPHP and Caddy). Launchable with a single double-click directly from a USB flash drive or laptop with zero installation overhead.
+* **100% Air-Gapped & Portable**: Operates entirely offline without an internet connection using a self-contained portable runtime (powered by FrankenPHP and Caddy). Launchable with a single double-click directly from a USB flash drive or laptop with zero installation overhead.
+* **Open Data Portability & Sovereignty**: Export complete patient clinical histories, visit notes, and records into standardized open formats (JSON / CSV) at any time with zero vendor lock-in.
 * **Ultra-Fast Grid UI**: Custom-engineered, lightweight Prescription Grid UI built with pure Vanilla JS and CSS tokens. Entirely keyboard-driven (Tab & Arrow keys) to eliminate mouse fatigue, allowing doctors to compose an error-free prescription in under 20-30 seconds.
 * **Sub-Millisecond Pharmaceutical Search**: Instant full-text search across 30,000+ national commercial drug brands, formulations, strengths, and generic equivalents powered by SQLite FTS5.
 * **Clinical Decision Support (CDS)**: Built-in safety checks for drug-drug interactions, pregnancy & lactation contraindications, renal/hepatic adjustments, and pediatric dosage calculators.
@@ -144,13 +145,13 @@ Heartfelt gratitude to the contributors and researchers who supported the ZimRx 
 * **Sifat Islam**
 * **Sifat Bin Siddique Urfi** *(DMC K-79)*
 * **Yeamin Faiaj**
-* **Azithromycin**
+* **Azithromycin** *(Pseudonym - Guess The Case Community Member)*
 * **Sauda Noor Sara** *(NMC)*
 * **Sohaila Raida** *(CMC)*
 * **Asif Iqbal** *(KMC K31)*
 * **Shamsul** *(RpMC)*
 * **Ramisa Subah** *(CMC)*
-* **Mahbub, The Dark Lord**
+* **Mahbub ("The Dark Lord")** *(Pseudonym - Guess The Case Community Member)*
 * **Jaowad Arham**
 
 ### Drug Interaction & Research Concept
