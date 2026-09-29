@@ -436,7 +436,9 @@
     };
 
     const setLookupStatus = (message) => {
-        lookupStatus.textContent = message;
+        if (lookupStatus) {
+            lookupStatus.textContent = message;
+        }
     };
 
     const updateQueueDateLabel = () => {
