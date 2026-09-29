@@ -25,7 +25,7 @@
 
 ---
 
-**ZimRx** is an open-source, high-performance digital prescription and Electronic Medical Record (EMR) system built for solo doctors, medical practitioners, and clinics in low-resource or bandwidth-constrained regions. Built on a strict **local-first philosophy**, ZimRx is designed for **fully air-gapped and offline environments with zero external network dependencies**, eliminates recurring SaaS subscription costs, and guarantees complete patient data privacy and sovereignty.
+**ZimRx** is an open-source, local-first, high-performance digital prescription and Electronic Medical Record (EMR) system built for solo doctors, medical practitioners, and clinics in low-resource or bandwidth-constrained regions. Built on a strict local-first philosophy, ZimRx is designed for fully air-gapped and offline environments with zero external network dependencies, eliminates recurring SaaS subscription costs, and guarantees complete patient data privacy and sovereignty.
 
 ---
 
@@ -71,11 +71,23 @@ Patient health records should **never** be monetized, tracked, or leaked to cent
 
 ### Directory Architecture & Security Boundaries
 
-To deliver a portable, single-folder appliance that runs offline while enforcing strict server security:
-* **`application/userdata/`**: Isolated clinic state vault (SQLite databases, cache, uploads). The entire clinic database, backups, and user uploads reside here; copying this single folder enables full backup and restoration across devices. Non-media subdirectories (`database/`, `cache/`, `backups/`) are strictly protected by defense-in-depth `.htaccess` deny rules and Caddy HTTP blocks.
-* **`application/lib/` & `application/db/`**: Central PDO abstractions, query builders, and migration engines. Direct HTTP invocation is denied by server configuration.
-* **`application/api/`**: JSON RPC and AJAX endpoints with mandatory session authentication, CSRF verification, and tenant doctor isolation guards.
-* **`application/assets/`**: Clean 3-tier presentation layer (`layout/`, `modules/`, `pages/`) separating design tokens, reusable UI components, and page-specific logic.
+Standard web frameworks rely on pointing the web server's DocumentRoot to a `/public` folder to keep source code and databases out of the web path. While that is effective on dedicated servers, it breaks "drop-in" portability for non-technical doctors using USB drives, portable runtimes, or local setups (like XAMPP) where modifying virtual host configurations is difficult or impossible for them.
+
+ZimRx balances instant plug-and-play portability with strict security boundaries through directory-level access controls:
+
+* **`application/userdata/` (Isolated Clinic Vault)**:
+  Contains all mutable state—SQLite databases, encrypted backups, user uploads, and cache. 
+  * *Why this design*: A doctor can back up, clone, or migrate their entire clinic practice simply by copying this single folder to a flash drive, eliminating database dump scripts or cloud dependencies.
+  * *Security*: Non-media subdirectories (`database/`, `backups/`, `cache/`) are strictly blocked from HTTP requests via `.htaccess` (`Require all denied`) and Caddyfile route blocks.
+* **`application/lib/` & `application/db/` (Core Engine & PDO Migrations)**:
+  Houses the database abstraction layer, query builders, and automated migration engine (`DbMigrator`). Direct execution via browser URL is barred by web server rules and code-level entry guards.
+* **`application/api/` (Controlled RPC Gateway)**:
+  All frontend communication routes through here. Every endpoint enforces active session checks, CSRF token verification, and doctor data isolation.
+* **`application/assets/` (Zero-Build Frontend Layer)**:
+  Clean 3-tier presentation structure (`layout/`, `modules/`, `pages/`) using native CSS tokens and vanilla JavaScript. Eliminates Node/NPM build pipelines, so files can be inspected, customized, and run offline without compile steps.
+
+> **Roadmap Note**: For high-security institutional and hospital LAN deployments where dedicated IT staff manage the web server, a native `public/` document-root separation mode is planned in future alongside MariaDB/PostgreSQL multi-user support.
+
 
 ---
 
