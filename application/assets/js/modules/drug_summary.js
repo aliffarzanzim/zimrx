@@ -1,7 +1,5 @@
-/**
- * ZimRx - Drug Summary & Interaction Module Controller
- * Auto-extracted from modules/drug_summary_interaction.php
- */
+// Drug summary and interaction controller: cost estimation, antibiotic tracking, and drug-drug/lifestyle interaction analysis.
+
 (function () {
     const wrapper = document.getElementById('drug-summary-module');
     const rxTbody = document.getElementById('rx-tbody');

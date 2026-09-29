@@ -1,4 +1,5 @@
-    function splitClassLabels(cls) {
+// Drug database utility functions: class label parsing, HTML escaping, and MOA formatting.
+function splitClassLabels(cls) {
         if (!cls) return [];
 
         const seen = new Set();

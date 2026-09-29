@@ -1,11 +1,9 @@
-/**
- * ZimRx - Clinical Exam: Local Examination
- */
+// Clinical local examination: 9-region abdominal diagram, surgical lump inspection/palpation, and pelvic assessment (P/S & P/V).
 (function() {
   'use strict';
 
   function initExamLocal() {
-    // 3. Local Examination Handlers
+    // Local and 9-region abdominal examination handlers
     const leWrapper = document.getElementById('local-exam-wrapper');
     if (leWrapper) {
       const normalBtn = leWrapper.querySelector('[data-action="normal-local"]');
@@ -212,7 +210,7 @@
       syncAbdoUI();
     }
 
-    // 3b. O/H Pelvic Examination (P/S & P/V) Handlers
+    // Pelvic examination handlers (P/S and P/V)
     const ohToggleBtn = document.getElementById('oh-pv-toggle-btn');
     const ohSection = document.getElementById('oh-pelvic-section');
     if (ohToggleBtn && ohSection) {

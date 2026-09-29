@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Clinical analytics dashboard: footfall trends, patient retention, demographics, and monthly financial summaries.
+
 $page_title = "Performance Dashboard - ZimRx";
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/auth.php';
@@ -250,7 +252,7 @@ require_once __DIR__ . '/header.php';
 
 <link rel="stylesheet" href="assets/css/pages/dashboard.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/dashboard.css') ?>">
 
-<div class="dash-container">
+<div class="dash-container zrx-page-container">
     <!-- Page Header -->
     <div class="dash-header">
         <div class="dash-title-wrap">
@@ -294,7 +296,7 @@ require_once __DIR__ . '/header.php';
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                 </div>
             </div>
-            <div class="dash-kpi-num" style="color: #059669;"><?= $returnRate ?>%</div>
+            <div class="dash-kpi-num" class="zrx-c-success"><?= $returnRate ?>%</div>
             <div class="dash-kpi-footer">
                 <span>Follow-up &amp; revisits share</span>
             </div>
@@ -307,7 +309,7 @@ require_once __DIR__ . '/header.php';
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                 </div>
             </div>
-            <div class="dash-kpi-num"><?= $avgDailyFootfall ?> <span style="font-size: 0.9rem; font-weight: 500; color: #64748b;">pts/day</span></div>
+            <div class="dash-kpi-num"><?= $avgDailyFootfall ?> <span class="dash-kpi-unit">pts/day</span></div>
             <div class="dash-kpi-footer">
                 <span>Across <?= $activeDays ?> clinic working days</span>
             </div>
@@ -336,18 +338,18 @@ require_once __DIR__ . '/header.php';
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
                     <span>Patient Volume &amp; Daily Revenue Trend</span>
                 </h3>
-                <div style="display: flex; gap: 12px; font-size: 0.76rem; font-weight: 600;">
-                    <span style="display: flex; align-items: center; gap: 4px; color: #2563eb;">
-                        <span style="width: 10px; height: 3px; background: #2563eb; display: inline-block; border-radius: 2px;"></span>
+                <div class="dash-chart-legend">
+                    <span class="dash-legend-indicator indicator-blue">
+                        <span class="dash-legend-line line-blue"></span>
                         Patients (left)
                     </span>
-                    <span style="display: flex; align-items: center; gap: 4px; color: #10b981;">
-                        <span style="width: 10px; height: 3px; background: #10b981; display: inline-block; border-radius: 2px;"></span>
+                    <span class="dash-legend-indicator indicator-green">
+                        <span class="dash-legend-line line-green"></span>
                         Revenue ৳ (right)
                     </span>
                 </div>
             </div>
-            <div class="dash-card-body" style="padding-bottom: 0.5rem;">
+            <div class="dash-card-body dash-card-body-chart">
                 <div class="chart-svg-wrap" id="trend-chart-wrap">
                     <?php
                     $svgW = 740;
@@ -448,7 +450,7 @@ require_once __DIR__ . '/header.php';
                 </h3>
                 <span><?= $genderTotal ?> patients</span>
             </div>
-            <div class="dash-card-body" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div class="dash-card-body dash-card-body-centered">
                 <?php
                 $malePct = round(($maleCount / $genderTotal) * 100);
                 $femalePct = round(($femaleCount / $genderTotal) * 100);
@@ -460,7 +462,7 @@ require_once __DIR__ . '/header.php';
                 $femaleDash = ($femalePct / 100) * $circ;
                 $otherDash = ($otherPct / 100) * $circ;
                 ?>
-                <div style="position: relative; width: 170px; height: 170px;">
+                <div class="donut-chart-box">
                     <svg viewBox="0 0 160 160" width="170" height="170">
                         <circle cx="80" cy="80" r="60" fill="none" stroke="#f1f5f9" stroke-width="18" />
                         <!-- Male segment (Blue) -->
@@ -481,18 +483,18 @@ require_once __DIR__ . '/header.php';
                     </svg>
                 </div>
 
-                <div class="chart-legend-wrap" style="width: 100%; max-width: 220px;">
+                <div class="chart-legend-wrap chart-legend-narrow">
                     <div class="legend-item">
-                        <span><span class="legend-color-dot" style="background: #2563eb;"></span>Male</span>
+                        <span><span class="legend-color-dot legend-dot-male"></span>Male</span>
                         <strong><?= $maleCount ?> (<?= $malePct ?>%)</strong>
                     </div>
                     <div class="legend-item">
-                        <span><span class="legend-color-dot" style="background: #ec4899;"></span>Female</span>
+                        <span><span class="legend-color-dot legend-dot-female"></span>Female</span>
                         <strong><?= $femaleCount ?> (<?= $femalePct ?>%)</strong>
                     </div>
                     <?php if ($otherCount > 0): ?>
                     <div class="legend-item">
-                        <span><span class="legend-color-dot" style="background: #06b6d4;"></span>Other / Unspecified</span>
+                        <span><span class="legend-color-dot legend-dot-other"></span>Other / Unspecified</span>
                         <strong><?= $otherCount ?> (<?= $otherPct ?>%)</strong>
                     </div>
                     <?php endif; ?>
@@ -522,7 +524,7 @@ require_once __DIR__ . '/header.php';
                             <span class="bar-metric-value"><?= $count ?> patients</span>
                         </div>
                         <div class="bar-metric-track">
-                            <div class="bar-metric-fill" style="width: <?= max(4, $pct) ?>%; background: #2563eb;"></div>
+                            <div class="bar-metric-fill bar-fill-blue" style="width: <?= max(4, $pct) ?>%;"></div>
                         </div>
                     </div>
                     <?php endforeach; ?>
@@ -541,7 +543,7 @@ require_once __DIR__ . '/header.php';
             <div class="dash-card-body">
                 <div class="bar-metric-list">
                     <?php if (empty($topPc)): ?>
-                        <div style="text-align: center; color: #94a3b8; padding: 2.5rem 1rem; font-size: 0.85rem;">
+                        <div class="dash-empty-state">
                             No presenting complaints recorded yet.
                         </div>
                     <?php else: ?>
@@ -554,7 +556,7 @@ require_once __DIR__ . '/header.php';
                                 <span class="bar-metric-value"><?= (int)$pc['use_count'] ?> cases</span>
                             </div>
                             <div class="bar-metric-track">
-                                <div class="bar-metric-fill" style="width: <?= max(5, $pct) ?>%; background: #8b5cf6;"></div>
+                                <div class="bar-metric-fill bar-fill-purple" style="width: <?= max(5, $pct) ?>%;"></div>
                             </div>
                         </div>
                         <?php endforeach; ?>
@@ -580,7 +582,7 @@ require_once __DIR__ . '/header.php';
                                 <span class="bar-metric-value">100%</span>
                             </div>
                             <div class="bar-metric-track">
-                                <div class="bar-metric-fill" style="width: 100%; background: #10b981;"></div>
+                                <div class="bar-metric-fill bar-fill-green" style="width: 100%;"></div>
                             </div>
                         </div>
                     <?php else: ?>
@@ -595,7 +597,7 @@ require_once __DIR__ . '/header.php';
                                 <span class="bar-metric-value"><?= $rfCount ?> (<?= $pct ?>%)</span>
                             </div>
                             <div class="bar-metric-track">
-                                <div class="bar-metric-fill" style="width: <?= max(4, $pct) ?>%; background: #10b981;"></div>
+                                <div class="bar-metric-fill bar-fill-green" style="width: <?= max(4, $pct) ?>%;"></div>
                             </div>
                         </div>
                         <?php endforeach; ?>
@@ -614,23 +616,23 @@ require_once __DIR__ . '/header.php';
             </h3>
             <span>Historical month-by-month record</span>
         </div>
-        <div class="dash-card-body" style="padding: 0; overflow-x: auto;">
+        <div class="dash-card-body dash-card-body-table">
             <table class="dash-table">
                 <thead>
                     <tr>
-                        <th style="width: 140px;">Month</th>
-                        <th style="text-align: right;">Total Visits</th>
-                        <th style="text-align: right;">New Patients</th>
-                        <th style="text-align: right;">Return Patients</th>
-                        <th style="text-align: right;">Retention %</th>
-                        <th style="text-align: right;">Total Revenue</th>
-                        <th style="text-align: right;">Avg / Patient</th>
+                        <th class="th-month">Month</th>
+                        <th class="zrx-ta-r">Total Visits</th>
+                        <th class="zrx-ta-r">New Patients</th>
+                        <th class="zrx-ta-r">Return Patients</th>
+                        <th class="zrx-ta-r">Retention %</th>
+                        <th class="zrx-ta-r">Total Revenue</th>
+                        <th class="zrx-ta-r">Avg / Patient</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($ledgerRows)): ?>
                         <tr>
-                            <td colspan="7" style="text-align: center; padding: 2rem; color: #94a3b8; font-style: italic;">
+                            <td colspan="7" class="td-empty-table">
                                 No monthly historical logs recorded yet.
                             </td>
                         </tr>
@@ -646,16 +648,16 @@ require_once __DIR__ . '/header.php';
                         ?>
                         <tr>
                             <td><strong><?= date('F Y', strtotime($ym . '-01')) ?></strong></td>
-                            <td style="text-align: right; font-weight: 700;"><?= $vCount ?></td>
-                            <td style="text-align: right; color: #2563eb;"><?= $nCount ?></td>
-                            <td style="text-align: right; color: #059669;"><?= $rCount ?></td>
-                            <td style="text-align: right;">
-                                <span style="display: inline-block; padding: 2px 7px; border-radius: 999px; background: #ecfdf5; color: #059669; font-size: 0.72rem; font-weight: 700;">
+                            <td class="td-bold-num"><?= $vCount ?></td>
+                            <td class="td-blue-num"><?= $nCount ?></td>
+                            <td class="td-green-num"><?= $rCount ?></td>
+                            <td class="zrx-ta-r">
+                                <span class="dash-retention-pill">
                                     <?= $retPct ?>%
                                 </span>
                             </td>
-                            <td style="text-align: right; font-weight: 700; color: #16a34a;">৳<?= number_format($mRev) ?></td>
-                            <td style="text-align: right; color: #64748b;">৳<?= number_format($avgPer) ?></td>
+                            <td class="td-revenue-num">৳<?= number_format($mRev) ?></td>
+                            <td class="td-muted-num">৳<?= number_format($avgPer) ?></td>
                         </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>

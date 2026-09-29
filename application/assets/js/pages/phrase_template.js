@@ -1,3 +1,4 @@
+// Clinical phrase template page managing bilingual presets, aliases, pinned status, and visibility.
 (() => {
     const payloadEl = document.getElementById('phrasePayloadData');
     const initial = payloadEl ? JSON.parse(payloadEl.textContent || '{}') : {};

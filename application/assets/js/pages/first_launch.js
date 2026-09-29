@@ -1,4 +1,5 @@
-// ── Step 2 Logic ──────────────────────────────────────
+// First-launch setup wizard handling practice configuration, credentials, and recovery keys.
+// Step 2 navigation
 function goStep2() {
     window.location = 'first_launch.php?step=2';
 }
@@ -67,7 +68,7 @@ function saveSetup() {
             btn.textContent = 'Continue →';
             return;
         }
-        // Store recovery key in sessionStorage to display on step 3
+        // Save recovery key in session storage for step 3
         if (data.recovery_key) {
             sessionStorage.setItem('zimrx_rkey', data.recovery_key);
         }
@@ -80,7 +81,7 @@ function saveSetup() {
     });
 }
 
-// ── Step 3 Logic ──────────────────────────────────────
+// Step 3 doctor profile setup
 function saveDoctor() {
     clearError();
     const btn = document.getElementById('btnSaveDoctor');
@@ -121,7 +122,7 @@ function saveDoctor() {
     });
 }
 
-// Show recovery key from sessionStorage on step 3
+// Populate recovery key from session storage on step 3
 (function() {
     const rkey = sessionStorage.getItem('zimrx_rkey');
     if (rkey) {

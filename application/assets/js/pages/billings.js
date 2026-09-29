@@ -1,11 +1,12 @@
+// Clinic billing and receipts management page handling payments, totals, and receipts.
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize date pickers with Flatpickr if available
+    // Datepicker initialization
     if (typeof flatpickr !== 'undefined') {
         flatpickr('#filter-from-date', { dateFormat: 'Y-m-d' });
         flatpickr('#filter-to-date', { dateFormat: 'Y-m-d' });
     }
 
-    // Modal Helpers
+    // Modal helper functions
     const openModal = (el) => {
         if (!el) return;
         el.hidden = false;
@@ -27,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Edit Payment Modal logic
+    // Edit payment modal
     const editModal = document.getElementById('modal-edit-payment');
     const editFeeDisplay = document.getElementById('edit-display-fee');
     const editNetDisplay = document.getElementById('edit-display-net');
@@ -91,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // New Transaction Modal
+    // New transaction modal
     const newModal = document.getElementById('modal-new-billing');
     const newBtn = document.getElementById('btn-new-billing');
     if (newBtn && newModal) {
@@ -143,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Print Receipt Modal logic
+    // Print receipt modal
     const receiptModal = document.getElementById('modal-receipt');
     document.querySelectorAll('.btn-print-receipt').forEach(btn => {
         btn.addEventListener('click', async () => {
@@ -186,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // CSV Export
+    // CSV export
     const exportBtn = document.getElementById('btn-export-csv');
     if (exportBtn) {
         exportBtn.addEventListener('click', () => {

@@ -1,18 +1,7 @@
 <?php
 declare(strict_types=1);
 
-/**
- * ==============================================================================
- * ZimRx Authenticated Clinical Report Viewer & Streamer
- * ==============================================================================
- *
- * Security Constraints:
- * 1. Enforces active doctor session authentication (rejects unauthenticated requests).
- * 2. Strict tenant doctor scoping (prevents cross-doctor medical data leaks).
- * 3. basename() path traversal prevention (blocks directory escalation attempts).
- * 4. Content sniffing defense with X-Content-Type-Options: nosniff.
- * ==============================================================================
- */
+// Authenticated clinical report viewer and streaming service with strict tenant isolation and path traversal guards.
 
 require_once __DIR__ . '/../auth.php';
 require_once __DIR__ . '/../db.php';
@@ -33,7 +22,7 @@ if ($rawFile === '') {
     exit();
 }
 
-// 1. Sanitize filename to block path traversal
+// Sanitize filename against directory traversal
 $fileName = basename(urldecode($rawFile));
 
 $reportsDir = realpath(__DIR__ . '/../userdata/uploads/reports');
@@ -54,7 +43,7 @@ if (!$realFilePath || !file_exists($realFilePath) || !str_starts_with($realFileP
     exit();
 }
 
-// 2. Enforce Doctor Tenant Ownership
+// Verify doctor ownership or assistant permission
 if (preg_match('/^report-(\d+)-/', $fileName, $matches)) {
     $ownerDoctorId = (int)$matches[1];
     if ($ownerDoctorId !== $doctorId) {
@@ -82,7 +71,7 @@ if (preg_match('/^report-(\d+)-/', $fileName, $matches)) {
     }
 }
 
-// 3. Determine MIME type and stream inline safely
+// Determine MIME type and stream inline
 $ext = strtolower(pathinfo($realFilePath, PATHINFO_EXTENSION));
 $mimeTypes = [
     'pdf'  => 'application/pdf',

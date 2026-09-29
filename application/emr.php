@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// EMR workspace: patient master profile, longitudinal trajectory tracking, visit timeline, and active encounter editor.
+
 require_once __DIR__ . '/auth.php';
 require_login();
 require_once __DIR__ . '/db.php';
@@ -62,7 +64,7 @@ if ($currentDoctorId <= 0) {
     exit('A doctor scope is required to access the EMR.');
 }
 
-// ── Routing Logic based on URL Parameters ──
+// Routing logic based on URL parameters
 $requestedReg = trim((string)($_GET['reg'] ?? ''));
 $requestedPatientId = (int)($_GET['patient_id'] ?? 0);
 $requestedVisit = trim((string)($_GET['visit'] ?? ''));
@@ -76,7 +78,7 @@ $allergies = [];
 $pastVisitsForDrawer = [];
 
 if ($requestedVisit !== '' || $requestedVisitRecordId > 0) {
-    // ── Active EMR Encounter Mode ──
+    // Active EMR encounter mode
     $viewMode = 'ACTIVE';
     if ($requestedVisitRecordId > 0) {
         $stmtV = $pdo->prepare("SELECT * FROM zimrx_visits WHERE id = :id AND doctor_id = :did LIMIT 1");
@@ -112,7 +114,7 @@ if ($requestedVisit !== '' || $requestedVisitRecordId > 0) {
         exit;
     }
 } elseif ($requestedReg !== '' || $requestedPatientId > 0) {
-    // ── Patient Master Profile Mode ──
+    // Patient master profile mode
     $viewMode = 'MASTER';
     if ($requestedPatientId > 0) {
         $stmtP = $pdo->prepare("SELECT * FROM zimrx_patients WHERE id = :id AND doctor_id = :did LIMIT 1");
@@ -186,12 +188,10 @@ if ($patient && !empty($patient['id'])) {
 }
 ?>
 
-<div class="emr-page">
+<div class="emr-page zrx-page-container">
 
     <?php if ($viewMode === 'MASTER' && $patient): ?>
-        <!-- ═══════════════════════════════════════════════════════
-             PATIENT MASTER PROFILE VIEW (emr.php?reg=...)
-        ════════════════════════════════════════════════════════ -->
+        <!-- Patient Master Profile View -->
 
         <?php if (!$isNonClinical && !empty($allergies)): ?>
         <div class="emr-alert-banner allergy-alert">
@@ -249,7 +249,7 @@ if ($patient && !empty($patient['id'])) {
             <div class="emr-demographics-card">
                 <h3>
                     <span>Patient Particulars</span>
-                    <div style="display: flex; gap: 6px; align-items: center;">
+                    <div class="emr-header-actions-group">
                         <button type="button" class="btn-emr btn-emr-outline btn-emr-sm" onclick="openParticularsAuditModal()" title="View particulars change audit trail">
                             🕒 History (<?= $auditCount ?>)
                         </button>
@@ -259,7 +259,7 @@ if ($patient && !empty($patient['id'])) {
                 <div class="emr-demo-list">
                     <div class="emr-demo-item">
                         <span class="label">Master Reg ID</span>
-                        <span class="val" style="color: #047857;"><?= htmlspecialchars($patient['reg_no'] ?: 'P' . $patient['id']) ?></span>
+                        <span class="val emr-reg-val"><?= htmlspecialchars($patient['reg_no'] ?: 'P' . $patient['id']) ?></span>
                     </div>
                     <div class="emr-demo-item">
                         <span class="label">Full Name</span>
@@ -279,7 +279,7 @@ if ($patient && !empty($patient['id'])) {
                     </div>
                     <div class="emr-demo-item">
                         <span class="label">Blood Group</span>
-                        <span class="val" style="color: #dc2626;"><?= htmlspecialchars($patient['blood_group'] ?: '--') ?></span>
+                        <span class="val" class="zrx-c-danger"><?= htmlspecialchars($patient['blood_group'] ?: '--') ?></span>
                     </div>
                     <div class="emr-demo-item">
                         <span class="label">Phone / Mobile</span>
@@ -307,7 +307,7 @@ if ($patient && !empty($patient['id'])) {
                             <span class="emr-allergy-tag"><?= htmlspecialchars($alg) ?></span>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <span style="font-size: 0.82rem; color: #94a3b8;">No documented drug allergies recorded.</span>
+                        <span class="emr-empty-note">No documented drug allergies recorded.</span>
                     <?php endif; ?>
                 </div>
                 <?php endif; ?>
@@ -321,7 +321,7 @@ if ($patient && !empty($patient['id'])) {
                         <span><?= $isNonClinical ? 'Visits History' : 'Clinical Timeline' ?> (<?= count($timeline) ?> Visits)</span>
                     </h3>
                     <?php if (empty($timeline)): ?>
-                        <div style="text-align: center; color: #94a3b8; padding: 2rem;">No previous visits on record for this patient.</div>
+                        <div class="zrx-empty-block">No previous visits on record for this patient.</div>
                     <?php else: ?>
                     <div class="emr-timeline-table-wrap">
                         <table class="emr-timeline-table">
@@ -334,10 +334,10 @@ if ($patient && !empty($patient['id'])) {
                                     <th>Chief Complaints</th>
                                     <th>Primary Diagnosis</th>
                                     <th>Vitals</th>
-                                    <th style="text-align: right;">Action</th>
+                                    <th class="zrx-ta-r">Action</th>
                                     <?php else: ?>
                                     <th>Next Revisit</th>
-                                    <th style="text-align: right;">Status</th>
+                                    <th class="zrx-ta-r">Status</th>
                                     <?php endif; ?>
                                 </tr>
                             </thead>
@@ -363,14 +363,14 @@ if ($patient && !empty($patient['id'])) {
                                     <td><?= htmlspecialchars(!empty($ccArr) ? implode(', ', $ccArr) : '--') ?></td>
                                     <td><?= htmlspecialchars(!empty($dxArr) ? implode(', ', $dxArr) : '--') ?></td>
                                     <td><?= htmlspecialchars($bp ? "BP: $bp" : ($t['weight_at_visit'] ? "Wt: " . $t['weight_at_visit'] . ($t['weight_unit_at_visit'] ?: 'kg') : '--')) ?></td>
-                                    <td style="text-align: right;">
+                                    <td class="zrx-ta-r">
                                         <button type="button" class="btn-emr btn-emr-outline btn-emr-sm" onclick="openPastRxDrawer('<?= htmlspecialchars($t['visit_id'] ?: (string)$t['visit_record_id']) ?>')">
                                             👁 View Rx
                                         </button>
                                     </td>
                                     <?php else: ?>
                                     <td><?= !empty($t['next_visit']) ? htmlspecialchars(date('d M Y', strtotime($t['next_visit']))) : '--' ?></td>
-                                    <td style="text-align: right;"><span class="emr-meta-pill" style="color: #047857; background: #ecfdf5; border-color: #a7f3d0;">Completed</span></td>
+                                    <td class="zrx-ta-r"><span class="emr-meta-pill emr-meta-pill-green">Completed</span></td>
                                     <?php endif; ?>
                                 </tr>
                                 <?php endforeach; ?>
@@ -433,7 +433,7 @@ if ($patient && !empty($patient['id'])) {
                     </div>
 
                     <div class="emr-trends-grid" id="emr-trajectories-grid">
-                        <div style="text-align: center; color: #94a3b8; padding: 2.5rem 1rem; grid-column: span 2;">
+                        <div class="emr-empty-state-grid2">
                             Loading patient trajectories...
                         </div>
                     </div>
@@ -443,9 +443,7 @@ if ($patient && !empty($patient['id'])) {
         </div>
 
     <?php elseif ($viewMode === 'ACTIVE' && $activeVisit && $patient): ?>
-        <!-- ═══════════════════════════════════════════════════════
-             ACTIVE EMR ENCOUNTER WORKSPACE (emr.php?visit=...)
-        ════════════════════════════════════════════════════════ -->
+        <!-- Active EMR Encounter Workspace -->
 
         <div class="emr-top-card">
             <div class="emr-patient-identity">
@@ -520,23 +518,23 @@ if ($patient && !empty($patient['id'])) {
                 <div class="emr-panel-header">2. Prescription (Rx) Medication Grid</div>
                 
                 <div class="emr-rx-entry-bar">
-                    <div class="emr-form-group" style="margin: 0;">
+                    <div class="emr-form-group" class="zrx-m0">
                         <label>Drug Search</label>
                         <input type="text" id="emr-rx-drug-name" placeholder="Search Brand / Generic..." autocomplete="off">
                     </div>
-                    <div class="emr-form-group" style="margin: 0;">
+                    <div class="emr-form-group" class="zrx-m0">
                         <label>Dose</label>
                         <input type="text" id="emr-rx-dose" placeholder="1+0+1">
                     </div>
-                    <div class="emr-form-group" style="margin: 0;">
+                    <div class="emr-form-group" class="zrx-m0">
                         <label>Duration</label>
                         <input type="text" id="emr-rx-duration" placeholder="7 Days">
                     </div>
-                    <div class="emr-form-group" style="margin: 0;">
+                    <div class="emr-form-group" class="zrx-m0">
                         <label>Instruction</label>
                         <input type="text" id="emr-rx-instruction" placeholder="After meal">
                     </div>
-                    <button type="button" class="btn-emr btn-emr-success" id="btn-add-rx-item" style="height: 34px;">
+                    <button type="button" class="btn-emr btn-emr-success btn-emr-add-fixed" id="btn-add-rx-item">
                         + Add
                     </button>
                 </div>
@@ -577,17 +575,15 @@ if ($patient && !empty($patient['id'])) {
                     <input type="text" id="emr-next-visit" placeholder="e.g. After 7 days / DD-MM-YYYY">
                 </div>
 
-                <div style="margin-top: 1rem; padding-top: 0.85rem; border-top: 1px solid #f1f5f9; display: flex; align-items: center; gap: 0.5rem;">
-                    <input type="checkbox" id="emr-schedule-call" style="width: auto;">
-                    <label for="emr-schedule-call" style="font-size: 0.82rem; font-weight: 600; color: #475569; cursor: pointer;">Schedule Assistant Check-in Call</label>
+                <div class="emr-schedule-call-row">
+                    <input type="checkbox" id="emr-schedule-call" class="emr-check-auto">
+                    <label for="emr-schedule-call" class="emr-schedule-label">Schedule Assistant Check-in Call</label>
                 </div>
             </div>
         </div>
 
     <?php else: ?>
-        <!-- ═══════════════════════════════════════════════════════
-             EMR HUB & OMNI SEARCH LANDING VIEW (emr.php)
-        ════════════════════════════════════════════════════════ -->
+        <!-- EMR Hub View -->
 
         <div class="emr-hub-hero">
             <h2>Electronic Medical Record (EMR) Hub</h2>
@@ -616,7 +612,7 @@ if ($patient && !empty($patient['id'])) {
                             <th>Phone</th>
                             <th>Address</th>
                             <th>Blood Group</th>
-                            <th style="text-align: right;">Action</th>
+                            <th class="zrx-ta-r">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -627,8 +623,8 @@ if ($patient && !empty($patient['id'])) {
                             <td><?= htmlspecialchars($rp['age'] ?: '--') ?> <?= htmlspecialchars($rp['age_unit'] ?: 'Y') ?> / <?= htmlspecialchars($rp['gender'] ?: '--') ?></td>
                             <td><?= htmlspecialchars($rp['mobile'] ?: '--') ?></td>
                             <td><?= htmlspecialchars($rp['address'] ?: '--') ?></td>
-                            <td><span style="color: #dc2626; font-weight: 700;"><?= htmlspecialchars($rp['blood_group'] ?: '--') ?></span></td>
-                            <td style="text-align: right;">
+                            <td><span class="emr-bp-val-danger"><?= htmlspecialchars($rp['blood_group'] ?: '--') ?></span></td>
+                            <td class="zrx-ta-r">
                                 <a href="emr.php?reg=<?= urlencode($rp['reg_no'] ?: 'P' . $rp['id']) ?>" class="btn-emr btn-emr-primary btn-emr-sm">
                                     Open Master Profile ➔
                                 </a>
@@ -644,9 +640,7 @@ if ($patient && !empty($patient['id'])) {
 
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     SLIDING PAST RX REFERENCE DRAWER
-════════════════════════════════════════════════════════ -->
+<!-- Past Rx Reference Drawer -->
 <div class="emr-drawer-overlay" id="emr-drawer-overlay" onclick="closePastRxDrawer()"></div>
 <div class="emr-past-rx-drawer" id="emr-past-rx-drawer">
     <div class="emr-drawer-header">
@@ -654,13 +648,11 @@ if ($patient && !empty($patient['id'])) {
         <button type="button" class="emr-drawer-close-btn" onclick="closePastRxDrawer()">&times;</button>
     </div>
     <div class="emr-drawer-body" id="emr-drawer-content">
-        <div style="text-align: center; color: #94a3b8; padding: 2rem;">Loading encounter details...</div>
+        <div class="zrx-empty-block">Loading encounter details...</div>
     </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     EDIT DEMOGRAPHICS MODAL
-════════════════════════════════════════════════════════ -->
+<!-- Edit Demographics Modal -->
 <?php if ($patient): ?>
 <div class="emr-modal" id="emr-edit-demographics-modal">
     <div class="emr-modal-card">
@@ -739,14 +731,14 @@ if ($patient && !empty($patient['id'])) {
         <div class="emr-modal-header">
             <div>
                 <h3>Particulars Change Audit History</h3>
-                <div style="font-size: 0.8rem; color: #64748b; margin-top: 2px;">
+                <div class="emr-modal-subtitle">
                     <?= htmlspecialchars($patient['full_name'] ?? '') ?> (Reg: <?= htmlspecialchars(($patient['reg_no'] ?? '') ?: 'P' . ($patient['id'] ?? '')) ?>)
                 </div>
             </div>
             <button type="button" class="btn-emr-close" onclick="closeParticularsAuditModal()">&times;</button>
         </div>
         <div class="emr-modal-body" id="emr-particulars-audit-body">
-            <div style="text-align: center; color: #64748b; padding: 2.5rem 1rem;">
+            <div class="emr-empty-state-card">
                 Loading audit trail...
             </div>
         </div>
@@ -758,11 +750,11 @@ if ($patient && !empty($patient['id'])) {
 
 <!-- Quick Log Reading Modal (Home / Clinic standalone data) -->
 <div class="emr-modal" id="emr-log-reading-modal">
-    <div class="emr-modal-card" style="max-width: 460px;">
+    <div class="emr-modal-card emr-modal-card-narrow">
         <div class="emr-modal-header">
             <div>
                 <h3 id="log-reading-modal-title">Log Home Reading</h3>
-                <div style="font-size: 0.8rem; color: #64748b; margin-top: 2px;">
+                <div class="emr-modal-subtitle">
                     Record self-monitored home reading or clinic desk check
                 </div>
             </div>
@@ -773,10 +765,10 @@ if ($patient && !empty($patient['id'])) {
             <input type="hidden" name="patient_id" value="<?= (int)($patient['id'] ?? 0) ?>">
             <input type="hidden" name="metric_type" id="log-metric-type" value="">
 
-            <div style="display: flex; flex-direction: column; gap: 0.85rem; padding: 0.5rem 0;">
+            <div class="emr-log-form-body">
                 <div class="emr-form-group">
                     <label>Source</label>
-                    <select name="source" id="log-source" style="width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.88rem;">
+                    <select name="source" id="log-source" class="emr-log-input-standard">
                         <option value="home" selected>🏠 Home / Self-Reported (Patient Logbook)</option>
                         <option value="clinic">🏥 Clinic / Desk Check</option>
                     </select>
@@ -784,25 +776,25 @@ if ($patient && !empty($patient['id'])) {
 
                 <div class="emr-form-group">
                     <label id="log-reading-value-label">Reading Value</label>
-                    <div style="display: flex; gap: 8px;" id="log-reading-input-wrap">
-                        <input type="text" name="reading_value" id="log-reading-value" required placeholder="e.g. 125/80" style="flex: 1; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; font-weight: 600;">
+                    <div class="emr-log-reading-wrap" id="log-reading-input-wrap">
+                        <input type="text" name="reading_value" id="log-reading-value" required placeholder="e.g. 125/80" class="emr-log-reading-val">
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div class="emr-log-grid-2col">
                     <div class="emr-form-group">
                         <label>Date</label>
-                        <input type="date" name="reading_date" id="log-reading-date" value="<?= date('Y-m-d') ?>" required style="width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.88rem;">
+                        <input type="date" name="reading_date" id="log-reading-date" value="<?= date('Y-m-d') ?>" required class="emr-log-input-standard">
                     </div>
                     <div class="emr-form-group">
                         <label>Time (Optional)</label>
-                        <input type="time" name="reading_time" id="log-reading-time" style="width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.88rem;">
+                        <input type="time" name="reading_time" id="log-reading-time" class="emr-log-input-standard">
                     </div>
                 </div>
 
                 <div class="emr-form-group">
                     <label>Context / Notes (Optional)</label>
-                    <input type="text" name="notes" placeholder="e.g. Morning fasting, post-exercise, before pills" style="width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.85rem;">
+                    <input type="text" name="notes" placeholder="e.g. Morning fasting, post-exercise, before pills" class="emr-log-input-notes">
                 </div>
             </div>
 

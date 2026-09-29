@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Drug catalog explorer: handles brand/generic search, therapeutic classes, dosage variants, and clinical monographs.
+
 $rx_popup_mode = isset($_GET['rx_popup']) && $_GET['rx_popup'] === '1';
 $initialDrugDetail = null;
 $initialSidebarState = null;

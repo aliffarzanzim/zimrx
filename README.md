@@ -78,6 +78,15 @@ To deliver a portable, single-folder appliance that runs offline while enforcing
 
 ---
 
+## Deployment Scope & Global Adaptability
+
+* **Cross-Border Scalability & Decoupled Formularies**: While currently being developed in Bangladesh, ZimRx is architected from the ground up for cross-border adoption. Generic names, class, indications are strictly decoupled from commercial brand names in the database, allowing international clinics, health services, or humanitarian teams to operate on Day 1 in generic-prescribing mode. Developers and medical contributors from other countries can easily plug in, customize, or maintain their own national drug formularies without altering the application core.
+* **Humanitarian Aid & Crisis Relief Ready**: Released under the copyleft **GNU AGPLv3** license, ZimRx provides medical teams and humanitarian organizations (such as *Médecins Sans Frontières*) with a zero-cost, resilient clinical prescribing engine that operates reliably in disaster response zones, refugee health posts, and rural clinics during complete telecommunication or power blackouts.
+* **Privacy by Design & Data Sovereignty**: Operates on a strict local-first, zero-telemetry model aligned with global privacy standards (GDPR, medical confidentiality). Sensitive patient health records remain strictly on local clinic hardware, entirely eliminating exposure to commercial cloud providers, telemetry backdoors, and recurring subscription lock-in.
+* **Modern Edge Infrastructure**: Powered by **[FrankenPHP](https://frankenphp.dev/)** and Caddy core, delivering a self-contained, single-binary execution environment that runs natively on budget laptops and clinic edge hardware without external database or web server configuration.
+
+---
+
 ## Quick Start (Windows)
 
 1. **Download or Clone the Repository**:

@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Operation Theater (OT) Note module: surgical particulars table, tabs, and print layout controls.
+
 $ot_predefined_particulars = [
     'Date',
     'Time',

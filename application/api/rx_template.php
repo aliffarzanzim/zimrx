@@ -1,4 +1,5 @@
 <?php
+// CRUD, ordering, and bulk management for prescription phrase templates (dose, duration, and advice).
 declare(strict_types=1);
 
 require_once __DIR__ . '/../auth.php';

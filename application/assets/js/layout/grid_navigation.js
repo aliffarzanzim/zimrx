@@ -1,9 +1,4 @@
-// ZimRx Universal Keyboard Grid Navigation
-
-// =======================================================
-// Universal Prescription Grid Keyboard Navigation Engine
-// Excel/Vim-grade navigation unified across all ZimRx tables
-// =======================================================
+// Universal keyboard grid navigation engine (cell navigation, row insertion, deletion, reordering).
 function initializeUniversalGridNavigation(root = document) {
   if (document.documentElement.dataset.universalGridNavReady === '1') {
     return;
@@ -167,7 +162,7 @@ function initializeUniversalGridNavigation(root = document) {
 
     const openDd = getOpenDropdown();
 
-    // 1. ESCAPE KEY: Blur input if dropdown is closed
+    // Escape: blur input if dropdown is closed
     if (e.key === 'Escape') {
       if (openDd) {
         return; // Let dropdown handler close it
@@ -177,7 +172,7 @@ function initializeUniversalGridNavigation(root = document) {
       return;
     }
 
-    // 2. MULTI-LINE TEXTAREA NEWLINE: Alt + Enter or Ctrl + Shift + Enter
+    // Textarea newline: Alt+Enter or Ctrl+Shift+Enter
     if (input.tagName === 'TEXTAREA' && ((e.altKey && e.key === 'Enter') || (e.ctrlKey && e.shiftKey && e.key === 'Enter'))) {
       e.preventDefault();
       const start = input.selectionStart || 0;
@@ -189,7 +184,7 @@ function initializeUniversalGridNavigation(root = document) {
       return;
     }
 
-    // 3. CTRL + ENTER: Typewriter Carriage Return -> Column 1 of NEXT row
+    // Ctrl+Enter: advance to column 1 of next row or append row
     if (e.ctrlKey && !e.shiftKey && !e.altKey && e.key === 'Enter') {
       e.preventDefault();
       if (!isLastRow) {
@@ -202,7 +197,7 @@ function initializeUniversalGridNavigation(root = document) {
       return;
     }
 
-    // 4. SHIFT + ENTER: Reverse Return -> Column 1 of PREVIOUS row
+    // Shift+Enter: move to column 1 of previous row
     if (e.shiftKey && !e.ctrlKey && !e.altKey && e.key === 'Enter') {
       e.preventDefault();
       if (!isFirstRow) {
@@ -213,7 +208,7 @@ function initializeUniversalGridNavigation(root = document) {
       return;
     }
 
-    // 5. ALT + DELETE: Instantly delete current row with re-indexing & refocusing
+    // Alt+Delete: delete current row and refocus adjacent cell
     if (e.altKey && !e.ctrlKey && !e.shiftKey && (e.key === 'Delete' || e.key === 'Del')) {
       e.preventDefault();
       const tbody = table.querySelector('tbody') || table;
@@ -239,7 +234,7 @@ function initializeUniversalGridNavigation(root = document) {
       return;
     }
 
-    // 6. ALT + SHIFT + UP / DOWN: Slide entire row up or down without leaving input!
+    // Alt+Shift+Up/Down: reorder row up or down preserving caret
     if (e.altKey && e.shiftKey && !e.ctrlKey) {
       if (e.key === 'ArrowUp') {
         e.preventDefault();
@@ -275,7 +270,7 @@ function initializeUniversalGridNavigation(root = document) {
       }
     }
 
-    // 7. ALT + ARROW KEYS: Free Spatial Movement across grid (traps browser history)
+    // Alt+Arrow: spatial navigation across grid cells
     if (e.altKey && !e.ctrlKey && !e.shiftKey) {
       if (e.key === 'ArrowUp') {
         e.preventDefault();
@@ -321,7 +316,7 @@ function initializeUniversalGridNavigation(root = document) {
       }
     }
 
-    // 6. TAB: Move ONLY (never select dropdown items, simply advance)
+    // Tab: advance to next cell or append row without selecting dropdown
     if (e.key === 'Tab' && !e.shiftKey && !e.ctrlKey && !e.altKey) {
       e.preventDefault();
       // If a dropdown is currently open, close it without selecting anything
@@ -342,7 +337,7 @@ function initializeUniversalGridNavigation(root = document) {
       return;
     }
 
-    // 7. ENTER: Select active dropdown item (if open), otherwise move to next cell
+    // Enter: select active dropdown item or advance to next cell
     if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.altKey) {
       if (openDd?.activeItem) {
         // Let the autocomplete module's own keydown handler select the item and advance
@@ -362,7 +357,7 @@ function initializeUniversalGridNavigation(root = document) {
       return;
     }
 
-    // 8. SHIFT + TAB: Backward Step (move only, never select)
+    // Shift+Tab: move to previous cell
     if (e.shiftKey && e.key === 'Tab' && !e.ctrlKey && !e.altKey) {
       e.preventDefault();
       if (openDd?.list) {
@@ -380,7 +375,7 @@ function initializeUniversalGridNavigation(root = document) {
       return;
     }
 
-    // 8. ARROW UP / DOWN (When dropdown is NOT open)
+    // Arrow Up/Down: navigate between rows when dropdown is closed
     if (!openDd && !e.altKey && !e.ctrlKey && !e.shiftKey) {
       if (e.key === 'ArrowUp') {
         if (!isFirstRow) {
@@ -404,7 +399,7 @@ function initializeUniversalGridNavigation(root = document) {
       }
     }
 
-    // 9. ARROW LEFT / RIGHT (Boundary Escape)
+    // Arrow Left/Right: navigate across columns at text boundaries
     if (!e.altKey && !e.shiftKey && !e.ctrlKey) {
       const len = input.value.length;
       const start = input.selectionStart;
@@ -435,7 +430,7 @@ function initializeUniversalGridNavigation(root = document) {
       }
     }
 
-    // 10. BACKSPACE: Mouseless Empty Row Deletion
+    // Backspace: delete empty row at first column boundary
     if (e.key === 'Backspace' && !e.ctrlKey && !e.altKey && !e.shiftKey) {
       if (isFirstCol && input.selectionStart === 0 && input.selectionEnd === 0) {
         const isBlankRow = rowCells.every((c) => !c.value.trim());

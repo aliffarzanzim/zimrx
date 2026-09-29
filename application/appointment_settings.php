@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Chamber settings: consultation pacing, safety buffer slots, fee schedules, weekly rules, and token print fields.
+
 require_once 'auth.php';
 require_login();
 require_once 'db.php';
@@ -129,9 +131,9 @@ include 'header.php';
 
 <link rel="stylesheet" href="assets/css/pages/appointment_settings.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/appointment_settings.css') ?>">
 
-<div class="layout-editor-page">
+<div class="layout-editor-page zrx-page-container">
 
-    <!-- ── Upper Heading Box matching Print Setup & Page Setup ── -->
+    <!-- Heading Box -->
     <div class="layout-editor-heading">
         <div>
             <h1>Appointment Settings</h1>
@@ -153,29 +155,29 @@ include 'header.php';
         </div>
     </div>
 
-    <!-- ── Flash Toast ──────────────────────────────────────── -->
+    <!-- Flash Toast -->
     <?php if ($flashMessage !== ''): ?>
-        <div class="admin-flash" style="<?= $flashType === 'error' ? 'background: #fef2f2; color: #b91c1c; border: 1px solid #fca5a5;' : 'background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;' ?> margin-top: 1rem; margin-bottom: 0;">
+        <div class="admin-flash <?= $flashType === 'error' ? 'apt-flash-msg-error' : 'apt-flash-msg-success' ?>">
             <?= htmlspecialchars($flashMessage) ?>
         </div>
     <?php endif; ?>
 
-    <!-- ── Reset Confirmation Modal ──────────────────────────── -->
+    <!-- Reset Confirmation Modal -->
     <div id="apt-confirm-modal" class="print-setup-toast" hidden>
-        <div class="print-setup-toast-panel" role="dialog" aria-modal="true" style="width: min(100%, 400px); text-align: center; gap: 1.25rem; background: #ffffff; padding: 1.75rem; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.25); border: 1px solid #cbd5e1;">
-            <div style="font-size: 2.25rem; line-height: 1;">⚠️</div>
-            <strong style="font-size: 1.15rem; color: #1e293b; display: block;">Reset to Defaults?</strong>
-            <p style="font-size: 0.875rem; color: #64748b; margin: 0; line-height: 1.5;">
+        <div class="print-setup-toast-panel apt-modal-panel" role="dialog" aria-modal="true">
+            <div class="apt-modal-icon">⚠️</div>
+            <strong class="apt-modal-title">Reset to Defaults?</strong>
+            <p class="apt-modal-desc">
                 Are you sure you want to restore the appointment chamber timings, safety slots, fees, and token print options to default settings?
             </p>
-            <div style="display: flex; gap: 0.75rem; width: 100%; justify-content: center; margin-top: 0.5rem;">
-                <button type="button" id="confirm-reset-cancel" class="btn btn-outline" style="flex: 1; padding: 0.5rem 1rem;">Cancel</button>
-                <button type="button" id="confirm-reset-proceed" class="btn btn-primary" style="flex: 1; padding: 0.5rem 1rem; background: #dc2626; border-color: #dc2626;">Yes, Reset</button>
+            <div class="apt-modal-actions">
+                <button type="button" id="confirm-reset-cancel" class="btn btn-outline apt-modal-btn">Cancel</button>
+                <button type="button" id="confirm-reset-proceed" class="btn btn-primary apt-modal-btn apt-modal-btn-danger">Yes, Reset</button>
             </div>
         </div>
     </div>
 
-    <!-- ── Settings Form ────────────────────────────────────── -->
+    <!-- Settings Form -->
     <form method="POST" id="appointment-settings-form" class="apt-settings-form-body" action="appointment_settings.php<?= $selectedDoctorId ? '?doctor_id=' . $selectedDoctorId : '' ?>">
 
         <div class="apt-layout-grid">
@@ -310,7 +312,7 @@ include 'header.php';
                         Appointment Token Print Slip Fields
                     </h2>
                 </div>
-                <p style="font-size: 0.85rem; color: #64748b; margin-top: -0.5rem; margin-bottom: 1rem;">Select which patient and financial details appear on thermal/slip print tokens issued to queue patients.</p>
+                <p class="apt-section-desc">Select which patient and financial details appear on thermal/slip print tokens issued to queue patients.</p>
 
                 <div class="token-grid-container">
                     <?php

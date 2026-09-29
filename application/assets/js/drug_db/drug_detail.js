@@ -1,29 +1,5 @@
-/**
- * ==============================================================================
- * ZimRx Pharmaceutical Formulary & Clinical Decision Support (CDS) Inspector
- * ==============================================================================
- *
- * Architecture & Lifecycle Overview:
- * 1. State Model & Caching:
- *    - In-memory brand & clinical data cache (drugDetailCache, paediatricCalcStore).
- *    - Request sequencing (drugDetailRequestSeq) to prevent stale async race conditions.
- *    - Doctor override & custom drug staging state.
- *
- * 2. API Communication & Data Retrieval:
- *    - High-speed FTS lookup via api/search_drug.php and api/drug_detail.php.
- *    - User drug customization, override, and hiding endpoints via api/user_drug_*.
- *    - PubMed evidence query generator with external citation links.
- *
- * 3. Clinical Decision Support (CDS) Renderers:
- *    - Contraindications, Black-Box Warnings, and Adverse Drug Reaction snapshots.
- *    - Pregnancy & Lactation Safety Categories (FDA / Briggs rating system).
- *    - Dynamic Pediatric Dosage Calculator Engine with weight/age/BSA parameters.
- *    - Commercial formulations, brand variants, and unit-price comparison tables.
- *
- * 4. User Formulary Management & Event Lifecycle:
- *    - Doctor-specific brand overrides, custom compound creation, and brand masking.
- * ==============================================================================
- */
+// Drug database detail view, clinical monograph renderer, paediatric dosage calculator, and custom user drug manager.
+
 let drugDetailRequestSeq = 0;
 let drugHeaderLayoutObserver = null;
 let paediatricCalcSeq = 0;
@@ -158,7 +134,7 @@ function loadBrand(id, preloadedData = null) {
             currentGenericId = b.generic_id;
             currentFormNew = b.form_new;
 
-            // 1. Update all content silently
+            // Update all content silently
             $('#h_brand').text(b.brand_name);
             $('#h_strength').text(b.strength);
             $('#h_form').text(b.form);
@@ -909,13 +885,13 @@ function loadBrand(id, preloadedData = null) {
             .replace(/<br>\s*(<h3 class="clinical-md-heading">)/g, '$1')
             .replace(/(<\/h3>)\s*<br>/g, '$1');
 
-        // 2. Bold clinical headers followed by a colon
+        // Bold clinical headers followed by a colon
         formatted = formatted.replace(/((?:^|<br>)\s*)([^<:\n]+:)/gi, '$1<span class="clinical-inline-heading">$2</span>');
 
-        // 3. Bold Pregnancy Category specifically (since it uses a dash)
+        // Bold pregnancy category notes
         formatted = formatted.replace(/((?:^|<br>)\s*)(Pregnancy Category\s*-\s*[A-DX]+)/gi, '$1<span class="clinical-inline-heading">$2</span>');
 
-        // 4. Highlight standalone routes or forms
+        // Highlight administration routes and dosage forms
         formatted = formatted.replace(/((?:^|<br>)\s*)(Oral|Rectal|Tablet|Capsule|Injection|Syrup\/Suspension|Suspension|Syrup|Paediatric Drops|Infusion|Topical|Ophthalmic)(\b)/gi, '$1<strong style="border-bottom: 2px solid #e2e8f0; padding-bottom: 2px; margin-bottom: 4px; display: inline-block;">$2</strong>$3');
 
         return formatted;

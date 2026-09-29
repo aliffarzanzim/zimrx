@@ -1,13 +1,15 @@
 <?php
 declare(strict_types=1);
 
+// EMR API endpoint: patient record search, visit history timeline, vitals trend graphing, and sync journal tombstones.
+
 require_once __DIR__ . '/../auth.php';
 require_login();
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/../lib/visit_identity.php';
 require_once __DIR__ . '/../lib/emr_identity_lib.php';
 require_once __DIR__ . '/../lib/particulars_audit_lib.php';
-require_once __DIR__ . '/../lib/sync_service.php';
+require_once __DIR__ . '/../lib/Services/SyncJournalService.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -792,8 +794,8 @@ switch ($action) {
             }
 
             $readingId = (int)$pdo->lastInsertId();
-            if (class_exists('ZimRxSyncJournal')) {
-                ZimRxSyncJournal::recordMetricReadingChange($pdo, $readingId, $patientId, 'insert', [
+            if (class_exists('SyncJournalService')) {
+                SyncJournalService::recordMetricReadingChange($pdo, $readingId, $patientId, 'insert', [
                     'id' => $readingId,
                     'patient_id' => $patientId,
                     'metric_type' => $metricType,
@@ -863,7 +865,7 @@ switch ($action) {
             // Stable sync_id — assign one if the column exists but the row pre-dates migration.
             $delSyncId = (string)($delRow['sync_id'] ?? '');
             if ($delSyncId === '') {
-                $delSyncId = ZimRxSyncJournal::generateUuid();
+                $delSyncId = SyncJournalService::generateUuid();
                 $pdo->prepare("UPDATE zimrx_patient_metric_readings SET sync_id = :sid WHERE id = :id")
                     ->execute(['sid' => $delSyncId, 'id' => $readingId]);
             }
@@ -880,8 +882,8 @@ switch ($action) {
             ]);
 
             // Write tombstone to sync journal so offline peers can reconcile.
-            if (class_exists('ZimRxSyncJournal') && DbSchema::tableExists($pdo, 'zimrx_sync_changes')) {
-                ZimRxSyncJournal::logChange(
+            if (class_exists('SyncJournalService') && DbSchema::tableExists($pdo, 'zimrx_sync_changes')) {
+                SyncJournalService::logChange(
                     $pdo,
                     'metric_reading',
                     $delSyncId,

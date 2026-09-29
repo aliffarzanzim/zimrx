@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Static advice catalog endpoint: loads standard bilingual clinical advice items sorted by category.
+
 require_once __DIR__ . '/../auth.php';
 require_once __DIR__ . '/../config.php';
 require_login();

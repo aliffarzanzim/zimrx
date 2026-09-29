@@ -1,3 +1,4 @@
+// Dosage form icon resolver: maps medication forms and prescription prefixes to SVG iconography.
 (function () {
     const ICON_BASE = 'assets/images/dosage-form-images/';
 

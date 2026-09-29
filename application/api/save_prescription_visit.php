@@ -1,4 +1,5 @@
 <?php
+// Saves patient prescription visits, handles revisions/archiving, concurrency checks, and sync journal logging.
 declare(strict_types=1);
 
 require_once __DIR__ . '/../auth.php';
@@ -282,7 +283,7 @@ try {
     $appointment = load_appointment($pdo, $appointmentId, $doctorId);
     $expectedRevision = isset($payload['revision']) ? (int)$payload['revision'] : 0;
 
-    require_once __DIR__ . '/../lib/sync_service.php';
+    require_once __DIR__ . '/../lib/Services/SyncJournalService.php';
 
     if ($appointment && !empty($appointment['visit_record_id'])) {
         $visitRecordId = (int)$appointment['visit_record_id'];
@@ -341,10 +342,10 @@ try {
 
             $syncId = (string)($currentVisitRow['sync_id'] ?? '');
             if ($syncId === '') {
-                $syncId = ZimRxSyncJournal::generateUuid();
+                $syncId = SyncJournalService::generateUuid();
                 $pdo->prepare("UPDATE zimrx_visits SET sync_id = :sync_id WHERE id = :id")->execute(['sync_id' => $syncId, 'id' => $visitRecordId]);
             }
-            ZimRxSyncJournal::logChange($pdo, 'visit', $syncId, 'update', $currentRevision, $currentRevision + 1, [
+            SyncJournalService::logChange($pdo, 'visit', $syncId, 'update', $currentRevision, $currentRevision + 1, [
                 'id' => $visitRecordId,
                 'visit_no' => (int)($appointment['visit_no'] ?? 0),
             ]);
@@ -421,10 +422,10 @@ try {
 
             $syncId = (string)($existingVisit['sync_id'] ?? '');
             if ($syncId === '') {
-                $syncId = ZimRxSyncJournal::generateUuid();
+                $syncId = SyncJournalService::generateUuid();
                 $pdo->prepare("UPDATE zimrx_visits SET sync_id = :sync_id WHERE id = :id")->execute(['sync_id' => $syncId, 'id' => $visitRecordId]);
             }
-            ZimRxSyncJournal::logChange($pdo, 'visit', $syncId, 'update', $currentRevision, $currentRevision + 1, [
+            SyncJournalService::logChange($pdo, 'visit', $syncId, 'update', $currentRevision, $currentRevision + 1, [
                 'id' => $visitRecordId,
                 'visit_no' => (int)($existingVisit['visit_no'] ?? 0),
             ]);
@@ -499,7 +500,7 @@ try {
         ? trim((string)$appointment['appointment_date'] . ' ' . (string)($appointment['appointment_time'] ?? ''))
         : date('Y-m-d H:i:s');
 
-    $syncId = ZimRxSyncJournal::generateUuid();
+    $syncId = SyncJournalService::generateUuid();
 
     if (DbConnections::driver() === 'sqlite') {
         $pdo->exec('BEGIN IMMEDIATE');
@@ -574,7 +575,7 @@ try {
         zimrx_record_user_occupation($pdo, $doctorId, $savedOccupation);
     }
 
-    ZimRxSyncJournal::logChange($pdo, 'visit', $syncId, 'insert', 0, 1, [
+    SyncJournalService::logChange($pdo, 'visit', $syncId, 'insert', 0, 1, [
         'id' => $visitRecordId,
         'visit_no' => $visitNo,
         'patient_id' => $patientId,

@@ -1,4 +1,8 @@
-<?php declare(strict_types=1); ?>
+<?php
+declare(strict_types=1);
+
+// Menstrual History (M/H) module: menarche, cycle, LMP, and EDD calculation table.
+?>
 <div class="oh-wrapper js-mh-module">
     <div class="oh-table-container">
         <table class="oh-table" id="mh-table">

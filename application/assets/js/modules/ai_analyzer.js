@@ -1,5 +1,6 @@
+// Clinical AI assistant: extracts active consultation details, formats clinical prompts, and queries LLM endpoints.
 (function() {
-    // --- 1. Settings & UI Elements ---
+    // AI provider configuration and credential settings
     const settingsToggle = document.getElementById('ai-settings-toggle');
     const settingsPanel = document.getElementById('ai-settings-panel');
     const providerSelect = document.getElementById('ai-provider');
@@ -122,7 +123,7 @@
     });
 
 
-    // --- 2. Summary Generation Logic ---
+    // Clinical summary prompt generation
     function generateClinicalSummary() {
         let age = document.getElementById('patient-age')?.value || '[Age]';
         let gender = document.getElementById('patient-gender')?.value || '[Gender]';
@@ -196,7 +197,7 @@
         return summary;
     }
 
-    // --- 3. Chat Actions ---
+    // Chat UI actions and message dispatching
     const copyBtn = document.getElementById('ai-copy-btn');
     const startBtn = document.getElementById('ai-start-btn');
     const chatBox = document.getElementById('ai-chat-box');

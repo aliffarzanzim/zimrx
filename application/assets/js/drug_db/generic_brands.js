@@ -1,3 +1,4 @@
+// Generic drug brand explorer: middle-pane brand lists, form filtering, brand comparisons, and MOA modal tables.
 function loadGenericBrands(gid, gname) {
         currentGenericId = gid;
         if (gname) $('#midGenericName').text(gname);

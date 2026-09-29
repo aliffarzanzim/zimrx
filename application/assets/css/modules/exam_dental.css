@@ -1,6 +1,5 @@
-/* =======================================================
-   Dental Chart & FDI Odontogram Styles
-======================================================= */
+/* Dental odontogram, tooth grid arches, surfaces, and pathological status styles */
+
 .zrx-dental-top-bar {
     display: flex;
     align-items: center;
@@ -12,14 +11,14 @@
 .zrx-dental-mode-toggle {
     display: flex;
     gap: 0.35rem;
-    background: #e2e8f0;
+    background: var(--zrx-border-subtle);
     padding: 3px;
     border-radius: 6px;
 }
 .zrx-dental-type-btn {
     border: none;
     background: transparent;
-    color: #475569;
+    color: var(--zrx-slate-600);
     font-size: 0.72rem;
     font-weight: 600;
     padding: 3px 8px;
@@ -28,29 +27,29 @@
     transition: all 0.12s;
 }
 .zrx-dental-type-btn.active {
-    background: #ffffff;
-    color: #0f172a;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.1);
+    background: var(--zrx-bg-card);
+    color: var(--zrx-text-main);
+    box-shadow: var(--zrx-shadow-sm);
 }
 .zrx-dental-dmft-badge {
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
+    background: var(--zrx-blue-50);
+    border: 1px solid var(--zrx-blue-200);
     border-radius: 6px;
     padding: 3px 8px;
     font-size: 0.72rem;
-    color: #1e40af;
+    color: var(--zrx-blue-800);
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
 }
 .zrx-dental-dmft-badge strong {
-    color: #0f172a;
+    color: var(--zrx-text-main);
     font-weight: 700;
 }
 
 .zrx-odontogram-card {
-    background: #f8fafc;
-    border: 1px solid #cbd5e1;
+    background: var(--zrx-bg-subtle);
+    border: 1px solid var(--zrx-border);
     border-radius: 6px;
     padding: 0.65rem;
     margin-bottom: 0.65rem;
@@ -70,7 +69,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #64748b;
+    color: var(--zrx-text-muted);
     margin: 0.2rem 0;
 }
 .zrx-arch-row {
@@ -88,11 +87,11 @@
 .zrx-arch-midline {
     width: 2px;
     height: 38px;
-    background: #94a3b8;
+    background: var(--zrx-border-divider);
 }
 .zrx-tooth-btn {
-    border: 1px solid #cbd5e1;
-    background: #ffffff;
+    border: 1px solid var(--zrx-border);
+    background: var(--zrx-bg-card);
     border-radius: 4px;
     padding: 2px;
     width: 28px;
@@ -106,61 +105,62 @@
     user-select: none;
 }
 .zrx-tooth-btn:hover {
-    border-color: #2563eb;
-    background: #eff6ff;
+    border-color: var(--zrx-primary);
+    background: var(--zrx-blue-50);
 }
 .zrx-tooth-btn.active {
-    border-color: #0f172a;
-    box-shadow: 0 0 0 2px #0f172a;
+    border-color: var(--zrx-text-main);
+    box-shadow: 0 0 0 2px var(--zrx-text-main);
     transform: scale(1.05);
 }
 .zrx-tooth-num {
     font-size: 9px;
     font-weight: 700;
-    color: #475569;
+    color: var(--zrx-slate-600);
     line-height: 1;
 }
 .zrx-tooth-box {
     width: 18px;
     height: 18px;
-    border: 1px solid #94a3b8;
+    border: 1px solid var(--zrx-border-divider);
     border-radius: 3px;
-    background: #f1f5f9;
+    background: var(--zrx-slate-100);
     display: block;
     position: relative;
     transition: background 0.12s;
 }
 
-/* Tooth pathological status colors */
+/* Pathological status and restoration indicators */
+
 .zrx-tooth-btn.caries .zrx-tooth-box {
-    background: #ef4444;
-    border-color: #b91c1c;
+    background: var(--zrx-red-500);
+    border-color: var(--zrx-red-700);
 }
 .zrx-tooth-btn.filled .zrx-tooth-box {
-    background: #3b82f6;
-    border-color: #1d4ed8;
+    background: var(--zrx-blue-500);
+    border-color: var(--zrx-primary-hover);
 }
 .zrx-tooth-btn.missing .zrx-tooth-box {
-    background: #94a3b8;
-    border-color: #64748b;
+    background: var(--zrx-border-divider);
+    border-color: var(--zrx-text-muted);
     opacity: 0.6;
 }
 .zrx-tooth-btn.missing .zrx-tooth-box::after {
     content: "✕";
     font-size: 11px;
-    color: #ffffff;
+    color: var(--zrx-white);
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
 }
 .zrx-tooth-btn.rct .zrx-tooth-box {
-    background: #8b5cf6;
-    border-color: #6d28d9;
+    background: var(--zrx-violet-500);
+    border-color: var(--zrx-violet-700);
 }
 .zrx-tooth-btn.crown .zrx-tooth-box {
-    background: #f59e0b;
-    border-color: #b45309;
+    background: var(--zrx-amber-500);
+    border-color: var(--zrx-amber-700);
 }
 
 .zrx-arch-divider {
@@ -169,17 +169,17 @@
     justify-content: space-between;
     width: 90%;
     max-width: 520px;
-    border-top: 1px dashed #cbd5e1;
+    border-top: 1px dashed var(--zrx-border);
     margin: 0.35rem 0;
     padding-top: 0.2rem;
     font-size: 0.65rem;
     font-weight: 700;
-    color: #94a3b8;
+    color: var(--zrx-border-divider);
 }
 
 .zrx-dental-inspector-card {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
     border-radius: 6px;
     padding: 0.6rem;
     margin-bottom: 0.65rem;
@@ -192,11 +192,11 @@
     align-items: center;
     gap: 0.45rem;
     padding-bottom: 0.35rem;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--zrx-border-subtle);
 }
 .zrx-dental-insp-badge {
-    background: #dbeafe;
-    color: #1e40af;
+    background: var(--zrx-blue-100);
+    color: var(--zrx-blue-800);
     font-size: 0.7rem;
     font-weight: 800;
     padding: 2px 7px;
@@ -205,7 +205,7 @@
 .zrx-dental-insp-title {
     font-size: 0.8rem;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--zrx-text-main);
 }
 .zrx-dental-insp-grid {
     display: grid;
@@ -227,18 +227,18 @@
     display: inline-flex;
     align-items: center;
     gap: 2px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--zrx-border);
     border-radius: 3px;
     padding: 2px 5px;
     font-size: 0.68rem;
     font-weight: 600;
     cursor: pointer;
-    background: #ffffff;
+    background: var(--zrx-bg-card);
 }
 .zrx-dental-surf-pill:has(input:checked) {
-    background: #dbeafe;
-    border-color: #3b82f6;
-    color: #1e40af;
+    background: var(--zrx-blue-100);
+    border-color: var(--zrx-blue-500);
+    color: var(--zrx-blue-800);
 }
 .zrx-dental-surf-pill input {
     margin: 0;
@@ -246,7 +246,7 @@
 .zrx-dental-perio-row {
     display: flex;
     gap: 0.65rem;
-    border-top: 1px dashed #e2e8f0;
+    border-top: 1px dashed var(--zrx-border-subtle);
     padding-top: 0.45rem;
 }
 @media (max-width: 768px) {

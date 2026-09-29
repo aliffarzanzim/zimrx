@@ -1,11 +1,9 @@
-/**
- * ZimRx - Clinical Exam: Burn Assessment & Parkland
- */
+// Clinical burn assessment: Wallace Rule of Nines SVG mapping, TBSA estimation, and Parkland resuscitation calculation.
 (function() {
   'use strict';
 
   function initExamBurn() {
-    // 5. Burn Assessment & Parkland Resuscitation Handlers
+    // Burn assessment and Parkland resuscitation handlers
     const burnWrapper = document.getElementById('burn-assessment-wrapper');
     if (burnWrapper) {
       const activeSegments = new Set();

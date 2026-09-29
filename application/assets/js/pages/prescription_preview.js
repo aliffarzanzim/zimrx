@@ -1,3 +1,4 @@
+// Prescription preview data collector, snapshot builder, and print payload extractor.
 function collectRxPreviewDrugs() {
   const rows = document.querySelectorAll('#rx-tbody tr');
   return Array.from(rows).map((row) => {
@@ -878,9 +879,7 @@ function learnCurrentPcAutocompletes() {
   }).catch(() => {});
 }
 
-/**
- * Fetches pre-defined advice templates from the static database.
- */
+// Fetch predefined advice templates from static database
 async function fetchStaticAdviceTemplates() {
   try {
     const response = await fetch('api/get_static_advice.php');

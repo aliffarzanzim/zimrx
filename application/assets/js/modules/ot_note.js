@@ -1,6 +1,7 @@
+// Operation Theater (OT) notes module handling rich text editors, tab navigation, and table rows.
 document.addEventListener("DOMContentLoaded", function() {
     
-    // --- Tab Switching Logic ---
+    // Tab switching
     const tabs = document.querySelectorAll('.ot-tab');
     const panes = document.querySelectorAll('.ot-pane');
     let editorsInitialized = false;
@@ -24,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    // --- NicEditor Initialization ---
+    // NicEditor initialization
     function initOTEditors() {
         if (typeof bkLib === 'undefined') return;
 
@@ -50,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }, 100);
     }
 
-    // --- Table Row Management ---
+    // Table row management
     const tbody = document.getElementById('ot-tbody');
     const template = document.getElementById('ot-row-template');
     const addBtn = document.querySelector('.ot-add-row-btn');
@@ -75,7 +76,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // --- Textarea Auto-Resize ---
+    // Textarea auto-resize
     function autoResizeTextarea(textarea) {
         if (!textarea || textarea.tagName !== 'TEXTAREA') return;
         textarea.style.transition = 'none';

@@ -1,13 +1,11 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Migration 001 — Core identity, configuration, user accounts, and doctors schema
- */
+// Core identity tables: schema versioning, app config, doctor profiles, and auth accounts.
 class Migration001CoreIdentityTables {
 
     public function up(PDO $pdo): void {
-        // ---- zimrx_userdb_version ----
+        // Tracks legacy versioning metadata if imported from older databases
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_userdb_version (
                 id " . DbSql::intType() . " PRIMARY KEY CHECK (id = 1),
@@ -19,7 +17,7 @@ class Migration001CoreIdentityTables {
             )"
         );
 
-        // ---- zimrx_app_config ----
+        // Key-value store for system-wide application settings
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_app_config (
                 config_key VARCHAR(100) PRIMARY KEY NOT NULL,
@@ -28,7 +26,7 @@ class Migration001CoreIdentityTables {
             )"
         );
 
-        // ---- zimrx_doctors ----
+        // Doctor profiles with bilingual metadata for prescription headers
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_doctors (
                 id " . DbSql::autoIncrement() . ",
@@ -57,7 +55,7 @@ class Migration001CoreIdentityTables {
             )"
         );
 
-        // Ensure default doctor id=1 exists
+        // Seed default primary doctor so single-doctor clinics work out of the box
         $pdo->prepare(
             DbSql::insertIgnore(
                 'zimrx_doctors',
@@ -66,7 +64,7 @@ class Migration001CoreIdentityTables {
             )
         )->execute(['id' => 1, 'code' => 'D001', 'name' => 'Doctor', 'fname' => 'Doctor']);
 
-        // ---- zimrx_user_accounts ----
+        // User accounts for login and role-based access control
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_accounts (
                 id " . DbSql::autoIncrement() . ",
@@ -81,7 +79,7 @@ class Migration001CoreIdentityTables {
             )"
         );
 
-        // Ensure root admin account exists
+        // Seed default root superadmin (password: 123)
         $pdo->prepare(
             DbSql::insertIgnore(
                 'zimrx_user_accounts',
@@ -93,7 +91,7 @@ class Migration001CoreIdentityTables {
             'password_hash' => password_hash('123', PASSWORD_DEFAULT),
         ]);
 
-        // ---- zimrx_assistants ----
+        // Assistant profiles and doctor-assistant delegation mappings
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_assistants (
                 id " . DbSql::autoIncrement() . ",
@@ -111,7 +109,6 @@ class Migration001CoreIdentityTables {
             )"
         );
 
-        // ---- zimrx_doctor_assistants ----
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_doctor_assistants (
                 id " . DbSql::autoIncrement() . ",
@@ -124,9 +121,9 @@ class Migration001CoreIdentityTables {
             )"
         );
 
-        // Indexes
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_users_doctor_id ON zimrx_user_accounts(doctor_id)");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_zimrx_doctor_assistants_doctor ON zimrx_doctor_assistants(doctor_id, is_active)");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_zimrx_doctor_assistants_assistant ON zimrx_doctor_assistants(assistant_user_id, is_active)");
     }
 }
+

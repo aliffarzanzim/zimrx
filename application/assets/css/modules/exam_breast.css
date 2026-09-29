@@ -1,9 +1,8 @@
-/* =======================================================
-   Breast Examination Diagram & Lesion Mapping
-======================================================= */
+/* Breast examination interactive SVG diagram, lesion markers, and staging controls */
+
 .zrx-breast-diagram-section {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: var(--zrx-bg-subtle);
+    border: 1px solid var(--zrx-border-subtle);
     border-radius: 6px;
     padding: 0.6rem 0.75rem;
     display: flex;
@@ -18,11 +17,11 @@
 .zrx-diagram-title {
     font-size: 0.78rem;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--zrx-slate-800);
 }
 .zrx-diagram-subtitle {
     font-size: 0.70rem;
-    color: #64748b;
+    color: var(--zrx-text-muted);
 }
 .zrx-breast-diagrams-grid {
     display: grid;
@@ -35,15 +34,15 @@
     }
 }
 .zrx-breast-diagram-card {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
     border-radius: 6px;
     padding: 0.45rem 0.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.35rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    box-shadow: var(--zrx-shadow-sm);
 }
 .zrx-diagram-card-top {
     width: 100%;
@@ -51,28 +50,28 @@
     justify-content: space-between;
     align-items: center;
     padding-bottom: 0.25rem;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--zrx-slate-100);
 }
 .zrx-diagram-name {
     font-size: 0.75rem;
     font-weight: 700;
-    color: #334155;
+    color: var(--zrx-slate-700);
 }
 .zrx-diagram-btn-clear {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
     border-radius: 3px;
     font-size: 0.66rem;
     font-weight: 600;
-    color: #64748b;
+    color: var(--zrx-text-muted);
     padding: 1px 6px;
     cursor: pointer;
     transition: all 0.12s;
 }
 .zrx-diagram-btn-clear:hover {
-    background: #fee2e2;
-    border-color: #f87171;
-    color: #dc2626;
+    background: var(--zrx-red-100);
+    border-color: var(--zrx-red-400);
+    color: var(--zrx-red-600);
 }
 .zrx-svg-canvas-wrap {
     display: flex;
@@ -90,18 +89,18 @@
     transition: stroke 0.15s;
 }
 .zrx-breast-svg:hover .zrx-svg-breast-outer {
-    stroke: #2563eb;
+    stroke: var(--zrx-primary);
 }
 .zrx-svg-hour {
     font-size: 8px;
     font-weight: 700;
-    fill: #64748b;
+    fill: var(--zrx-text-muted);
     pointer-events: none;
 }
 .zrx-svg-label-tail {
     font-size: 7.5px;
     font-weight: 700;
-    fill: #64748b;
+    fill: var(--zrx-text-muted);
     pointer-events: none;
 }
 .zrx-svg-pin {
@@ -119,24 +118,24 @@
 }
 .zrx-diagram-empty-hint {
     font-size: 0.72rem;
-    color: #64748b;
+    color: var(--zrx-text-muted);
     font-style: italic;
     text-align: center;
     padding: 0.45rem 0.6rem;
-    background: #ffffff;
-    border: 1px dashed #cbd5e1;
+    background: var(--zrx-bg-card);
+    border: 1px dashed var(--zrx-border);
     border-radius: 4px;
 }
 .zrx-lesion-card {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
-    border-left: 3px solid #ef4444;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
+    border-left: 3px solid var(--zrx-red-500);
     border-radius: 5px;
     padding: 0.45rem 0.6rem;
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    box-shadow: var(--zrx-shadow-sm);
 }
 .zrx-lesion-header {
     display: flex;
@@ -149,8 +148,8 @@
     gap: 0.4rem;
 }
 .zrx-lesion-badge {
-    background: #fee2e2;
-    color: #b91c1c;
+    background: var(--zrx-red-100);
+    color: var(--zrx-red-700);
     font-size: 0.66rem;
     font-weight: 700;
     padding: 1px 5px;
@@ -159,7 +158,7 @@
 }
 .zrx-lesion-title {
     font-size: 0.74rem;
-    color: #1e293b;
+    color: var(--zrx-slate-800);
     font-weight: 500;
 }
 .zrx-lesion-del-btn {
@@ -167,15 +166,15 @@
     border: none;
     font-size: 1.15rem;
     line-height: 1;
-    color: #94a3b8;
+    color: var(--zrx-border-divider);
     cursor: pointer;
     padding: 0 4px;
     border-radius: 3px;
     transition: all 0.12s;
 }
 .zrx-lesion-del-btn:hover {
-    color: #dc2626;
-    background: #fee2e2;
+    color: var(--zrx-red-600);
+    background: var(--zrx-red-100);
 }
 .zrx-lesion-body {
     display: grid;
@@ -196,16 +195,17 @@
 .zrx-lesion-field label {
     font-size: 0.66rem;
     font-weight: 600;
-    color: #64748b;
+    color: var(--zrx-text-muted);
 }
 
-/* Clinical Category (E1 - E5) Bar */
+/* Clinical category score selector (E1 - E5) */
+
 .zrx-exam-e-score-bar {
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: var(--zrx-bg-subtle);
+    border: 1px solid var(--zrx-border-subtle);
     border-radius: 6px;
     padding: 0.4rem 0.65rem;
     flex-wrap: wrap;
@@ -213,7 +213,7 @@
 .zrx-exam-e-score-label {
     font-size: 0.72rem;
     font-weight: 700;
-    color: #334155;
+    color: var(--zrx-slate-700);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -223,43 +223,43 @@
     gap: 0.35rem;
 }
 .zrx-e-btn {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
     border-radius: 4px;
     padding: 2px 8px;
     font-size: 0.72rem;
     font-weight: 600;
-    color: #475569;
+    color: var(--zrx-slate-600);
     cursor: pointer;
     transition: all 0.14s ease-in-out;
 }
 .zrx-e-btn:hover {
-    background: #f1f5f9;
-    border-color: #94a3b8;
+    background: var(--zrx-slate-100);
+    border-color: var(--zrx-border-divider);
 }
 .zrx-e-btn.active[data-escore="E1"] {
-    background: #10b981;
-    color: #ffffff;
-    border-color: #059669;
+    background: var(--zrx-emerald-500);
+    color: var(--zrx-white);
+    border-color: var(--zrx-emerald-600);
 }
 .zrx-e-btn.active[data-escore="E2"] {
-    background: #0284c7;
-    color: #ffffff;
-    border-color: #0369a1;
+    background: var(--zrx-blue-600);
+    color: var(--zrx-white);
+    border-color: var(--zrx-blue-700);
 }
 .zrx-e-btn.active[data-escore="E3"] {
-    background: #f59e0b;
-    color: #ffffff;
-    border-color: #d97706;
+    background: var(--zrx-amber-500);
+    color: var(--zrx-white);
+    border-color: var(--zrx-amber-600);
 }
 .zrx-e-btn.active[data-escore="E4"] {
-    background: #ea580c;
-    color: #ffffff;
-    border-color: #c2410c;
+    background: var(--zrx-orange-700);
+    color: var(--zrx-white);
+    border-color: var(--zrx-orange-700);
 }
 .zrx-e-btn.active[data-escore="E5"] {
-    background: #dc2626;
-    color: #ffffff;
-    border-color: #b91c1c;
+    background: var(--zrx-red-600);
+    color: var(--zrx-white);
+    border-color: var(--zrx-red-700);
 }
 

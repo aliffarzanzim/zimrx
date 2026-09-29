@@ -1,7 +1,4 @@
-/**
- * ZimRx - Manufacturer Preferences Module Controller
- * Auto-extracted from manufacturer_preferences.php
- */
+// Pharmaceutical manufacturer preferences page managing custom rankings, hidden brands, and directories.
 document.addEventListener('DOMContentLoaded', () => {
     let customRanked = [];
     let allManufacturers = [];
@@ -61,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dirCountEl.textContent = allManufacturers.length + ' Companies';
     };
 
-    // Render Custom Ranked List (Left Panel)
+    // Custom ranked list rendering
     const renderCustomList = () => {
         if (customRanked.length === 0) {
             customListEl.innerHTML = `
@@ -125,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bindCustomDragEvents();
     };
 
-    // Render Directory List (Right Panel)
+    // Directory list rendering
     const renderDirectoryList = () => {
         const query = searchInput.value.toLowerCase().trim();
         const customIds = new Set(customRanked.map(c => String(c.id)));
@@ -207,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dirListEl.innerHTML = html;
     };
 
-    // Reorder Handlers
+    // Reordering handlers
     customListEl.addEventListener('click', (e) => {
         const topBtn = e.target.closest('.btn-move-top');
         if (topBtn) {
@@ -260,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Directory Action Handlers
+    // Directory actions
     dirListEl.addEventListener('click', async (e) => {
         const addBtn = e.target.closest('.btn-add-priority');
         if (addBtn) {
@@ -313,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Filter Chips
+    // Filter chip handlers
     document.querySelectorAll('.mpref-chip').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.mpref-chip').forEach(b => b.classList.remove('active'));
@@ -323,12 +320,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Live Search input
+    // Search filtering
     searchInput.addEventListener('input', () => {
         renderDirectoryList();
     });
 
-    // Save All Changes
+    // Save preferences
     saveBtn.addEventListener('click', async () => {
         saveBtn.disabled = true;
         saveBtn.textContent = 'Saving...';
@@ -364,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Reset Defaults
+    // Reset to defaults
     resetBtn.addEventListener('click', async () => {
         if (!confirm('Are you sure you want to reset all manufacturer priorities back to the national default ranking?')) {
             return;
@@ -389,7 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Drag and Drop implementation
+    // Drag and drop reordering
     let draggedIndex = null;
 
     function bindCustomDragEvents() {

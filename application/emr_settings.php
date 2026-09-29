@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// EMR settings: annual patient capacity, daily visit volume, ID formats (sequential vs random), and auto-expansion.
+
 require_once 'auth.php';
 require_login();
 require_once 'db.php';
@@ -49,16 +51,16 @@ include 'header.php';
 
 <link rel="stylesheet" href="assets/css/pages/emr_settings.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/emr_settings.css') ?>">
 
-<div class="layout-editor-page">
+<div class="layout-editor-page zrx-page-container">
 
-    <!-- ── Header matching Print Setup & Page Setup ─────────── -->
+    <!-- Header -->
     <div class="layout-editor-heading">
         <div>
             <h1>EMR Settings</h1>
             <p>Configure patient registration numbering, daily encounter IDs, and traffic capacity rules.</p>
         </div>
         <div class="layout-editor-heading-actions">
-            <span class="dimension-chip" style="color: #2563eb; background: #eff6ff; border-color: #bfdbfe;">
+            <span class="dimension-chip emr-dimension-chip">
                 <?= $isMultiDoctor ? '🏢 Multi-Doctor Setup' : '🩺 Solo Doctor Setup' ?>
             </span>
             <button type="button" class="btn btn-outline" id="factory-reset-btn">Reset to Defaults</button>
@@ -66,34 +68,34 @@ include 'header.php';
         </div>
     </div>
 
-    <!-- ── Flash Toast ──────────────────────────────────────── -->
+    <!-- Flash Toast -->
     <?php if ($flash): ?>
-        <div class="admin-flash" style="<?= $flashType === 'error' ? 'background: #fef2f2; color: #b91c1c; border: 1px solid #fca5a5;' : 'background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;' ?> margin-top: 1rem; margin-bottom: 0;">
+        <div class="admin-flash emr-flash-alert <?= $flashType === 'error' ? 'emr-flash-error' : 'emr-flash-success' ?>">
             <?= htmlspecialchars($flash) ?>
         </div>
     <?php endif; ?>
 
-    <!-- ── Reset Confirmation Modal ──────────────────────────── -->
+    <!-- Reset Confirmation Modal -->
     <div id="emr-confirm-modal" class="print-setup-toast" hidden>
-        <div class="print-setup-toast-panel" role="dialog" aria-modal="true" style="width: min(100%, 380px); text-align: center; gap: 1.25rem; background: #ffffff; padding: 1.75rem; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.25); border: 1px solid #cbd5e1;">
-            <div style="font-size: 2.25rem; line-height: 1;">⚠️</div>
-            <strong style="font-size: 1.15rem; color: #1e293b; display: block;">Reset to Defaults?</strong>
-            <p style="font-size: 0.875rem; color: #64748b; margin: 0; line-height: 1.5;">
+        <div class="print-setup-toast-panel emr-reset-modal-panel" role="dialog" aria-modal="true">
+            <div class="emr-reset-modal-icon">⚠️</div>
+            <strong class="emr-reset-modal-title">Reset to Defaults?</strong>
+            <p class="emr-reset-modal-desc">
                 Are you sure you want to restore the EMR patient flow limits and identity formats to default settings?
             </p>
-            <div style="display: flex; gap: 0.75rem; width: 100%; justify-content: center; margin-top: 0.5rem;">
-                <button type="button" id="confirm-reset-cancel" class="btn btn-outline" style="flex: 1; padding: 0.5rem 1rem;">Cancel</button>
-                <button type="button" id="confirm-reset-proceed" class="btn btn-primary" style="flex: 1; padding: 0.5rem 1rem; background: #dc2626; border-color: #dc2626;">Yes, Reset</button>
+            <div class="emr-reset-modal-actions">
+                <button type="button" id="confirm-reset-cancel" class="btn btn-outline emr-btn-modal-cancel">Cancel</button>
+                <button type="button" id="confirm-reset-proceed" class="btn btn-primary emr-btn-modal-confirm">Yes, Reset</button>
             </div>
         </div>
     </div>
 
-    <!-- ── Settings Form ────────────────────────────────────── -->
+    <!-- Settings Form -->
     <form method="post" id="emr-settings-form" class="emr-settings-body">
 
         <div class="emr-layout-grid">
 
-            <!-- ── LEFT COLUMN: Flow Limits & Auto-Expansion ────── -->
+            <!-- Left Column: Flow Limits -->
             <div>
                 <!-- Capacity Limits Card -->
                 <div class="emr-section-card">
@@ -154,8 +156,8 @@ include 'header.php';
                     <label class="emr-toggle-card">
                         <input type="checkbox" name="auto_expand" value="1" <?= !empty($settings['auto_expand']) ? 'checked' : '' ?>>
                         <div>
-                            <strong style="color: #0f172a; font-size: 0.88rem;">Auto-Upgrade Digit Capacity on Rush Overflows</strong>
-                            <p class="emr-field-hint" style="margin-top: 0.2rem;">
+                            <strong class="emr-toggle-title">Auto-Upgrade Digit Capacity on Rush Overflows</strong>
+                            <p class="emr-field-hint emr-field-hint-spacing">
                                 If your clinic encounters an unexpected patient surge exceeding your limit (e.g. Patient 1,000 on a 3-digit limit), the system automatically expands the ID length without errors and permanently upgrades your settings to maintain uniform string length for all future days.
                             </p>
                         </div>
@@ -163,7 +165,7 @@ include 'header.php';
                 </div>
             </div>
 
-            <!-- ── RIGHT COLUMN: Registration ID & Visit ID ─────── -->
+            <!-- Right Column: Registration & Visit ID -->
             <div>
                 <!-- Registration ID Card -->
                 <div class="emr-section-card">
@@ -174,7 +176,7 @@ include 'header.php';
                         </h2>
                         <span class="emr-chip-tag" id="reg-digit-badge">5 Digits</span>
                     </div>
-                    <div class="emr-field-hint" style="margin-bottom: 0.5rem;">
+                    <div class="emr-field-hint emr-field-hint-mb">
                         Prefix: <strong>P + 2-digit Year</strong> (e.g. <code>P<?= date('y') ?></code> for <?= date('Y') ?>). Choose whether the annual sequence is sequential or obfuscated random.
                     </div>
 
@@ -216,7 +218,7 @@ include 'header.php';
                         </h2>
                         <span class="emr-chip-tag" id="visit-digit-badge">3 Digits</span>
                     </div>
-                    <div class="emr-field-hint" style="margin-bottom: 0.5rem;">
+                    <div class="emr-field-hint emr-field-hint-mb">
                         Prefix: <strong>V + 6-digit Date</strong> (e.g. <code>V<?= date('ymd') ?></code> for <?= date('d M Y') ?>). Choose whether the daily encounter sequence is sequential or obfuscated.
                     </div>
 
@@ -252,20 +254,20 @@ include 'header.php';
 
         </div>
 
-        <!-- ── FULL WIDTH: Live Dynamic ID Preview Console ──────── -->
+        <!-- Dynamic ID Preview Console -->
         <div class="emr-preview-shell">
             <div class="emr-preview-head">
                 <h3>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                     Live Dynamic ID Preview (Real-Time Output)
                 </h3>
-                <span style="font-size: 0.72rem; color: #94a3b8; font-family: monospace;">Auto-Updating</span>
+                <span class="emr-preview-badge-status">Auto-Updating</span>
             </div>
             <div class="emr-preview-grid">
                 <div class="emr-preview-item">
                     <div class="emr-preview-label">
                         <span>Patient Registration ID (`reg_no`)</span>
-                        <span id="preview-reg-tag" style="color: #38bdf8;">5 Digits</span>
+                        <span id="preview-reg-tag" class="emr-preview-tag-cyan">5 Digits</span>
                     </div>
                     <div class="emr-preview-code" id="preview-reg-val">P<?= date('y') ?>00001</div>
                     <div class="emr-preview-sub" id="preview-reg-meta">Sequential Mode &bull; Up to 99,999 patients/yr</div>
@@ -274,7 +276,7 @@ include 'header.php';
                 <div class="emr-preview-item">
                     <div class="emr-preview-label">
                         <span>Visit Encounter ID (`visit_id`)</span>
-                        <span id="preview-visit-tag" style="color: #38bdf8;">3 Digits</span>
+                        <span id="preview-visit-tag" class="emr-preview-tag-cyan">3 Digits</span>
                     </div>
                     <div class="emr-preview-code" id="preview-visit-val">V<?= date('ymd') ?>001</div>
                     <div class="emr-preview-sub" id="preview-visit-meta">Sequential Mode &bull; Up to 999 patients/day</div>

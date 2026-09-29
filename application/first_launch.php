@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// First launch wizard: onboarding flow for installation type, admin password, recovery key, and initial doctor letterhead.
+
 require_once 'auth.php';
 require_once 'db.php';
 
@@ -85,10 +87,10 @@ if ($step === 3 && !is_logged_in()) {
             <div class="error-msg" id="errorMsg"></div>
 
             <?php if ($step === 1): ?>
-            <!-- ── STEP 1: Welcome ───────────────────────── -->
+            <!-- Step 1: Welcome -->
             <div class="step-panel active" id="panel1">
-                <p style="color:#94a3b8;line-height:1.7;margin-bottom:1.5rem;font-size:0.95rem;">
-                    ZimRx helps you write, manage, and print professional bilingual prescriptions — completely free.
+                <p class="fl-desc-lead">
+                    ZimRx helps you write, manage, and print professional bilingual prescriptions, completely free.
                     <br><br>
                     Let's get you set up in under a minute.
                 </p>
@@ -98,7 +100,7 @@ if ($step === 3 && !is_logged_in()) {
             </div>
 
             <?php elseif ($step === 2): ?>
-            <!-- ── STEP 2: Setup ──────────────────────────── -->
+            <!-- Step 2: Setup -->
             <div class="step-panel active" id="panel2">
 
                 <div class="section-label">Installation Type</div>
@@ -141,18 +143,18 @@ if ($step === 3 && !is_logged_in()) {
                 </div>
 
                 <?php if (!$isLoopback): ?>
-                <div class="section-label" style="color: #fbbf24;">Server Setup Token</div>
-                <div class="field" style="margin-bottom: 1.25rem;">
-                    <label>Setup Token <span style="color:#64748b;font-weight:400">(from userdata/setup_token.txt)</span></label>
-                    <input type="text" id="setupToken" value="<?= htmlspecialchars($queryToken, ENT_QUOTES, 'UTF-8') ?>" placeholder="Paste setup token generated on server host" autocomplete="off" style="font-family: monospace;">
-                    <small style="color: #94a3b8; display: block; margin-top: 0.35rem;">Because this setup wizard is accessed over the network, please enter the security token found in <code>userdata/setup_token.txt</code> on the server to claim administration.</small>
+                <div class="section-label" class="fl-warn-icon">Server Setup Token</div>
+                <div class="field" class="recovery-box fl-mb-20">
+                    <label>Setup Token <span class="fl-label-opt">(from userdata/setup_token.txt)</span></label>
+                    <input type="text" id="setupToken" value="<?= htmlspecialchars($queryToken, ENT_QUOTES, 'UTF-8') ?>" placeholder="Paste setup token generated on server host" autocomplete="off" class="fl-mono">
+                    <small class="fl-field-hint">Because this setup wizard is accessed over the network, please enter the security token found in <code>userdata/setup_token.txt</code> on the server to claim administration.</small>
                 </div>
                 <?php endif; ?>
 
                 <div class="section-label">Security</div>
                 <div class="field-row">
                     <div class="field">
-                        <label>Password <span style="color:#64748b;font-weight:400">(min 14 chars)</span></label>
+                        <label>Password <span class="fl-label-opt">(min 14 chars)</span></label>
                         <input type="password" id="password" placeholder="At least 14 characters">
                     </div>
                     <div class="field">
@@ -162,7 +164,7 @@ if ($step === 3 && !is_logged_in()) {
                 </div>
 
                 <div class="field">
-                    <label>Recovery Email <span style="color:#64748b;font-weight:400">(for password reset)</span></label>
+                    <label>Recovery Email <span class="fl-label-opt">(for password reset)</span></label>
                     <input type="email" id="recoveryEmail" placeholder="doctor@example.com">
                 </div>
 
@@ -186,7 +188,7 @@ if ($step === 3 && !is_logged_in()) {
             </div>
 
             <?php elseif ($step === 3): ?>
-            <!-- ── STEP 3: Doctor Onboarding ──────────────── -->
+            <!-- Step 3: Doctor Onboarding -->
             <div class="step-panel active" id="panel3">
                 <?php
                 // Show recovery key if just set up
@@ -203,7 +205,7 @@ if ($step === 3 && !is_logged_in()) {
                 </div>
                 <?php endif; ?>
 
-                <p style="color:#94a3b8;font-size:0.88rem;margin-bottom:1.25rem;">
+                <p class="fl-desc-sub">
                     Fill in your profile to set up your prescription letterhead. You can always update this later from settings.
                 </p>
 
@@ -287,7 +289,7 @@ if ($step === 3 && !is_logged_in()) {
                     </div>
                 </div>
 
-                <div class="btn-row" style="margin-top:1.5rem;">
+                <div class="btn-row" class="fl-mt-24">
                     <button class="btn btn-primary" id="btnSaveDoctor" onclick="saveDoctor()">Save & Enter ZimRx →</button>
                 </div>
                 <div class="step3-skip">

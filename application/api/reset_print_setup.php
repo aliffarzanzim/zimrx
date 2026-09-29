@@ -1,4 +1,5 @@
 <?php
+// Resets print setup configuration back to defaults for the active doctor.
 declare(strict_types=1);
 
 require_once __DIR__ . '/../auth.php';

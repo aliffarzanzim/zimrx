@@ -1,8 +1,11 @@
 <?php
 declare(strict_types=1);
 
+// Drug catalog querying, phonetic search tokenization, brand/generic matching heuristics, and user customizations.
+
 require_once __DIR__ . '/user_drug_lib.php';
 
+// Concatenates therapeutic class names matching a drug's generic ID
 function drug_catalog_class_expr(string $genericExpr = 'p.generic_id'): string {
     return "COALESCE((
         SELECT GROUP_CONCAT(tc.class_name, ', ')
@@ -11,6 +14,7 @@ function drug_catalog_class_expr(string $genericExpr = 'p.generic_id'): string {
     ), '')";
 }
 
+// Complete column projection including safety alerts, pregnancy categories, and manufacturer rankings
 function drug_catalog_select_sql(): string {
     return "
         p.brand_id AS id,
@@ -134,6 +138,7 @@ function drug_catalog_normalize_search_text(string $value): string {
     return preg_replace('/\s+/', ' ', $value) ?: '';
 }
 
+// Normalize dosage form terms (e.g. tablet -> tab, syrup -> syp) for uniform autocomplete matching
 function drug_catalog_canonical_search_text(string $value): string {
     $aliases = [
         'tablet' => 'tab',
@@ -250,6 +255,7 @@ function drug_catalog_row_matches_all_tokens(array $row, array $tokens): bool {
     return true;
 }
 
+// Calculate relevance score: favors exact prefix matches on brand name, followed by word starts and multi-token coverage
 function drug_catalog_row_score(array $row, string $query): int {
     $canonicalQuery = drug_catalog_canonical_search_text($query);
     $tokens = drug_catalog_search_tokens($query);
@@ -302,6 +308,7 @@ function drug_catalog_fetch_search_rows(PDO $pdo, string $column, string $operat
     return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 }
 
+// Multi-stage drug search: brand prefix -> generic prefix -> substring fallback, sorted by clinical relevance
 function drug_catalog_search_brands(PDO $pdo, string $query, int $limit = 50, int $candidateLimit = 120): array {
     $query = trim($query);
     if ($query === '') {

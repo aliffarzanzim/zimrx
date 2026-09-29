@@ -1,4 +1,8 @@
-<?php declare(strict_types=1); ?>
+<?php
+declare(strict_types=1);
+
+// Uploaded Reports module: patient document attachments list, local file picker, and QR code phone upload modal.
+?>
 <div id="uploaded-reports-wrapper" class="reports-wrapper reports-single-wrapper">
     <section class="reports-section reports-upload-section">
         <div class="reports-section-header">
@@ -19,25 +23,25 @@
             </button>
         </div>
 
-        <div id="reports-upload-table-container" class="reports-panel reports-upload-table-container" style="display: none;">
+        <div id="reports-upload-table-container" class="reports-panel reports-upload-table-container is-hidden">
             <div class="pc-table-container reports-table-container">
-                <table class="pc-table reports-upload-table" id="reports-upload-table" style="border-style: hidden; margin-bottom: 0;">
+                <table class="pc-table reports-upload-table" id="reports-upload-table">
                     <colgroup>
-                        <col style="width: 32px;">
-                        <col style="width: 42px;">
-                        <col style="width: 32%;">
-                        <col style="width: 18%;">
-                        <col style="width: 25%;">
-                        <col style="width: 110px;">
+                        <col class="col-up-del">
+                        <col class="col-up-name">
+                        <col class="col-up-type">
+                        <col class="col-up-date">
+                        <col class="col-up-file">
+                        <col class="col-up-actions">
                     </colgroup>
                     <thead>
                         <tr>
-                            <th style="text-align: center; border-left: none;"></th>
-                            <th style="text-align: center;">#</th>
-                            <th style="text-align: left;">Report Name</th>
-                            <th style="text-align: center;">Date</th>
-                            <th style="text-align: left;">File Name</th>
-                            <th style="text-align: center; border-right: none;">Actions</th>
+                            <th class="th-rep-first"></th>
+                            <th class="text-center">#</th>
+                            <th class="text-left">Report Name</th>
+                            <th class="text-center">Date</th>
+                            <th class="text-left">File Name</th>
+                            <th class="th-rep-last">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="reports-upload-tbody"></tbody>
@@ -46,7 +50,7 @@
         </div>
 
         <div class="reports-upload-area">
-            <input type="file" id="report-file-input" style="display: none;" accept="image/*,application/pdf">
+            <input type="file" id="report-file-input" class="is-hidden" accept="image/*,application/pdf">
             <button type="button" id="report-upload-btn" class="report-upload-btn">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                 Upload Document (PDF/Image)
@@ -56,7 +60,7 @@
 
     <template id="reports-upload-template">
         <tr class="pc-row" draggable="true">
-            <td class="pc-action pc-drag" style="border-left: none;">
+            <td class="pc-action pc-drag td-rep-del-borderless">
                 <button type="button" class="pc-row-move-btn" title="Move Row">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="19 9 22 12 19 15"></polyline><polyline points="9 19 12 22 15 19"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>
                 </button>
@@ -66,21 +70,21 @@
             <td>
                 <input type="text" class="pc-input custom-date-picker upload-date-input" autocomplete="off" placeholder="DD/MM/YYYY">
             </td>
-            <td style="vertical-align: middle; padding: 0 10px;">
-                <span class="upload-filename-display" style="font-size: 0.85rem; color: #475569; word-break: break-all; font-weight: 500;"></span>
+            <td class="td-upload-filename">
+                <span class="upload-filename-display"></span>
                 <input type="hidden" class="upload-file-path">
             </td>
-            <td class="pc-action" style="vertical-align: middle; border-right: none;">
-                <div style="display: flex; gap: 6px; justify-content: center; align-items: center; height: 100%;">
-                    <a href="#" target="_blank" class="upload-view-btn" style="padding: 3px 8px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-decoration: none;">View</a>
-                    <button type="button" class="upload-del-btn" style="padding: 3px 8px; background: #ffffff; color: #b91c1c; border: 1px solid #94a3b8; border-radius: 4px; font-size: 0.75rem; font-weight: 700; cursor: pointer; box-shadow: 0 1px 1px rgba(0,0,0,0.05);">Del</button>
+            <td class="pc-action td-upload-actions">
+                <div class="upload-actions-wrap">
+                    <a href="#" target="_blank" class="upload-view-btn upload-view-btn-custom">View</a>
+                    <button type="button" class="upload-del-btn upload-del-btn-custom">Del</button>
                 </div>
             </td>
         </tr>
     </template>
 
     <!-- Phone Upload QR Code Modal -->
-    <div class="phone-upload-modal" id="phone-upload-modal" hidden style="display: none;">
+    <div class="phone-upload-modal" id="phone-upload-modal" hidden>
         <div class="phone-upload-backdrop" data-phone-upload-close></div>
         <div class="phone-upload-panel" role="dialog" aria-modal="true" aria-labelledby="phone-upload-title">
             <div class="phone-upload-header">
@@ -106,7 +110,7 @@
                         <span class="pup-label">Active Patient:</span>
                         <strong id="pup-patient-name">Walk-in Patient</strong>
                     </div>
-                    <div id="pup-patient-reg-wrap" style="display: none;">
+                    <div id="pup-patient-reg-wrap" class="is-hidden">
                         <span class="pup-label">Reg:</span>
                         <strong id="pup-patient-reg">--</strong>
                     </div>
@@ -116,7 +120,7 @@
                 <div class="phone-upload-qr-container">
                     <div class="phone-upload-qr-box" id="phone-upload-qr-box">
                         <div class="phone-upload-spinner" id="phone-upload-spinner">Generating QR Code...</div>
-                        <img id="phone-upload-qr-img" src="" alt="QR Code for Mobile Upload" style="display: none;">
+                        <img id="phone-upload-qr-img" src="" alt="QR Code for Mobile Upload" class="is-hidden">
                     </div>
                     <div class="phone-upload-instructions">
                         <ol>
@@ -145,4 +149,4 @@
     </div>
 </div>
 
-<script src="assets/js/modules/uploaded_reports_module.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/uploaded_reports_module.js') ?>"></script>
+<script src="assets/js/modules/uploaded_reports.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/uploaded_reports.js') ?>"></script>

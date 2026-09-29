@@ -1,3 +1,4 @@
+// Drug instruction templates management page handling phrases, dosage form chips, pinned ordering, and drag-and-drop.
 document.addEventListener('DOMContentLoaded', () => {
     const body = document.getElementById('instruction-template-body');
     const status = document.getElementById('instruction-template-status');
@@ -374,21 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /**
-     * Rebuild the full row list with new sequential sort_orders after a drag-drop.
-     *
-     * For unpinned drag:
-     *   - Unpinned rows are in their new display order.
-     *   - Each pinned row is re-inserted at its logical position: after the last unpinned
-     *     row whose ORIGINAL sort_order is less than the pinned row's original sort_order.
-     *   - This keeps pinned rows anchored relative to the items that originally surrounded
-     *     them, even when unpinned items cross the pinned item's position.
-     *
-     * For pinned drag:
-     *   - The set of sort_order slots used by pinned rows is redistributed among them in
-     *     their new display order, so they swap positions in the logical list.
-     *   - Unpinned rows are unchanged.
-     */
+    // Rebuild full row list with sequential sort orders after drag-and-drop, preserving pinned anchors.
     function buildNewRowOrder(domOrderedKeys, previousRows, draggedSection) {
         const rowMap = new Map(previousRows.map((r) => [r.client_key, r]));
         const origSort = new Map(previousRows.map((r) => [r.client_key, r.sort_order]));

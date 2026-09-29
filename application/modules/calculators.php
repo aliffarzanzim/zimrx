@@ -1,17 +1,21 @@
-<?php declare(strict_types=1); ?>
-<div id="calculators-wrapper" style="background: #e2e8f0; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; height: 100%;">
+<?php
+declare(strict_types=1);
+
+// Clinical calculators panel: BMI, insulin dosing, pediatric Z-score, BMR/TDEE, eGFR/CrCl, EDD, and vaccine schedules.
+?>
+<div id="calculators-wrapper" class="calculators-module-wrapper">
     
-    <div style="display: flex; flex-direction: column;">
+    <div class="calc-header-wrap">
         <!-- Centered Module Title -->
-        <h3 style="text-align: center; font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-top: 0; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'SolaimanLipi', sans-serif;">
+        <h3 class="calc-module-heading">
             Calculators
         </h3>
 
         <!-- Main Card Body -->
-        <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 4px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+        <div class="calc-main-card">
             
             <!-- Tabs -->
-            <div style="display: flex; flex-wrap: wrap; background: #f8fafc; border-bottom: 1px solid #cbd5e1;">
+            <div class="calc-tabs-bar">
                 <button type="button" class="calc-tab-btn active" data-target="pane-bmi">BMI</button>
                 <button type="button" class="calc-tab-btn" data-target="pane-insulin">Insulin</button>
                 <button type="button" class="calc-tab-btn" data-target="pane-zscore">Z-Score</button>
@@ -23,7 +27,7 @@
             </div>
 
             <!-- Panes Container -->
-            <div style="padding: 20px;">
+            <div class="calc-panes-body">
                 
                 <!-- 1. BMI Pane -->
                 <div class="calc-pane active" id="pane-bmi">
@@ -41,12 +45,12 @@
                             <input type="number" id="bmi-in" class="calc-inp calc-trigger-bmi" placeholder="0">
                         </div>
                     </div>
-                    <div class="calc-row" style="background: #f8fafc; padding: 15px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                    <div class="calc-row calc-result-box">
                         <div class="calc-col">
                             <label class="calc-label">BMI Result</label>
                             <input type="text" id="bmi-res" class="calc-inp" readonly>
                         </div>
-                        <div class="calc-col" style="flex: 1.5;">
+                        <div class="calc-col calc-col-flex-15">
                             <label class="calc-label">Class</label>
                             <input type="text" id="bmi-cls" class="calc-inp" readonly>
                         </div>
@@ -76,14 +80,14 @@
                             </select>
                         </div>
                     </div>
-                    <div class="calc-row" style="background: #f8fafc; padding: 15px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                    <div class="calc-row calc-result-box">
                         <div class="calc-col">
                             <label class="calc-label">Total Unit</label>
                             <input type="text" id="ins-total" class="calc-inp" readonly>
                         </div>
-                        <div class="calc-col" style="flex: 2;">
+                        <div class="calc-col calc-col-flex-20">
                             <label class="calc-label">Dose Distribution</label>
-                            <input type="text" id="ins-dose" class="calc-inp" readonly style="font-family: 'SolaimanLipi', sans-serif; font-size: 1rem;">
+                            <input type="text" id="ins-dose" class="calc-inp calc-inp-dose" readonly>
                         </div>
                     </div>
                 </div>
@@ -91,7 +95,7 @@
                 <!-- 3. Z-Score Pane (Approximate) -->
                 <div class="calc-pane" id="pane-zscore">
                     <div class="calc-row">
-                        <div class="calc-col" style="flex: 0.8;">
+                        <div class="calc-col calc-col-flex-08">
                             <label class="calc-label">Age (Months)</label>
                             <input type="number" id="z-age" class="calc-inp calc-trigger-z" placeholder="0-60">
                         </div>
@@ -102,12 +106,12 @@
                                 <label><input type="radio" name="z-gen" value="F" class="calc-trigger-z"> Girl</label>
                             </div>
                         </div>
-                        <div class="calc-col" style="flex: 0.8;">
+                        <div class="calc-col calc-col-flex-08">
                             <label class="calc-label">Weight (kg)</label>
                             <input type="number" step="0.1" id="z-wt" class="calc-inp calc-trigger-z" placeholder="0.0">
                         </div>
                     </div>
-                    <div class="calc-row" style="background: #f8fafc; padding: 15px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                    <div class="calc-row calc-result-box">
                         <div class="calc-col">
                             <label class="calc-label">Z-Score</label>
                             <input type="text" id="z-res" class="calc-inp" readonly>
@@ -121,7 +125,7 @@
                             <input type="text" id="z-diff" class="calc-inp" readonly>
                         </div>
                     </div>
-                    <p style="margin:0; font-size:0.75rem; color:#64748b; text-align:center;">* Uses WHO approximate formulas for weight-for-age.</p>
+                    <p class="calc-footnote-text">* Calibrated with official WHO Child Growth Standards (LMS data tables).</p>
                 </div>
 
                 <!-- 4. BMR Pane -->
@@ -140,7 +144,7 @@
                                 <label><input type="radio" name="bmr-gen" value="F" class="calc-trigger-bmr"> Fem</label>
                             </div>
                         </div>
-                        <div class="calc-col" style="flex: 1.5;">
+                        <div class="calc-col calc-col-flex-15">
                             <label class="calc-label">Activity</label>
                             <select id="bmr-act" class="calc-inp calc-trigger-bmr">
                                 <option value="1.2">Sedentary</option>
@@ -150,7 +154,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="calc-row" style="background: #f8fafc; padding: 15px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                    <div class="calc-row calc-result-box">
                         <div class="calc-col">
                             <label class="calc-label">BMR (kcal/day)</label>
                             <input type="text" id="bmr-res" class="calc-inp" readonly>
@@ -165,7 +169,7 @@
                 <!-- 5. eGFR Pane -->
                 <div class="calc-pane" id="pane-egfr">
                     <div class="calc-row">
-                        <div class="calc-col" style="flex: 1.5;">
+                        <div class="calc-col calc-col-flex-15">
                             <label class="calc-label">S. Creatinine</label>
                             <input type="number" step="0.1" id="egfr-cr" class="calc-inp calc-trigger-egfr">
                         </div>
@@ -188,12 +192,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="calc-row" style="background: #f8fafc; padding: 15px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                    <div class="calc-row calc-result-box">
                         <div class="calc-col">
                             <label class="calc-label">CrCl (Cockcroft-Gault)</label>
                             <input type="text" id="egfr-res" class="calc-inp" readonly>
                         </div>
-                        <div class="calc-col" style="flex: 1.5;">
+                        <div class="calc-col calc-col-flex-15">
                             <label class="calc-label">CKD Stage Estimation</label>
                             <input type="text" id="egfr-stage" class="calc-inp" readonly>
                         </div>
@@ -208,10 +212,10 @@
                             <input type="date" id="edd-lmp" class="calc-inp calc-trigger-edd">
                         </div>
                     </div>
-                    <div class="calc-row" style="background: #f8fafc; padding: 15px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                    <div class="calc-row calc-result-box">
                         <div class="calc-col">
                             <label class="calc-label">Estimated Delivery Date (EDD)</label>
-                            <input type="text" id="edd-res" class="calc-inp" readonly style="color: #047857; background: #d1fae5; border-color: #6ee7b7;">
+                            <input type="text" id="edd-res" class="calc-inp calc-inp-edd-res" readonly>
                         </div>
                         <div class="calc-col">
                             <label class="calc-label">Gestational Age (Today)</label>
@@ -228,7 +232,7 @@
                             <input type="date" id="td-date-1" class="calc-inp calc-trigger-td">
                         </div>
                     </div>
-                    <div class="calc-row" style="background: #f8fafc; padding: 15px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                    <div class="calc-row calc-result-box">
                         <div class="calc-col">
                             <label class="calc-label">Dose 2 (+4 weeks)</label>
                             <input type="text" id="td-date-2" class="calc-inp" readonly>
@@ -256,7 +260,7 @@
                             <input type="date" id="rabies-date-0" class="calc-inp calc-trigger-rabies">
                         </div>
                     </div>
-                    <div class="calc-row" style="background: #f8fafc; padding: 15px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                    <div class="calc-row calc-result-box">
                         <div class="calc-col">
                             <label class="calc-label">Day 3</label>
                             <input type="text" id="rabies-date-3" class="calc-inp" readonly>
@@ -281,4 +285,4 @@
     </div>
 </div>
 
-<script src="assets/js/modules/calculators_module.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/calculators_module.js') ?>"></script>
+<script src="assets/js/modules/calculators.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/calculators.js') ?>"></script>

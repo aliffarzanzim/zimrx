@@ -1,12 +1,11 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Migration 005 — Custom user address table
- */
+// Custom patient address suggestions with frequency ranking per doctor.
 class Migration005AddCustomUserAddress {
 
     public function up(PDO $pdo): void {
+        // Saved addresses for quick autocomplete during patient registration
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_address (
                 id " . DbSql::autoIncrement() . ",
@@ -23,3 +22,4 @@ class Migration005AddCustomUserAddress {
         );
     }
 }
+

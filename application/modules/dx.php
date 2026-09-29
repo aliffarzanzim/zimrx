@@ -1,4 +1,8 @@
-<?php declare(strict_types=1); ?>
+<?php
+declare(strict_types=1);
+
+// Diagnosis (Dx) module: provisional and confirmed clinical diagnoses.
+?>
 <div class="pc-wrapper" id="dx-wrapper">
     <div class="pc-table-container">
         <table class="pc-table" id="dx-table">
@@ -62,5 +66,5 @@
     </template>
 </div>
 
-<script src="assets/js/modules/dx_module.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/dx_module.js') ?>"></script>
+<script src="assets/js/modules/dx.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/dx.js') ?>"></script>
 

@@ -1,10 +1,12 @@
 <?php
 declare(strict_types=1);
 
+// User login gateway: handles credential verification, rate-limited lockouts, solo practice auto-login, and role redirection.
+
 require_once 'auth.php';
 require_once 'db.php';
 
-// ── First-launch gate ─────────────────────────────────────────────────────
+// First-launch gate
 if (zimrx_db_table_exists($pdo, 'zimrx_app_config')) {
     $stmt = $pdo->query("SELECT config_key, config_value FROM zimrx_app_config");
     $appConfig = $stmt ? $stmt->fetchAll(PDO::FETCH_KEY_PAIR) : [];
@@ -17,7 +19,7 @@ if (($appConfig['setup_complete'] ?? '0') !== '1') {
     exit();
 }
 
-// ── Auto-login (solo doctor, autologin enabled) ────────────────────────────
+// Auto-login (solo doctor, autologin enabled)
 if (!is_logged_in()
     && empty($_GET['logout'])
     && ($appConfig['practice_type'] ?? '') === 'solo'
@@ -184,7 +186,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </form>
 
         <div style="margin-top: 0.75rem; margin-bottom: 0.25rem;">
-            <a href="forgot_password.php" style="font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 500;">Forgot Password?</a>
+            <a href="forgot_password.php" style="font-size: 0.85rem; color: var(--zrx-primary); text-decoration: none; font-weight: 500;">Forgot Password?</a>
         </div>
 
         <div class="login-footer">

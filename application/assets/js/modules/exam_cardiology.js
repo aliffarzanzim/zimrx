@@ -1,12 +1,9 @@
-/**
- * ZimRx - Clinical Exam: Cardiology & Hemodynamic
- */
+// Clinical cardiovascular exam: hemodynamic classification (NYHA/Killip), precordial auscultation, vascular perfusion, and ECG rhythm.
 (function() {
   'use strict';
 
   function initExamCardiology() {
-    // 13. Cardiology & Hemodynamic Assessment Handlers
-    // =======================================================
+    // Cardiovascular and hemodynamic examination handlers
     const cardioWrapper = document.getElementById('cardio-wrapper');
     if (cardioWrapper) {
       const modeTabs = cardioWrapper.querySelectorAll('.zrx-exam-mode-tab[data-cardio-tab]');
@@ -137,8 +134,6 @@
         });
       }
     }
-
-    // =======================================================
   }
 
   if (document.readyState === 'loading') {

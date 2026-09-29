@@ -130,16 +130,18 @@ const _zrxPxToSize = (px) => {
 // --- Family map: lowercase key → display name ---
 const _zrxFamilyMap = {
     // English
-    'times new roman': 'Times New Roman',
-    'arial': 'Arial',
-    'calibri': 'Calibri',
-    'tahoma': 'Tahoma',
-    'georgia': 'Georgia',
-    'gabriola': 'Gabriola',
-    'courier new': 'Courier New',
-    'comic sans': 'Comic Sans',
-    'comic sans ms': 'Comic Sans',
-    'bradley hand itc': 'Bradley Hand ITC',
+    'tinos': 'Tinos',
+    'arimo': 'Arimo',
+    'carlito': 'Carlito',
+    'noto sans': 'Noto Sans',
+    'notosans': 'Noto Sans',
+    'gelasio': 'Gelasio',
+    'alex brush': 'Alex Brush',
+    'alexbrush': 'Alex Brush',
+    'cousine': 'Cousine',
+    'comic neue': 'Comic Neue',
+    'comicneue': 'Comic Neue',
+    'caveat': 'Caveat',
     
     // Bangla
     'solaimanlipi': 'SolaimanLipi',
@@ -152,7 +154,8 @@ const _zrxFamilyMap = {
     'mangalikunicode': 'Mangalik Unicode',
     
     // Rx fonts
-    'lucida calligraphy': 'Lucida Calligraphy',
+    'marck script': 'Marck Script',
+    'marckscript': 'Marck Script',
     'akayakanadaka': 'Akaya Kanadaka',
     'birthstone': 'Birthstone',
     'charm': 'Charm',
@@ -167,13 +170,7 @@ const _zrxFamilyMap = {
     'montecarlo': 'MonteCarlo',
     'parisienne': 'Parisienne',
     'shantellsans': 'Shantell Sans',
-    'texgyrechorus': 'TeX Gyre Chorus',
-    
-    // Legacy/System fallbacks
-    'helvetica': 'Helvetica',
-    'impact': 'Impact',
-    'trebuchet ms': 'Trebuchet',
-    'verdana': 'Verdana'
+    'texgyrechorus': 'TeX Gyre Chorus'
 };
 
 // --- Format map: block tag → display label ---
@@ -325,15 +322,15 @@ if (typeof nicEditorFontFamilySelect !== 'undefined') {
             {
                 title: "English Fonts",
                 fonts: {
-                    'times new roman': 'Times New Roman',
-                    'arial': 'Arial',
-                    'calibri': 'Calibri',
-                    'tahoma': 'Tahoma',
-                    'georgia': 'Georgia',
-                    'gabriola': 'Gabriola',
-                    'courier new': 'Courier New',
-                    'comic sans': 'Comic Sans',
-                    'bradley hand itc': 'Bradley Hand ITC'
+                    'tinos': 'Tinos',
+                    'arimo': 'Arimo',
+                    'carlito': 'Carlito',
+                    'noto sans': 'Noto Sans',
+                    'gelasio': 'Gelasio',
+                    'alex brush': 'Alex Brush',
+                    'cousine': 'Cousine',
+                    'comic neue': 'Comic Neue',
+                    'caveat': 'Caveat'
                 }
             },
             {
@@ -352,7 +349,7 @@ if (typeof nicEditorFontFamilySelect !== 'undefined') {
             {
                 title: "Rx fonts",
                 fonts: {
-                    'lucida calligraphy': 'Lucida Calligraphy',
+                    'marck script': 'Marck Script',
                     'akayakanadaka': 'Akaya Kanadaka',
                     'birthstone': 'Birthstone',
                     'charm': 'Charm',

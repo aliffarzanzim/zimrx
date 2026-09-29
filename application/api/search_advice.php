@@ -1,4 +1,5 @@
 <?php
+// Search prescription advice templates by query string, category group, or individual entry.
 declare(strict_types=1);
 
 define('ZIMRX_DB_LIGHTWEIGHT', true);

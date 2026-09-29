@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Billings API endpoint: payment records, receipt generation, and manual transaction logging.
+
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../auth.php';
 require_login();

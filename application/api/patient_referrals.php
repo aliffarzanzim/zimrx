@@ -1,4 +1,5 @@
 <?php
+// Referral autocomplete suggestions and recent patient referral lookup across visits, appointments, and user referral logs.
 declare(strict_types=1);
 
 require_once __DIR__ . '/../auth.php';

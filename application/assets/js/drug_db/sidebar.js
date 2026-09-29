@@ -1,3 +1,4 @@
+// Drug database sidebar navigation: brand, generic, class, and indication searching with result caching.
 const searchCache = new Map();
 const initialSidebarState = window.ZIMRX_INITIAL_SIDEBAR_STATE || null;
 let sidebarScrollTimer = null;
@@ -36,9 +37,9 @@ function renderSearchResults(data, mode = currentMode) {
             const attrName = encodeURIComponent(item.generic || '');
             html = `
                 <div class="res-row" onclick="loadGenericBrands('${escapedId}', decodeURIComponent('${attrName}'))">
-                    <i class="fas fa-microscope" style="color:#64748b;"></i>
+                    <i class="fas fa-microscope" class="db-text-muted"></i>
                     <div class="res-info">
-                        <span class="res-brand" style="color:var(--accent-blue);">${escapedName}</span>
+                        <span class="res-brand" class="db-text-accent">${escapedName}</span>
                         <span class="res-price">${escapeHtml(item.brand_count)} Brands</span>
                     </div>
                 </div>
@@ -48,9 +49,9 @@ function renderSearchResults(data, mode = currentMode) {
             const attrCls = encodeURIComponent(item.cls || '');
             html = `
                 <div class="res-row" onclick="loadClassDetail(decodeURIComponent('${attrCls}'))">
-                    <i class="fas fa-layer-group" style="color:var(--accent-blue); font-size: 1.1rem;"></i>
+                    <i class="fas fa-layer-group" class="db-item-lead-title"></i>
                     <div class="res-info">
-                        <span class="res-brand" style="color:var(--navy-dark);">${escapedCls}</span>
+                        <span class="res-brand" class="db-text-navy">${escapedCls}</span>
                     </div>
                 </div>
             `;
@@ -60,9 +61,9 @@ function renderSearchResults(data, mode = currentMode) {
             const attrIndName = encodeURIComponent(item.indication_name || '');
             html = `
                 <div class="res-row" onclick="loadIndicationDetail('${escapedIndId}', decodeURIComponent('${attrIndName}'))">
-                    <i class="fas fa-stethoscope" style="color:#64748b; font-size: 1.2rem;"></i>
+                    <i class="fas fa-stethoscope" class="db-item-icon-lead"></i>
                     <div class="res-info">
-                        <span class="res-brand" style="color:var(--navy-dark);">${escapedIndName}</span>
+                        <span class="res-brand" class="db-text-navy">${escapedIndName}</span>
                     </div>
                 </div>
             `;
@@ -113,16 +114,16 @@ function renderDocsBookmarks(query = '') {
 
     $('#resultsList').empty();
     if (!rows.length) {
-        $('#resultsList').append('<div style="padding: 20px; text-align:center; color:#64748b;">No bookmarks found.</div>');
+        $('#resultsList').append('<div class="db-status-empty-box">No bookmarks found.</div>');
         return;
     }
 
     rows.forEach(item => {
         $('#resultsList').append(`
             <div class="res-row docs-bookmark-row" data-target="${escapeHtml(item.id)}">
-                <i class="fas fa-bookmark" style="color:var(--accent-blue);"></i>
+                <i class="fas fa-bookmark" class="db-text-accent"></i>
                 <div class="res-info">
-                    <span class="res-brand" style="color:var(--navy-dark);">${escapeHtml(item.title)}</span>
+                    <span class="res-brand" class="db-text-navy">${escapeHtml(item.title)}</span>
                     <div class="res-line-2">Jump to ${escapeHtml(item.title)} section</div>
                 </div>
             </div>
@@ -389,12 +390,12 @@ function loadIndicationDetail(id, name) {
     toggleSidebarMoaButton(false);
     $('#sidebarNav').css('display', 'flex');
     $('#sidebarNavTitle').text(name);
-    $('#resultsList').empty().append('<div style="padding: 20px; text-align:center; color:#64748b;"><i class="fas fa-spinner fa-spin"></i> Loading medications...</div>');
+    $('#resultsList').empty().append('<div class="db-status-empty-box"><i class="fas fa-spinner fa-spin"></i> Loading medications...</div>');
 
     $.getJSON(`api/drug_explorer.php?type=indication_generics&id=${id}`, function(data) {
         $('#resultsList').empty();
         if (!data || data.length === 0) {
-            $('#resultsList').append('<div style="padding: 20px; text-align:center; color:#64748b;">No drugs mapped to this indication yet.</div>');
+            $('#resultsList').append('<div class="db-status-empty-box">No drugs mapped to this indication yet.</div>');
             return;
         }
 
@@ -403,9 +404,9 @@ function loadIndicationDetail(id, name) {
             const attrName = encodeURIComponent(item.name || '');
             const html = `
                 <div class="res-row" onclick="loadGenericBrands('${escapeHtml(item.id)}', decodeURIComponent('${attrName}'))">
-                    <i class="fas fa-microscope" style="color:var(--accent-blue); font-size: 1.1rem;"></i>
+                    <i class="fas fa-microscope" class="db-item-lead-title"></i>
                     <div class="res-info">
-                        <span class="res-brand" style="color:var(--accent-blue);">${escapedName}</span>
+                        <span class="res-brand" class="db-text-accent">${escapedName}</span>
                         <span class="res-price">${escapeHtml(item.brand_count)} Brands</span>
                     </div>
                 </div>
@@ -426,12 +427,12 @@ function loadClassDetail(cls, autoGenericId = '', autoGenericName = '') {
 
     $('#sidebarNav').css('display', 'flex');
     $('#sidebarNavTitle').text(className);
-    $('#resultsList').empty().append('<div style="padding: 20px; text-align:center; color:#64748b;"><i class="fas fa-spinner fa-spin"></i> Loading generics...</div>');
+    $('#resultsList').empty().append('<div class="db-status-empty-box"><i class="fas fa-spinner fa-spin"></i> Loading generics...</div>');
 
     $.getJSON(`api/drug_explorer.php?type=class_generics&id=${encodeURIComponent(className)}`, function(data) {
         $('#resultsList').empty();
         if (!data || data.length === 0) {
-            $('#resultsList').append('<div style="padding: 20px; text-align:center; color:#64748b;">No generics found for this therapeutic class.</div>');
+            $('#resultsList').append('<div class="db-status-empty-box">No generics found for this therapeutic class.</div>');
             return;
         }
 
@@ -440,9 +441,9 @@ function loadClassDetail(cls, autoGenericId = '', autoGenericName = '') {
             const attrName = encodeURIComponent(item.name || '');
             const html = `
                 <div class="res-row" onclick="loadGenericBrands('${escapeHtml(item.id)}', decodeURIComponent('${attrName}'))">
-                    <i class="fas fa-microscope" style="color:var(--accent-blue); font-size: 1.1rem;"></i>
+                    <i class="fas fa-microscope" class="db-item-lead-title"></i>
                     <div class="res-info">
-                        <span class="res-brand" style="color:var(--accent-blue);">${escapedName}</span>
+                        <span class="res-brand" class="db-text-accent">${escapedName}</span>
                         <span class="res-price">${escapeHtml(item.brand_count)} Brands</span>
                     </div>
                 </div>
@@ -475,7 +476,7 @@ function goBackToSidebarResults() {
 function runDrillDown(type, id) {
     $.getJSON(`api/drug_explorer.php?type=${type}&id=${encodeURIComponent(id)}`, function(data) {
         $('#resultsList').empty();
-        $('#resultsList').append('<div style="padding:10px; border-bottom:1px solid #ddd; background:#f1f5f9; cursor:pointer;" onclick="performSearch(\'\')"><i class="fas fa-arrow-left"></i> BACK</div>');
+        $('#resultsList').append('<div class="db-dropdown-item-hover" onclick="performSearch(\'\')"><i class="fas fa-arrow-left"></i> BACK</div>');
         data.forEach(item => {
             const iconPath = getDosageFormIcon(item.form, item.pres_new_upper);
             const iconHtml = iconPath ? `<img src="${iconPath}" class="res-icon">` : '<span class="res-star">â˜…</span>';

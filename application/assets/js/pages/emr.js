@@ -1,3 +1,4 @@
+// Electronic Medical Record (EMR) longitudinal dashboard, encounter drawer, vitals graphing, and analytics.
 const emrConfig = (() => {
     const el = document.getElementById('emrConfigData');
     return el ? JSON.parse(el.textContent || '{}') : {};
@@ -5,7 +6,7 @@ const emrConfig = (() => {
 const emrPatientId = Number(emrConfig.patientId || 0);
 const emrFirstPastVisitId = String(emrConfig.firstPastVisitId || '');
 
-// ── EMR UI Interactions & API Handlers ──
+// Encounter drawer and past visit details
 function openPastRxDrawer(visitIdentifier) {
     const drawer = document.getElementById('emr-past-rx-drawer');
     const overlay = document.getElementById('emr-drawer-overlay');
@@ -183,7 +184,7 @@ function openParticularsAuditModal() {
     const body = document.getElementById('emr-particulars-audit-body');
     if (!modal) return;
     modal.classList.add('open');
-    body.innerHTML = '<div style="text-align: center; color: #64748b; padding: 2.5rem 1rem;">Loading audit trail...</div>';
+    body.innerHTML = '<div class="emr-js-loading">Loading audit trail...</div>';
 
     fetch('api/emr_api.php?action=get_particulars_audit_log&patient_id=' + emrPatientId)
         .then(res => res.json())
@@ -192,8 +193,8 @@ function openParticularsAuditModal() {
                 body.innerHTML = `
                     <div class="emr-audit-empty">
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                        <p style="margin: 0.75rem 0 0.25rem; font-weight: 600; color: #475569;">No changes logged yet</p>
-                        <span style="font-size: 0.82rem; color: #94a3b8;">The particulars for this patient are at their initial registration values.</span>
+                        <p class="emr-js-no-change-title">No changes logged yet</p>
+                        <span class="emr-js-no-change-desc">The particulars for this patient are at their initial registration values.</span>
                     </div>
                 `;
                 return;
@@ -247,7 +248,7 @@ function openParticularsAuditModal() {
             body.innerHTML = html;
         })
         .catch(err => {
-            body.innerHTML = `<div style="color: #dc2626; padding: 1.5rem; text-align: center;">Failed to load audit history: ${escapeHtml(err.message)}</div>`;
+            body.innerHTML = `<div class="emr-js-error-msg">Failed to load audit history: ${escapeHtml(err.message)}</div>`;
         });
 }
 
@@ -265,11 +266,9 @@ function escapeHtml(str) {
         .replace(/"/g, '&quot;');
 }
 
-// ═════════════════════════════════════════════════════════════════════
-// ── Modular Vitals & Longitudinal Trajectories Engine ──
-// ═════════════════════════════════════════════════════════════════════
+// Vitals and longitudinal trajectory engine
 const METRIC_CONFIG = {
-    // 1. Daily & General Vitals
+    // Daily and general vitals
     'weight':        { title: 'Weight Trajectory', unit: 'kg', icon: '⚖️', placeholder: 'e.g. 78.5', color: '#2563eb' },
     'bp':            { title: 'Blood Pressure', unit: 'mmHg', icon: '❤️', placeholder: 'e.g. 125/80', colorSys: '#dc2626', colorDia: '#059669' },
     'pulse':         { title: 'Pulse / Heart Rate', unit: 'bpm', icon: '💓', placeholder: 'e.g. 74', color: '#e11d48' },
@@ -277,7 +276,7 @@ const METRIC_CONFIG = {
     'temp':          { title: 'Body Temperature', unit: '°F', icon: '🌡️', placeholder: 'e.g. 98.6', color: '#ea580c' },
     'rr':            { title: 'Respiratory Rate', unit: '/min', icon: '💨', placeholder: 'e.g. 18', color: '#0d9488' },
 
-    // 2. Metabolic & Chronic Care
+    // Metabolic and chronic care
     'glucose':       { title: 'Blood Glucose (FBS/PP)', unit: 'mmol/L', icon: '🩸', placeholder: 'e.g. 6.8', color: '#8b5cf6' },
     'hba1c':         { title: 'Glycated Hb (HbA1c)', unit: '%', icon: '📊', placeholder: 'e.g. 7.2', color: '#ec4899' },
     'creatinine':    { title: 'Serum Creatinine', unit: 'mg/dL', icon: '🧪', placeholder: 'e.g. 1.1', color: '#6366f1' },
@@ -287,12 +286,12 @@ const METRIC_CONFIG = {
     'tsh':           { title: 'Thyroid TSH', unit: 'µIU/mL', icon: '🦋', placeholder: 'e.g. 2.5', color: '#7c3aed' },
     'uric_acid':     { title: 'Serum Uric Acid', unit: 'mg/dL', icon: '🦶', placeholder: 'e.g. 6.2', color: '#c026d3' },
 
-    // 3. Pediatric Growth
+    // Pediatric growth
     'height':        { title: 'Height / Length', unit: 'inch', icon: '📏', placeholder: 'e.g. 66', color: '#059669' },
     'ofc':           { title: 'Head Circumference (OFC)', unit: 'cm', icon: '👶', placeholder: 'e.g. 42.5', color: '#f59e0b' },
     'muac':          { title: 'Arm Circumference (MUAC)', unit: 'cm', icon: '📐', placeholder: 'e.g. 14.5', color: '#14b8a6' },
 
-    // 4. Special Clinical Curves
+    // Clinical curves
     'platelets':     { title: 'Platelet Count', unit: 'k/µL', icon: '🩸', placeholder: 'e.g. 185', color: '#e11d48' },
     'hb':            { title: 'Hemoglobin (Hb)', unit: 'g/dL', icon: '🔴', placeholder: 'e.g. 13.2', color: '#be123c' },
     'crp':           { title: 'C-Reactive Protein (CRP)', unit: 'mg/L', icon: '⚡', placeholder: 'e.g. 4.5', color: '#f97316' },
@@ -311,7 +310,7 @@ function loadTrajectories() {
         .then(res => res.json())
         .then(data => {
             if (!data.success) {
-                grid.innerHTML = `<div style="color: #dc2626; padding: 1.5rem; text-align: center; grid-column: span 2;">${escapeHtml(data.message || 'Failed to load trajectories')}</div>`;
+                grid.innerHTML = `<div class="emr-js-error-grid">${escapeHtml(data.message || 'Failed to load trajectories')}</div>`;
                 return;
             }
             currentTrackedMetrics = Array.isArray(data.tracked_metrics) && data.tracked_metrics.length ? data.tracked_metrics : ['weight'];
@@ -319,7 +318,7 @@ function loadTrajectories() {
             renderTrajectories();
         })
         .catch(err => {
-            grid.innerHTML = `<div style="color: #dc2626; padding: 1.5rem; text-align: center; grid-column: span 2;">Network error loading trajectories: ${escapeHtml(err.message)}</div>`;
+            grid.innerHTML = `<div class="emr-js-error-grid">Network error loading trajectories: ${escapeHtml(err.message)}</div>`;
         });
 }
 
@@ -329,10 +328,10 @@ function renderTrajectories() {
 
     if (currentTrackedMetrics.length === 0) {
         grid.innerHTML = `
-            <div style="text-align: center; color: #64748b; padding: 2.5rem 1rem; grid-column: 1 / -1; border: 1px dashed #cbd5e1; border-radius: 8px; background: #f8fafc;">
-                <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📊</div>
-                <div style="font-weight: 700; color: #334155; margin-bottom: 0.25rem;">No Trajectories Active for This Patient</div>
-                <div style="font-size: 0.82rem; color: #94a3b8; margin-bottom: 1rem;">Click "Add Tracker ▾" above to select and monitor metrics for this patient.</div>
+            <div class="emr-js-empty-trajectory">
+                <div class="emr-js-empty-icon">📊</div>
+                <div class="emr-js-empty-title">No Trajectories Active for This Patient</div>
+                <div class="emr-js-empty-subtitle">Click "Add Tracker ▾" above to select and monitor metrics for this patient.</div>
                 <button type="button" class="btn-emr btn-emr-outline btn-emr-sm" onclick="addTracker('weight')">＋ Show Weight Trajectory</button>
             </div>
         `;
@@ -495,8 +494,8 @@ function buildTrajectorySvg(mType, points, conf) {
     if (!points || points.length === 0) {
         return `
             <div class="emr-chart-empty">
-                <span style="font-weight: 600;">No readings recorded yet</span>
-                <span style="font-size: 0.72rem; color: #94a3b8; margin-top: 4px;">Click <strong>＋ Log</strong> to add home readings or clinic measurements.</span>
+                <span class="emr-js-no-readings-title">No readings recorded yet</span>
+                <span class="emr-js-no-readings-hint">Click <strong>＋ Log</strong> to add home readings or clinic measurements.</span>
             </div>
         `;
     }
@@ -508,7 +507,7 @@ function buildTrajectorySvg(mType, points, conf) {
     const chartH = height - padding.top - padding.bottom;
     const baselineY = padding.top + chartH;
 
-    // Single reading graceful baseline milestone (No ugly triangles!)
+    // Single reading baseline milestone
     if (points.length === 1) {
         const pt = points[0];
         let valNum = parseFloat(pt.value) || 0;
@@ -577,7 +576,7 @@ function buildTrajectorySvg(mType, points, conf) {
                       onmouseenter="onTrajectorySliceHover(event, '${mType}', 0)"
                       onmouseleave="onTrajectorySliceLeave('${mType}')" />
             </svg>
-            <div class="emr-chart-tooltip" id="tooltip-${mType}" style="display:none;"></div>
+            <div class="emr-chart-tooltip" id="tooltip-${mType}" class="zrx-dn"></div>
         `;
     }
 
@@ -680,10 +679,10 @@ function buildTrajectorySvg(mType, points, conf) {
                 <path d="${diaPathD}" fill="none" stroke="#059669" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 3" />
                 ${pointsHtml}
 
-                <line id="crosshair-${mType}" class="emr-chart-crosshair" x1="0" y1="${padding.top}" x2="0" y2="${baselineY}" style="display:none;" />
+                <line id="crosshair-${mType}" class="emr-chart-crosshair" x1="0" y1="${padding.top}" x2="0" y2="${baselineY}" class="zrx-dn" />
                 ${hitSlicesHtml}
             </svg>
-            <div class="emr-chart-tooltip" id="tooltip-${mType}" style="display:none;"></div>
+            <div class="emr-chart-tooltip" id="tooltip-${mType}" class="zrx-dn"></div>
         `;
     }
 
@@ -791,10 +790,10 @@ function buildTrajectorySvg(mType, points, conf) {
             <path d="${pathD}" fill="none" stroke="${conf.color || '#2563eb'}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
             ${pointsHtml}
 
-            <line id="crosshair-${mType}" class="emr-chart-crosshair" x1="0" y1="${padding.top}" x2="0" y2="${baselineY}" style="display:none;" />
+            <line id="crosshair-${mType}" class="emr-chart-crosshair" x1="0" y1="${padding.top}" x2="0" y2="${baselineY}" class="zrx-dn" />
             ${hitSlicesHtml}
         </svg>
-        <div class="emr-chart-tooltip" id="tooltip-${mType}" style="display:none;"></div>
+        <div class="emr-chart-tooltip" id="tooltip-${mType}" class="zrx-dn"></div>
     `;
 }
 
@@ -819,7 +818,7 @@ function onTrajectorySliceHover(event, mType, idx) {
         y = parseFloat(dot.getAttribute('cy')) || y;
     }
 
-    // 1. Move & Show Crosshair
+    // Move and show crosshair
     const crosshair = document.getElementById(`crosshair-${mType}`);
     if (crosshair) {
         crosshair.setAttribute('x1', x.toFixed(1));
@@ -827,7 +826,7 @@ function onTrajectorySliceHover(event, mType, idx) {
         crosshair.style.display = 'block';
     }
 
-    // 2. Highlight point dot
+    // Highlight point dot
     document.querySelectorAll(`.emr-chart-dot[id^="dot-${mType}-"]`).forEach(d => d.classList.remove('active'));
     if (dot) dot.classList.add('active');
     const dotSys = document.getElementById(`dot-${mType}-sys-${idx}`);
@@ -835,7 +834,7 @@ function onTrajectorySliceHover(event, mType, idx) {
     const dotDia = document.getElementById(`dot-${mType}-dia-${idx}`);
     if (dotDia) dotDia.classList.add('active');
 
-    // 3. Highlight point value text label right above dot
+    // Highlight point value label
     document.querySelectorAll(`.emr-chart-point-val[id^="val-tag-${mType}-"]`).forEach(t => t.classList.remove('active'));
     document.querySelectorAll(`.emr-chart-point-val[id^="val-tag-sys-${mType}-"]`).forEach(t => t.classList.remove('active'));
     document.querySelectorAll(`.emr-chart-point-val[id^="val-tag-dia-${mType}-"]`).forEach(t => t.classList.remove('active'));
@@ -847,25 +846,25 @@ function onTrajectorySliceHover(event, mType, idx) {
     const tagDia = document.getElementById(`val-tag-dia-${mType}-${idx}`);
     if (tagDia) tagDia.classList.add('active', 'visible');
 
-    // 4. Populate and Position Full Clinical Details Tooltip Above Exact Point
+    // Populate and position clinical details tooltip
     const tooltip = document.getElementById(`tooltip-${mType}`);
     if (tooltip) {
         const isHome = (pt.source === 'home');
         const fullDate = pt.date + (pt.time ? ' ' + pt.time : '');
         const delBtn = (pt.id && String(pt.id).indexOf('visit_') === -1) 
-            ? `<button type="button" onclick="event.stopPropagation(); deleteLogReading(${pt.id}, '${mType}')" style="background:none; border:none; color:#dc2626; font-size:0.68rem; font-weight:700; cursor:pointer; padding:0 2px;" title="Delete logbook entry">✕ Delete</button>` 
+            ? `<button type="button" onclick="event.stopPropagation(); deleteLogReading(${pt.id}, '${mType}')" class="emr-btn-del-reading" title="Delete logbook entry">✕ Delete</button>` 
             : '';
 
         let metricContent = '';
         if (mType === 'bp') {
             metricContent = `
                 <div class="tooltip-metric-row">
-                    <span class="tooltip-metric-title" style="color: #dc2626;">Systolic</span>
-                    <strong class="tooltip-metric-value" style="color: #dc2626;">${pt.sys || '--'} <small style="font-weight:600; color:#64748b;">mmHg</small></strong>
+                    <span class="tooltip-metric-title" class="zrx-c-danger">Systolic</span>
+                    <strong class="tooltip-metric-value" class="zrx-c-danger">${pt.sys || '--'} <small class="emr-tooltip-unit-muted">mmHg</small></strong>
                 </div>
                 <div class="tooltip-metric-row">
-                    <span class="tooltip-metric-title" style="color: #059669;">Diastolic</span>
-                    <strong class="tooltip-metric-value" style="color: #059669;">${pt.dia || '--'} <small style="font-weight:600; color:#64748b;">mmHg</small></strong>
+                    <span class="tooltip-metric-title" class="zrx-c-success">Diastolic</span>
+                    <strong class="tooltip-metric-value" class="zrx-c-success">${pt.dia || '--'} <small class="emr-tooltip-unit-muted">mmHg</small></strong>
                 </div>
             `;
         } else {
@@ -886,7 +885,7 @@ function onTrajectorySliceHover(event, mType, idx) {
             </div>
             ${metricContent}
             ${pt.notes ? `<div class="tooltip-notes"><strong>Note:</strong> ${escapeHtml(pt.notes)}</div>` : ''}
-            ${delBtn ? `<div style="text-align: right; margin-top: 4px;">${delBtn}</div>` : ''}
+            ${delBtn ? `<div class="emr-tooltip-del-wrap">${delBtn}</div>` : ''}
         `;
 
         // Position floating comfortably above the exact hovered point
@@ -1021,7 +1020,7 @@ function closeLogReadingModal() {
     if (modal) modal.classList.remove('open');
 }
 
-// Form submit listener for log reading
+// Log reading submission
 const logReadingForm = document.getElementById('emr-log-reading-form');
 if (logReadingForm) {
     logReadingForm.addEventListener('submit', function(e) {
@@ -1048,7 +1047,7 @@ if (logReadingForm) {
     });
 }
 
-// Auto-run loadTrajectories on page load
+// Page load initialization
 document.addEventListener('DOMContentLoaded', function() {
     loadTrajectories();
 });

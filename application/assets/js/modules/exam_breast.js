@@ -1,8 +1,4 @@
-/**
- * ZimRx - Clinical Exam: Breast Examination (Clock SVG)
- * Clock SVG diagram, coordinate mapping (O'Clock & FN distance),
- * E1-E5 staging, and marker management for breast examination.
- */
+// Clinical breast examination diagram: SVG clock face coordinate mapping (o'clock and distance from nipple), lesion cards, and E1-E5 staging.
 (function() {
   'use strict';
 

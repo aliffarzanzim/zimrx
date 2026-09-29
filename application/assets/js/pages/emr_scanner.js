@@ -1,17 +1,11 @@
-/**
- * ZimRx Hardware Barcode Scanner & Omni-Search Interceptor
- * Detects lightning-fast hardware keyboard inputs (<40ms per keystroke)
- * Auto-routes:
- *   - 'P...' (Patient Master Reg ID) -> emr.php?reg=P...
- *   - 'V...' (Visit Encounter Token) -> emr.php?visit=V...
- */
+// Hardware barcode scanner listener and omni-search input routing for patient and visit IDs.
 
 (function () {
     'use strict';
 
     let scanBuffer = '';
     let lastKeyTime = 0;
-    const SCANNER_MAX_INTERVAL_MS = 45; // Hardware barcode scanners type < 35-40ms per char
+    const SCANNER_MAX_INTERVAL_MS = 45; // Hardware scanners type rapidly (<40ms per char)
     const MIN_SCAN_LENGTH = 3;
 
     window.addEventListener('keydown', function (e) {
@@ -30,14 +24,14 @@
                 const scannedCode = scanBuffer.trim();
                 scanBuffer = '';
 
-                // Handle Rule A: Patient Master ID ('P...')
+                // Patient master ID ('P...')
                 if (/^P\d+/i.test(scannedCode)) {
                     e.preventDefault();
                     window.location.href = 'emr.php?reg=' + encodeURIComponent(scannedCode.toUpperCase());
                     return;
                 }
 
-                // Handle Rule B: Visit ID ('V...')
+                // Visit encounter token ('V...')
                 if (/^V\d+/i.test(scannedCode)) {
                     e.preventDefault();
                     window.location.href = 'emr.php?visit=' + encodeURIComponent(scannedCode.toUpperCase());
@@ -54,7 +48,7 @@
         }
     }, true);
 
-    // Initialize Omni Search Box on EMR Landing
+    // Omni-search input on EMR landing
     document.addEventListener('DOMContentLoaded', function () {
         const omniInput = document.getElementById('emr-omni-input');
         if (!omniInput) return;
@@ -70,7 +64,7 @@
                 } else if (/^V\d+/i.test(val)) {
                     window.location.href = 'emr.php?visit=' + encodeURIComponent(val.toUpperCase());
                 } else {
-                    // Regular query search
+                    // Text search query
                     if (window.zimrxExecuteOmniSearch) {
                         window.zimrxExecuteOmniSearch(val);
                     }

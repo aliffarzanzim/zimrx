@@ -1,3 +1,4 @@
+// Prescription print layout and page dimensions setup controller with live scaled preview.
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('page-setup-form');
     const resetButton = document.getElementById('zps-factory-reset');
@@ -176,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Common Page Sizes Modal Logic ---
+    // Common page sizes modal
     const pageSizesModal = document.getElementById('page-sizes-modal');
     const pageSizesCloseX = document.getElementById('page-sizes-close-x');
     const pageSizesCloseBtn = document.getElementById('page-sizes-close-btn');

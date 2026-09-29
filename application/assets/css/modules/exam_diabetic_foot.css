@@ -1,6 +1,4 @@
-/* =======================================================
-   Diabetic Foot & Ulcer Assessment Styles
-======================================================= */
+/* Diabetic foot examination metrics, monofilament sensory map, and risk scoring */
 .zrx-df-metrics-bar {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -13,8 +11,8 @@
     }
 }
 .zrx-df-metric-chip {
-    background: #f8fafc;
-    border: 1px solid #cbd5e1;
+    background: var(--zrx-bg-subtle);
+    border: 1px solid var(--zrx-border);
     border-radius: 6px;
     padding: 0.45rem 0.65rem;
     display: flex;
@@ -26,21 +24,21 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.4px;
-    color: #64748b;
+    color: var(--zrx-text-muted);
 }
 .zrx-df-metric-val {
     font-size: 0.88rem;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--zrx-text-main);
     line-height: 1.25;
 }
 .zrx-df-metric-status {
     font-size: 0.84rem;
     font-weight: 700;
-    color: #10b981;
+    color: var(--zrx-emerald-500);
 }
-.zrx-df-metric-status.moderate { color: #f59e0b; }
-.zrx-df-metric-status.high { color: #dc2626; }
+.zrx-df-metric-status.moderate { color: var(--zrx-amber-500); }
+.zrx-df-metric-status.high { color: var(--zrx-red-600); }
 
 .zrx-df-layout-grid {
     display: grid;
@@ -55,8 +53,8 @@
     }
 }
 .zrx-df-map-card {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
     border-radius: 6px;
     padding: 0.5rem;
     display: flex;
@@ -72,11 +70,11 @@
 .zrx-df-card-title {
     font-size: 0.74rem;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--zrx-text-main);
 }
 .zrx-df-card-sub {
     font-size: 0.66rem;
-    color: #64748b;
+    color: var(--zrx-text-muted);
 }
 .zrx-df-svg-wrap {
     width: 150px;
@@ -92,13 +90,13 @@
     transition: all 0.12s;
 }
 .zrx-df-point.intact {
-    fill: #10b981;
-    stroke: #059669;
+    fill: var(--zrx-emerald-500);
+    stroke: var(--zrx-emerald-600);
     stroke-width: 1.5;
 }
 .zrx-df-point.absent {
-    fill: #ef4444;
-    stroke: #b91c1c;
+    fill: var(--zrx-red-500);
+    stroke: var(--zrx-red-700);
     stroke-width: 2;
 }
 .zrx-df-point:hover {
@@ -107,7 +105,7 @@
 .zrx-df-pt-text {
     font-size: 8px;
     font-weight: 800;
-    fill: #ffffff;
+    fill: var(--zrx-white);
     pointer-events: none;
     text-anchor: middle;
 }
@@ -117,7 +115,7 @@
     margin-top: 0.4rem;
     font-size: 0.66rem;
     font-weight: 600;
-    color: #475569;
+    color: var(--zrx-slate-600);
 }
 .zrx-df-legend-item {
     display: inline-flex;
@@ -130,12 +128,12 @@
     border-radius: 999px;
     display: inline-block;
 }
-.zrx-df-dot.intact { background: #10b981; }
-.zrx-df-dot.absent { background: #ef4444; }
+.zrx-df-dot.intact { background: var(--zrx-emerald-500); }
+.zrx-df-dot.absent { background: var(--zrx-red-500); }
 
 .zrx-df-controls-card {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
     border-radius: 6px;
     padding: 0.65rem;
     display: flex;

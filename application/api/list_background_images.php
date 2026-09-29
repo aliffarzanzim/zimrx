@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Background images gallery API: lists user uploads and categorized system watermark presets.
+
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../auth.php';
 require_login();
@@ -13,13 +15,12 @@ $cat     = strtolower(trim((string)($_GET['cat'] ?? '')));
 $result  = [];
 $categories = [];
 
-// 1. User Uploads (latest first)
+// User-uploaded watermarks (newest first)
 $uploadDir = ZIMRX_UPLOADS_DIR . '/background-images';
 $uploadUrl = '/uploads/background-images';
 
 if (is_dir($uploadDir)) {
     $files = glob($uploadDir . '/*.{svg,png,jpg,jpeg,webp}', GLOB_BRACE) ?: [];
-    // Sort newest first by mtime
     usort($files, fn($a, $b) => filemtime($b) <=> filemtime($a));
     
     if (count($files) > 0) {
@@ -43,7 +44,7 @@ if (is_dir($uploadDir)) {
     }
 }
 
-// 2. System presets (grouped by directory)
+// System preset watermarks by category
 $baseDir = __DIR__ . '/../assets/images/background-images';
 $baseUrl = 'assets/images/background-images';
 
@@ -71,7 +72,7 @@ foreach ($dirs as $dir) {
     }
 }
 
-// Make sure category filter list has unique, tidy values
+// Unique category list for filter dropdown
 $categories = array_values(array_unique($categories));
 
 echo json_encode(['ok' => true, 'images' => $result, 'categories' => $categories]);

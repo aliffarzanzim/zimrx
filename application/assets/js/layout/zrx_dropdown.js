@@ -1,10 +1,21 @@
-/**
- * ZimRx Global Dropdown Engine
- * Provides unified, accessible, keyboard-synchronized dropdown and autocomplete functionality.
- */
-
+// Shared dropdown and custom select engine: autocomplete, keyboard navigation, and select replacement.
 (function () {
     window.ZimRxDropdown = {
+        // Global HTML escape utility for dropdown and autocomplete items
+        escapeHtml(value) {
+            const div = document.createElement('div');
+            div.textContent = value == null ? '' : String(value);
+            return div.innerHTML;
+        },
+
+        // Global icon renderer delegating to the ZimRxIcon registry
+        renderIcon(name, size = 14, attrs = {}) {
+            if (window.ZimRxIcon && typeof window.ZimRxIcon.render === 'function') {
+                return window.ZimRxIcon.render(name, size, attrs);
+            }
+            return '';
+        },
+
         attach({
             input,
             list,

@@ -1,4 +1,8 @@
-<?php declare(strict_types=1); ?>
+<?php
+declare(strict_types=1);
+
+// Investigations (Ix) module: laboratory, pathology, and imaging diagnostic test orders.
+?>
 <div class="pc-wrapper" id="ix-wrapper">
     <div class="pc-table-container">
         <table class="pc-table" id="ix-table">
@@ -66,4 +70,4 @@
     </template>
 </div>
 
-<script src="assets/js/modules/ix_module.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/ix_module.js') ?>"></script>
+<script src="assets/js/modules/ix.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/ix.js') ?>"></script>

@@ -1,8 +1,11 @@
 <?php
 declare(strict_types=1);
 
+// Presenting complaints (P/C) catalog: search indexing, doctor priority ordering, custom terms, and duration/unit lookups.
+
 require_once __DIR__ . '/rx_regimen_lib.php';
 
+// Sources available for complaint autocompletion and ranking
 function pc_supported_sources(): array {
     return [
         'most_used' => 'Most Used P/C',
@@ -11,6 +14,7 @@ function pc_supported_sources(): array {
     ];
 }
 
+// Default source priority ordering for new doctor profiles
 function pc_priority_default_rows(): array {
     $rows = [];
     foreach (pc_supported_sources() as $source => $label) {
@@ -682,135 +686,125 @@ function pc_static_term_exists(string $term): bool {
     return $exists;
 }
 
-function pc_static_pc_search(string $term, int $limit = 25): array {
-    $db = pc_catalog_db('zimrx_static.db');
-    if (!$db instanceof PDO || $limit < 1) {
-        return [];
+function pc_static_pc_seed_matches(PDO $db, int $limit): array {
+    static $staticPcSeedCache = null;
+    static $staticPcSeedLimit = 0;
+    if ($staticPcSeedCache !== null && $staticPcSeedLimit >= $limit) {
+        return array_slice($staticPcSeedCache, 0, $limit);
     }
 
-    if ($term === '') {
-        static $staticPcSeedCache = null;
-        static $staticPcSeedLimit = 0;
-        if ($staticPcSeedCache !== null && $staticPcSeedLimit >= $limit) {
-            return array_slice($staticPcSeedCache, 0, $limit);
-        }
+    $seeds = [];
+    $seedGroups = pc_seed_term_groups();
+    foreach ($seedGroups as $terms) {
+        $seeds = array_merge($seeds, $terms);
+    }
 
-        $seeds = [];
-        $seedGroups = pc_seed_term_groups();
-        foreach ($seedGroups as $terms) {
-            $seeds = array_merge($seeds, $terms);
-        }
+    $placeholders = implode(',', array_fill(0, count($seeds), '?'));
+    $stmt = $db->prepare(
+        "SELECT id AS concept_id, term AS preferred_term, category
+         FROM zimrx_static_pc
+         WHERE term COLLATE NOCASE IN ($placeholders)"
+    );
+    $stmt->execute($seeds);
 
-        $placeholders = implode(',', array_fill(0, count($seeds), '?'));
-        $stmt = $db->prepare(
-            "SELECT id AS concept_id, term AS preferred_term, category
-             FROM zimrx_static_pc
-             WHERE term COLLATE NOCASE IN ($placeholders)"
-        );
-        $stmt->execute($seeds);
+    $rowMap = [];
+    foreach ($stmt->fetchAll() as $row) {
+        $rowMap[strtolower((string)$row['preferred_term'])] = $row;
+    }
 
-        $rowMap = [];
-        foreach ($stmt->fetchAll() as $row) {
-            $rowMap[strtolower((string)$row['preferred_term'])] = $row;
-        }
-
-        $results = [];
-        $seen = [];
-        foreach ($seedGroups as $terms) {
-            foreach ($terms as $seed) {
-                $seedKey = strtolower($seed);
-                if (isset($rowMap[$seedKey])) {
-                    $row = $rowMap[$seedKey];
-                    $key = (string)$row['concept_id'];
-                    if (!isset($seen[$key])) {
-                        $seen[$key] = true;
-                        $results[] = $row;
-                    }
-                    break;
+    $results = [];
+    $seen = [];
+    foreach ($seedGroups as $terms) {
+        foreach ($terms as $seed) {
+            $seedKey = strtolower($seed);
+            if (isset($rowMap[$seedKey])) {
+                $row = $rowMap[$seedKey];
+                $key = (string)$row['concept_id'];
+                if (!isset($seen[$key])) {
+                    $seen[$key] = true;
+                    $results[] = $row;
                 }
-            }
-            if (count($results) >= $limit) {
                 break;
             }
         }
-
-        $staticPcSeedCache = $results;
-        $staticPcSeedLimit = $limit;
-        return array_slice($results, 0, $limit);
+        if (count($results) >= $limit) {
+            break;
+        }
     }
 
-    $ftsQuery = pc_fts_prefix_query($term);
-    $hasFts = (bool)$db->query(
-        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'fts_zimrx_static_pc' LIMIT 1"
-    )->fetchColumn();
+    $staticPcSeedCache = $results;
+    $staticPcSeedLimit = $limit;
+    return array_slice($results, 0, $limit);
+}
 
-    if ($hasFts && $ftsQuery !== '') {
-        $stmt = $db->prepare(
-            "
-            WITH prefix_matches AS (
-                SELECT
-                    id AS concept_id,
-                    term AS preferred_term,
-                    category,
-                    CASE category WHEN 'finding' THEN 0 ELSE 1 END AS category_order,
-                    -100.0 AS rank,
-                    0 AS source_order
-                FROM zimrx_static_pc
-                WHERE term LIKE :prefix COLLATE NOCASE
-            ),
-            fts_matches AS (
-                SELECT
-                    p.id AS concept_id,
-                    p.term AS preferred_term,
-                    p.category,
-                    CASE p.category WHEN 'finding' THEN 0 ELSE 1 END AS category_order,
-                    bm25(fts_zimrx_static_pc) AS rank,
-                    1 AS source_order
-                FROM fts_zimrx_static_pc f
-                JOIN zimrx_static_pc p ON p.id = f.rowid
-                WHERE fts_zimrx_static_pc MATCH :fts_query
-            ),
-            combined AS (
-                SELECT * FROM prefix_matches
-                UNION ALL
-                SELECT * FROM fts_matches
-            ),
-            deduped AS (
-                SELECT
-                    concept_id,
-                    preferred_term,
-                    category,
-                    category_order,
-                    source_order,
-                    rank,
-                    ROW_NUMBER() OVER (
-                        PARTITION BY concept_id
-                        ORDER BY
-                            source_order ASC,
-                            category_order ASC,
-                            rank ASC,
-                            preferred_term ASC
-                    ) AS row_priority
-                FROM combined
-            )
-            SELECT concept_id, preferred_term, category
-            FROM deduped
-            WHERE row_priority = 1
-            ORDER BY
-                source_order ASC,
-                category_order ASC,
-                rank ASC,
-                preferred_term ASC
-            LIMIT :limit
-            "
-        );
-        $stmt->bindValue(':prefix', $term . '%', PDO::PARAM_STR);
-        $stmt->bindValue(':fts_query', $ftsQuery, PDO::PARAM_STR);
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        return array_slice(pc_sort_static_pc_matches($stmt->fetchAll(), $term), 0, $limit);
-    }
+function pc_static_pc_fts_matches(PDO $db, string $term, string $ftsQuery, int $limit): array {
+    $stmt = $db->prepare(
+        "
+        WITH prefix_matches AS (
+            SELECT
+                id AS concept_id,
+                term AS preferred_term,
+                category,
+                CASE category WHEN 'finding' THEN 0 ELSE 1 END AS category_order,
+                -100.0 AS rank,
+                0 AS source_order
+            FROM zimrx_static_pc
+            WHERE term LIKE :prefix COLLATE NOCASE
+        ),
+        fts_matches AS (
+            SELECT
+                p.id AS concept_id,
+                p.term AS preferred_term,
+                p.category,
+                CASE p.category WHEN 'finding' THEN 0 ELSE 1 END AS category_order,
+                bm25(fts_zimrx_static_pc) AS rank,
+                1 AS source_order
+            FROM fts_zimrx_static_pc f
+            JOIN zimrx_static_pc p ON p.id = f.rowid
+            WHERE fts_zimrx_static_pc MATCH :fts_query
+        ),
+        combined AS (
+            SELECT * FROM prefix_matches
+            UNION ALL
+            SELECT * FROM fts_matches
+        ),
+        deduped AS (
+            SELECT
+                concept_id,
+                preferred_term,
+                category,
+                category_order,
+                source_order,
+                rank,
+                ROW_NUMBER() OVER (
+                    PARTITION BY concept_id
+                    ORDER BY
+                        source_order ASC,
+                        category_order ASC,
+                        rank ASC,
+                        preferred_term ASC
+                ) AS row_priority
+            FROM combined
+        )
+        SELECT concept_id, preferred_term, category
+        FROM deduped
+        WHERE row_priority = 1
+        ORDER BY
+            source_order ASC,
+            category_order ASC,
+            rank ASC,
+            preferred_term ASC
+        LIMIT :limit
+        "
+    );
+    $stmt->bindValue(':prefix', $term . '%', PDO::PARAM_STR);
+    $stmt->bindValue(':fts_query', $ftsQuery, PDO::PARAM_STR);
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt->execute();
+    return array_slice(pc_sort_static_pc_matches($stmt->fetchAll(), $term), 0, $limit);
+}
 
+function pc_static_pc_like_matches(PDO $db, string $term, int $limit): array {
     $stmt = $db->prepare(
         "
         SELECT id AS concept_id, term AS preferred_term, category
@@ -833,6 +827,28 @@ function pc_static_pc_search(string $term, int $limit = 25): array {
     $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
     $stmt->execute();
     return array_slice(pc_sort_static_pc_matches($stmt->fetchAll(), $term), 0, $limit);
+}
+
+function pc_static_pc_search(string $term, int $limit = 25): array {
+    $db = pc_catalog_db('zimrx_static.db');
+    if (!$db instanceof PDO || $limit < 1) {
+        return [];
+    }
+
+    if ($term === '') {
+        return pc_static_pc_seed_matches($db, $limit);
+    }
+
+    $ftsQuery = pc_fts_prefix_query($term);
+    $hasFts = (bool)$db->query(
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'fts_zimrx_static_pc' LIMIT 1"
+    )->fetchColumn();
+
+    if ($hasFts && $ftsQuery !== '') {
+        return pc_static_pc_fts_matches($db, $term, $ftsQuery, $limit);
+    }
+
+    return pc_static_pc_like_matches($db, $term, $limit);
 }
 
 function pc_snomed_search(string $term, int $limit = 25): array {

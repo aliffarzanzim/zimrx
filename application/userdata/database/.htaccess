@@ -1,4 +1,4 @@
-# Deny all direct HTTP access
+# Deny all direct HTTP requests to protect patient database files
 <IfModule mod_authz_core.c>
     Require all denied
 </IfModule>

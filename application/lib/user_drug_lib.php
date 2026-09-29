@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Doctor-customized medications: custom additions, brand overrides, manufacturer priority ranking, and hidden brand suppression.
+
 function zimrx_user_drug_pdo(): PDO {
     $pdo = DbConnections::userdata();
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);

@@ -1,4 +1,5 @@
 <?php
+// Resolves default and learned medication regimens based on generic templates, doctor history, and route constraints.
 declare(strict_types=1);
 
 require_once __DIR__ . '/../auth.php';

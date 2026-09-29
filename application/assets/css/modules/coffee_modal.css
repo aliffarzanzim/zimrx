@@ -1,3 +1,5 @@
+/* Support modal styling, payment methods, and contribution cards */
+
 /* Backdrop */
     .coffee-backdrop {
         display: none;
@@ -13,7 +15,7 @@
         animation: coffeeFade 0.2s ease-out;
     }
     .coffee-backdrop.open {
-        display: flex;
+        display: flex !important;
     }
 
     @keyframes coffeeFade {
@@ -23,13 +25,13 @@
 
     /* Dialog Box */
     .coffee-dialog {
-        background: #ffffff;
+        background: var(--zrx-bg-card);
         border-radius: 20px;
         max-width: 560px;
         width: 100%;
         max-height: 92vh;
         overflow: hidden;
-        box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(0, 0, 0, 0.05);
+        box-shadow: var(--zrx-shadow-modal);
         position: relative;
         animation: coffeePop 0.26s cubic-bezier(0.16, 1, 0.3, 1);
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -49,7 +51,7 @@
         max-height: 92vh;
         flex: 1 1 auto;
         scrollbar-width: thin;
-        scrollbar-color: #cbd5e1 transparent;
+        scrollbar-color: var(--zrx-border) transparent;
     }
     .coffee-scroll-area::-webkit-scrollbar {
         width: 5px;
@@ -59,11 +61,11 @@
         margin: 16px 0;
     }
     .coffee-scroll-area::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
+        background: var(--zrx-border);
         border-radius: 999px;
     }
     .coffee-scroll-area::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8;
+        background: var(--zrx-border-divider);
     }
 
     /* Close Button */
@@ -76,7 +78,7 @@
         border-radius: 50%;
         background: rgba(241, 245, 249, 0.9);
         border: 1px solid rgba(226, 232, 240, 0.8);
-        color: #64748b;
+        color: var(--zrx-text-muted);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -85,8 +87,8 @@
         z-index: 30;
     }
     .coffee-close-btn:hover {
-        background: #e2e8f0;
-        color: #0f172a;
+        background: var(--zrx-border-subtle);
+        color: var(--zrx-text-main);
         transform: rotate(90deg);
     }
 
@@ -103,12 +105,12 @@
         height: 48px;
         margin: 0 auto 0.6rem;
         border-radius: 14px;
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        color: #ffffff;
+        background: linear-gradient(135deg, var(--zrx-amber-500) 0%, var(--zrx-amber-600) 100%);
+        color: var(--zrx-white);
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 8px 18px -3px rgba(245, 158, 11, 0.4);
+        box-shadow: var(--zrx-shadow-amber-glow);
     }
 
     .coffee-pill {
@@ -117,9 +119,9 @@
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        color: #b45309;
-        background: #fef3c7;
-        border: 1px solid #fde68a;
+        color: var(--zrx-amber-700);
+        background: var(--zrx-amber-100);
+        border: 1px solid var(--zrx-amber-200);
         padding: 0.18rem 0.65rem;
         border-radius: 999px;
         margin-bottom: 0.35rem;
@@ -128,7 +130,7 @@
     .coffee-title {
         font-size: 1.25rem;
         font-weight: 800;
-        color: #0f172a;
+        color: var(--zrx-text-main);
         margin: 0 0 0.35rem;
         letter-spacing: -0.01em;
     }
@@ -137,16 +139,16 @@
         margin: 0;
         font-size: 0.84rem;
         line-height: 1.5;
-        color: #475569;
+        color: var(--zrx-slate-600);
     }
     .coffee-intro strong {
-        color: #0f172a;
+        color: var(--zrx-text-main);
     }
     .coffee-subintro {
         margin: 0.5rem 0 0;
         font-size: 0.84rem;
         font-weight: 600;
-        color: #334155;
+        color: var(--zrx-slate-700);
     }
 
     /* Content Area */
@@ -159,21 +161,21 @@
 
     /* Support Cards */
     .support-item {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
+        background: var(--zrx-bg-card);
+        border: 1px solid var(--zrx-border-subtle);
         border-radius: 12px;
         padding: 0.85rem 1rem;
         transition: all 0.2s ease;
     }
     .support-item:hover {
-        border-color: #cbd5e1;
-        box-shadow: 0 4px 12px -3px rgba(15, 23, 42, 0.05);
+        border-color: var(--zrx-border);
+        box-shadow: var(--zrx-shadow-card);
     }
 
     .item-coffee {
-        background: #ffffff;
-        border-color: #fed7aa;
-        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.04);
+        background: var(--zrx-bg-card);
+        border-color: var(--zrx-orange-200);
+        box-shadow: var(--zrx-shadow-amber-card);
     }
 
     .item-head {
@@ -191,19 +193,19 @@
         justify-content: center;
         flex-shrink: 0;
     }
-    .icon-coffee { background: #fff7ed; color: #ea580c; }
-    .icon-heart  { background: #ffe4e6; color: #e11d48; }
-    .icon-share  { background: #e0f2fe; color: #0284c7; }
+    .icon-coffee { background: var(--zrx-orange-100); color: var(--zrx-orange-700); }
+    .icon-heart  { background: var(--zrx-rose-100); color: var(--zrx-rose-600); }
+    .icon-share  { background: var(--zrx-blue-100); color: var(--zrx-blue-600); }
 
     .item-title {
         font-size: 0.9rem;
         font-weight: 700;
-        color: #0f172a;
+        color: var(--zrx-text-main);
         line-height: 1.2;
     }
     .item-desc {
         font-size: 0.78rem;
-        color: #64748b;
+        color: var(--zrx-text-muted);
         margin-top: 0.15rem;
         line-height: 1.35;
     }
@@ -225,18 +227,18 @@
     .pay-card {
         border-radius: 9px;
         padding: 0.6rem 0.75rem;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--zrx-border-subtle);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
     }
     .pay-bkash {
-        background: #fff5f8;
-        border-color: #fbcfe8;
+        background: var(--zrx-rose-50);
+        border-color: var(--zrx-rose-200);
     }
     .pay-bank {
-        background: #f0fdf4;
-        border-color: #bbf7d0;
+        background: var(--zrx-emerald-50);
+        border-color: var(--zrx-emerald-100);
     }
 
     .pay-card-header {
@@ -256,23 +258,23 @@
         border-radius: 5px;
     }
     .bkash-badge {
-        background: #ffffff;
-        color: #db2777;
-        border: 1px solid #f472b6;
+        background: var(--zrx-bg-card);
+        color: var(--zrx-rose-600);
+        border: 1px solid var(--zrx-rose-400);
     }
     .bank-badge {
-        background: #ffffff;
-        color: #059669;
-        border: 1px solid #6ee7b7;
+        background: var(--zrx-bg-card);
+        color: var(--zrx-emerald-600);
+        border: 1px solid var(--zrx-emerald-300);
     }
 
     .btn-copy {
         display: inline-flex;
         align-items: center;
         gap: 0.25rem;
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
-        color: #475569;
+        background: var(--zrx-bg-card);
+        border: 1px solid var(--zrx-border);
+        color: var(--zrx-slate-600);
         font-size: 0.68rem;
         font-weight: 600;
         padding: 0.18rem 0.48rem;
@@ -282,14 +284,14 @@
         transition: all 0.15s ease;
     }
     .btn-copy:hover {
-        background: #0f172a;
-        border-color: #0f172a;
-        color: #ffffff;
+        background: var(--zrx-text-main);
+        border-color: var(--zrx-text-main);
+        color: var(--zrx-white);
     }
     .btn-copy.copied {
-        background: #059669 !important;
-        border-color: #059669 !important;
-        color: #ffffff !important;
+        background: var(--zrx-emerald-600);
+        border-color: var(--zrx-emerald-600);
+        color: var(--zrx-white);
     }
 
     .pay-number-row {
@@ -299,7 +301,7 @@
         font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
         font-size: 0.98rem;
         font-weight: 700;
-        color: #831843;
+        color: var(--zrx-rose-800);
         letter-spacing: 0.04em;
     }
 
@@ -317,12 +319,12 @@
         line-height: 1.3;
     }
     .bank-k {
-        color: #64748b;
+        color: var(--zrx-text-muted);
         font-size: 0.7rem;
         min-width: 44px;
     }
     .bank-v {
-        color: #0f172a;
+        color: var(--zrx-text-main);
     }
     .bank-bold {
         font-weight: 700;
@@ -330,15 +332,15 @@
     .acct-mono {
         font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
         font-weight: 700;
-        color: #065f46;
+        color: var(--zrx-emerald-700);
         letter-spacing: 0.03em;
         font-size: 0.78rem;
     }
 
     /* Blessing Box */
     .coffee-blessing {
-        background: #fffbeb;
-        border: 1px solid #fef3c7;
+        background: var(--zrx-amber-50);
+        border: 1px solid var(--zrx-amber-100);
         border-radius: 10px;
         padding: 0.7rem 0.85rem;
         display: flex;
@@ -353,7 +355,7 @@
     .blessing-text {
         font-size: 0.76rem;
         line-height: 1.45;
-        color: #92400e;
+        color: var(--zrx-amber-700);
         font-style: italic;
     }
 
@@ -365,12 +367,12 @@
         left: 50%;
         transform: translateX(-50%);
         background: rgba(15, 23, 42, 0.85);
-        color: #ffffff;
+        color: var(--zrx-white);
         font-size: 0.7rem;
         font-weight: 600;
         padding: 0.3rem 0.75rem;
         border-radius: 999px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        box-shadow: var(--zrx-shadow-lg);
         cursor: pointer;
         backdrop-filter: blur(4px);
         align-items: center;

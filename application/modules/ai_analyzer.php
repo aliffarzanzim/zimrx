@@ -1,4 +1,8 @@
-<?php declare(strict_types=1); ?>
+<?php
+declare(strict_types=1);
+
+// AI Analyzer widget: local LLM (Ollama/LM Studio) or cloud provider clinical decision support.
+?>
 <div class="ai-wrapper">
     <!-- Header -->
     <div class="ai-header">
@@ -29,7 +33,7 @@
             </div>
         </div>
 
-        <div style="font-size: 0.72rem; color: #475569; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px 10px; margin-bottom: 8px; line-height: 1.4;">
+        <div style="font-size: 0.72rem; color: var(--zrx-slate-600); background: var(--zrx-bg-canvas); border: 1px solid var(--zrx-border); border-radius: 4px; padding: 6px 10px; margin-bottom: 8px; line-height: 1.4;">
             <strong>Privacy &amp; Data Sovereignty:</strong> Local Ollama/LM Studio processes clinical queries entirely offline with <em>zero external network transmission</em>. Cloud providers transmit de-identified prompts (patient names and contacts are never sent) over the internet.
         </div>
 
@@ -57,7 +61,7 @@
 
     <!-- Chat Box -->
     <div id="ai-chat-box" class="ai-chat-area">
-        <div style="text-align: center; color: #94a3b8; font-size: 0.85rem; margin-top: auto; margin-bottom: auto;">
+        <div style="text-align: center; color: var(--zrx-border-divider); font-size: 0.85rem; margin-top: auto; margin-bottom: auto;">
             AI analysis will appear here.<br>Click "Start Analysis" below.
         </div>
     </div>

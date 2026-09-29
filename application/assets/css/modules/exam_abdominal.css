@@ -1,11 +1,9 @@
-/* =======================================================
-   Local Exam: 9-Region Abdominal Diagram Styles
-======================================================= */
+/* Abdominal examination interactive SVG diagram, quadrant selection, and signs */
 .zrx-exam-mode-nav {
     display: flex;
     gap: 0.4rem;
     margin-bottom: 0.6rem;
-    background: #e2e8f0;
+    background: var(--zrx-border-subtle);
     padding: 3px;
     border-radius: 6px;
     width: fit-content;
@@ -17,7 +15,7 @@
     padding: 4px 10px;
     border: none;
     background: transparent;
-    color: #475569;
+    color: var(--zrx-slate-600);
     font-size: 0.74rem;
     font-weight: 600;
     border-radius: 4px;
@@ -25,16 +23,16 @@
     transition: all 0.14s ease;
 }
 .zrx-exam-mode-tab:hover {
-    color: #0f172a;
+    color: var(--zrx-text-main);
     background: rgba(255, 255, 255, 0.6);
 }
 .zrx-exam-mode-tab.active {
-    background: #ffffff;
-    color: #0f172a;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
+    background: var(--zrx-bg-card);
+    color: var(--zrx-text-main);
+    box-shadow: var(--zrx-shadow-sm);
 }
 .zrx-le-mode-pane[hidden] {
-    display: none !important;
+    display: none;
 }
 
 .zrx-abdo-layout {
@@ -42,8 +40,8 @@
     grid-template-columns: 280px 1fr;
     gap: 0.85rem;
     align-items: start;
-    background: #f8fafc;
-    border: 1px solid #cbd5e1;
+    background: var(--zrx-bg-subtle);
+    border: 1px solid var(--zrx-border);
     border-radius: 6px;
     padding: 0.75rem;
 }
@@ -53,8 +51,8 @@
     }
 }
 .zrx-abdo-diagram-card {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
     border-radius: 6px;
     padding: 0.5rem;
     display: flex;
@@ -71,11 +69,11 @@
 .zrx-abdo-title {
     font-size: 0.76rem;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--zrx-text-main);
 }
 .zrx-abdo-sub {
     font-size: 0.68rem;
-    color: #64748b;
+    color: var(--zrx-text-muted);
 }
 .zrx-abdo-svg-wrap {
     width: 240px;
@@ -87,33 +85,33 @@
     user-select: none;
 }
 .zrx-abdo-region {
-    fill: #ffffff;
-    stroke: #94a3b8;
+    fill: var(--zrx-white);
+    stroke: var(--zrx-border-divider);
     stroke-width: 1.5;
     cursor: pointer;
     transition: fill 0.12s, stroke 0.12s;
 }
 .zrx-abdo-region:hover {
-    fill: #e0f2fe;
-    stroke: #0284c7;
+    fill: var(--zrx-blue-100);
+    stroke: var(--zrx-blue-600);
 }
 .zrx-abdo-region.active {
-    fill: #fee2e2;
-    stroke: #ef4444;
+    fill: var(--zrx-red-100);
+    stroke: var(--zrx-red-500);
     stroke-width: 2.5;
 }
 .zrx-abdo-region.has-findings {
-    fill: #fef3c7;
-    stroke: #f59e0b;
+    fill: var(--zrx-amber-100);
+    stroke: var(--zrx-amber-500);
 }
 .zrx-abdo-region.has-findings.active {
-    fill: #fee2e2;
-    stroke: #ef4444;
+    fill: var(--zrx-red-100);
+    stroke: var(--zrx-red-500);
 }
 .zrx-abdo-text {
     font-size: 11px;
     font-weight: 700;
-    fill: #475569;
+    fill: var(--zrx-slate-600);
     pointer-events: none;
     text-anchor: middle;
 }
@@ -128,11 +126,11 @@
     align-items: center;
     gap: 0.5rem;
     padding-bottom: 0.4rem;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--zrx-border-subtle);
 }
 .zrx-abdo-badge {
-    background: #fee2e2;
-    color: #b91c1c;
+    background: var(--zrx-red-100);
+    color: var(--zrx-red-700);
     font-size: 0.68rem;
     font-weight: 700;
     padding: 2px 7px;
@@ -141,7 +139,7 @@
 .zrx-abdo-selected-name {
     font-size: 0.8rem;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--zrx-text-main);
 }
 .zrx-abdo-sign-grid {
     display: grid;
@@ -152,33 +150,33 @@
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
     border-radius: 5px;
     padding: 4px 8px;
     font-size: 0.72rem;
     font-weight: 600;
-    color: #334155;
+    color: var(--zrx-slate-700);
     cursor: pointer;
     user-select: none;
     transition: all 0.12s ease;
 }
 .zrx-abdo-check-pill:hover {
-    border-color: #94a3b8;
-    background: #f8fafc;
+    border-color: var(--zrx-border-divider);
+    background: var(--zrx-bg-subtle);
 }
 .zrx-abdo-check-pill:has(input:checked) {
-    background: #fee2e2;
-    border-color: #f87171;
-    color: #b91c1c;
+    background: var(--zrx-red-100);
+    border-color: var(--zrx-red-400);
+    color: var(--zrx-red-700);
 }
 .zrx-abdo-check-pill input {
     margin: 0;
-    accent-color: #ef4444;
+    accent-color: var(--zrx-red-500);
 }
 .zrx-abdo-divider {
     border: none;
-    border-top: 1px dashed #cbd5e1;
+    border-top: 1px dashed var(--zrx-border);
     margin: 0.2rem 0;
 }
 

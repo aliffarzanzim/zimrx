@@ -1,13 +1,11 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Migration 002 — Patient, appointment, visit, clinical, vitals, payments, and revisions schema
- */
+// Core clinical schema: patients, appointments, visits, vitals, billing, and revision history.
 class Migration002PatientAppointmentVisit {
 
     public function up(PDO $pdo): void {
-        // ---- zimrx_patients ----
+        // Patient demographics and baseline clinical metrics
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_patients (
                 id " . DbSql::autoIncrement() . ",
@@ -38,7 +36,7 @@ class Migration002PatientAppointmentVisit {
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_patients_reg_no ON zimrx_patients(reg_no)");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_patients_mobile ON zimrx_patients(mobile)");
 
-        // ---- zimrx_patient_doctor_access ----
+        // Multi-doctor permission controls per patient
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_patient_doctor_access (
                 id " . DbSql::autoIncrement() . ",
@@ -53,7 +51,7 @@ class Migration002PatientAppointmentVisit {
             )"
         );
 
-        // ---- zimrx_patient_doctor_access_settings ----
+        // Doctor default permission preferences for new patients
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_patient_doctor_access_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -67,7 +65,7 @@ class Migration002PatientAppointmentVisit {
             )"
         );
 
-        // ---- zimrx_patients_change_log ----
+        // Field-level change audit log for patient records
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_patients_change_log (
                 id " . DbSql::autoIncrement() . ",
@@ -83,7 +81,7 @@ class Migration002PatientAppointmentVisit {
             )"
         );
 
-        // ---- zimrx_patient_particulars_audit ----
+        // Structured audit trail for patient particulars modifications
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_patient_particulars_audit (
                 id " . DbSql::autoIncrement() . ",
@@ -100,7 +98,7 @@ class Migration002PatientAppointmentVisit {
         );
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_audit_patient ON zimrx_patient_particulars_audit(patient_id, created_at)");
 
-        // ---- zimrx_patient_metric_readings ----
+        // Longitudinal metric readings (vitals, growth measurements, lab observations)
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_patient_metric_readings (
                 id " . DbSql::autoIncrement() . ",
@@ -118,7 +116,7 @@ class Migration002PatientAppointmentVisit {
         );
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_metric_pt ON zimrx_patient_metric_readings(patient_id, metric_type, reading_date)");
 
-        // ---- zimrx_appointments ----
+        // Daily clinic appointments, serial tokens, and queue states
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_appointments (
                 id " . DbSql::autoIncrement() . ",
@@ -173,7 +171,7 @@ class Migration002PatientAppointmentVisit {
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_appointments_referrals ON zimrx_appointments(doctor_id, referral_category, referral_name)");
         $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS uid_appointments_doctor_date_no ON zimrx_appointments(doctor_id, appointment_date, appointment_no)");
 
-        // ---- zimrx_appointment_settings ----
+        // Doctor appointment slot and schedule configuration
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_appointment_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -183,7 +181,7 @@ class Migration002PatientAppointmentVisit {
             )"
         );
 
-        // ---- zimrx_payments ----
+        // Billing receipts and visit payments
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_payments (
                 id " . DbSql::autoIncrement() . ",
@@ -205,7 +203,7 @@ class Migration002PatientAppointmentVisit {
             )"
         );
 
-        // ---- zimrx_visit_vitals ----
+        // Pre-consultation assistant vitals check-in
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_visit_vitals (
                 id " . DbSql::autoIncrement() . ",
@@ -226,7 +224,7 @@ class Migration002PatientAppointmentVisit {
             )"
         );
 
-        // ---- zimrx_visits ----
+        // Full clinical consultation records and prescription data
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_visits (
                 id " . DbSql::autoIncrement() . ",
@@ -261,6 +259,7 @@ class Migration002PatientAppointmentVisit {
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_visits_referrals ON zimrx_visits(doctor_id, referral_category, referral_name)");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_zimrx_visits_patient ON zimrx_visits(patient_id, visit_date)");
         
+        // SQLite and Postgres support partial unique indexes; MySQL uses regular indexes
         if (DbConnections::driver() === 'sqlite' || DbConnections::driver() === 'pgsql') {
             $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_visits_doctor_patient_visit_no ON zimrx_visits(doctor_id, patient_id, visit_no) WHERE visit_no IS NOT NULL");
             $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_visits_visit_id ON zimrx_visits(visit_id) WHERE visit_id IS NOT NULL");
@@ -271,7 +270,7 @@ class Migration002PatientAppointmentVisit {
             $pdo->exec("CREATE INDEX IF NOT EXISTS idx_visits_appointment_id ON zimrx_visits(appointment_id)");
         }
 
-        // ---- zimrx_visit_revisions ----
+        // Full historical snapshots created on each prescription revision
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_visit_revisions (
                 id " . DbSql::autoIncrement() . ",
@@ -293,7 +292,7 @@ class Migration002PatientAppointmentVisit {
         );
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_visit_revisions_lookup ON zimrx_visit_revisions(doctor_id, visit_record_id, revision_no)");
 
-        // ---- zimrx_emr_settings ----
+        // Clinic registration formatting and ID generation rules
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_emr_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -306,7 +305,7 @@ class Migration002PatientAppointmentVisit {
             )"
         );
 
-        // ---- zimrx_user_patient_referrals ----
+        // Auto-learned directory of doctor referral sources
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_patient_referrals (
                 id " . DbSql::autoIncrement() . ",
@@ -329,7 +328,7 @@ class Migration002PatientAppointmentVisit {
             $pdo->exec("CREATE INDEX IF NOT EXISTS uid_patient_referrals_doctor_visit_record ON zimrx_user_patient_referrals(doctor_id, visit_record_id)");
         }
 
-        // ---- zimrx_user_occupations ----
+        // Custom occupation vocabulary learned per doctor
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_occupations (
                 id " . DbSql::autoIncrement() . ",
@@ -347,3 +346,4 @@ class Migration002PatientAppointmentVisit {
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_user_occupations_doc ON zimrx_user_occupations(doctor_id, name)");
     }
 }
+

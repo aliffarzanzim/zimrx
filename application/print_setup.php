@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Print setup: prescription typography matrix, generic/brand display styles, decoration lines, and module print slots.
+
 require_once 'auth.php';
 require_login();
 require_once 'db.php';
@@ -41,7 +43,7 @@ if (empty($options['right_width']) || (float)$options['right_width'] === 12.0) {
     $options['right_width'] = '11.0';
 }
 
-$fontOptions = ['Times New Roman', 'Arial', 'Calibri', 'Tahoma', 'Georgia', 'Gabriola', 'Courier New', 'Comic Sans', 'Bradley Hand ITC'];
+$fontOptions = ['Tinos', 'Arimo', 'Carlito', 'Noto Sans', 'Gelasio', 'Alex Brush', 'Cousine', 'Comic Neue', 'Caveat'];
 $banglaFontOptions = [
     'SolaimanLipi' => 'SolaimanLipi',
     'AdorshoLipi' => 'Adorsho Lipi',
@@ -53,7 +55,7 @@ $banglaFontOptions = [
     'MangalikUnicode' => 'Mangalik Unicode',
 ];
 $rxFontOptions = [
-    'Lucida Calligraphy' => 'Lucida Calligraphy',
+    'Marck Script' => 'Marck Script',
     'AkayaKanadaka' => 'Akaya Kanadaka',
     'Birthstone' => 'Birthstone',
     'Charm' => 'Charm',
@@ -150,7 +152,7 @@ $visibilityFields = [
 include 'header.php';
 ?>
 
-<div class="layout-editor-page">
+<div class="layout-editor-page zrx-page-container">
     <div class="layout-editor-heading">
         <div>
             <h1>Print Setup</h1>
@@ -174,13 +176,13 @@ include 'header.php';
     </div>
 
     <div id="print-setup-confirm-modal" class="print-setup-toast" hidden>
-        <div class="print-setup-toast-panel" role="dialog" aria-modal="true" style="width: min(100%, 360px); text-align: center; gap: 1.25rem;">
-            <span class="print-setup-toast-icon" style="color: #b91c1c; border-color: #fecaca; background: #fef2f2;" aria-hidden="true">&#9888;</span>
-            <strong style="font-size: 1.1rem; color: #1e293b;">Reset to Defaults?</strong>
-            <p style="font-size: 0.875rem; color: #64748b; margin: 0;">Are you sure you want to restore the print layout and decoration sizes to default settings? This cannot be undone.</p>
-            <div style="display: flex; gap: 0.75rem; width: 100%; justify-content: center; margin-top: 0.5rem;">
-                <button type="button" id="confirm-reset-cancel" class="btn btn-outline" style="flex: 1; padding: 0.5rem 1rem;">Cancel</button>
-                <button type="button" id="confirm-reset-yes" class="btn btn-primary" style="flex: 1; background-color: #dc2626; border-color: #dc2626; padding: 0.5rem 1rem;">Yes, Reset</button>
+        <div class="print-setup-toast-panel" role="dialog" aria-modal="true" class="print-setup-toast-panel ple-confirm-panel">
+            <span class="print-setup-toast-icon" class="print-setup-toast-icon ple-confirm-icon" aria-hidden="true">&#9888;</span>
+            <strong class="ple-confirm-title">Reset to Defaults?</strong>
+            <p class="ple-confirm-text">Are you sure you want to restore the print layout and decoration sizes to default settings? This cannot be undone.</p>
+            <div class="ple-confirm-actions">
+                <button type="button" id="confirm-reset-cancel" class="btn btn-outline" class="btn btn-outline ple-confirm-btn">Cancel</button>
+                <button type="button" id="confirm-reset-yes" class="btn btn-primary" class="btn btn-primary ple-confirm-btn-danger">Yes, Reset</button>
             </div>
         </div>
     </div>
@@ -641,7 +643,7 @@ include 'header.php';
             <div class="print-cards-row-2col">
                 <div class="print-advanced-card">
                     <h3>Display Configuration</h3>
-                    <div style="overflow-x:auto;">
+                    <div class="zrx-ox-auto">
                         <table class="print-advanced-table">
                             <tr>
                                 <th>Display Header</th>
@@ -720,7 +722,7 @@ include 'header.php';
 
                 <div class="print-advanced-card">
                     <h3>Decoration &amp; Lines</h3>
-                    <div style="overflow-x:auto;">
+                    <div class="zrx-ox-auto">
                         <table class="print-advanced-table">
                             <tr>
                                 <th>Pt Info Top Line</th>
@@ -784,7 +786,7 @@ include 'header.php';
                             <tr>
                                 <th>Presenting Complaints Format</th>
                                 <td colspan="3">
-                                    <select name="pc_format" style="width: 100%; max-width: 320px;">
+                                    <select name="pc_format" class="ple-select-w320">
                                         <?php foreach ($pcFormatOptions as $value => $label): ?>
                                             <option value="<?= preview_escape($value) ?>" <?= bridge_selected((string)($options['pc_format'] ?? 'parentheses'), $value) ?>><?= preview_escape($label) ?></option>
                                         <?php endforeach; ?>
@@ -794,7 +796,7 @@ include 'header.php';
                             <tr>
                                 <th>Diagnosis Format</th>
                                 <td>
-                                    <select name="dx_format" id="dx-format-select" style="width: 100%; max-width: 280px;">
+                                    <select name="dx_format" id="dx-format-select" class="ple-select-w280">
                                         <?php foreach ($dxFormats as $value => $label): ?>
                                             <option value="<?= preview_escape($value) ?>" <?= bridge_selected((string)($options['dx_format'] ?? 'per_line'), $value) ?>><?= preview_escape($label) ?></option>
                                         <?php endforeach; ?>
@@ -816,7 +818,7 @@ include 'header.php';
 
             <div class="print-advanced-card">
                 <h3>Patient Info Configuration</h3>
-                <div style="overflow-x:auto;">
+                <div class="zrx-ox-auto">
                     <table class="print-advanced-table visibility-table">
                         <thead>
                             <tr>
@@ -874,12 +876,12 @@ include 'header.php';
                     <input type="hidden" name="dx_name" value="<?= preview_escape((string)($options['dx_name'] ?? 'Dx')) ?>">
                 </div>
 
-                <div class="print-advanced-split" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                    <div style="overflow-x:auto;">
+                <div class="print-advanced-split" class="ple-2col-grid">
+                    <div class="zrx-ox-auto">
                         <table class="print-advanced-table slot-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 80px;">Print Order</th>
+                                    <th class="ple-w80">Print Order</th>
                                     <th>Module</th>
                                     <th>Edit Label</th>
                                 </tr>
@@ -903,11 +905,11 @@ include 'header.php';
                             </tbody>
                         </table>
                     </div>
-                    <div style="overflow-x:auto;">
+                    <div class="zrx-ox-auto">
                         <table class="print-advanced-table slot-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 80px;">Print Order</th>
+                                    <th class="ple-w80">Print Order</th>
                                     <th>Module</th>
                                     <th>Edit Label</th>
                                 </tr>
@@ -933,7 +935,7 @@ include 'header.php';
                     </div>
                 </div>
                 
-                <h4 style="margin-top: 1.5rem; margin-bottom: 0.75rem; border-top: 1px solid var(--print-border-soft); padding-top: 1.25rem;">History Sections</h4>
+                <h4 class="ple-section-subdivider">History Sections</h4>
                 
                 <!-- Hidden inputs for History submodule labels -->
                 <div id="hidden-history-labels-container">
@@ -945,12 +947,12 @@ include 'header.php';
                     <input type="hidden" name="lbl_history_drug" value="<?= preview_escape((string)($options['lbl_history_drug'] ?? 'Drug History:')) ?>">
                 </div>
 
-                <div class="print-advanced-split" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                    <div style="overflow-x:auto;">
+                <div class="print-advanced-split" class="ple-2col-grid">
+                    <div class="zrx-ox-auto">
                         <table class="print-advanced-table history-slot-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 80px;">Print Order</th>
+                                    <th class="ple-w80">Print Order</th>
                                     <th>History Field</th>
                                     <th>Edit Label</th>
                                 </tr>
@@ -974,11 +976,11 @@ include 'header.php';
                             </tbody>
                         </table>
                     </div>
-                    <div style="overflow-x:auto;">
+                    <div class="zrx-ox-auto">
                         <table class="print-advanced-table history-slot-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 80px;">Print Order</th>
+                                    <th class="ple-w80">Print Order</th>
                                     <th>History Field</th>
                                     <th>Edit Label</th>
                                 </tr>
@@ -1010,5 +1012,5 @@ include 'header.php';
     </form>
 </div>
 
-<script src="assets/js/pages/print_setup_module.js?v=<?= filemtime(__DIR__ . '/assets/js/pages/print_setup_module.js') ?>"></script>
+<script src="assets/js/pages/print_setup.js?v=<?= filemtime(__DIR__ . '/assets/js/pages/print_setup.js') ?>"></script>
 <?php include 'footer.php'; ?>

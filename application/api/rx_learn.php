@@ -1,4 +1,5 @@
 <?php
+// Records and increments usage frequency for prescribed drug regimens, phrases, and instructions.
 declare(strict_types=1);
 
 require_once __DIR__ . '/../auth.php';

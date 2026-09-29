@@ -1,14 +1,4 @@
-// Defined locally to avoid dependency on external load order.
-// SAFETY: Never assign server-fetched or user-supplied content to innerHTML without this.
-const escapeRxHtml = (str) => {
-    if (str === null || str === undefined) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-};
+// Prescription table autocomplete module handling brand/generic lookup, dosages, warnings, and settings.
 
 function initRxAutocomplete() {
     let activeDropdown = null;
@@ -289,13 +279,8 @@ function initRxAutocomplete() {
         return isNaN(numericPrice) ? (price || 'N/A') : `${numericPrice.toFixed(2)} TK.`;
     };
 
-    const escapeRxHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-    }[char]));
+    // Uses shared dropdown utility
+    const escapeRxHtml = (value) => ZimRxDropdown.escapeHtml(value);
 
     const truthyRxFlag = (value) => value === true || value === 1 || value === '1' || String(value).toLowerCase() === 'true';
     const falseRxFlag = (value) => value === false || value === 0 || value === '0' || String(value).toLowerCase() === 'false';
@@ -346,9 +331,8 @@ function initRxAutocomplete() {
         const row = document.createElement('tr');
         row.className = 'pc-row rx-row';
         row.draggable = true;
-        const moveIcon = typeof ZimRxIcon !== 'undefined'
-            ? ZimRxIcon.render('move', 14)
-            : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="19 9 22 12 19 15"></polyline><polyline points="9 19 12 22 15 19"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>';
+        const moveIcon = ZimRxDropdown.renderIcon('move', 14);
+
 
         row.innerHTML = `
             <td class="rx-action rx-drag pc-action pc-drag" style="padding: 0 !important;">

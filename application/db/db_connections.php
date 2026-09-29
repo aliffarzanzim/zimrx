@@ -1,31 +1,16 @@
 <?php
 declare(strict_types=1);
 
-/**
- * ZimRx Database Connection Manager
- * 
- * Provides a unified database connection layer that centralizes PDO instantiation
- * and driver configuration across the application.
- * 
- * - SQLite 3 is currently the primary supported, audited, and production-tested engine.
- * - Multi-engine drivers (MySQL, MariaDB, PostgreSQL) serve as architectural blueprints
- *   for planned cross-engine deployments.
- * 
- * Usage:
- *   DbConnections::userdata()   // Get PDO for userdata database
- *   DbConnections::staticDb()   // Get PDO for static database
- *   DbConnections::systemDb()   // Get PDO for system/drug database
- */
-
+// Central PDO connection manager for ZimRx.
+// Keeps reusable singleton connections for userdata (patients, visits) and static/drug databases.
 class DbConnections {
-    /** @var array<string, PDO> Connection pool */
+
     private static array $connections = [];
 
-    /** @var array Database configuration */
     private static array $config = [
-        'driver'   => 'sqlite',  // sqlite, mysql, mariadb, pgsql
+        'driver'   => 'sqlite', // sqlite, mysql, mariadb, pgsql
         'userdata' => [
-            'path' => null,  // For SQLite: file path; For MySQL: database name
+            'path' => null, // file path for sqlite, database name for mysql/pgsql
             'host' => 'localhost',
             'port' => 3306,
             'user' => 'root',
@@ -47,73 +32,30 @@ class DbConnections {
         ],
     ];
 
-    /**
-     * Initialize database configuration
-     * Call this once at application startup (before any database access)
-     * 
-     * Example for SQLite:
-     *   DbConnections::configure([
-     *       'driver' => 'sqlite',
-     *       'userdata' => ['path' => '/path/to/zimrx_userdata.db'],
-     *       'static' => ['path' => '/path/to/zimrx_static.db'],
-     *   ]);
-     * 
-     * Example for MySQL:
-     *   DbConnections::configure([
-     *       'driver' => 'mysql',
-     *       'userdata' => [
-     *           'host' => 'db.example.com',
-     *           'port' => 3306,
-     *           'user' => 'zimrx_user',
-     *           'pass' => 'password123',
-     *           'path' => 'zimrx_userdata',  // Database name
-     *       ],
-     *       'static' => [
-     *           'host' => 'db.example.com',
-     *           'user' => 'zimrx_user',
-     *           'pass' => 'password123',
-     *           'path' => 'zimrx_static',
-     *       ],
-     *   ]);
-     */
+    // Merge database settings on application startup
     public static function configure(array $config): void {
         self::$config = array_merge(self::$config, $config);
     }
 
-    /**
-     * Get current configuration
-     */
     public static function getConfig(): array {
         return self::$config;
     }
 
-    /**
-     * Get PDO connection to userdata database
-     * Contains: patients, zimrx_visits, appointments, zimrx_user_prescriptions, user-specific data
-     */
+    // Main clinic database: patients, visits, appointments, settings
     public static function userdata(): PDO {
         return self::getConnection('userdata');
     }
 
-    /**
-     * Get PDO connection to static database
-     * Contains: global lookups (zimrx_static_doses, zimrx_static_durations, zimrx_static_instructions, zimrx_static_discount_causes, zimrx_static_pc)
-     */
+    // Static lookup database: standard doses, durations, instructions
     public static function staticDb(): PDO {
         return self::getConnection('static');
     }
 
-    /**
-     * Get PDO connection to system database
-     * Contains: drug master data, ICD-11 codes, Standard P/C (zimrx_static_pc), etc.
-     */
+    // Master drug database and clinical reference data
     public static function systemDb(): PDO {
         return self::getConnection('system');
     }
 
-    /**
-     * Get a named connection (internal use)
-     */
     private static function getConnection(string $name): PDO {
         if (isset(self::$connections[$name])) {
             return self::$connections[$name];
@@ -124,9 +66,6 @@ class DbConnections {
         return $pdo;
     }
 
-    /**
-     * Create a new PDO connection based on driver and configuration
-     */
     private static function createConnection(string $name): PDO {
         $config = self::$config[$name] ?? [];
         $driver = self::$config['driver'] ?? 'sqlite';
@@ -134,21 +73,17 @@ class DbConnections {
         $pdo = match ($driver) {
             'sqlite'  => self::createSqliteConnection($config),
             'mysql'   => self::createMysqlConnection($config),
-            'mariadb' => self::createMysqlConnection($config),  // MariaDB uses MySQL driver
+            'mariadb' => self::createMysqlConnection($config),
             'pgsql'   => self::createPostgresConnection($config),
             default   => throw new RuntimeException("Unsupported database driver: $driver"),
         };
 
-        // Apply universal PDO configuration
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
         return $pdo;
     }
 
-    /**
-     * Create SQLite connection
-     */
     private static function createSqliteConnection(array $config): PDO {
         $path = $config['path'] ?? throw new RuntimeException('SQLite path not configured');
         
@@ -159,7 +94,7 @@ class DbConnections {
 
         $pdo = new PDO("sqlite:$path");
         
-        // SQLite-specific optimizations
+        // WAL mode and busy timeout help avoid database locked errors under concurrency
         $pdo->exec('PRAGMA journal_mode = WAL;');
         $pdo->exec('PRAGMA synchronous = NORMAL;');
         $pdo->exec('PRAGMA foreign_keys = ON;');
@@ -168,9 +103,6 @@ class DbConnections {
         return $pdo;
     }
 
-    /**
-     * Create MySQL or MariaDB connection
-     */
     private static function createMysqlConnection(array $config): PDO {
         $host = $config['host'] ?? 'localhost';
         $port = $config['port'] ?? 3306;
@@ -185,9 +117,6 @@ class DbConnections {
         ]);
     }
 
-    /**
-     * Create PostgreSQL connection
-     */
     private static function createPostgresConnection(array $config): PDO {
         $host = $config['host'] ?? 'localhost';
         $port = $config['port'] ?? 5432;
@@ -200,17 +129,13 @@ class DbConnections {
         return new PDO($dsn);
     }
 
-    /**
-     * Clear all cached connections (useful for testing)
-     */
+    // Reset connections (mainly for unit tests)
     public static function clearCache(): void {
         self::$connections = [];
     }
 
-    /**
-     * Get driver name (for diagnostics)
-     */
     public static function driver(): string {
         return self::$config['driver'] ?? 'sqlite';
     }
 }
+

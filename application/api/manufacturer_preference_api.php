@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Manufacturer preferences API: manages doctor-specific pharmaceutical company ranking and visibility.
+
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../auth.php';
 require_login();
@@ -33,7 +35,7 @@ if ($action !== 'get_list') {
 }
 
 try {
-    // 1. Get complete list of preferences and manufacturers
+    // Complete list of preferences and pharmaceutical manufacturers
     if ($action === 'get_list') {
         // Fetch user custom sorting
         $uStmt = $userDb->prepare(
@@ -128,7 +130,7 @@ try {
         exit;
     }
 
-    // 2. Save complete custom priority order
+    // Save doctor-defined custom priority order
     if ($action === 'save_order') {
         $raw = file_get_contents('php://input');
         $body = json_decode($raw, true) ?: $_POST;
@@ -181,7 +183,7 @@ try {
         exit;
     }
 
-    // 3. Toggle hide/show manufacturer
+    // Toggle manufacturer visibility
     if ($action === 'toggle_hide') {
         $mid = trim((string)($_POST['manufacturer_id'] ?? ''));
         $mName = trim((string)($_POST['manufacturer_name'] ?? ''));
@@ -212,7 +214,7 @@ try {
         exit;
     }
 
-    // 4. Remove single company from custom ranking (reverts to default)
+    // Remove company from custom ranking (reverts to catalog default)
     if ($action === 'remove_custom') {
         $mid = trim((string)($_POST['manufacturer_id'] ?? ''));
         if (!$mid) {
@@ -231,7 +233,7 @@ try {
         exit;
     }
 
-    // 5. Reset all customizations back to system defaults
+    // Reset all manufacturer preferences to system defaults
     if ($action === 'reset_defaults') {
         $del = $userDb->prepare(
             "DELETE FROM zimrx_user_manufacturer_sorting WHERE doctor_id = :doc"

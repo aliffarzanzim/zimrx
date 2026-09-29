@@ -1,11 +1,13 @@
 <?php
 declare(strict_types=1);
 
+// Application-wide header: navigation bar, global CSS/JS assets, CSRF injection, and dropdown themes.
+
 require_once 'auth.php';
 require_once 'db.php';
 require_once __DIR__ . '/api/zrx_icons.php';
-include_once __DIR__ . '/modules/coffee_modal.php';
-// Dynamically check which page we are on to highlight the active menu link
+
+// Active route detection for navigation bar highlighting
 $current_page = basename($_SERVER['PHP_SELF']);
 $user_role = current_user_role();
 $is_multi_doctor = isset($pdo) ? zimrx_is_multi_doctor($pdo) : false;
@@ -35,7 +37,6 @@ $help_menu_pages = [
 ];
 $help_menu_active = in_array($current_page, $help_menu_pages, true);
 
-// Set a default page title if one isn't provided
 $page_title = isset($page_title) ? $page_title : "ZimRx - Professional EMR";
 $body_class = isset($body_class) ? trim((string)$body_class) : '';
 $home_page = $user_role === 'admin' ? 'admin.php' : ($user_role === 'assistant' ? 'appointments.php' : 'prescription.php');
@@ -48,11 +49,8 @@ $zrx_dd_theme = $_COOKIE['zimrx_dropdown_theme'] ?? 'subtle-tint';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($page_title) ?></title>
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
-    <!-- Professional Modern Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Flatpickr for the Professional Date Picker -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <!-- Global Custom CSS -->
     <link rel="stylesheet" href="assets/css/layout/global.css?v=<?= filemtime(__DIR__ . '/assets/css/layout/global.css') ?>">
     <?php
     $zrx_dd_bg = $_COOKIE['zimrx_dropdown_hover_bg'] ?? '';
@@ -172,7 +170,7 @@ $zrx_dd_theme = $_COOKIE['zimrx_dropdown_theme'] ?? 'subtle-tint';
         </div>
 
         <?php if ($user_role === 'doctor'): ?>
-        <!-- ── Templates Menu Panel ── -->
+        <!-- Templates Menu Panel -->
         <div id="template-menu-panel" class="floating-nav-menu" hidden>
             <div class="floating-nav-subtitle">Templates</div>
             <a href="#" class="nav-link">Rx Template</a>
@@ -191,14 +189,14 @@ $zrx_dd_theme = $_COOKIE['zimrx_dropdown_theme'] ?? 'subtle-tint';
             <a href="manufacturer_preferences.php" class="nav-link <?= $current_page == 'manufacturer_preferences.php' ? 'active' : '' ?>">Manufacturer Preferences</a>
         </div>
 
-        <!-- ── Billings & Stats Menu Panel ── -->
+        <!-- Billings & Stats Menu Panel -->
         <div id="finance-menu-panel" class="floating-nav-menu" hidden>
             <div class="floating-nav-subtitle">Financials &amp; Analytics</div>
             <a href="billings.php" class="nav-link <?= $current_page == 'billings.php' ? 'active' : '' ?>">Billings</a>
             <a href="performance_dashboard.php" class="nav-link <?= $current_page == 'performance_dashboard.php' ? 'active' : '' ?>">Performance Dashboard</a>
         </div>
 
-        <!-- ── Settings Menu Panel ── -->
+        <!-- Settings Menu Panel -->
         <div id="setup-menu-panel" class="floating-nav-menu" hidden>
             <div class="floating-nav-subtitle">Layout &amp; Print</div>
             <a href="profile_settings.php" class="nav-link <?= $current_page == 'profile_settings.php' ? 'active' : '' ?>">Profile Settings</a>
@@ -222,7 +220,7 @@ $zrx_dd_theme = $_COOKIE['zimrx_dropdown_theme'] ?? 'subtle-tint';
             <a href="#" class="nav-link">Audit Log</a>
         </div>
 
-        <!-- ── Help Menu Panel ── -->
+        <!-- Help Menu Panel -->
         <div id="help-menu-panel" class="floating-nav-menu" hidden>
             <div class="floating-nav-subtitle">Clinical Reference</div>
             <a href="#" class="nav-link">Study Materials</a>
@@ -245,10 +243,10 @@ $zrx_dd_theme = $_COOKIE['zimrx_dropdown_theme'] ?? 'subtle-tint';
                 </svg>
                 <span class="header-chat-badge" id="header-chat-unread-badge" style="display: none;">0</span>
             </button>
-            <div style="font-size: 0.85rem; color: #cbd5e1; font-weight: 500;">
-                <span style="color: #38bdf8; font-weight: 700;"><?= htmlspecialchars(current_user_name()) ?></span>
+            <div style="font-size: 0.85rem; color: var(--zrx-slate-300); font-weight: 500;">
+                <span style="color: var(--zrx-sky-400); font-weight: 700;"><?= htmlspecialchars(current_user_name()) ?></span>
             </div>
-            <a href="logout.php" class="nav-link" style="color: #ef4444; background: rgba(239, 68, 68, 0.1);">Logout</a>
+            <a href="logout.php" class="nav-link" style="color: var(--zrx-red-500); background: var(--zrx-danger-bg);">Logout</a>
         </div>
         <?php endif; ?>
     </header>

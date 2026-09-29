@@ -1,4 +1,5 @@
 <?php
+// Autocomplete suggestions for prescription fields (dose, instruction, duration) with weighted scoring.
 declare(strict_types=1);
 
 require_once __DIR__ . '/../auth.php';

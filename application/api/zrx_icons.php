@@ -1,11 +1,7 @@
 <?php
 declare(strict_types=1);
 
-/**
- * ZimRx Global Icon Registry (PHP)
- * Provides crisp, centralized Feather/Lucide SVG icons across all PHP views.
- */
-
+// Global SVG icon registry; renders Feather/Lucide vector icons for PHP views and JS maps.
 class ZimRxIcon {
     private static array $icons = [
         'user' => '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>',

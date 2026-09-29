@@ -1,21 +1,12 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Migration 014 — Visit-identity columns and patient-particulars audit schema
- *
- * Absorbs every ALTER TABLE / CREATE TABLE that was previously executed at
- * request-time by zimrx_ensure_visit_identity_schema() (visit_identity.php)
- * and ensure_patient_particulars_audit_schema() (particulars_audit_lib.php).
- *
- * After this migration runs, those runtime functions are replaced by
- * fail-closed assertions; no DDL is executed during normal web requests.
- */
+// Audit trail for patient demographic edits, plus standardized visit-identity columns across appointments and clinical visits.
 class Migration014VisitIdentityAndAuditSchema {
 
     public function up(PDO $pdo): void {
 
-        // ── 1. Patient-particulars audit table ────────────────────────────────
+        // Patient demographic audit log tracking field-level diffs, actor role, and source action
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_patient_particulars_audit (
                 id "    . DbSql::autoIncrement() . ",
@@ -35,11 +26,11 @@ class Migration014VisitIdentityAndAuditSchema {
              ON zimrx_patient_particulars_audit(patient_id, created_at)"
         );
 
-        // ── 2. zimrx_appointments — visit-identity column set ─────────────────
+        // Synchronize appointment schema with visit codes, intake vitals, and billing records
         if (DbSchema::tableExists($pdo, 'zimrx_appointments') &&
             !DbSchema::isView($pdo, 'zimrx_appointments')) {
 
-            // Column renames (idempotent — skipped if already done)
+            // Align legacy column names: visit_id becomes DB record ID, visit_code becomes the clinic-facing visit_id
             if (DbSchema::columnExists($pdo, 'zimrx_appointments', 'visit_id') &&
                 !DbSchema::columnExists($pdo, 'zimrx_appointments', 'visit_record_id')) {
                 try {
@@ -79,7 +70,7 @@ class Migration014VisitIdentityAndAuditSchema {
             }
         }
 
-        // ── 3. zimrx_visits — visit-identity column set ───────────────────────
+        // Add doctor assignment, visit code, referrals, and snapshot archive to visits
         if (DbSchema::tableExists($pdo, 'zimrx_visits') &&
             !DbSchema::isView($pdo, 'zimrx_visits')) {
 
@@ -106,7 +97,7 @@ class Migration014VisitIdentityAndAuditSchema {
             }
         }
 
-        // ── 4. zimrx_user_patient_referrals — visit-identity column set ───────
+        // Link referral ledger entries to both internal visit record ID and clinic-facing visit code
         if (DbSchema::tableExists($pdo, 'zimrx_user_patient_referrals')) {
             if (DbSchema::columnExists($pdo, 'zimrx_user_patient_referrals', 'visit_id') &&
                 !DbSchema::columnExists($pdo, 'zimrx_user_patient_referrals', 'visit_record_id')) {

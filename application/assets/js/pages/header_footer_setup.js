@@ -1,7 +1,4 @@
-/**
- * ZimRx - Header & Footer Background Setup Module
- * Auto-extracted from header_footer_background_setup.php
- */
+// Prescription header, footer, background, and doctor seal setup editor.
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('zimrx-header-form');
     
@@ -148,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const normalizeColor = value => String(value || '').replace(/[^a-fA-F0-9]/g, '').slice(0, 6).toUpperCase().padEnd(6, 'F');
 
-    // ---- Iframe preview (Responsive Dynamic Scale) ----
+    // Responsive dynamic scale for iframe preview
     const hfFrame = document.getElementById('hf-preview-frame');
     const hfWrap  = document.getElementById('zrx-paper-wrap');
     const sheetStage = document.querySelector('.zrx-sheet-stage');
@@ -177,9 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     scaleIframe();
 
-    // ================================================================
-    // REAL-TIME INSTANT LIVE PREVIEW SYNC
-    // ================================================================
+    // Real-time live preview sync
     const getPreviewDoc = () => {
         try {
             return hfFrame?.contentDocument || null;
@@ -496,7 +491,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             imageBodyStatus.textContent = 'Uploading...';
-            imageBodyStatus.style.color = 'var(--primary)';
+            imageBodyStatus.style.color = 'var(--zrx-primary)';
 
             const fd = new FormData();
             fd.append('image_body', imageBodyInput.files[0]);
@@ -669,7 +664,7 @@ document.addEventListener('DOMContentLoaded', () => {
         logoGalleryUploadInput.addEventListener('change', async () => {
             if (!logoGalleryUploadInput.files.length) return;
             logoGalleryUploadStatus.textContent = 'Uploading...';
-            logoGalleryUploadStatus.style.color = 'var(--primary)';
+            logoGalleryUploadStatus.style.color = 'var(--zrx-primary)';
 
             const fd = new FormData();
             fd.append('logo', logoGalleryUploadInput.files[0]);
@@ -739,9 +734,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ================================================================
-    // BACKGROUND IMAGE GALLERY & CONTROLS
-    // ================================================================
+    // Background image gallery and controls
     const bgImgCard       = document.getElementById('bgimg-card');
     const bgImgBody       = bgImgCard?.querySelector('.zrx-bgimg-body');
     const bgImgPathInput  = document.getElementById('bg_image_path');
@@ -768,9 +761,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const offsetYRange    = document.getElementById('bgimg-offsety-range');
     const offsetYVal      = document.getElementById('bgimg-offsety-val');
 
-    // ================================================================
-    // SEAL & STAMP GALLERY & CONTROLS
-    // ================================================================
+    // Seal and stamp gallery and controls
     const stampCard       = document.getElementById('stamp-card');
     const stampPathInput  = document.getElementById('stamp_path');
     const stampOpacityIn  = document.getElementById('stamp_opacity');
@@ -1027,9 +1018,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePreviewStamp();
     };
 
-    // ================================================================
-    // GALLERY MODAL
-    // ================================================================
+    // Gallery modal
     const overlay      = document.getElementById('zrx-gallery-overlay');
     const galleryGrid  = document.getElementById('zrx-gallery-grid');
     const galleryClose = document.getElementById('zrx-gallery-close');
@@ -1177,7 +1166,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!bgGalleryUploadInput.files.length) return;
             bgGalleryUploadStatus.style.display = 'block';
             bgGalleryUploadStatus.textContent = 'Uploading...';
-            bgGalleryUploadStatus.style.color = 'var(--primary)';
+            bgGalleryUploadStatus.style.color = 'var(--zrx-primary)';
 
             const uploadApi = currentIsBgGallery ? 'api/upload_background_image.php' : 'api/upload_seal_and_stamp.php';
             const fieldName = currentIsBgGallery ? 'bg_image' : 'stamp_image';

@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Clinical prescription templates: doses, durations, and advice phrases with usage-based learning and doctor overrides.
+
 require_once __DIR__ . '/rx_regimen_lib.php';
 
 function rx_template_config(string $type): array {

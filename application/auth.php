@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Authentication, session lifecycle, CSRF tokens, role routing, and SVG upload sanitizer.
+
 $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
 $isLoopback = in_array($remoteAddr, ['127.0.0.1', '::1', ''], true)
     || str_starts_with($remoteAddr, '127.')
@@ -8,6 +10,7 @@ $isLoopback = in_array($remoteAddr, ['127.0.0.1', '::1', ''], true)
 $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
     || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
 
+// Enforce HTTPS encryption on non-local network/LAN connections to protect clinical data
 if (php_sapi_name() !== 'cli' && !$isLoopback && !$isHttps) {
     http_response_code(403);
     header('Content-Type: text/html; charset=utf-8');
@@ -30,9 +33,6 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-/**
- * Check if user is logged in
- */
 function is_logged_in() {
     return isset($_SESSION['user_id']);
 }
@@ -60,30 +60,20 @@ function is_admin_user(): bool {
     return current_user_role() === 'admin';
 }
 
-/**
- * Hash a password using modern cryptographically secure password_hash (Bcrypt/Argon2id).
- */
+// Password hashing and verification routines using native algorithms (bcrypt/Argon2)
 function zimrx_password_hash(string $password): string {
     return password_hash($password, PASSWORD_DEFAULT);
 }
 
-/**
- * Verify a password against a modern cryptographically secure hash (Bcrypt/Argon2id).
- */
 function zimrx_password_verify(string $password, string $storedHash): bool {
     return password_verify($password, $storedHash);
 }
 
-/**
- * Check if a stored password hash needs rehash/upgrade to modern bcrypt/argon2.
- */
 function zimrx_password_needs_rehash(string $storedHash): bool {
     return password_needs_rehash($storedHash, PASSWORD_DEFAULT);
 }
 
-/**
- * CSRF Protection Helpers
- */
+// CSRF prevention using session-bound tokens
 function zimrx_csrf_token(): string {
     if (empty($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -110,9 +100,7 @@ function zimrx_verify_csrf(?string $token = null): bool {
     return is_string($sessionToken) && $sessionToken !== '' && hash_equals($sessionToken, $token);
 }
 
-/**
- * Require login for a page or API endpoint
- */
+// Access gatekeeper: redirects unauthenticated requests and restricts pages according to user role
 function require_login() {
     if (!is_logged_in()) {
         $script = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? $_SERVER['PHP_SELF'] ?? '');
@@ -155,9 +143,7 @@ function require_admin(): void {
     }
 }
 
-/**
- * Safely validate an SVG file to ensure it is valid XML and contains no scripts or active payloads.
- */
+// Inspect uploaded SVG files for embedded JavaScript, event handlers, or external entity injections (XXE)
 function zimrx_validate_safe_svg(string $filePath): bool {
     $content = @file_get_contents($filePath);
     if ($content === false || strlen($content) < 10) {
@@ -185,4 +171,3 @@ function zimrx_validate_safe_svg(string $filePath): bool {
     libxml_use_internal_errors($prevErrors);
     return ($xml !== false && strtolower($xml->getName()) === 'svg');
 }
-?>

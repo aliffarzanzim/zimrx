@@ -1,6 +1,4 @@
-/* =======================================================
-   Dermatology & Lesion Morphology Styles
-======================================================= */
+/* Dermatology examination layout, anatomical sites, and clinical signs grid */
 .zrx-derma-top-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -13,8 +11,8 @@
     }
 }
 .zrx-derma-sites-card {
-    background: #f8fafc;
-    border: 1px solid #cbd5e1;
+    background: var(--zrx-bg-subtle);
+    border: 1px solid var(--zrx-border);
     border-radius: 6px;
     padding: 0.55rem 0.65rem;
     margin-bottom: 0.65rem;
@@ -25,7 +23,7 @@
 .zrx-derma-card-title {
     font-size: 0.72rem;
     font-weight: 700;
-    color: #334155;
+    color: var(--zrx-slate-700);
     text-transform: uppercase;
     letter-spacing: 0.3px;
 }
@@ -38,8 +36,8 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 0.55rem;
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
     border-radius: 6px;
     padding: 0.6rem;
     margin-bottom: 0.65rem;

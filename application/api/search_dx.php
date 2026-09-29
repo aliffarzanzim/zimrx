@@ -1,4 +1,5 @@
 <?php
+// Search diagnoses using full-text search (FTS), acronym matching, and tiered relevance scoring.
 declare(strict_types=1);
 
 if (!defined('ZIMRX_DB_LIGHTWEIGHT')) {

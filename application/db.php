@@ -1,26 +1,17 @@
 <?php
 declare(strict_types=1);
 
-/**
- * ZimRx Central Database Layer
- *
- * Configures the unified PDO connection manager and executes versioned
- * database migrations on application boot.
- */
+// Central database bootstrapper: loads PDO connection manager, doctor tenancy helpers, and runs pending migrations.
 
-// 1. Include Configuration and Database Subsystems
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db/db_connections.php';
 require_once __DIR__ . '/db/db_schema.php';
 require_once __DIR__ . '/db/db_sql.php';
 require_once __DIR__ . '/db/db_migrator.php';
 
-// 2. Initialize Database Connections
 DbConnections::configure(DB_CONFIG);
 
-/**
- * Central PDO instance for active clinic userdata
- */
+// Primary PDO handle for clinical userdata
 $pdo = null;
 
 if (!defined('ZIMRX_DB_LIGHTWEIGHT')) {
@@ -33,9 +24,7 @@ if (!defined('ZIMRX_DB_LIGHTWEIGHT')) {
     }
 }
 
-/**
- * Get a PDO connection for a specific database path or context
- */
+// Maps legacy file paths or connection names to their pooled PDO handle
 function zimrx_get_pdo(string $dbPath): PDO {
     if (strpos($dbPath, 'zimrx_userdata') !== false) {
         return DbConnections::userdata();
@@ -47,16 +36,11 @@ function zimrx_get_pdo(string $dbPath): PDO {
     return DbConnections::userdata();
 }
 
-/**
- * Check if a table exists in the database
- */
 function zimrx_db_table_exists(PDO $pdo, string $table): bool {
     return DbSchema::tableExists($pdo, $table);
 }
 
-/**
- * Active doctor count for multi-doctor tenancy awareness
- */
+// Counts active doctor accounts for multi-provider layout toggles
 function zimrx_active_doctor_count(PDO $pdo): int {
     try {
         if (!DbSchema::tableExists($pdo, 'zimrx_doctors')) {
@@ -69,19 +53,50 @@ function zimrx_active_doctor_count(PDO $pdo): int {
     }
 }
 
-/**
- * Returns true if the clinic is operating in multi-doctor mode
- */
 function zimrx_is_multi_doctor(PDO $pdo): bool {
     return zimrx_active_doctor_count($pdo) > 1;
 }
 
-/**
- * Sync interface settings from the database to cookies
- */
+// Filter doctor selector based on access rights (admins see all, assistants see assigned doctors)
+function zimrx_doctor_options_for_user(PDO $pdo, int $userId, string $role, int $doctorId = 1): array {
+    $role = strtolower($role);
+    if ($role === 'admin') {
+        return $pdo->query(
+            "SELECT id, doctor_code, display_name, qualifications_en AS qualifications, specialty_en AS specialty, is_active
+             FROM zimrx_doctors
+             WHERE is_active = 1
+             ORDER BY display_name ASC, id ASC"
+        )->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
+    if ($role === 'assistant') {
+        $stmt = $pdo->prepare(
+            "SELECT d.id, d.doctor_code, d.display_name, d.qualifications_en AS qualifications, d.specialty_en AS specialty, d.is_active
+             FROM zimrx_doctor_assistants da
+             JOIN zimrx_doctors d ON d.id = da.doctor_id
+             WHERE da.assistant_user_id = :assistant_user_id
+               AND da.is_active = 1
+               AND d.is_active = 1
+             ORDER BY d.display_name ASC, d.id ASC"
+        );
+        $stmt->execute(['assistant_user_id' => $userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
+    $stmt = $pdo->prepare(
+        "SELECT id, doctor_code, display_name, qualifications_en AS qualifications, specialty_en AS specialty, is_active
+         FROM zimrx_doctors
+         WHERE id = :doctor_id
+         LIMIT 1"
+    );
+    $stmt->execute(['doctor_id' => max(1, $doctorId)]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+}
+
+// Sync persistent dashboard panel layouts from the database into cookies for rapid client-side rendering
 function zimrx_sync_interface_layout(PDO $pdo): void {
     if (!function_exists('current_user_doctor_id')) {
-        return; // auth.php not loaded yet
+        return;
     }
     $doctorId = current_user_doctor_id();
     if ($doctorId <= 0) {
@@ -92,7 +107,6 @@ function zimrx_sync_interface_layout(PDO $pdo): void {
         return;
     }
 
-    // Fetch dashboard settings for this doctor
     $stmt = $pdo->prepare(
         "SELECT setting_key, setting_value 
          FROM zimrx_interface_settings 
@@ -107,15 +121,14 @@ function zimrx_sync_interface_layout(PDO $pdo): void {
         $dbVal = $dbSettings[$key] ?? '';
         $cookieVal = $_COOKIE[$cookieName] ?? '';
 
-        // If DB has a value and it differs from the cookie, override it
         if ($dbVal !== '' && $dbVal !== $cookieVal) {
             setcookie($cookieName, $dbVal, time() + 31536000, '/', '', false, false);
-            $_COOKIE[$cookieName] = $dbVal; // In-memory sync for the current page request
+            $_COOKIE[$cookieName] = $dbVal;
         }
     }
 }
 
-// 3. Run automated versioned schema migrations on boot
+// Run pending migrations unless intentionally running in lightweight mode
 if (!defined('ZIMRX_DB_LIGHTWEIGHT') && $pdo instanceof PDO) {
     try {
         (new DbMigrator())->run($pdo);
@@ -125,6 +138,5 @@ if (!defined('ZIMRX_DB_LIGHTWEIGHT') && $pdo instanceof PDO) {
         exit('Database upgrade failed. Clinical operations are unavailable until migrations complete successfully.');
     }
 
-    // Sync layout settings from DB to Cookies
     zimrx_sync_interface_layout($pdo);
 }

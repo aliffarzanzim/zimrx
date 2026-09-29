@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Patient history module: past medical history, surgical treatments, habits, diet, and drug allergies.
+
 require_once __DIR__ . '/../lib/medical_history_lib.php';
 $medHistoryDoctorId = max(1, (int)(function_exists('current_user_doctor_id') ? current_user_doctor_id() : 1));
 $medHistoryDoctorConfig = med_history_get_doctor_config($medHistoryDoctorId);
@@ -30,7 +32,7 @@ $dietOptions = [
 ?>
 <div class="module-header history-card-header">
     <span>History</span>
-    <div class="history-header-actions" style="display: flex; align-items: center; gap: 6px;">
+    <div class="history-header-actions" class="zrx-flex-ac-6">
         <button type="button" class="history-toggle-all-btn" data-history-toggle-all title="Expand or Collapse All History Sections">
             <?= zrx_icon('chevron-down', 12) ?>
             <span class="history-toggle-all-text">Expand All</span>
@@ -45,7 +47,7 @@ $dietOptions = [
     <?php
     $submodules = [];
 
-    // --- medical ---
+    // Medical conditions
     ob_start();
     ?>
     <section class="history-submodule history-submodule-medical" data-history-submodule="medical">
@@ -75,11 +77,11 @@ $dietOptions = [
                                         <span><?= $label ?></span>
                                     </label>
                                     <?php if ($fieldType === 'textbox'): ?>
-                                        <div class="history-med-input-wrap" style="display: none;">
+                                        <div class="history-med-input-wrap" class="zrx-dn">
                                             <textarea rows="1" class="history-med-value-input" placeholder="<?= $placeholder ?: 'e.g. Details...' ?>"></textarea>
                                         </div>
                                     <?php elseif ($fieldType === 'dropdown_text' || $fieldType === 'dropdown'): ?>
-                                        <div class="history-med-input-wrap" style="display: none;">
+                                        <div class="history-med-input-wrap" class="zrx-dn">
                                             <textarea rows="1" class="history-med-value-input" placeholder="<?= $placeholder ?: ($fieldType === 'dropdown' ? 'Select...' : 'Select or type...') ?>" <?= $fieldType === 'dropdown' ? 'readonly' : '' ?>></textarea>
                                             <button type="button" class="history-med-dropdown-btn" title="Select option" tabindex="-1">
                                                 <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l4 4 4-4"/></svg>
@@ -101,7 +103,7 @@ $dietOptions = [
     <?php
     $submodules['medical'] = ob_get_clean();
 
-    // --- treatment ---
+    // Surgical and procedural treatment history
     ob_start();
     ?>
     <section class="history-submodule history-submodule-treatment" data-history-submodule="treatment">
@@ -113,7 +115,7 @@ $dietOptions = [
                 <span class="history-accordion-title">Treatment History</span>
             </div>
         </button>
-        <div class="history-accordion-content" style="display: none;">
+        <div class="history-accordion-content" class="zrx-dn">
             <div class="pc-wrapper history-treatment-wrapper" id="history-treatment-wrapper">
                 <div class="pc-table-container">
                     <table class="pc-table history-treatment-table" id="history-treatment-table">
@@ -160,7 +162,7 @@ $dietOptions = [
     <?php
     $submodules['treatment'] = ob_get_clean();
 
-    // --- habits ---
+    // Habits and lifestyle risks
     ob_start();
     ?>
     <section class="history-submodule history-submodule-habits" data-history-submodule="habits">
@@ -172,7 +174,7 @@ $dietOptions = [
                 <span class="history-accordion-title">Habits</span>
             </div>
         </button>
-        <div class="history-accordion-content" style="display: none;">
+        <div class="history-accordion-content" class="zrx-dn">
             <div class="history-habits-grid">
                 <?php foreach ($habitOptions as $key => $habit): ?>
                     <div class="history-habit-item">
@@ -181,14 +183,14 @@ $dietOptions = [
                             <span><?= htmlspecialchars($habit['label'], ENT_QUOTES, 'UTF-8') ?></span>
                         </label>
                         <?php if (!empty($habit['unit']) || !empty($habit['placeholder'])): ?>
-                            <span class="history-habit-qty-wrap <?= empty($habit['unit']) ? 'history-habit-text-wrap' : '' ?>" style="display: none;">
+                            <span class="history-habit-qty-wrap <?= empty($habit['unit']) ? 'history-habit-text-wrap' : '' ?>" class="zrx-dn">
                                 <input type="text" class="history-habit-qty-input <?= empty($habit['unit']) ? 'history-habit-text-input-field' : '' ?>" data-unit="<?= htmlspecialchars($habit['unit'], ENT_QUOTES, 'UTF-8') ?>" placeholder="<?= htmlspecialchars($habit['placeholder'], ENT_QUOTES, 'UTF-8') ?>">
                                 <?php if (!empty($habit['unit'])): ?>
                                     <span class="history-habit-qty-unit"><?= htmlspecialchars($habit['unit'], ENT_QUOTES, 'UTF-8') ?></span>
                                 <?php endif; ?>
                             </span>
                             <?php if ($key === 'Smoking'): ?>
-                                <button type="button" class="history-calc-btn" data-history-packyear-open title="Calculate Pack-Years" style="display: none;">
+                                <button type="button" class="history-calc-btn" data-history-packyear-open title="Calculate Pack-Years" class="zrx-dn">
                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <rect x="4" y="2" width="16" height="20" rx="2"></rect>
                                         <line x1="8" y1="6" x2="16" y2="6"></line>
@@ -203,7 +205,7 @@ $dietOptions = [
                                     </svg>
                                 </button>
                             <?php elseif ($key === 'Alcohol Consumption'): ?>
-                                <button type="button" class="history-calc-btn" data-history-alcohol-open title="Calculate Alcohol Units/Week" style="display: none;">
+                                <button type="button" class="history-calc-btn" data-history-alcohol-open title="Calculate Alcohol Units/Week" class="zrx-dn">
                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <rect x="4" y="2" width="16" height="20" rx="2"></rect>
                                         <line x1="8" y1="6" x2="16" y2="6"></line>
@@ -231,7 +233,7 @@ $dietOptions = [
     <?php
     $submodules['habits'] = ob_get_clean();
 
-    // --- diet-hypersensitivity ---
+    // Diet and hypersensitivities
     ob_start();
     ?>
     <section class="history-submodule history-submodule-diet" data-history-submodule="diet-hypersensitivity">
@@ -243,7 +245,7 @@ $dietOptions = [
                 <span class="history-accordion-title">Diet &amp; Hypersensitivity</span>
             </div>
         </button>
-        <div class="history-accordion-content" style="display: none;">
+        <div class="history-accordion-content" class="zrx-dn">
             <label class="history-field-row">
                 <span class="history-control-label">Diet Type</span>
                 <select class="module-input history-select" data-history-field="diet-type">
@@ -267,7 +269,7 @@ $dietOptions = [
     <?php
     $submodules['diet-hypersensitivity'] = ob_get_clean();
 
-    // --- drug-history ---
+    // Past medications and drug history
     ob_start();
     ?>
     <section class="history-submodule history-submodule-dh" data-history-submodule="drug-history">
@@ -279,7 +281,7 @@ $dietOptions = [
                 <span class="history-accordion-title">Drug History</span>
             </div>
         </button>
-        <div class="history-accordion-content" style="display: none;">
+        <div class="history-accordion-content" class="zrx-dn">
             <div class="pc-wrapper history-dh-wrapper" id="dh-wrapper">
                 <div class="pc-table-container">
                     <table class="pc-table history-dh-table" id="dh-table">
@@ -334,7 +336,7 @@ $dietOptions = [
     <?php
     $submodules['drug-history'] = ob_get_clean();
 
-    // --- Render in customized order ---
+    // Render submodules according to doctor's saved layout order
     $defaultHistoryLayout = ['medical', 'treatment', 'habits', 'diet-hypersensitivity', 'drug-history'];
     $historyLayout = $defaultHistoryLayout;
     if (isset($_COOKIE['zimrx_history_layout'])) {
@@ -352,7 +354,7 @@ $dietOptions = [
     ?>
 </div>
 
-<div class="history-calc-modal" id="packyear-calc-modal" hidden style="display: none;">
+<div class="history-calc-modal" id="packyear-calc-modal" hidden class="zrx-dn">
     <div class="history-calc-backdrop" data-history-packyear-close></div>
     <div class="history-calc-panel" role="dialog" aria-modal="true" aria-labelledby="packyear-calc-title">
         <div class="history-calc-header">
@@ -401,7 +403,7 @@ $dietOptions = [
     </div>
 </div>
 
-<div class="history-calc-modal" id="alcohol-calc-modal" hidden style="display: none;">
+<div class="history-calc-modal" id="alcohol-calc-modal" hidden class="zrx-dn">
     <div class="history-calc-backdrop" data-history-alcohol-close></div>
     <div class="history-calc-panel" role="dialog" aria-modal="true" aria-labelledby="alcohol-calc-title">
         <div class="history-calc-header">
@@ -502,7 +504,7 @@ $dietOptions = [
 </div>
 
 <!-- History Settings Modal -->
-<div class="history-med-settings-modal" id="history-med-settings-modal" hidden style="display: none;">
+<div class="history-med-settings-modal" id="history-med-settings-modal" hidden class="zrx-dn">
     <div class="history-med-settings-backdrop" data-med-settings-close></div>
     <div class="history-med-settings-panel" role="dialog" aria-modal="true" aria-labelledby="med-settings-title">
         <div class="history-med-settings-header">
@@ -565,7 +567,7 @@ $dietOptions = [
                 <!-- Right Main Pane: Table View & Collapsible Custom Form -->
                 <div class="history-med-main">
                     <!-- Collapsible Custom Form (Hidden by default) -->
-                    <div class="history-med-add-card" id="med-add-card" style="display: none;">
+                    <div class="history-med-add-card" id="med-add-card" class="zrx-dn">
                         <div class="history-med-add-card-header">
                             <h4>+ Add Custom Condition / Category</h4>
                             <button type="button" class="history-med-add-card-close" id="med-add-card-close">&times;</button>
@@ -591,8 +593,8 @@ $dietOptions = [
                         </div>
 
                         <!-- Dynamic Presets / Notes Section for Custom Condition -->
-                        <div id="med-custom-options-chip-wrap" style="margin-top: 0.6rem;">
-                            <label style="display:block; font-size:0.72rem; font-weight:600; color:#334155; margin-bottom:3px;">
+                        <div id="med-custom-options-chip-wrap" class="med-custom-options-wrap">
+                            <label class="med-custom-label">
                                 Preset Stages / Options (Click text to edit &bull; Drag to reorder):
                             </label>
                             <div class="history-med-chip-container" id="med-custom-chip-container">
@@ -604,14 +606,14 @@ $dietOptions = [
                             </div>
                         </div>
 
-                        <div id="med-custom-placeholder-wrap" style="margin-top: 0.6rem; display: none;">
-                            <label style="display:block; font-size:0.72rem; font-weight:600; color:#334155; margin-bottom:3px;">
+                        <div id="med-custom-placeholder-wrap" class="med-custom-options-wrap" hidden class="zrx-dn">
+                            <label class="med-custom-label">
                                 Guidance Hint (Optional placeholder):
                             </label>
-                            <input type="text" id="med-custom-placeholder" placeholder="e.g. Both eyes, on anti-VEGF" autocomplete="off" style="width: 100%; font-size: 0.8rem; padding: 4px 7px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                            <input type="text" id="med-custom-placeholder" placeholder="e.g. Both eyes, on anti-VEGF" autocomplete="off" class="med-custom-input-full">
                         </div>
 
-                        <div style="display: flex; justify-content: flex-end; margin-top: 0.6rem;">
+                        <div class="med-settings-footer-actions">
                             <button type="button" id="med-add-custom-btn" class="history-med-add-btn">+ Add Condition</button>
                         </div>
                     </div>
@@ -627,13 +629,13 @@ $dietOptions = [
                         <table class="history-med-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 32px; text-align: center;"></th>
-                                    <th style="width: 48px; text-align: center;">Active</th>
-                                    <th style="width: 170px;">Display Label</th>
-                                    <th style="width: 140px;">Category</th>
-                                    <th style="width: 160px;">Input Style</th>
+                                    <th class="hist-cfg-col-drag"></th>
+                                    <th class="hist-cfg-col-active">Active</th>
+                                    <th class="hist-cfg-col-label">Display Label</th>
+                                    <th class="hist-cfg-col-cat">Category</th>
+                                    <th class="hist-cfg-col-style">Input Style</th>
                                     <th>Presets / Notes Hint</th>
-                                    <th style="width: 36px; text-align: center;"></th>
+                                    <th class="hist-cfg-col-del"></th>
                                 </tr>
                             </thead>
                             <tbody id="med-settings-tbody"></tbody>
@@ -652,7 +654,7 @@ $dietOptions = [
         </div>
 
         <!-- Tab Pane 2: Habits (Coming Soon) -->
-        <div class="history-tab-pane" id="history-tab-pane-habits" style="display: none;">
+        <div class="history-tab-pane" id="history-tab-pane-habits" class="zrx-dn">
             <div class="history-coming-soon-card">
                 <div class="coming-soon-badge">Coming soon</div>
                 <div class="coming-soon-icon-circle">
@@ -671,7 +673,7 @@ $dietOptions = [
         </div>
 
         <!-- Tab Pane 3: Treatment History (Coming Soon) -->
-        <div class="history-tab-pane" id="history-tab-pane-treatment" style="display: none;">
+        <div class="history-tab-pane" id="history-tab-pane-treatment" class="zrx-dn">
             <div class="history-coming-soon-card">
                 <div class="coming-soon-badge">Coming soon</div>
                 <div class="coming-soon-icon-circle">
@@ -688,7 +690,7 @@ $dietOptions = [
         </div>
 
         <!-- Tab Pane 4: Diet & Hypersensitivity (Coming Soon) -->
-        <div class="history-tab-pane" id="history-tab-pane-diet" style="display: none;">
+        <div class="history-tab-pane" id="history-tab-pane-diet" class="zrx-dn">
             <div class="history-coming-soon-card">
                 <div class="coming-soon-badge">Coming soon</div>
                 <div class="coming-soon-icon-circle">
@@ -703,7 +705,7 @@ $dietOptions = [
         </div>
 
         <!-- Tab Pane 5: Drug History (Coming Soon) -->
-        <div class="history-tab-pane" id="history-tab-pane-drug" style="display: none;">
+        <div class="history-tab-pane" id="history-tab-pane-drug" class="zrx-dn">
             <div class="history-coming-soon-card">
                 <div class="coming-soon-badge">Coming soon</div>
                 <div class="coming-soon-icon-circle">
@@ -721,13 +723,13 @@ $dietOptions = [
 </div>
 
 <!-- Focused Preset Options Sub-Modal -->
-<div class="history-med-presets-modal" id="history-med-presets-modal" hidden style="display: none;">
+<div class="history-med-presets-modal" id="history-med-presets-modal" hidden class="zrx-dn">
     <div class="history-med-presets-backdrop" data-med-presets-close></div>
     <div class="history-med-presets-panel" role="dialog" aria-modal="true" aria-labelledby="med-presets-modal-title">
         <div class="history-med-presets-header">
             <div>
                 <h4 id="med-presets-modal-title">Manage Presets</h4>
-                <p>Click text to edit &bull; Drag <span style="font-weight:bold;">⋮⋮</span> to swap/reorder &bull; Click &times; to remove.</p>
+                <p>Click text to edit &bull; Drag <span class="text-bold-drag">⋮⋮</span> to swap/reorder &bull; Click &times; to remove.</p>
             </div>
             <button type="button" class="history-med-presets-close" data-med-presets-close aria-label="Close Presets">&times;</button>
         </div>

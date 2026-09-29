@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Drug database view layout: sidebar search, brand monographs, variant pills, and drug management modals.
+
 $initialBrand = $initialDrugDetail['brand'] ?? null;
 $initialClinical = $initialDrugDetail['clinical'] ?? [];
 $initialVariants = $initialDrugDetail['variants'] ?? [];
@@ -378,7 +380,7 @@ function drug_db_view_initial_accordions_html($brand, $clinical, $pregDesc = '')
 
     $therapeuticClass = trim((string)($brand['cls'] ?? ''));
     $therapeuticContent = $therapeuticClass !== ''
-        ? '<div style="display: flex; justify-content: space-between; align-items: center;"><span>' . drug_db_view_e($therapeuticClass) . '</span><i class="fas fa-eye" onclick="searchByClass(\'' . drug_db_view_e(str_replace("'", "\\'", $therapeuticClass)) . '\')" style="color: var(--accent-blue); cursor: pointer; padding: 5px;" title="Browse this class"></i></div>'
+        ? '<div class="db-flex-between"><span>' . drug_db_view_e($therapeuticClass) . '</span><i class="fas fa-eye" onclick="searchByClass(\'' . drug_db_view_e(str_replace("'", "\\'", $therapeuticClass)) . '\')" class="db-accent-btn" title="Browse this class"></i></div>'
         : '';
 
     $sections = [
@@ -457,9 +459,9 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
         $id = (string)($item['generic_id'] ?? '');
         return '
             <div class="res-row" onclick="' . drug_db_view_e(drug_db_view_js_call('loadGenericBrands', $id, $name)) . '">
-                <i class="fas fa-microscope" style="color:#64748b;"></i>
+                <i class="fas fa-microscope" class="zrx-c-muted"></i>
                 <div class="res-info">
-                    <span class="res-brand" style="color:var(--accent-blue);">' . drug_db_view_e($name) . '</span>
+                    <span class="res-brand" class="db-text-accent">' . drug_db_view_e($name) . '</span>
                     <span class="res-price">' . drug_db_view_e($item['brand_count'] ?? '') . ' Brands</span>
                 </div>
             </div>
@@ -470,9 +472,9 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
         $name = (string)($item['cls'] ?? '');
         return '
             <div class="res-row" onclick="' . drug_db_view_e(drug_db_view_js_call('loadClassDetail', $name)) . '">
-                <i class="fas fa-layer-group" style="color:var(--accent-blue); font-size: 1.1rem;"></i>
+                <i class="fas fa-layer-group" class="db-item-lead-title"></i>
                 <div class="res-info">
-                    <span class="res-brand" style="color:var(--navy-dark);">' . drug_db_view_e($name) . '</span>
+                    <span class="res-brand" class="db-text-navy">' . drug_db_view_e($name) . '</span>
                 </div>
             </div>
         ';
@@ -483,9 +485,9 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
         $id = (string)($item['indication_id'] ?? '');
         return '
             <div class="res-row" onclick="' . drug_db_view_e(drug_db_view_js_call('loadIndicationDetail', $id, $name)) . '">
-                <i class="fas fa-stethoscope" style="color:#64748b; font-size: 1.2rem;"></i>
+                <i class="fas fa-stethoscope" class="db-item-icon-lead"></i>
                 <div class="res-info">
-                    <span class="res-brand" style="color:var(--navy-dark);">' . drug_db_view_e($name) . '</span>
+                    <span class="res-brand" class="db-text-navy">' . drug_db_view_e($name) . '</span>
                 </div>
             </div>
         ';
@@ -509,7 +511,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
             <div class="db-subtab">Update</div>
             <div class="db-subtab compact<?= $isInitialDocsMode ? ' active' : '' ?>" id="docsBooksPapersTab">Docs, Books &amp; Papers</div>
         </div>
-        <div class="new-drug-sidebar-panel" id="newDrugSidebarPanel"<?= $isInitialNewDrugMode ? ' style="display:flex;"' : '' ?>>
+        <div class="new-drug-sidebar-panel" id="newDrugSidebarPanel"<?= $isInitialNewDrugMode ? ' class="zrx-df"' : '' ?>>
             <button type="button" class="new-drug-add-btn" id="addNewDrugBtn">
                 <i class="fas fa-plus"></i>
                 Add New Drug
@@ -520,7 +522,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
             </div>
             <div class="new-drug-results-list" id="newDrugResultsList"></div>
         </div>
-        <div class="new-drug-sidebar-panel" id="editDrugSidebarPanel"<?= $isInitialEditDrugMode ? ' style="display:flex;"' : '' ?>>
+        <div class="new-drug-sidebar-panel" id="editDrugSidebarPanel"<?= $isInitialEditDrugMode ? ' class="zrx-df"' : '' ?>>
             <button type="button" class="new-drug-add-btn" id="editDrugPickBtn">
                 <i class="fas fa-pen"></i>
                 Edit a drug
@@ -531,7 +533,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
             </div>
             <div class="new-drug-results-list" id="editDrugResultsList"></div>
         </div>
-        <div class="new-drug-sidebar-panel" id="deleteDrugSidebarPanel"<?= $isInitialDeleteDrugMode ? ' style="display:flex;"' : '' ?>>
+        <div class="new-drug-sidebar-panel" id="deleteDrugSidebarPanel"<?= $isInitialDeleteDrugMode ? ' class="zrx-df"' : '' ?>>
             <button type="button" class="new-drug-add-btn danger" id="deleteDrugPickBtn">
                 <i class="fas fa-trash"></i>
                 Delete a drug
@@ -542,7 +544,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
             </div>
             <div class="new-drug-results-list" id="deleteDrugResultsList"></div>
         </div>
-        <div class="db-search-box"<?= ($isInitialNewDrugMode || $isInitialEditDrugMode || $isInitialDeleteDrugMode) ? ' style="display:none;"' : '' ?>>
+        <div class="db-search-box"<?= ($isInitialNewDrugMode || $isInitialEditDrugMode || $isInitialDeleteDrugMode) ? ' class="zrx-dn"' : '' ?>>
             <input type="text" id="dbSearchInput" class="db-input" placeholder="<?= drug_db_view_e($initialSearchPlaceholder) ?>" value="<?= drug_db_view_e($initialSidebarQuery) ?>">
         </div>
         
@@ -556,7 +558,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
             </div>
         </div>
 
-        <div id="resultsList" class="db-results-list"<?= ($isInitialNewDrugMode || $isInitialEditDrugMode || $isInitialDeleteDrugMode) ? ' style="display:none;"' : '' ?>>
+        <div id="resultsList" class="db-results-list"<?= ($isInitialNewDrugMode || $isInitialEditDrugMode || $isInitialDeleteDrugMode) ? ' class="zrx-dn"' : '' ?>>
             <?php foreach ($initialSidebarResults as $sidebarItem): ?>
                 <?= drug_db_view_sidebar_row($sidebarItem, $initialSidebarMode, $initialActiveBrandId) ?>
             <?php endforeach; ?>
@@ -600,7 +602,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
     </aside>
 
     <main class="db-content">
-        <section class="new-drug-workspace" id="newDrugWorkspace"<?= $isInitialNewDrugMode ? ' style="display:flex;"' : '' ?>>
+        <section class="new-drug-workspace" id="newDrugWorkspace"<?= $isInitialNewDrugMode ? ' class="zrx-df"' : '' ?>>
             <div class="new-drug-workspace-empty" id="newDrugWorkspaceEmpty">
                 <i class="fas fa-capsules"></i>
                 <strong>Select a new drug or add one.</strong>
@@ -684,7 +686,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
             </div>
         </section>
 
-        <section class="new-drug-workspace" id="editDrugWorkspace"<?= $isInitialEditDrugMode ? ' style="display:flex;"' : '' ?>>
+        <section class="new-drug-workspace" id="editDrugWorkspace"<?= $isInitialEditDrugMode ? ' class="zrx-df"' : '' ?>>
             <div class="new-drug-workspace-empty" id="editDrugWorkspaceEmpty">
                 <i class="fas fa-pen-to-square"></i>
                 <strong>Select an edited drug or search a drug to edit.</strong>
@@ -783,7 +785,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
             </div>
         </section>
 
-        <section class="new-drug-workspace" id="deleteDrugWorkspace"<?= $isInitialDeleteDrugMode ? ' style="display:flex;"' : '' ?>>
+        <section class="new-drug-workspace" id="deleteDrugWorkspace"<?= $isInitialDeleteDrugMode ? ' class="zrx-df"' : '' ?>>
             <div class="new-drug-workspace-empty" id="deleteDrugWorkspaceEmpty">
                 <i class="fas fa-trash"></i>
                 <strong>Select a deleted drug or search a drug to delete.</strong>
@@ -829,8 +831,8 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
             </div>
         </section>
 
-        <div id="emptyState" style="<?= ($initialBrand || $isInitialNewDrugMode || $isInitialEditDrugMode || $isInitialDeleteDrugMode || $isInitialDocsMode) ? 'display: none;' : '' ?> text-align: center; padding: 150px 20px; color: #94a3b8;">
-            <i class="fas fa-search-plus" style="font-size: 4rem; margin-bottom: 20px; opacity: 0.3;"></i>
+        <div id="emptyState" class="db-empty-state-view <?= ($initialBrand || $isInitialNewDrugMode || $isInitialEditDrugMode || $isInitialDeleteDrugMode || $isInitialDocsMode) ? 'is-hidden' : '' ?>">
+            <i class="fas fa-search-plus" class="db-empty-state-icon"></i>
             <p>Search and select a medication to view clinical details.</p>
         </div>
 
@@ -844,10 +846,10 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
                         <div class="brand-title">
                             <span id="h_brand"><?= drug_db_view_e($initialBrand['brand_name'] ?? '') ?></span>
                             <span class="brand-strength" id="h_strength"><?= drug_db_view_e($initialBrand['strength'] ?? '') ?></span>
-                            <div id="headerIcon" style="margin-left: 20px;"><?= $initialBrand ? '<img src="assets/images/dosage-form-images/' . drug_db_view_e(drug_db_view_header_icon_file($initialBrand['form'] ?? '', $initialBrand['pres_new_upper'] ?? '')) . '" style="width: 32px; height: 32px; filter: invert(1); opacity: 0.9;">' : '' ?></div>
+                            <div id="headerIcon" class="db-content-header-brand-icon"><?= $initialBrand ? '<img src="assets/images/dosage-form-images/' . drug_db_view_e(drug_db_view_header_icon_file($initialBrand['form'] ?? '', $initialBrand['pres_new_upper'] ?? '')) . '" >' : '' ?></div>
                         </div>
                         <div class="brand-form" id="h_form"><?= drug_db_view_e($initialBrand['form'] ?? '') ?></div>
-                        <div class="brand-generic-top" id="h_generic" style="color: #94a3b8;"><?= drug_db_view_e($initialBrand['generic'] ?? '') ?></div>
+                        <div class="brand-generic-top" id="h_generic" class="zrx-c-muted2"><?= drug_db_view_e($initialBrand['generic'] ?? '') ?></div>
                         <div class="brand-manufacturer-top" id="h_manufacturer"><?= drug_db_view_e($initialBrand['manufacturer'] ?? '') ?></div>
                     </div>
 
@@ -872,7 +874,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
                 <div class="clinical-snapshot" id="clinicalSnapshot"><?= drug_db_view_snapshot_html($initialBrand, $initialClinical) ?></div>
 
                 <div class="also-available">
-                    <div id="sameCompanySection" style="margin-bottom: 20px;">
+                    <div id="sameCompanySection" class="db-section-gap-b20">
                         <span class="also-label">Also available in this company:</span>
                         <div class="pill-container" id="sameCompanyPills">
                             <?php foreach ($initialVariants as $variant): ?>
@@ -948,7 +950,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
     <div class="modal-content drug-editor-modal" onclick="event.stopPropagation()">
         <div class="modal-head">
             <div class="modal-title" id="drugEditorTitle">New Drug</div>
-            <i class="fas fa-times" style="cursor: pointer; font-size: 1.2rem;" onclick="closeDrugEditor()"></i>
+            <i class="fas fa-times" class="db-btn-pointer-lg" onclick="closeDrugEditor()"></i>
         </div>
         <form class="drug-editor-body" id="drugEditorForm">
             <input type="hidden" name="source_type" id="drugEditorSourceType" value="custom">
@@ -1001,7 +1003,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
     <div class="modal-content drug-hidden-modal" onclick="event.stopPropagation()">
         <div class="modal-head">
             <div class="modal-title">Delete / Restore Drugs</div>
-            <i class="fas fa-times" style="cursor: pointer; font-size: 1.2rem;" onclick="closeHiddenDrugModal()"></i>
+            <i class="fas fa-times" class="db-btn-pointer-lg" onclick="closeHiddenDrugModal()"></i>
         </div>
         <div class="drug-hidden-body">
             <div class="drug-hide-current">
@@ -1027,7 +1029,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
                     <option value="">All Forms</option>
                 </select>
             </div>
-            <i class="fas fa-times" style="cursor: pointer; font-size: 1.2rem;" onclick="closeModal()"></i>
+            <i class="fas fa-times" class="db-btn-pointer-lg" onclick="closeModal()"></i>
         </div>
         <div class="modal-body">
             <table class="alt-table" id="altTable">
@@ -1053,7 +1055,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
             <div class="modal-search">
                 <input type="text" id="moaSearchInput" placeholder="Search generic, brands, or mode of action...">
             </div>
-            <i class="fas fa-times" style="cursor: pointer; font-size: 1.2rem;" onclick="closeMoaModal()"></i>
+            <i class="fas fa-times" class="db-btn-pointer-lg" onclick="closeMoaModal()"></i>
         </div>
         <div class="modal-body">
             <table class="alt-table moa-table" id="moaTable">

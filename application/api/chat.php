@@ -1,10 +1,7 @@
 <?php
 declare(strict_types=1);
-/**
- * ZimRx Clinical Internal Messaging API
- * High-performance, scalable communication system supporting direct messages,
- * group channels, attachments, delivery/seen receipts, and customizable quick messages.
- */
+// Internal messaging API: direct messages, attachments, read receipts, and quick message templates.
+
 
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../auth.php';
@@ -64,9 +61,7 @@ if (in_array($action, $mutatingActions, true)) {
 }
 
 try {
-    // -------------------------------------------------------------------------
-    // 1. List Conversations for Current User
-    // -------------------------------------------------------------------------
+    // List conversations for current user
     if ($action === 'list_conversations') {
         $sql = "
             SELECT 
@@ -153,9 +148,7 @@ try {
         exit();
     }
 
-    // -------------------------------------------------------------------------
-    // 2. Get Messages in a Conversation
-    // -------------------------------------------------------------------------
+    // Fetch messages in conversation
     if ($action === 'get_messages') {
         $convId = (int)($_GET['conversation_id'] ?? 0);
         $afterId = (int)($_GET['after_id'] ?? 0);
@@ -291,9 +284,7 @@ try {
         exit();
     }
 
-    // -------------------------------------------------------------------------
-    // 3. Send Message (Supports Text, Patient Cards, and Attachments)
-    // -------------------------------------------------------------------------
+    // Send message (text, patient card, or attachment)
     if ($action === 'send_message') {
         $convId = (int)($_POST['conversation_id'] ?? 0);
         $message = trim($_POST['message'] ?? '');
@@ -481,9 +472,7 @@ try {
         exit();
     }
 
-    // -------------------------------------------------------------------------
-    // 4. Delete or Hide Message
-    // -------------------------------------------------------------------------
+    // Delete or hide message
     if ($action === 'delete_message') {
         $msgId = (int)($_POST['message_id'] ?? 0);
         if ($msgId <= 0) {
@@ -527,9 +516,7 @@ try {
         exit();
     }
 
-    // -------------------------------------------------------------------------
-    // Toggle Pin/Unpin Conversation
-    // -------------------------------------------------------------------------
+    // Toggle pin/unpin conversation
     if ($action === 'toggle_pin') {
         $convId = (int)($_POST['conversation_id'] ?? 0);
         if ($convId <= 0) {
@@ -563,9 +550,7 @@ try {
         exit();
     }
 
-    // -------------------------------------------------------------------------
-    // 5. Start or Find Direct Conversation
-    // -------------------------------------------------------------------------
+    // Start or find direct conversation
     if ($action === 'start_direct') {
         $targetUserId = (int)($_POST['target_user_id'] ?? 0);
         if ($targetUserId <= 0 || $targetUserId === $currentUserId) {
@@ -627,9 +612,7 @@ try {
         exit();
     }
 
-    // -------------------------------------------------------------------------
-    // 6. Quick Messages CRUD (Customizable Presets)
-    // -------------------------------------------------------------------------
+    // Quick message presets management
     if ($action === 'get_quick_messages') {
         $qStmt = $pdo->prepare("
             SELECT id, user_id, title, message, message_type, sort_order, is_active 
@@ -744,9 +727,7 @@ try {
         exit();
     }
 
-    // -------------------------------------------------------------------------
-    // 7. Ultra-Fast Smart Polling Tick Check (Updates Delivery Status)
-    // -------------------------------------------------------------------------
+    // Smart polling tick check and delivery status updates
     if ($action === 'poll') {
         $clientTick = (float)($_GET['since_tick'] ?? 0);
         $activeConvId = (int)($_GET['active_conversation_id'] ?? 0);
@@ -767,7 +748,7 @@ try {
             $updDelivered->execute([':max_id' => $lastKnownMsgId, ':user_id' => $currentUserId]);
         }
 
-        // If client already has latest state, return in 0.2ms
+        // Return early if client already has latest state
         if ($clientTick > 0 && $serverTick <= $clientTick) {
             echo json_encode([
                 'ok' => true,
@@ -881,11 +862,18 @@ try {
 
     throw new RuntimeException('Invalid action.');
 } catch (Throwable $e) {
+    if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
+        try {
+            $pdo->rollBack();
+        } catch (Throwable $rbEx) {
+            error_log('[ZimRx] chat transaction rollback failed: ' . $rbEx->getMessage());
+        }
+    }
     error_log('[ZimRx] chat error: ' . $e->getMessage());
     http_response_code(400);
     echo json_encode([
         'ok' => false,
         'error' => 'An internal error occurred. Please try again.'
-    ]);
+    ], JSON_UNESCAPED_UNICODE);
     exit();
 }

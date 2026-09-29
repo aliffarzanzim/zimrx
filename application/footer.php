@@ -1,13 +1,11 @@
 <?php
 declare(strict_types=1);
 
-// footer.php — shared app footer
-// coffee_modal.php handles its own include-once guard
+// Application-wide footer: copyright notice, software version, and coffee modal trigger.
 include_once __DIR__ . '/modules/coffee_modal.php';
 $app_version = '1.0.0';
 ?>
 
-<!-- ── App Footer ──────────────────────────────────────────────────────── -->
 <footer class="app-footer">
     <span>&copy; <?= date('Y') ?> ZimRx EMR System</span>
     <span class="app-footer-sep">|</span>

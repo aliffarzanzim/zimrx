@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Patient occupation autocomplete API: combines static catalog with doctor custom and pinned occupations.
+
 define('ZIMRX_DB_LIGHTWEIGHT', true);
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/../auth.php';
@@ -14,7 +16,7 @@ try {
     $occupations = [];
     $seen = [];
 
-    // 1. Fetch static default occupations
+    // Static default occupations
     $staticMap = [];
     $stmtStatic = $pdo_static->query("SELECT id, name FROM zimrx_static_occupations ORDER BY name ASC");
     $staticRows = $stmtStatic->fetchAll(PDO::FETCH_ASSOC) ?: [];
@@ -25,7 +27,7 @@ try {
         ];
     }
 
-    // 2. Fetch user learned / custom occupations for the current doctor
+    // Custom or learned occupations for active doctor
     $userMap = [];
     if (DbSchema::tableExists($pdo_user, 'zimrx_user_occupations')) {
         $stmtUser = $pdo_user->prepare(
@@ -69,7 +71,7 @@ try {
         ];
     }
 
-    // Sort: is_pinned DESC, (sort_order > 0 ? sort_order : 999999) ASC, usage_count DESC, name ASC
+    // Prioritize pinned entries, custom sort orders, and frequency
     usort($items, function($a, $b) {
         if ($a['is_pinned'] !== $b['is_pinned']) {
             return $b['is_pinned'] <=> $a['is_pinned'];

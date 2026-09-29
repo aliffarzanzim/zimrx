@@ -1,12 +1,9 @@
-/**
- * ZimRx - Clinical Exam: Urology & Nephrology
- */
+// Urology and nephrology examination module handling findings sync and presets.
 (function() {
   'use strict';
 
   function initExamUrology() {
-    // 11. Urology & Nephrology Examination Handlers
-    // =======================================================
+    // Urology examination handlers
     const uroWrapper = document.getElementById('urology-wrapper');
     if (uroWrapper) {
       const modeTabs = uroWrapper.querySelectorAll('.zrx-exam-mode-tab[data-uro-tab]');
@@ -137,7 +134,7 @@
       }
     }
 
-    // =======================================================
+
   }
 
   if (document.readyState === 'loading') {

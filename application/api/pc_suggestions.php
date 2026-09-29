@@ -1,4 +1,5 @@
 <?php
+// Autocomplete suggestions for Presenting Complaints (complaints, duration, units, and bulk prefetch).
 declare(strict_types=1);
 
 require_once __DIR__ . '/../auth.php';

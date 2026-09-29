@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Header, footer, watermark, and seal/stamp customizer: WYSIWYG text, logo transforms, full-bleed images, and live iframe preview.
+
 require_once 'auth.php';
 require_login();
 require_once 'db.php';
@@ -71,14 +73,14 @@ $rightBlockHtml = zimrx_print_visual_block_html($header, 'right', $rightLines);
 include 'header.php';
 ?>
 
-<main class="header-editor-page">
+<main class="header-editor-page zrx-page-container">
     <div class="zps-heading-card">
         <div class="zps-heading">
             <div>
                 <h1>Header, Footer &amp; Background Setup</h1>
                 <p>Customize your prescription header text/image, footer, background watermark, and stamp.</p>
             </div>
-            <div class="header-editor-heading-actions" style="display: flex; gap: 0.5rem; align-items: center;">
+            <div class="header-editor-heading-actions" class="hfb-flex-gap8">
                 <a href="prescription_preview.php" target="_blank" class="btn btn-outline">Full Preview</a>
                 <a href="page_setup.php" class="btn btn-outline">Page Setup</a>
                 <a href="print_setup.php" class="btn btn-outline">Print Setup</a>
@@ -113,7 +115,7 @@ include 'header.php';
                     <div class="header-editor-panel panel-left">
                         <h2>Left Side Header</h2>
                         <div class="panel-content" style="background: #<?= preview_escape($bgColor) ?>;">
-                            <textarea name="left_block_html" id="left_block_html" style="width: 100%;"><?= preview_escape($leftBlockHtml) ?></textarea>
+                            <textarea name="left_block_html" id="left_block_html" class="zrx-w100"><?= preview_escape($leftBlockHtml) ?></textarea>
                         </div>
                     </div>
 
@@ -121,7 +123,7 @@ include 'header.php';
                     <div class="header-editor-panel panel-middle" id="header-logo-wrap">
                         <h2>Logo</h2>
                         <div class="panel-content logo-settings-panel">
-                            <div class="logo-preview-box <?= $displayLogo === 'yes' ? '' : 'logo-hidden' ?>" style="position: relative;">
+                            <div class="logo-preview-box <?= $displayLogo === 'yes' ? '' : 'logo-hidden' ?>" class="hfb-pos-rel">
                                 <img id="header-logo-preview" src="<?= preview_escape($logoPath) ?>" alt="Logo" class="<?= $logoPath ? '' : 'is-hidden' ?>">
                                 <span id="header-logo-placeholder" class="zrx-logo-placeholder <?= $logoPath ? 'is-hidden' : '' ?>">Logo</span>
                                 <button type="button" id="logo-remove-btn" class="zrx-bgimg-remove <?= $logoPath ? '' : 'is-hidden' ?>" title="Remove logo">&#x2715;</button>
@@ -131,7 +133,7 @@ include 'header.php';
                                 <input type="hidden" name="logo_path" id="logo_path" value="<?= preview_escape($logoPath) ?>">
                                 <input type="file" id="header-logo-file" accept="image/*" hidden>
                                 <div class="zrx-logo-select-row">
-                                    <button type="button" id="logo-open-gallery" class="btn btn-outline" style="width: 100%;">Select Logo</button>
+                                    <button type="button" id="logo-open-gallery" class="btn btn-outline" class="zrx-w100">Select Logo</button>
                                     <button type="button" id="upload-logo-trigger" class="btn btn-outline" title="Upload a new logo from your computer">&#8679; Upload</button>
                                 </div>
                                 <span id="logo-upload-status" class="upload-logo-status"></span>
@@ -166,7 +168,7 @@ include 'header.php';
                     <div class="header-editor-panel panel-right">
                         <h2>Right Side Header</h2>
                         <div class="panel-content" style="background: #<?= preview_escape($bgColor) ?>;">
-                            <textarea name="right_block_html" id="right_block_html" style="width: 100%;"><?= preview_escape($rightBlockHtml) ?></textarea>
+                            <textarea name="right_block_html" id="right_block_html" class="zrx-w100"><?= preview_escape($rightBlockHtml) ?></textarea>
                         </div>
                     </div>
                 </div>
@@ -198,10 +200,7 @@ include 'header.php';
             </section>
         </div>
 
-        <!-- ============================================================
-             TWO-COLUMN LAYOUT: left = Background Image + Footer Editor
-                                right = Live Preview
-        ============================================================ -->
+        <!-- Lower Two-Column Layout -->
         <?php
         $footerWidth = (float)($options['footer_width'] ?? ($options['page_width'] ?? 21));
         if ($footerWidth <= 0) $footerWidth = 21;
@@ -213,7 +212,7 @@ include 'header.php';
 
                 <!-- Header Customization Card -->
                 <section class="header-editor-card zrx-bgimg-card <?= $headerType === 'text' ? '' : 'is-disabled' ?>" id="header-customization-card" style="width:<?= $footerWidth ?>cm; margin-bottom: 1.5rem;">
-                    <div class="zrx-bgimg-card-topbar" style="display:flex; justify-content:space-between; align-items:center;">
+                    <div class="zrx-bgimg-card-topbar" class="hfb-footer-header-row">
                         <h2>Header Customization</h2>
                         <button type="button" id="btn-reset-header-customization" class="zrx-reset-icon-btn" title="Reset Header Customization to Defaults" <?= $headerType === 'text' ? '' : 'disabled' ?>>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -226,22 +225,22 @@ include 'header.php';
                         <?php endif; ?>
                     </div>
 
-                    <div class="control-row" style="margin-bottom: 1.25rem;">
-                        <div style="flex: 1;">
-                            <label class="form-label" style="font-weight: 600; margin-bottom: 0.25rem; display: block;">Column Widths (%)</label>
-                            <span style="font-size: 0.8rem; color: #64748b; margin-bottom: 0.75rem; display: block;">Note: Column widths must combine to exactly 100% if you edit them.</span>
-                            <div style="display: flex; gap: 1rem;" id="header-widths-container">
-                                <div style="flex: 1;" class="width-ctrl-left">
-                                    <span style="font-size: 0.8rem; color:#64748b;">Left Column Width:</span>
-                                    <input type="number" name="header_left_width" id="header_left_width" min="10" max="80" step="1" class="zps-size-input" style="width: 100%; margin-top: 4px;" value="<?= preview_escape($options['header_left_width'] ?? ($displayLogo === 'yes' ? '40' : '49')) ?>">
+                    <div class="control-row" class="hfb-mb-20">
+                        <div class="hfb-flex-1">
+                            <label class="form-label" class="hfb-label-bold">Column Widths (%)</label>
+                            <span class="hfb-label-muted-desc">Note: Column widths must combine to exactly 100% if you edit them.</span>
+                            <div class="hfb-field-group-row" id="header-widths-container">
+                                <div class="hfb-flex-1" class="width-ctrl-left">
+                                    <span class="hfb-field-label">Left Column Width:</span>
+                                    <input type="number" name="header_left_width" id="header_left_width" min="10" max="80" step="1" class="zps-size-input" class="hfb-full-input" value="<?= preview_escape($options['header_left_width'] ?? ($displayLogo === 'yes' ? '40' : '49')) ?>">
                                 </div>
-                                <div style="flex: 1;" class="width-ctrl-logo">
-                                    <span style="font-size: 0.8rem; color:#64748b;">Logo Column Width:</span>
-                                    <input type="number" name="header_logo_width" id="header_logo_width" min="5" max="50" step="1" class="zps-size-input" style="width: 100%; margin-top: 4px;" value="<?= preview_escape($options['header_logo_width'] ?? '18') ?>">
+                                <div class="hfb-flex-1" class="width-ctrl-logo">
+                                    <span class="hfb-field-label">Logo Column Width:</span>
+                                    <input type="number" name="header_logo_width" id="header_logo_width" min="5" max="50" step="1" class="zps-size-input" class="hfb-full-input" value="<?= preview_escape($options['header_logo_width'] ?? '18') ?>">
                                 </div>
-                                <div style="flex: 1;" class="width-ctrl-right">
-                                    <span style="font-size: 0.8rem; color:#64748b;">Right Column Width:</span>
-                                    <input type="number" name="header_right_width" id="header_right_width" min="10" max="80" step="1" class="zps-size-input" style="width: 100%; margin-top: 4px;" value="<?= preview_escape($options['header_right_width'] ?? ($displayLogo === 'yes' ? '40' : '49')) ?>">
+                                <div class="hfb-flex-1" class="width-ctrl-right">
+                                    <span class="hfb-field-label">Right Column Width:</span>
+                                    <input type="number" name="header_right_width" id="header_right_width" min="10" max="80" step="1" class="zps-size-input" class="hfb-full-input" value="<?= preview_escape($options['header_right_width'] ?? ($displayLogo === 'yes' ? '40' : '49')) ?>">
                                 </div>
                             </div>
                         </div>
@@ -249,52 +248,52 @@ include 'header.php';
 
                     <!-- Logo Transformation Panel -->
                     <div id="logo-customization-controls" class="<?= $displayLogo === 'yes' ? '' : 'is-hidden' ?>">
-                        <label class="form-label" style="font-weight: 600; margin-bottom: 0.5rem; display: block; border-top: 1px solid #e2e8f0; padding-top: 1rem;">Logo Placement &amp; Transformation</label>
+                        <label class="form-label" class="hfb-section-header-bordered">Logo Placement &amp; Transformation</label>
                         
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem 1.5rem;">
+                        <div class="hfb-grid-2col-responsive">
                             <!-- Scale Slider -->
                             <div class="control-group">
-                                <div style="display:flex; justify-content:space-between; font-size: 0.8rem; color:#64748b;">
+                                <div class="hfb-field-label-between">
                                     <span>Logo Scale:</span>
                                     <strong id="logo-scale-val"><?= preview_escape($options['logo_scale'] ?? '100') ?>%</strong>
                                 </div>
-                                <input type="range" name="logo_scale" id="logo_scale" min="20" max="250" step="1" value="<?= preview_escape($options['logo_scale'] ?? '100') ?>" style="width: 100%; margin-top: 4px; accent-color: var(--primary);">
+                                <input type="range" name="logo_scale" id="logo_scale" min="20" max="250" step="1" value="<?= preview_escape($options['logo_scale'] ?? '100') ?>" class="hfb-full-input-range">
                             </div>
                             
                             <!-- Rotation Slider -->
                             <div class="control-group">
-                                <div style="display:flex; justify-content:space-between; font-size: 0.8rem; color:#64748b;">
+                                <div class="hfb-field-label-between">
                                     <span>Logo Rotation:</span>
                                     <strong id="logo-rotation-val"><?= preview_escape($options['logo_rotation'] ?? '0') ?>°</strong>
                                 </div>
-                                <input type="range" name="logo_rotation" id="logo_rotation" min="-180" max="180" step="1" value="<?= preview_escape($options['logo_rotation'] ?? '0') ?>" style="width: 100%; margin-top: 4px; accent-color: var(--primary);">
+                                <input type="range" name="logo_rotation" id="logo_rotation" min="-180" max="180" step="1" value="<?= preview_escape($options['logo_rotation'] ?? '0') ?>" class="hfb-full-input-range">
                             </div>
 
                             <!-- Opacity Slider -->
                             <div class="control-group">
-                                <div style="display:flex; justify-content:space-between; font-size: 0.8rem; color:#64748b;">
+                                <div class="hfb-field-label-between">
                                     <span>Logo Opacity:</span>
                                     <strong id="logo-opacity-val"><?= preview_escape($options['logo_opacity'] ?? '100') ?>%</strong>
                                 </div>
-                                <input type="range" name="logo_opacity" id="logo_opacity" min="0" max="100" step="1" value="<?= preview_escape($options['logo_opacity'] ?? '100') ?>" style="width: 100%; margin-top: 4px; accent-color: var(--primary);">
+                                <input type="range" name="logo_opacity" id="logo_opacity" min="0" max="100" step="1" value="<?= preview_escape($options['logo_opacity'] ?? '100') ?>" class="hfb-full-input-range">
                             </div>
 
                             <!-- X Offset Slider -->
                             <div class="control-group">
-                                <div style="display:flex; justify-content:space-between; font-size: 0.8rem; color:#64748b;">
+                                <div class="hfb-field-label-between">
                                     <span>Horizontal Mover (X):</span>
                                     <strong id="logo-offset-x-val"><?= preview_escape($options['logo_offset_x'] ?? '0') ?>px</strong>
                                 </div>
-                                <input type="range" name="logo_offset_x" id="logo_offset_x" min="-100" max="100" step="1" value="<?= preview_escape($options['logo_offset_x'] ?? '0') ?>" style="width: 100%; margin-top: 4px; accent-color: var(--primary);">
+                                <input type="range" name="logo_offset_x" id="logo_offset_x" min="-100" max="100" step="1" value="<?= preview_escape($options['logo_offset_x'] ?? '0') ?>" class="hfb-full-input-range">
                             </div>
 
                             <!-- Y Offset Slider -->
                             <div class="control-group">
-                                <div style="display:flex; justify-content:space-between; font-size: 0.8rem; color:#64748b;">
+                                <div class="hfb-field-label-between">
                                     <span>Vertical Mover (Y):</span>
                                     <strong id="logo-offset-y-val"><?= preview_escape($options['logo_offset_y'] ?? '0') ?>px</strong>
                                 </div>
-                                <input type="range" name="logo_offset_y" id="logo_offset_y" min="-100" max="100" step="1" value="<?= preview_escape($options['logo_offset_y'] ?? '0') ?>" style="width: 100%; margin-top: 4px; accent-color: var(--primary);">
+                                <input type="range" name="logo_offset_y" id="logo_offset_y" min="-100" max="100" step="1" value="<?= preview_escape($options['logo_offset_y'] ?? '0') ?>" class="hfb-full-input-range">
                             </div>
                         </div>
                     </div>
@@ -410,21 +409,21 @@ include 'header.php';
                                 <input type="range" min="-1200" max="1200" step="1" id="stamp-offsety-range" value="<?= $stampOffsetY ?>">
                             </div>
                             <!-- Customize SVG Stamp Color Checkbox -->
-                            <div class="stamp-control-custom-row" id="stamp-color-enable-row" style="display: none; align-items: center; justify-content: space-between;">
-                                <span style="font-size: 0.82rem; font-weight: 600; color: #475569;">Customize SVG Color</span>
+                            <div class="stamp-control-custom-row" id="stamp-color-enable-row" class="hfb-drawer-field-row">
+                                <span class="hfb-drawer-label">Customize SVG Color</span>
                                 <label class="zrx-switch">
                                     <input type="checkbox" id="stamp-color-enable-chk" <?= $stampColorEnable === 'yes' ? 'checked' : '' ?>>
                                     <span class="zrx-slider"></span>
                                 </label>
                             </div>
                             <!-- SVG Stamp Color Picker -->
-                            <div class="stamp-control-custom-row" id="stamp-color-row" style="display: none; align-items: center; justify-content: space-between;">
-                                <span style="font-size: 0.82rem; font-weight: 600; color: #475569;">Stamp Color</span>
-                                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <input type="color" id="stamp-color-picker" value="<?= preview_escape($stampColor) ?>" style="border: none; width: 36px; height: 36px; padding: 0; background: none; cursor: pointer; border-radius: 6px; flex-shrink: 0;">
-                                    <div class="hex-input-label" style="display: inline-flex; align-items: center; gap: 0.25rem; background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 0.5rem; height: 34px;">
-                                        <span style="color: #64748b; font-size: 0.85rem;">#</span>
-                                        <input type="text" id="stamp-color-hex" value="<?= ltrim($stampColor, '#') ?>" style="width: 70px; border: none; outline: none; font-size: 0.85rem; text-transform: uppercase; color: #334155; font-family: monospace;">
+                            <div class="stamp-control-custom-row" id="stamp-color-row" class="hfb-drawer-field-row">
+                                <span class="hfb-drawer-label">Stamp Color</span>
+                                <div class="zrx-flex-ac-5">
+                                    <input type="color" id="stamp-color-picker" value="<?= preview_escape($stampColor) ?>" class="hfb-color-palette-btn">
+                                    <div class="hex-input-label" class="hfb-color-hex-wrapper">
+                                        <span class="hfb-color-hash">#</span>
+                                        <input type="text" id="stamp-color-hex" value="<?= ltrim($stampColor, '#') ?>" class="hfb-color-hex-field">
                                     </div>
                                 </div>
                             </div>
@@ -458,17 +457,15 @@ include 'header.php';
 
     </form>
 
-    <!-- ============================================================
-         BACKGROUND IMAGE GALLERY POPUP
-    ============================================================ -->
+    <!-- Background Image Gallery Modal -->
     <div class="zrx-gallery-overlay is-hidden" id="zrx-gallery-overlay">
         <div class="zrx-gallery-modal">
             <div class="zrx-gallery-header">
                 <h3 id="zrx-gallery-title">Select Background Image</h3>
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <div id="bg-gallery-upload-container" style="display: none; align-items: center; gap: 0.5rem;">
+                <div class="zrx-flex-ac-5">
+                    <div id="bg-gallery-upload-container" class="hfb-img-actions-flex">
                         <input type="file" id="bg-gallery-upload-input" accept=".svg,.png,.jpg,.jpeg" hidden>
-                        <button type="button" class="btn btn-outline zrx-logo-gallery-upload-btn" id="bg-gallery-upload-btn" style="padding: 0.35rem 0.75rem; font-size: 0.82rem; height: 32px; display: flex; align-items: center; gap: 0.25rem;">&#8679; Upload New</button>
+                        <button type="button" class="btn btn-outline zrx-logo-gallery-upload-btn" id="bg-gallery-upload-btn" class="btn btn-outline hfb-btn-sm-action">&#8679; Upload New</button>
                     </div>
                     <button type="button" class="zrx-gallery-close" id="zrx-gallery-close">&#x2715;</button>
                 </div>
@@ -479,22 +476,20 @@ include 'header.php';
                     <option value="">All Categories</option>
                 </select>
             </div>
-            <div id="bg-gallery-upload-status" class="zrx-logo-gallery-status" style="display: none; margin-bottom: 0.5rem;"></div>
+            <div id="bg-gallery-upload-status" class="zrx-logo-gallery-status" class="hfb-mb-sm"></div>
             <div class="zrx-gallery-grid" id="zrx-gallery-grid">
                 <div class="zrx-gallery-loading">Loading&hellip;</div>
             </div>
         </div>
     </div>
-    <!-- ============================================================
-         LOGO GALLERY POPUP
-    ============================================================ -->
+    <!-- Logo Gallery Modal -->
     <div class="zrx-gallery-overlay is-hidden" id="zrx-logo-gallery-overlay">
         <div class="zrx-gallery-modal">
             <div class="zrx-gallery-header">
                 <h3>Select Logo</h3>
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div class="zrx-flex-ac-5">
                     <input type="file" id="logo-gallery-upload-input" accept="image/*" hidden>
-                    <button type="button" class="btn btn-outline zrx-logo-gallery-upload-btn" id="logo-gallery-upload-btn" style="padding: 0.35rem 0.75rem; font-size: 0.82rem; height: 32px; display: flex; align-items: center; gap: 0.25rem;">&#8679; Upload New</button>
+                    <button type="button" class="btn btn-outline zrx-logo-gallery-upload-btn" id="logo-gallery-upload-btn" class="btn btn-outline hfb-btn-sm-action">&#8679; Upload New</button>
                     <button type="button" class="zrx-gallery-close" id="zrx-logo-gallery-close">&#x2715;</button>
                 </div>
             </div>
@@ -512,17 +507,15 @@ include 'header.php';
     </div>
 
 
-    <!-- ============================================================
-         CUSTOM CONFIRM MODAL
-    ============================================================ -->
-    <div class="zrx-gallery-overlay is-hidden" id="zrx-confirm-overlay" style="z-index: 100001;">
+    <!-- Confirm Modal -->
+    <div class="zrx-gallery-overlay is-hidden" id="zrx-confirm-overlay" class="hfb-drawer-ztop">
         <div class="zrx-confirm-modal">
             <div class="zrx-confirm-body" id="zrx-confirm-message">
                 Are you sure you want to permanently delete this uploaded logo?
             </div>
             <div class="zrx-confirm-actions">
                 <button type="button" class="btn btn-outline" id="zrx-confirm-cancel">Cancel</button>
-                <button type="button" class="btn btn-primary" id="zrx-confirm-ok" style="background: #ef4444; border-color: #ef4444;">Delete</button>
+                <button type="button" class="btn btn-primary" id="zrx-confirm-ok" class="hfb-btn-danger-solid">Delete</button>
             </div>
         </div>
     </div>

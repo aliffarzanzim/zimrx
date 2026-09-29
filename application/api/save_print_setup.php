@@ -1,4 +1,5 @@
 <?php
+// Saves print setup configuration payload (margins, headers, layout parameters) for the active doctor.
 declare(strict_types=1);
 
 require_once __DIR__ . '/../auth.php';

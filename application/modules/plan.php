@@ -1,4 +1,8 @@
-<?php declare(strict_types=1); ?>
+<?php
+declare(strict_types=1);
+
+// Plan module: tabular management/treatment plan items with row ordering and templates.
+?>
 <div class="pc-wrapper" id="plan-wrapper">
     <div class="pc-table-container">
         <table class="pc-table" id="plan-table">
@@ -60,4 +64,4 @@
     </template>
 </div>
 
-<script src="assets/js/modules/plan_module.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/plan_module.js') ?>"></script>
+<script src="assets/js/modules/plan.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/plan.js') ?>"></script>

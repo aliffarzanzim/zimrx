@@ -1,4 +1,5 @@
 <?php
+// Saves new or learned address fragments and combinations to the user address database.
 declare(strict_types=1);
 
 define('ZIMRX_DB_LIGHTWEIGHT', true);
@@ -74,7 +75,7 @@ try {
         UNION SELECT 1 FROM zimrx_static_address_postoffice WHERE name = :p OR bn_name = :p
     ");
 
-    // 1. Save individual parts that are not present in static national database
+    // Save individual parts not found in the static address database
     foreach ($clean_parts as $part) {
         $stmt_check->execute(['p' => $part]);
         if (!$stmt_check->fetch()) {
@@ -83,7 +84,7 @@ try {
         }
     }
 
-    // 2. ALSO save the full multi-part combination
+    // Save multi-part compound combination
     if (count($clean_parts) >= 2) {
         $combination = implode(', ', $clean_parts);
         $stmt_upsert->execute(['doctor_id' => $doctor_id, 'name' => $combination]);

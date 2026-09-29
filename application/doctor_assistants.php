@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Assistant management: create, assign, or disassign chamber assistants for the active doctor.
+
 require_once 'auth.php';
 require_login();
 require_once 'db.php';

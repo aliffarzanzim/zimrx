@@ -1,3 +1,7 @@
+/* Appointments workspace layout, queue management, patient desk, and follow-ups */
+@import "../modules/pres_particulars.css";
+
+
 .appointments-page {
     /* Uses universal container width from global.css */
 }
@@ -8,22 +12,22 @@
     justify-content: space-between;
     gap: 18px;
     padding: 20px 22px;
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
     border-radius: 10px;
-    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+    box-shadow: var(--zrx-shadow-card);
 }
 
 .appointment-hero h1 {
     margin: 3px 0 6px;
     font-size: 1.9rem;
     line-height: 1.1;
-    color: #0f172a;
+    color: var(--zrx-text-main);
     letter-spacing: 0;
 }
 
 .appointment-subtitle {
-    color: #64748b;
+    color: var(--zrx-text-muted);
     font-size: 0.95rem;
 }
 
@@ -36,18 +40,18 @@
 .appointment-doctor-selector input[type="text"] {
     width: 100%;
     height: 38px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--zrx-border);
     border-radius: 9px;
-    background: #ffffff;
-    color: #0f172a;
+    background: var(--zrx-bg-card);
+    color: var(--zrx-text-main);
     font: inherit;
     padding: 0 0.8rem;
     outline: none;
 }
 
 .appointment-doctor-selector input[type="text"]:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    border-color: var(--zrx-primary);
+    box-shadow: var(--zrx-shadow-focus);
 }
 
 .appointment-refreshing {
@@ -67,8 +71,8 @@
 }
 
 .appointment-refreshed {
-    background: #d1fae5 !important;
-    color: #047857 !important;
+    background: var(--zrx-emerald-100);
+    color: var(--zrx-emerald-700);
 }
 
 @keyframes appointment-spin {
@@ -76,7 +80,7 @@
 }
 
 .eyebrow {
-    color: #2563eb;
+    color: var(--zrx-primary);
     font-size: 0.72rem;
     font-weight: 800;
     letter-spacing: 0.08em;
@@ -86,8 +90,8 @@
 .appointment-date-card {
     min-width: 260px;
     padding: 14px;
-    background: #f8fafc;
-    border: 1px solid #dbe3ee;
+    background: var(--zrx-bg-subtle);
+    border: 1px solid var(--zrx-border-subtle);
     border-radius: 8px;
     display: flex;
     flex-direction: column;
@@ -99,22 +103,22 @@
     margin-top: 4px;
     width: 100%;
     min-height: 38px;
-    border-color: #1d4ed8 !important;
-    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
-    color: #ffffff !important;
+    border-color: var(--zrx-primary-hover);
+    background: linear-gradient(135deg, var(--zrx-primary), var(--zrx-primary-hover));
+    color: var(--zrx-white);
     font-weight: 900;
     letter-spacing: 0.02em;
-    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.22);
+    box-shadow: var(--zrx-shadow-md);
 }
 
 .appointment-settings-trigger:hover {
-    background: linear-gradient(135deg, #1d4ed8, #1e40af) !important;
-    color: #ffffff !important;
+    background: linear-gradient(135deg, var(--zrx-primary-hover), var(--zrx-blue-800));
+    color: var(--zrx-white);
 }
 
 .appointment-date-card label,
 .appointment-form label span {
-    color: #64748b;
+    color: var(--zrx-text-muted);
     font-size: 0.72rem;
     font-weight: 800;
     letter-spacing: 0.04em;
@@ -127,10 +131,10 @@
     height: 36px;
     width: 100%;
     padding: 0 10px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--zrx-border);
     border-radius: 6px;
-    background: #ffffff;
-    color: #0f172a;
+    background: var(--zrx-bg-card);
+    color: var(--zrx-text-main);
     font: inherit;
     outline: none;
 }
@@ -138,8 +142,8 @@
 .appointment-date-card input:focus,
 .appointment-form input:focus,
 .appointment-form select:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    border-color: var(--zrx-primary);
+    box-shadow: var(--zrx-shadow-focus);
 }
 
 .appointment-workspace {
@@ -152,10 +156,10 @@
 
 .appointment-form,
 .appointment-list-card {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
     border-radius: 10px;
-    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+    box-shadow: var(--zrx-shadow-card);
 }
 
 .appointment-list-card {
@@ -169,7 +173,7 @@
 
 .form-title {
     margin-bottom: 14px;
-    color: #0f172a;
+    color: var(--zrx-text-main);
     font-size: 1rem;
     font-weight: 800;
 }
@@ -204,8 +208,8 @@
     justify-content: space-between;
     gap: 12px;
     padding: 16px;
-    background: #f8fafc;
-    border-bottom: 1px solid #cbd5e1;
+    background: var(--zrx-bg-subtle);
+    border-bottom: 1px solid var(--zrx-border);
 }
 
 .appointment-list-header h2 {
@@ -213,7 +217,7 @@
     align-items: center;
     gap: 0.75rem;
     margin: 0;
-    color: #0f172a;
+    color: var(--zrx-text-main);
     font-size: 1.05rem;
 }
 
@@ -221,18 +225,18 @@
     width: 148px;
     height: 34px;
     padding: 0.25rem 0.5rem;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--zrx-border);
     border-radius: 8px;
-    background: #ffffff;
-    color: #0f172a;
-    font-family: Arial, sans-serif;
+    background: var(--zrx-bg-card);
+    color: var(--zrx-text-main);
+    font-family: "Arimo", sans-serif;
     font-size: 0.92rem;
     font-weight: 600;
 }
 
 #appointment-date-filter,
 #queue-date-input {
-    font-family: Arial, sans-serif;
+    font-family: "Arimo", sans-serif;
 }
 
 .zimrx-date-wrap {
@@ -278,13 +282,13 @@
 
 .zimrx-date-trigger:hover,
 .zimrx-date-trigger:focus-visible {
-    background: #e2e8f0;
+    background: var(--zrx-border-subtle);
     outline: none;
 }
 
 .appointment-list-header p {
     margin-top: 2px;
-    color: #64748b;
+    color: var(--zrx-text-muted);
     font-size: 0.82rem;
 }
 
@@ -317,9 +321,9 @@
     position: sticky;
     top: 0;
     padding: 8px 7px;
-    background: #e2e8f0;
-    border-bottom: 1px solid #cbd5e1;
-    color: #0f172a;
+    background: var(--zrx-border-subtle);
+    border-bottom: 1px solid var(--zrx-border);
+    color: var(--zrx-text-main);
     font-size: 0.75rem;
     text-align: left;
     z-index: 1;
@@ -327,8 +331,8 @@
 
 .appointment-table td {
     padding: 10px 7px;
-    border-bottom: 1px solid #e2e8f0;
-    color: #0f172a;
+    border-bottom: 1px solid var(--zrx-border-subtle);
+    color: var(--zrx-text-main);
     font-size: 0.86rem;
     vertical-align: top;
 }
@@ -336,36 +340,36 @@
 .appointment-table td span {
     display: block;
     margin-top: 2px;
-    color: #64748b;
+    color: var(--zrx-text-muted);
     font-size: 0.78rem;
 }
 
 .serial-cell {
     width: 58px;
-    color: #2563eb;
+    color: var(--zrx-primary);
     font-weight: 800;
 }
 
 .status-pill {
     padding: 3px 9px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--zrx-border);
     border-radius: 999px;
-    background: #f8fafc;
-    color: #475569;
+    background: var(--zrx-bg-subtle);
+    color: var(--zrx-slate-600);
     font-size: 0.75rem;
     font-weight: 800;
 }
 
 .status-pill.done {
-    border-color: #6ee7b7;
-    background: #d1fae5;
-    color: #047857;
+    border-color: var(--zrx-emerald-300);
+    background: var(--zrx-emerald-100);
+    color: var(--zrx-emerald-700);
 }
 
 .status-pill.pending {
-    border-color: #fecaca;
-    background: #fee2e2;
-    color: #b91c1c;
+    border-color: var(--zrx-red-200);
+    background: var(--zrx-red-100);
+    color: var(--zrx-red-700);
 }
 
 .row-actions {
@@ -381,10 +385,10 @@
     align-items: center;
     justify-content: center;
     padding: 4px 8px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--zrx-border);
     border-radius: 5px;
-    background: #ffffff;
-    color: #0f172a;
+    background: var(--zrx-bg-card);
+    color: var(--zrx-text-main);
     cursor: pointer;
     font: inherit;
     font-size: 0.75rem;
@@ -398,14 +402,14 @@
 
 .row-actions button:hover,
 .row-actions a:hover {
-    border-color: #2563eb;
-    color: #2563eb;
+    border-color: var(--zrx-primary);
+    color: var(--zrx-primary);
 }
 
 .empty-appointments {
-    padding: 34px 10px !important;
+    padding: 34px 10px;
     text-align: center;
-    color: #64748b !important;
+    color: var(--zrx-text-muted);
 }
 
 @media (max-width: 1024px) {
@@ -437,7 +441,8 @@
     }
 }
 
-/* Patient-particulars appointment desk */
+/* Patient appointment desk and quick particulars card */
+
 
 
 .appointment-patient-card.patient-particulars {
@@ -453,7 +458,7 @@
     width: 175px;
     min-width: 175px;
     padding-left: 1.5rem;
-    border-left: 1px solid var(--border-color, #cbd5e1);
+    border-left: 1px solid var(--zrx-border);
     display: flex;
     flex-direction: column;
     gap: 0.45rem;
@@ -467,7 +472,7 @@
 }
 
 .appointment-side-panel span {
-    color: var(--text-muted, #64748b);
+    color: var(--zrx-text-muted);
     font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 0.04em;
@@ -475,7 +480,7 @@
 }
 
 .appointment-side-panel .field-note {
-    color: #64748b;
+    color: var(--zrx-text-muted);
     font-size: 0.65rem;
     font-weight: 500;
     line-height: 1.2;
@@ -484,10 +489,10 @@
 .appointment-side-panel input,
 .appointment-side-panel textarea {
     width: 100%;
-    border: 1px solid var(--border-color, #cbd5e1);
+    border: 1px solid var(--zrx-border);
     border-radius: 6px;
-    background: #ffffff;
-    color: var(--text-dark, #0f172a);
+    background: var(--zrx-bg-card);
+    color: var(--zrx-text-main);
     font: inherit;
     outline: none;
     font-size: 0.85rem;
@@ -506,8 +511,8 @@
 
 .appointment-side-panel input:focus,
 .appointment-side-panel textarea:focus {
-    border-color: var(--primary, #2563eb);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    border-color: var(--zrx-primary);
+    box-shadow: var(--zrx-shadow-focus);
 }
 
 .appointment-actions {
@@ -524,7 +529,48 @@
 }
 
 .appointment-lookup-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
     z-index: 1100;
+    min-width: 290px;
+    width: max-content;
+    max-width: 440px;
+    max-height: 420px;
+    margin: 0;
+    padding: 0;
+    background: var(--zrx-dropdown-bg);
+    border: 1px solid var(--zrx-dropdown-border);
+    border-radius: var(--zrx-dropdown-radius);
+    box-shadow: var(--zrx-dropdown-shadow);
+    list-style: none;
+    overflow-y: auto;
+    display: none;
+    scrollbar-width: thin;
+    scrollbar-color: var(--zrx-slate-300) transparent;
+}
+.appointment-lookup-list::-webkit-scrollbar { width: 6px; }
+.appointment-lookup-list::-webkit-scrollbar-track { background: transparent; }
+.appointment-lookup-list::-webkit-scrollbar-thumb { background-color: var(--zrx-slate-300); border-radius: 3px; }
+.appointment-lookup-list::-webkit-scrollbar-thumb:hover { background-color: var(--zrx-slate-400); }
+.appointment-lookup-list.show { display: block; }
+
+.appointment-lookup-list li {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--zrx-dropdown-border-item);
+    color: var(--zrx-text-main);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.88rem;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+.appointment-lookup-list li:last-child { border-bottom: none; }
+.appointment-lookup-list li.active { background-color: var(--zrx-dropdown-hover-bg); }
+html:not([data-dropdown-theme="subtle-tint"]) .appointment-lookup-list li.active,
+html:not([data-dropdown-theme="subtle-tint"]) .appointment-lookup-list li.active * {
+    color: var(--zrx-dropdown-hover-text);
 }
 
 .appointment-table th,
@@ -550,7 +596,7 @@
 .last-visit-cell span {
     display: block;
     margin-top: 2px;
-    color: #64748b;
+    color: var(--zrx-text-muted);
     font-size: 0.78rem;
 }
 
@@ -561,7 +607,7 @@
 .history-table-wrap {
     max-height: min(62vh, 520px);
     overflow: auto;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--zrx-border-subtle);
     border-radius: 10px;
 }
 
@@ -573,14 +619,14 @@
 .history-table th,
 .history-table td {
     padding: 0.65rem 0.7rem;
-    border-bottom: 1px solid #e2e8f0;
-    color: #0f172a;
+    border-bottom: 1px solid var(--zrx-border-subtle);
+    color: var(--zrx-text-main);
     font-size: 0.86rem;
     text-align: left;
 }
 
 .history-table th {
-    background: #f1f5f9;
+    background: var(--zrx-slate-100);
     font-size: 0.76rem;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -591,7 +637,7 @@
 }
 
 .money-cell {
-    color: #0f766e;
+    color: var(--zrx-teal-700);
     font-weight: 800;
 }
 
@@ -600,18 +646,18 @@
     align-items: center;
     justify-content: center;
     padding: 0.2rem 0.55rem;
-    border: 1px solid #fecaca;
+    border: 1px solid var(--zrx-red-200);
     border-radius: 999px;
-    background: #fee2e2;
-    color: #b91c1c;
+    background: var(--zrx-red-100);
+    color: var(--zrx-red-700);
     font-size: 0.75rem;
     font-weight: 800;
 }
 
 .payment-pill.paid {
-    border-color: #6ee7b7;
-    background: #d1fae5;
-    color: #047857;
+    border-color: var(--zrx-emerald-300);
+    background: var(--zrx-emerald-100);
+    color: var(--zrx-emerald-700);
 }
 
 .queue-start-btn {
@@ -621,10 +667,10 @@
     min-width: 98px;
     min-height: 30px;
     padding: 0.3rem 0.72rem;
-    border: 1px solid #2563eb;
+    border: 1px solid var(--zrx-primary);
     border-radius: 999px;
-    background: #2563eb;
-    color: #ffffff;
+    background: var(--zrx-primary);
+    color: var(--zrx-white);
     font-size: 0.76rem;
     font-weight: 800;
     text-decoration: none;
@@ -633,39 +679,40 @@
 }
 
 .queue-start-btn:hover {
-    background: #1d4ed8;
-    border-color: #1d4ed8;
-    color: #ffffff;
+    background: var(--zrx-primary-hover);
+    border-color: var(--zrx-primary-hover);
+    color: var(--zrx-white);
 }
 
 .queue-start-btn.vitals-btn {
-    border-color: #0f766e;
-    background: #0f766e;
+    border-color: var(--zrx-teal-700);
+    background: var(--zrx-teal-700);
 }
 
 .queue-start-btn.vitals-btn:hover {
-    border-color: #115e59;
-    background: #115e59;
+    border-color: var(--zrx-teal-800);
+    background: var(--zrx-teal-800);
 }
 
-.vitals-summary {
-    color: #0f766e !important;
+.vitals-summary,
+td.vitals-summary {
+    color: var(--zrx-teal-700);
     font-weight: 800;
 }
 
 .reg-cell {
-    color: #166534;
+    color: var(--zrx-emerald-700);
     font-weight: 800;
 }
 
 .status-pill.cancelled {
-    border-color: #fecaca;
-    background: #fee2e2;
-    color: #b91c1c;
+    border-color: var(--zrx-red-200);
+    background: var(--zrx-red-100);
+    color: var(--zrx-red-700);
 }
 
 .row-actions button[data-action="delete"] {
-    color: #b91c1c;
+    color: var(--zrx-red-700);
 }
 
 .appointment-modal[hidden] {
@@ -694,10 +741,10 @@
     z-index: 1;
     width: min(560px, 100%);
     padding: 1.2rem;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--zrx-border);
     border-radius: 14px;
-    background: #ffffff;
-    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+    background: var(--zrx-bg-card);
+    box-shadow: var(--zrx-shadow-modal);
 }
 
 .appointment-settings-panel {
@@ -716,12 +763,12 @@
 
 .appointment-modal-header h2 {
     margin: 0.1rem 0 0.2rem;
-    color: #0f172a;
+    color: var(--zrx-text-main);
     font-size: 1.25rem;
 }
 
 .appointment-modal-header span {
-    color: #64748b;
+    color: var(--zrx-text-muted);
     font-size: 0.82rem;
     font-weight: 700;
 }
@@ -729,10 +776,10 @@
 .appointment-modal-close {
     width: 34px;
     height: 34px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--zrx-border);
     border-radius: 999px;
-    background: #f8fafc;
-    color: #0f172a;
+    background: var(--zrx-bg-subtle);
+    color: var(--zrx-text-main);
     cursor: pointer;
     font-size: 1.3rem;
     line-height: 1;
@@ -762,7 +809,7 @@
 
 .settings-form-grid span,
 .settings-section-title {
-    color: #64748b;
+    color: var(--zrx-text-muted);
     font-size: 0.7rem;
     font-weight: 800;
     letter-spacing: 0.04em;
@@ -771,16 +818,16 @@
 
 .settings-section-title {
     margin: 1rem 0 0.45rem;
-    color: #0f172a;
+    color: var(--zrx-text-main);
 }
 
 .settings-form-grid input {
     height: 36px;
     width: 100%;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--zrx-border);
     border-radius: 7px;
     padding: 0 0.65rem;
-    color: #0f172a;
+    color: var(--zrx-text-main);
     font: inherit;
     outline: none;
 }
@@ -792,8 +839,8 @@
 }
 
 .unit-input input {
-    border-radius: 7px 0 0 7px !important;
-    border-right: 0 !important;
+    border-radius: 7px 0 0 7px;
+    border-right: 0;
 }
 
 .unit-input b {
@@ -801,26 +848,26 @@
     align-items: center;
     justify-content: center;
     min-height: 36px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--zrx-border);
     border-radius: 0 7px 7px 0;
-    background: #e2e8f0;
-    color: #0f172a;
+    background: var(--zrx-border-subtle);
+    color: var(--zrx-text-main);
     font-size: 0.78rem;
     font-weight: 900;
 }
 
 .settings-form-grid input:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    border-color: var(--zrx-primary);
+    box-shadow: var(--zrx-shadow-focus);
 }
 
 .blank-slot-explanation {
     margin-top: 0.85rem;
     padding: 0.85rem;
-    border: 1px solid #bfdbfe;
+    border: 1px solid var(--zrx-blue-200);
     border-radius: 10px;
-    background: #eff6ff;
-    color: #1e3a8a;
+    background: var(--zrx-blue-50);
+    color: var(--zrx-blue-900);
     font-size: 0.82rem;
     line-height: 1.5;
 }
@@ -837,16 +884,16 @@
     align-items: center;
     gap: 0.65rem;
     padding: 0.55rem 0.65rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--zrx-border-subtle);
     border-radius: 8px;
-    background: #f8fafc;
+    background: var(--zrx-bg-subtle);
     font-size: 0.82rem;
 }
 
 .weekday-row input[type="time"] {
     width: 112px;
     height: 30px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--zrx-border);
     border-radius: 6px;
     padding: 0 0.4rem;
 }
@@ -856,9 +903,9 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.45rem 0.75rem;
     padding: 0.75rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--zrx-border-subtle);
     border-radius: 10px;
-    background: #f8fafc;
+    background: var(--zrx-bg-subtle);
     font-size: 0.85rem;
 }
 
@@ -873,7 +920,7 @@
 }
 
 .vitals-grid span {
-    color: #64748b;
+    color: var(--zrx-text-muted);
     font-size: 0.7rem;
     font-weight: 800;
     letter-spacing: 0.04em;
@@ -883,10 +930,10 @@
 .vitals-grid input,
 .vitals-grid textarea {
     width: 100%;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--zrx-border);
     border-radius: 7px;
-    background: #ffffff;
-    color: #0f172a;
+    background: var(--zrx-bg-card);
+    color: var(--zrx-text-main);
     font: inherit;
     outline: none;
 }
@@ -904,8 +951,8 @@
 
 .vitals-grid input:focus,
 .vitals-grid textarea:focus {
-    border-color: #0f766e;
-    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+    border-color: var(--zrx-teal-700);
+    box-shadow: var(--zrx-shadow-focus);
 }
 
 .appointment-modal-actions {
@@ -934,7 +981,7 @@
         min-width: 0;
         padding-top: 1.15rem;
         padding-left: 0;
-        border-top: 1px solid #e2e8f0;
+        border-top: 1px solid var(--zrx-border-subtle);
         border-left: 0;
         display: grid;
         grid-template-columns: 150px 180px 1fr;
@@ -1007,7 +1054,8 @@
     }
 }
 
-/* ── Clean Modern Segmented Control ─────────────────────────────────── */
+/* Queue and follow-up view toggle tabs */
+
 .apt-segmented-wrap {
     display: flex;
     align-items: center;
@@ -1018,8 +1066,8 @@
 .apt-segmented-bar {
     display: inline-flex;
     align-items: center;
-    background: #f1f5f9;
-    border: 1px solid #cbd5e1;
+    background: var(--zrx-slate-100);
+    border: 1px solid var(--zrx-border);
     border-radius: 8px;
     padding: 4px;
     gap: 4px;
@@ -1033,7 +1081,7 @@
     padding: 0.6rem 1.25rem;
     font-size: 0.92rem;
     font-weight: 600;
-    color: #64748b;
+    color: var(--zrx-text-muted);
     background: transparent;
     border: none;
     border-radius: 6px;
@@ -1044,32 +1092,32 @@
 }
 
 .apt-segment-btn svg {
-    color: #94a3b8;
+    color: var(--zrx-border-divider);
     transition: color 0.15s ease;
 }
 
 .apt-segment-btn:hover:not(.active) {
-    color: #0f172a;
+    color: var(--zrx-text-main);
     background: rgba(255, 255, 255, 0.7);
 }
 
 .apt-segment-btn:hover:not(.active) svg {
-    color: #475569;
+    color: var(--zrx-slate-600);
 }
 
 .apt-segment-btn.active {
-    background: #ffffff;
-    color: #0f172a;
+    background: var(--zrx-bg-card);
+    color: var(--zrx-text-main);
     font-weight: 700;
-    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+    box-shadow: var(--zrx-shadow-sm);
 }
 
 .apt-segment-btn.active svg {
-    color: #2563eb;
+    color: var(--zrx-primary);
 }
 
 #btn-tab-followup.active svg {
-    color: #059669;
+    color: var(--zrx-emerald-600);
 }
 
 .apt-segment-badge {
@@ -1082,22 +1130,23 @@
     border-radius: 999px;
     font-size: 0.76rem;
     font-weight: 700;
-    background: #e2e8f0;
-    color: #475569;
+    background: var(--zrx-border-subtle);
+    color: var(--zrx-slate-600);
     transition: all 0.15s ease;
 }
 
 .apt-segment-btn.active .apt-segment-badge {
-    background: #2563eb;
-    color: #ffffff;
+    background: var(--zrx-primary);
+    color: var(--zrx-white);
 }
 
 #btn-tab-followup.active .apt-segment-badge {
-    background: #059669;
-    color: #ffffff;
+    background: var(--zrx-emerald-600);
+    color: var(--zrx-white);
 }
 
-/* ── Follow-up KPI Cards ──────────────────────────────────────────────── */
+/* Follow-up KPI metric cards */
+
 .followup-kpi-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -1118,8 +1167,8 @@
 }
 
 .followup-kpi-card {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
     border-radius: 8px;
     padding: 1rem 1.15rem;
     display: flex;
@@ -1127,13 +1176,13 @@
     gap: 0.85rem;
     cursor: pointer;
     transition: all 0.15s ease;
-    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+    box-shadow: var(--zrx-shadow-card);
 }
 
 .followup-kpi-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
-    border-color: #94a3b8;
+    box-shadow: var(--zrx-shadow-md);
+    border-color: var(--zrx-border-divider);
 }
 
 .kpi-icon-wrap {
@@ -1151,18 +1200,19 @@
     font-size: 1.35rem;
     font-weight: 800;
     line-height: 1.1;
-    color: #0f172a;
+    color: var(--zrx-text-main);
 }
 
 .kpi-lbl {
     font-size: 0.76rem;
     font-weight: 600;
-    color: #64748b;
+    color: var(--zrx-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.03em;
 }
 
-/* ── Follow-up Filter Bar ─────────────────────────────────────────────── */
+/* Follow-up status and date filter toolbar */
+
 .followup-filter-bar {
     display: flex;
     flex-wrap: wrap;
@@ -1170,11 +1220,11 @@
     justify-content: space-between;
     gap: 1rem;
     padding: 0.85rem 1.15rem;
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
     border-radius: 8px;
     margin-bottom: 1.25rem;
-    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.03);
+    box-shadow: var(--zrx-shadow-card);
 }
 
 .followup-filter-chips {
@@ -1189,29 +1239,29 @@
     font-weight: 700;
     padding: 0.35rem 0.75rem;
     border-radius: 6px;
-    border: 1px solid #cbd5e1;
-    background: #ffffff;
-    color: #475569;
+    border: 1px solid var(--zrx-border);
+    background: var(--zrx-bg-card);
+    color: var(--zrx-slate-600);
     cursor: pointer;
     transition: all 0.15s ease;
 }
 
 .followup-chip-btn:hover {
-    background: #f8fafc;
-    border-color: #94a3b8;
+    background: var(--zrx-bg-subtle);
+    border-color: var(--zrx-border-divider);
 }
 
 .followup-chip-btn.active {
-    background: #2563eb;
-    border-color: #2563eb;
-    color: #ffffff;
+    background: var(--zrx-primary);
+    border-color: var(--zrx-primary);
+    color: var(--zrx-white);
 }
 
 .followup-search-input {
     min-width: 280px;
     height: 38px;
     padding: 0 0.85rem;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--zrx-border);
     border-radius: 6px;
     font-size: 0.88rem;
     outline: none;
@@ -1219,8 +1269,8 @@
 }
 
 .followup-search-input:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    border-color: var(--zrx-primary);
+    box-shadow: var(--zrx-shadow-focus);
 }
 
 .status-badge-due {
@@ -1230,9 +1280,9 @@
     font-weight: 700;
     padding: 0.22rem 0.6rem;
     border-radius: 999px;
-    background: #ecfdf5;
-    color: #059669;
-    border: 1px solid #a7f3d0;
+    background: var(--zrx-emerald-50);
+    color: var(--zrx-emerald-600);
+    border: 1px solid var(--zrx-emerald-200);
 }
 
 .status-badge-upcoming {
@@ -1242,9 +1292,9 @@
     font-weight: 700;
     padding: 0.22rem 0.6rem;
     border-radius: 999px;
-    background: #eff6ff;
-    color: #2563eb;
-    border: 1px solid #bfdbfe;
+    background: var(--zrx-blue-50);
+    color: var(--zrx-primary);
+    border: 1px solid var(--zrx-blue-200);
 }
 
 .status-badge-overdue {
@@ -1254,9 +1304,9 @@
     font-weight: 700;
     padding: 0.22rem 0.6rem;
     border-radius: 999px;
-    background: #fffbeb;
-    color: #d97706;
-    border: 1px solid #fde68a;
+    background: var(--zrx-amber-50);
+    color: var(--zrx-amber-600);
+    border: 1px solid var(--zrx-amber-200);
 }
 
 .quick-contact-link {
@@ -1265,7 +1315,7 @@
     gap: 0.25rem;
     font-size: 0.78rem;
     font-weight: 600;
-    color: #2563eb;
+    color: var(--zrx-primary);
     text-decoration: none;
 }
 
@@ -1273,7 +1323,8 @@
     text-decoration: underline;
 }
 
-/* ── Queue KPI Summary Strip ──────────────────────────────────────────── */
+/* Real-time queue KPI summary metrics */
+
 .queue-kpi-strip {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -1288,14 +1339,14 @@
 }
 
 .queue-kpi-item {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
     border-radius: 8px;
     padding: 0.85rem 1.15rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+    box-shadow: var(--zrx-shadow-card);
 }
 
 .queue-kpi-item-left {
@@ -1308,13 +1359,13 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: #64748b;
+    color: var(--zrx-text-muted);
 }
 
 .queue-kpi-number {
     font-size: 1.3rem;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--zrx-text-main);
     line-height: 1.2;
 }
 
@@ -1325,8 +1376,8 @@
     width: 24px;
     height: 24px;
     border-radius: 5px;
-    background: #25d366;
-    color: #ffffff;
+    background: var(--zrx-brand-whatsapp);
+    color: var(--zrx-white);
     text-decoration: none;
     transition: transform 0.15s ease;
     margin-left: 0.35rem;
@@ -1335,5 +1386,148 @@
 
 .whatsapp-reminder-btn:hover {
     transform: scale(1.15);
+}
+
+/* Appointments desk doctor selector and status indicators */
+
+.apt-desk-doctor-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    background: var(--zrx-bg-card);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--zrx-border-subtle);
+}
+
+.apt-desk-doctor-inner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.apt-desk-doctor-label {
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--zrx-slate-700);
+}
+
+.apt-desk-doctor-select-box {
+    flex: 1;
+    max-width: 320px;
+}
+
+.kpi-icon-wrap.icon-emerald {
+    background: var(--zrx-emerald-50);
+    color: var(--zrx-emerald-700);
+}
+
+.queue-kpi-number.num-emerald {
+    color: var(--zrx-emerald-700);
+}
+
+.kpi-icon-wrap.icon-sky {
+    background: var(--zrx-blue-50);
+    color: var(--zrx-blue-600);
+}
+
+.kpi-val.val-sky {
+    color: var(--zrx-blue-600);
+}
+
+.kpi-icon-wrap.icon-amber {
+    background: var(--zrx-amber-50);
+    color: var(--zrx-amber-600);
+}
+
+.appointment-hero-compact {
+    margin-bottom: 1.25rem;
+}
+
+.btn-print-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.btn-quick-queue {
+    background: var(--zrx-primary);
+    color: var(--zrx-white);
+    border: none;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+    box-shadow: var(--zrx-shadow-sm);
+}
+
+.btn-quick-prescribe {
+    margin-left: 0.35rem;
+    white-space: nowrap;
+}
+
+.followup-patient-name {
+    color: var(--zrx-text-main);
+    font-size: 0.92rem;
+}
+
+.followup-patient-meta {
+    font-size: 0.78rem;
+    color: var(--zrx-text-muted);
+    display: block;
+    margin-top: 0.1rem;
+}
+
+.followup-patient-phone {
+    font-size: 0.75rem;
+    color: var(--zrx-border-divider);
+    display: block;
+}
+
+.followup-date-row {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.followup-bullet {
+    color: var(--zrx-border-divider);
+    font-size: 0.8rem;
+}
+
+.followup-days-ago {
+    font-size: 0.74rem;
+    color: var(--zrx-text-muted);
+    display: block;
+}
+
+.followup-next-date {
+    color: var(--zrx-text-main);
+}
+
+.followup-badge-active {
+    display: inline-block;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--zrx-emerald-600);
+    background: var(--zrx-emerald-50);
+    border: 1px solid var(--zrx-emerald-200);
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+}
+
+.followup-badge-scheduled {
+    display: inline-block;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--zrx-text-muted);
+    background: var(--zrx-slate-100);
+    border: 1px solid var(--zrx-border-subtle);
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
 }
 

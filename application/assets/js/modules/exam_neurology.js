@@ -1,12 +1,9 @@
-/**
- * ZimRx - Clinical Exam: Neurology & Stroke Assessment
- */
+// Clinical neurological exam: Glasgow Coma Scale (GCS), cranial nerve mapping, motor power (MRC), and stroke assessment.
 (function() {
   'use strict';
 
   function initExamNeurology() {
-    // 12. Neurology & Stroke Assessment Handlers
-    // =======================================================
+    // Neurology and stroke assessment handlers
     const neuroWrapper = document.getElementById('neuro-wrapper');
     if (neuroWrapper) {
       const modeTabs = neuroWrapper.querySelectorAll('.zrx-exam-mode-tab[data-neuro-tab]');
@@ -182,8 +179,6 @@
 
       updateGCSCalculation();
     }
-
-    // =======================================================
   }
 
   if (document.readyState === 'loading') {

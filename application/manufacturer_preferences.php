@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Manufacturer preferences: configure pharmaceutical company search priority and brand suppression.
+
 $page_title = "Manufacturer Preferences - ZimRx";
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/auth.php';
@@ -14,7 +16,7 @@ require_once __DIR__ . '/header.php';
 
 <link rel="stylesheet" href="assets/css/pages/manufacturer_preferences.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/manufacturer_preferences.css') ?>">
 
-<div class="mpref-container">
+<div class="mpref-container zrx-page-container">
     <!-- Hero Header -->
     <div class="mpref-header">
         <div class="mpref-title-wrap">
@@ -42,12 +44,12 @@ require_once __DIR__ . '/header.php';
         <div class="mpref-summary-pill">
             <span class="pill-dot dot-blue"></span>
             <span>My Prioritized Companies:</span>
-            <strong id="count-custom" style="color: #2563eb;">0</strong>
+            <strong id="count-custom" style="color: var(--zrx-primary);">0</strong>
         </div>
         <div class="mpref-summary-pill">
             <span class="pill-dot dot-amber"></span>
             <span>Hidden Companies:</span>
-            <strong id="count-hidden" style="color: #d97706;">0</strong>
+            <strong id="count-hidden" style="color: var(--zrx-amber-600);">0</strong>
         </div>
         <div class="mpref-summary-pill">
             <span class="pill-dot dot-slate"></span>

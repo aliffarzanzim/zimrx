@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Address settings endpoint: manages preferred districts, custom address entries, pinning, and visibility.
+
 header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/../auth.php';
@@ -46,7 +48,7 @@ try {
         $searchQ = trim((string)($_GET['q'] ?? $jsonInput['q'] ?? ''));
         $filterType = trim((string)($_GET['filter'] ?? $jsonInput['filter'] ?? 'all')); // 'all', 'custom', 'system', 'pinned', 'hidden'
 
-        // 1. Fetch saved preferred districts from interface settings
+        // Preferred districts for the doctor's prescription layout
         $preferredDistricts = [];
         $stmtPref = $pdo_user->prepare("
             SELECT setting_value FROM zimrx_interface_settings 
@@ -62,7 +64,7 @@ try {
             }
         }
 
-        // 2. Fetch all 64 districts from static DB
+        // Static district catalog
         $stmtDist = $pdo_static->query("SELECT id, name, bn_name FROM zimrx_static_address_districts ORDER BY name ASC");
         $districtsRaw = $stmtDist->fetchAll(PDO::FETCH_ASSOC) ?: [];
         $districts = [];
@@ -77,7 +79,7 @@ try {
             ];
         }
 
-        // 3. Fetch custom addresses from userdata
+        // Custom address entries saved by doctor
         $customItems = [];
         if ($filterType !== 'system') {
             $sqlUser = "
@@ -113,7 +115,7 @@ try {
             }
         }
 
-        // 4. If filter is 'all' or 'system' and search is active (or viewing system), fetch static entries
+        // Fall back to static administrative units when searching or viewing catalog
         $systemItems = [];
         if (($filterType === 'system' || ($filterType === 'all' && $searchQ !== '')) && count($customItems) < 100) {
             $limitSystem = 100 - count($customItems);

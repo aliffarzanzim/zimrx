@@ -1,12 +1,9 @@
-/**
- * ZimRx - Clinical Exam: Psychiatry & Mental State (MSE)
- */
+// Mental State Examination (MSE) module handling MSE tabs, preset scenarios, and findings sync.
 (function() {
   'use strict';
 
   function initExamPsychiatry() {
-    // 9. Psychiatry & Mental State Examination (MSE) Handlers
-    // =======================================================
+    // MSE event handlers and preset bindings
     const psychWrapper = document.getElementById('psychiatry-wrapper');
     if (psychWrapper) {
       const modeTabs = psychWrapper.querySelectorAll('.zrx-exam-mode-tab[data-psych-tab]');
@@ -186,7 +183,7 @@
       }
     }
 
-    // =======================================================
+
   }
 
   if (document.readyState === 'loading') {

@@ -1,6 +1,5 @@
-/* =======================================================
-   Universal Excel-Style Table Column Resizer
-======================================================= */
+/* Table column resizing handles and visual indicators */
+
 .zrx-table th,
 .pc-table th,
 .rx-table th,
@@ -24,14 +23,16 @@
     background: transparent;
 }
 
-/* Directly light up the exact border-right of th */
+/* Highlight the active column border during drag */
+
 th:has(> .zrx-col-resizer:hover),
 th:has(> .zrx-col-resizer.is-resizing),
 th.zrx-th-resizing {
-    border-right-color: var(--zrx-primary, #2563eb) !important;
+    border-right-color: var(--zrx-primary, var(--zrx-primary));
 }
 
-/* Table Header Title Sizing Behavior: Auto-wrap & expand to fit column width */
+/* Text wrapping and header cell height adjustments */
+
 .zrx-th-text,
 .pc-header-flex,
 .pc-header-flex span {
@@ -49,17 +50,18 @@ th.zrx-th-resizing {
 .ot-table th,
 .reports-table th,
 .zrx-table th {
-    white-space: normal !important;
-    word-break: break-word !important;
-    overflow: visible !important;
-    height: auto !important;
-    min-height: 32px !important;
-    padding-top: 4px !important;
-    padding-bottom: 4px !important;
-    line-height: 1.25 !important;
+    white-space: normal;
+    word-break: break-word;
+    overflow: visible;
+    height: auto;
+    min-height: 32px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    line-height: 1.25;
 }
 
-/* Keep index (#, No.) and action headers single-line and centered without wrapping */
+/* Keep index and action columns single-line and centered */
+
 .pc-table th:nth-child(1),
 .pc-table th:nth-child(2),
 .pc-table th:last-child,
@@ -70,11 +72,11 @@ th.zrx-th-resizing {
 .oh-table th:nth-child(1),
 .oh-table th:nth-child(2),
 .oh-table th:last-child {
-    white-space: nowrap !important;
-    word-break: keep-all !important;
-    padding-left: 2px !important;
-    padding-right: 2px !important;
-    text-align: center !important;
+    white-space: nowrap;
+    word-break: keep-all;
+    padding-left: 2px;
+    padding-right: 2px;
+    text-align: center;
 }
 
 .pc-table thead tr,
@@ -82,26 +84,28 @@ th.zrx-th-resizing {
 .ot-table thead tr,
 .reports-table thead tr,
 .zrx-table thead tr {
-    height: auto !important;
+    height: auto;
 }
 
-/* Rx Table follows auto-row-size toggle */
+/* Rx table auto-row-size toggle support */
+
 body.rx-auto-row-size-enabled .rx-table th {
-    white-space: normal !important;
-    word-break: break-word !important;
-    overflow: visible !important;
-    height: auto !important;
-    min-height: 32px !important;
-    padding-top: 4px !important;
-    padding-bottom: 4px !important;
-    line-height: 1.25 !important;
+    white-space: normal;
+    word-break: break-word;
+    overflow: visible;
+    height: auto;
+    min-height: 32px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    line-height: 1.25;
 }
 
 body.rx-auto-row-size-enabled .rx-table thead tr {
-    height: auto !important;
+    height: auto;
 }
 
-/* Table Layout Action Toolbar (Beside Add More Button) */
+/* Layout persistence actions (save, reset, help) */
+
 .zrx-tbl-layout-actions {
     display: inline-flex;
     align-items: center;
@@ -120,24 +124,25 @@ body.rx-auto-row-size-enabled .rx-table thead tr {
     font-weight: 600;
     font-family: inherit;
     border-radius: 8px;
-    border: 1px solid var(--zrx-primary, #2563eb);
-    background: var(--zrx-primary, #2563eb);
-    color: #ffffff;
+    border: 1px solid var(--zrx-primary, var(--zrx-primary));
+    background: var(--zrx-primary, var(--zrx-primary));
+    color: var(--zrx-white);
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.22);
+    box-shadow: var(--zrx-shadow-sm);
     transition: all 0.15s ease;
     white-space: nowrap;
 }
 
 .zrx-btn-layout-save:hover {
-    background: var(--zrx-primary-hover, #1d4ed8);
-    border-color: var(--zrx-primary-hover, #1d4ed8);
-    box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
+    background: var(--zrx-primary-hover, var(--zrx-primary-hover));
+    border-color: var(--zrx-primary-hover, var(--zrx-primary-hover));
+    box-shadow: var(--zrx-shadow-md);
 }
 
-.zrx-btn-layout-save.saved {
-    background: var(--zrx-success, #16a34a) !important;
-    border-color: var(--zrx-success, #16a34a) !important;
+.zrx-btn-layout-save.saved,
+.zrx-btn-layout-save.saved:hover {
+    background: var(--zrx-success, var(--zrx-emerald-600));
+    border-color: var(--zrx-success, var(--zrx-emerald-600));
 }
 
 .zrx-btn-layout-reset {
@@ -151,20 +156,20 @@ body.rx-auto-row-size-enabled .rx-table thead tr {
     font-weight: 600;
     font-family: inherit;
     border-radius: 8px;
-    border: 1px solid #94a3b8;
-    background: #ffffff;
-    color: #334155;
+    border: 1px solid var(--zrx-border-divider);
+    background: var(--zrx-bg-card);
+    color: var(--zrx-slate-700);
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    box-shadow: var(--zrx-shadow-sm);
     transition: all 0.15s ease;
     white-space: nowrap;
 }
 
 .zrx-btn-layout-reset:hover {
-    background: #fef2f2;
-    color: #dc2626;
-    border-color: #f87171;
-    box-shadow: 0 3px 8px rgba(220, 38, 38, 0.15);
+    background: var(--zrx-red-50);
+    color: var(--zrx-red-600);
+    border-color: var(--zrx-red-400);
+    box-shadow: var(--zrx-shadow-md);
 }
 
 .zrx-tbl-layout-help {
@@ -174,20 +179,20 @@ body.rx-auto-row-size-enabled .rx-table thead tr {
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
-    color: #64748b;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
+    color: var(--zrx-text-muted);
     cursor: pointer;
     margin-left: 2px;
     transition: all 0.15s ease;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    box-shadow: var(--zrx-shadow-sm);
 }
 
 .zrx-tbl-layout-help:hover {
-    background: #eff6ff;
-    border-color: var(--zrx-primary, #2563eb);
-    color: var(--zrx-primary, #2563eb);
-    box-shadow: 0 2px 5px rgba(37, 99, 235, 0.2);
+    background: var(--zrx-blue-50);
+    border-color: var(--zrx-primary, var(--zrx-primary));
+    color: var(--zrx-primary, var(--zrx-primary));
+    box-shadow: var(--zrx-shadow-sm);
 }
 
 .pc-footer,

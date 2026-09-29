@@ -1,4 +1,5 @@
 <?php
+// Search static medical investigations by query string and diagnostic category.
 declare(strict_types=1);
 
 define('ZIMRX_DB_LIGHTWEIGHT', true);

@@ -1,11 +1,9 @@
-/**
- * ZimRx - Clinical Exam: ENT Examination
- */
+// Clinical ENT examination: otoscopy, tuning fork tests (Rinne/Weber), anterior rhinoscopy, and oropharyngeal assessment.
 (function() {
   'use strict';
 
   function initExamEnt() {
-    // 6. ENT Examination Module Handlers
+    // ENT examination module handlers
     const entWrapper = document.getElementById('ent-exam-wrapper');
     if (entWrapper) {
       const modeTabs = entWrapper.querySelectorAll('.zrx-exam-mode-tab');

@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Seal and stamp deletion endpoint: removes doctor-specific signature and seal image files.
+
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../auth.php';
 require_login();

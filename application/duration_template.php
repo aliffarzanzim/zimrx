@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Duration phrase template manager: bilingual durations (e.g. 7 days), search aliases, and sort ordering.
+
 require_once 'auth.php';
 require_login();
 require_once __DIR__ . '/db.php';
@@ -32,7 +34,7 @@ include 'header.php';
 ?>
 <link rel="stylesheet" href="assets/css/pages/phrase_template.css">
 
-<div class="phrase-template-page">
+<div class="phrase-template-page zrx-page-container">
     <div class="phrase-template-card">
         <div class="phrase-hero">
             <div>

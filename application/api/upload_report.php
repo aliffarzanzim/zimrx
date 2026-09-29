@@ -1,4 +1,5 @@
 <?php
+// Upload and securely store patient investigation reports and documents (PDF, image).
 declare(strict_types=1);
 
 require_once __DIR__ . '/../config.php';

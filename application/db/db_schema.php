@@ -1,27 +1,9 @@
 <?php
 declare(strict_types=1);
 
-/**
- * DbSchema — Driver-aware database schema introspection helper
- *
- * Replaces all SQLite-specific PRAGMA / sqlite_master queries with
- * portable equivalents that work on SQLite, MySQL/MariaDB, and PostgreSQL.
- *
- * Usage:
- *   DbSchema::tableExists($pdo, 'zimrx_patients')        → bool
- *   DbSchema::columnExists($pdo, 'zimrx_patients', 'dob') → bool
- *   DbSchema::columns($pdo, 'zimrx_patients')             → ['id','full_name',...]
- *   DbSchema::tables($pdo)                          → ['appointments','zimrx_doctors',...]
- *   DbSchema::columnInfo($pdo, 'zimrx_patients')          → [['name'=>'id','type'=>'INTEGER','pk'=>1],...]
- *
- * Depends on DbConnections::driver() to select the correct query.
- * Requires: application/DbConnections.php must be loaded before this file.
- */
+// Cross-driver schema inspector for SQLite, MySQL/MariaDB, and PostgreSQL.
 class DbSchema {
 
-    /**
-     * Return true if the named schema object is a view.
-     */
     public static function isView(PDO $pdo, string $table): bool {
         return match (DbConnections::driver()) {
             'sqlite'           => self::sqliteObjectType($pdo, $table) === 'view',
@@ -31,13 +13,6 @@ class DbSchema {
         };
     }
 
-    // ----------------------------------------------------------------
-    // Table existence
-    // ----------------------------------------------------------------
-
-    /**
-     * Return true if the table exists in the current schema.
-     */
     public static function tableExists(PDO $pdo, string $table): bool {
         return match (DbConnections::driver()) {
             'sqlite'          => self::sqliteTableExists($pdo, $table),
@@ -100,14 +75,6 @@ class DbSchema {
         return $type === false ? null : (string)$type;
     }
 
-    // ----------------------------------------------------------------
-    // Column existence
-    // ----------------------------------------------------------------
-
-    /**
-     * Return true if $column exists in $table.
-     * Returns false immediately if the table itself does not exist.
-     */
     public static function columnExists(PDO $pdo, string $table, string $column): bool {
         if (!self::tableExists($pdo, $table)) {
             return false;
@@ -115,30 +82,12 @@ class DbSchema {
         return in_array($column, self::columns($pdo, $table), true);
     }
 
-    // ----------------------------------------------------------------
-    // Column list (names only)
-    // ----------------------------------------------------------------
-
-    /**
-     * Return a flat array of column names for $table.
-     * Returns [] if the table does not exist.
-     */
+    // Flat list of column names for a table
     public static function columns(PDO $pdo, string $table): array {
         return array_column(self::columnInfo($pdo, $table), 'name');
     }
 
-    // ----------------------------------------------------------------
-    // Column info (name, type, pk, nullable, default)
-    // ----------------------------------------------------------------
-
-    /**
-     * Return full column metadata for $table as an array of associative rows.
-     *
-     * Each row contains at minimum:
-     *   ['name' => string, 'type' => string, 'pk' => int (1 if primary key, else 0)]
-     *
-     * Returns [] if the table does not exist.
-     */
+    // Normalizes column metadata (name, type, pk, notnull, default) across database engines
     public static function columnInfo(PDO $pdo, string $table): array {
         if (!self::tableExists($pdo, $table)) {
             return [];
@@ -155,12 +104,11 @@ class DbSchema {
         $quoted = str_replace('"', '""', $table);
         $stmt = $pdo->query("PRAGMA table_info(\"$quoted\")");
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        // Normalize to a consistent shape
         return array_map(fn($r) => [
-            'name'    => (string)$r['name'],
-            'type'    => (string)$r['type'],
-            'pk'      => (int)$r['pk'],
-            'notnull' => (int)$r['notnull'],
+            'name'       => (string)$r['name'],
+            'type'       => (string)$r['type'],
+            'pk'         => (int)$r['pk'],
+            'notnull'    => (int)$r['notnull'],
             'dflt_value' => $r['dflt_value'],
         ], $rows);
     }
@@ -211,14 +159,7 @@ class DbSchema {
         ], $stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
-    // ----------------------------------------------------------------
-    // Table list
-    // ----------------------------------------------------------------
-
-    /**
-     * Return an array of table names in the current schema,
-     * excluding internal system tables.
-     */
+    // Returns all table names in current schema, excluding internal engine tables
     public static function tables(PDO $pdo): array {
         return match (DbConnections::driver()) {
             'sqlite'           => self::sqliteTables($pdo),
@@ -255,3 +196,4 @@ class DbSchema {
         return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
     }
 }
+

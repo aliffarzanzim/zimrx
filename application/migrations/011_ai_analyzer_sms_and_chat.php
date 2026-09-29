@@ -1,13 +1,11 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Migration 011 — AI analyzer, SMS settings and templates, and internal chat system
- */
+// AI clinical assistant, outbound SMS notifications, and internal staff messaging schema.
 class Migration011AiAnalyzerSmsAndChat {
 
     public function up(PDO $pdo): void {
-        // ---- zimrx_ai_analyzer_settings ----
+        // AI provider credentials, model selection, and prompt configs
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_ai_analyzer_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -20,7 +18,7 @@ class Migration011AiAnalyzerSmsAndChat {
             )"
         );
 
-        // ---- zimrx_ai_analyzer_history ----
+        // Audit log of AI clinical assistance prompts and generated responses
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_ai_analyzer_history (
                 id " . DbSql::autoIncrement() . ",
@@ -35,7 +33,7 @@ class Migration011AiAnalyzerSmsAndChat {
             )"
         );
 
-        // ---- zimrx_sms_settings ----
+        // SMS gateway API keys, sender IDs, and gateway configurations
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_sms_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -47,7 +45,7 @@ class Migration011AiAnalyzerSmsAndChat {
             )"
         );
 
-        // ---- zimrx_sms_templates ----
+        // Patient reminder and prescription confirmation SMS templates
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_sms_templates (
                 id " . DbSql::autoIncrement() . ",
@@ -61,7 +59,7 @@ class Migration011AiAnalyzerSmsAndChat {
             )"
         );
 
-        // ---- zimrx_sms_history ----
+        // Outbound SMS delivery log and provider callback statuses
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_sms_history (
                 id " . DbSql::autoIncrement() . ",
@@ -76,7 +74,7 @@ class Migration011AiAnalyzerSmsAndChat {
             )"
         );
 
-        // ---- zimrx_chat_conversations ----
+        // Direct and group internal messaging channels between doctors and staff
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_chat_conversations (
                 id " . DbSql::autoIncrement() . ",
@@ -95,7 +93,7 @@ class Migration011AiAnalyzerSmsAndChat {
         );
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_chat_conv_last_msg ON zimrx_chat_conversations(last_message_at DESC)");
 
-        // ---- zimrx_chat_participants ----
+        // Conversation membership, unread message trackers, and mute toggles
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_chat_participants (
                 conversation_id " . DbSql::intType() . " NOT NULL,
@@ -112,7 +110,7 @@ class Migration011AiAnalyzerSmsAndChat {
         );
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_chat_participants_user ON zimrx_chat_participants(user_id, last_read_message_id)");
 
-        // ---- zimrx_chat_messages ----
+        // Message stream supporting text, clinical attachments, and status indicators
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_chat_messages (
                 id " . DbSql::autoIncrement() . ",
@@ -137,7 +135,7 @@ class Migration011AiAnalyzerSmsAndChat {
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_chat_messages_conv_id ON zimrx_chat_messages(conversation_id, id)");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_chat_messages_created ON zimrx_chat_messages(created_at)");
 
-        // ---- zimrx_chat_quick_messages ----
+        // Canned quick-reply message snippets for clinic receptionists
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_chat_quick_messages (
                 id " . DbSql::autoIncrement() . ",
@@ -155,3 +153,4 @@ class Migration011AiAnalyzerSmsAndChat {
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_chat_quick_user ON zimrx_chat_quick_messages(user_id, is_active, is_deleted)");
     }
 }
+

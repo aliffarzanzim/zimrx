@@ -20,7 +20,7 @@ include 'header.php';
 
 <main class="adm-page">
 
-    <!-- ── Top Bar ──────────────────────────────────────────── -->
+    <!-- Top Bar -->
     <div class="adm-topbar">
         <div>
             <div class="adm-eyebrow">Admin Dashboard</div>
@@ -34,7 +34,7 @@ include 'header.php';
         </div>
     </div>
 
-    <!-- ── Stat Cards ────────────────────────────────────────── -->
+    <!-- Stat Cards -->
     <div class="adm-stats">
         <div class="adm-stat adm-stat--blue">
             <div class="adm-stat-icon">
@@ -74,7 +74,7 @@ include 'header.php';
         </div>
     </div>
 
-    <!-- ── Navigation Sections ───────────────────────────────── -->
+    <!-- Navigation Sections -->
     <div class="adm-section-label">People & Access</div>
     <div class="adm-nav-grid">
 

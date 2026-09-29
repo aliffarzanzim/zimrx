@@ -1,10 +1,13 @@
 <?php
 declare(strict_types=1);
 
+// Administrative helpers for doctor profiles, assistant assignments, user accounts, and flash messages.
+
 function admin_value(array $data, string $key): string {
     return trim((string)($data[$key] ?? ''));
 }
 
+// Fetch all doctors with legacy aliases for admin templates
 function admin_all_doctors(PDO $pdo, bool $activeOnly = false): array {
     $sql = "SELECT *, qualifications_en AS qualifications, specialty_en AS specialty, bmdc_no_en AS bmdc_no, id AS doctor_id, display_name AS doctor_name, is_active AS status FROM zimrx_doctors";
     if ($activeOnly) {
@@ -14,6 +17,7 @@ function admin_all_doctors(PDO $pdo, bool $activeOnly = false): array {
     return $pdo->query($sql)->fetchAll();
 }
 
+// Active doctor IDs assigned to an assistant
 function admin_assigned_doctor_ids(PDO $pdo, int $assistantId): array {
     $stmt = $pdo->prepare(
         "SELECT doctor_id

@@ -1,4 +1,5 @@
 <?php
+// Multi-tier address search across static administrative units and user address entries with contextual awareness.
 declare(strict_types=1);
 
 define('ZIMRX_DB_LIGHTWEIGHT', true);
@@ -17,9 +18,7 @@ try {
 
     $all_suggestions = [];
 
-    // ==========================================
-    // PHASE 1: CONTEXT AWARENESS (Previous Word)
-    // ==========================================
+    // Contextual suggestions based on preceding address segments
     if ($prev !== '') {
         // Find if prev is a Union (Get its Upazila and District)
         $stmt = $pdo_static->prepare("
@@ -120,14 +119,12 @@ try {
         $upaSubquery = "AND upazila_id IN (SELECT id FROM zimrx_static_address_upazillas WHERE district_id IN (SELECT id FROM zimrx_static_address_districts WHERE name IN ('{$quotedDistList}')))";
     }
 
-    // ==========================================
-    // PHASE 2: STANDARD SEARCH (PREFIX-FIRST + CONTAINS)
-    // ==========================================
+    // Text search matching prefix and substring
     if (strlen($query) >= 1) {
         $pLike = "{$query}%";
         $cLike = "%{$query}%";
         
-        // 1. Prefix query across all address entities (subqueries ensure equal representation)
+        // Prefix query across all address entities
         $sql_prefix = "
             SELECT * FROM (SELECT 'district' as type, name FROM zimrx_static_address_districts WHERE (name LIKE :p OR bn_name LIKE :p) {$distFilterSql} LIMIT 25)
             UNION ALL
@@ -148,7 +145,7 @@ try {
             }
         }
 
-        // 2. Contains query (if query has >= 2 chars) to match inside compound names
+        // Substring match for queries with 2 or more characters
         if (strlen($query) >= 2) {
             $sql_contains = "
                 SELECT * FROM (SELECT 'district' as type, name FROM zimrx_static_address_districts WHERE (name LIKE :c OR bn_name LIKE :c) AND name NOT LIKE :p {$distFilterSql} LIMIT 15)
@@ -201,9 +198,7 @@ try {
         }
     }
 
-    // ==========================================
-    // PHASE 3: SMART TIERED SCORING & SORTING
-    // ==========================================
+    // Tiered scoring and relevance ranking
     foreach ($all_suggestions as $name => &$data) {
         $score = (int)($data['score'] ?? 0);
         $type = $data['type'];

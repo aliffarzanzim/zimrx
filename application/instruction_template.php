@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Instruction template manager: bilingual intake directions, dosage form linking, aliases, and prescription ordering.
+
 require_once 'auth.php';
 require_login();
 require_once __DIR__ . '/db.php';
@@ -56,7 +58,7 @@ function instruction_template_pin_cell(array $row): string {
 function instruction_template_sl_cell(array $row): string {
     $sortOrder = (int)($row['sort_order'] ?? 0);
     if ((int)($row['is_pinned'] ?? 0) === 1) {
-        return '<div style="display:flex; align-items:center; justify-content:center; gap:0.25rem;"><span style="color:#b45309;">&#x25F3;</span><span>' . $sortOrder . '</span></div>';
+        return '<div style="display:flex; align-items:center; justify-content:center; gap:0.25rem;"><span style="color:var(--zrx-amber-700);">&#x25F3;</span><span>' . $sortOrder . '</span></div>';
     }
     return (string)$sortOrder;
 }
@@ -118,7 +120,7 @@ include 'header.php';
 ?>
 <link rel="stylesheet" href="assets/css/pages/instruction_template.css">
 
-<div class="instruction-template-page">
+<div class="instruction-template-page zrx-page-container">
     <div class="instruction-template-card">
         <div class="instruction-template-hero">
             <div>

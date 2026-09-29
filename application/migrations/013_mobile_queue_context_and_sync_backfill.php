@@ -1,22 +1,11 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Migration 013 — Backfill: Mobile queue context columns, sync UUIDs, and delta-sync journal
- *
- * Migration 012 was shipped containing both CREATE TABLE and ALTER TABLE guards.
- * Any installation that applied 012 in its original form (before patient_id / visit_record_id /
- * active_revision were added) already has version "012" recorded in schema_migrations and will
- * never re-run 012.  This migration delivers those missing columns and indexes as a safe,
- * idempotent backfill for all such installations.
- *
- * New installations (which apply 012 in its current form first) will see all guards here
- * evaluate to false (columns already exist) and this migration becomes a safe no-op.
- */
+// Backfills sync metadata, UUIDs, and active consultation context across mobile and patient records.
 class Migration013MobileQueueContextAndSyncBackfill {
 
     public function up(PDO $pdo): void {
-        // ── 1. Backfill missing columns on zimrx_mobile_upload_queue ─────────────────
+        // Attach clinical context to pending mobile uploads so photos link directly to the right visit
         if (DbSchema::tableExists($pdo, 'zimrx_mobile_upload_queue')) {
             if (!DbSchema::columnExists($pdo, 'zimrx_mobile_upload_queue', 'patient_id')) {
                 $pdo->exec("ALTER TABLE zimrx_mobile_upload_queue ADD COLUMN patient_id " . DbSql::intType() . " NULL");
@@ -30,7 +19,7 @@ class Migration013MobileQueueContextAndSyncBackfill {
             $pdo->exec("CREATE INDEX IF NOT EXISTS idx_mobile_upload_queue_pending ON zimrx_mobile_upload_queue (doctor_id, claimed_at, created_at)");
         }
 
-        // ── 2. Backfill sync_id / revision / deleted_at on zimrx_visits ─────────────
+        // Add sync identifiers, revision tracking, and soft-delete support for visits
         if (DbSchema::tableExists($pdo, 'zimrx_visits')) {
             if (!DbSchema::columnExists($pdo, 'zimrx_visits', 'sync_id')) {
                 $pdo->exec("ALTER TABLE zimrx_visits ADD COLUMN sync_id TEXT NULL");
@@ -45,7 +34,7 @@ class Migration013MobileQueueContextAndSyncBackfill {
             $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS uq_visit_patient_doctor_number ON zimrx_visits(patient_id, doctor_id, visit_no)");
         }
 
-        // ── 3. Backfill sync_id / revision / deleted_at on zimrx_patients ────────────
+        // Add sync identifiers and optimistic revision counters to patients
         if (DbSchema::tableExists($pdo, 'zimrx_patients')) {
             if (!DbSchema::columnExists($pdo, 'zimrx_patients', 'sync_id')) {
                 $pdo->exec("ALTER TABLE zimrx_patients ADD COLUMN sync_id TEXT NULL");
@@ -59,7 +48,7 @@ class Migration013MobileQueueContextAndSyncBackfill {
             $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS uq_patients_sync_id ON zimrx_patients(sync_id)");
         }
 
-        // ── 3b. Backfill sync_id / revision / deleted_at on zimrx_patient_metric_readings ─
+        // Add sync identifiers and soft-deletion tracking to vital metric readings
         if (DbSchema::tableExists($pdo, 'zimrx_patient_metric_readings')) {
             if (!DbSchema::columnExists($pdo, 'zimrx_patient_metric_readings', 'sync_id')) {
                 $pdo->exec("ALTER TABLE zimrx_patient_metric_readings ADD COLUMN sync_id TEXT NULL");
@@ -73,7 +62,7 @@ class Migration013MobileQueueContextAndSyncBackfill {
             $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS uq_metric_readings_sync_id ON zimrx_patient_metric_readings(sync_id)");
         }
 
-        // ── 4. Backfill RFC 4122 v4 UUIDs for records that still lack sync_id ────────
+        // Generate v4 UUIDs for legacy rows created before sync IDs were introduced
         $uuidGen = static function (): string {
             $data = random_bytes(16);
             $data[6] = chr((ord($data[6]) & 0x0f) | 0x40);
@@ -114,7 +103,7 @@ class Migration013MobileQueueContextAndSyncBackfill {
             }
         }
 
-        // ── 5. Create delta-sync changes journal (safe no-op if already exists) ──────
+        // Change journal tracking incremental insertions, mutations, and deletions across clients
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_sync_changes (
                 sequence " . DbSql::autoIncrement() . ",
@@ -129,7 +118,7 @@ class Migration013MobileQueueContextAndSyncBackfill {
             )"
         );
 
-        // ── 6. Create transactional mobile active context table ───────────────────
+        // Tracks which patient/visit is active on the doctor's screen so companion devices pair instantly
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_mobile_active_context (
                 doctor_id " . DbSql::intType() . " PRIMARY KEY,

@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Clinical prescription workspace: manages patient demographic prefill, module card arrangement, and script bindings.
+
 $zimrx_prescription_ob_level = ob_get_level();
 ob_start();
 require_once 'auth.php';
@@ -224,7 +226,7 @@ function prescription_query_prefill(): array {
 $prescription_prefill = prescription_query_prefill();
 $page_title = "ZimRx - New Prescription";
 $body_class = trim(($body_class ?? '') . ' zimrx-prescription-hold');
-$extra_css = ['assets/css/modules/paediatric_module.css'];
+$extra_css = ['assets/css/pages/prescription.css'];
 include 'header.php';
 ?>
 
@@ -234,7 +236,7 @@ include 'header.php';
     ?>
 
 <?php
-// Central Central Module Configurations & Mappings
+// Clinical module grid layout and file mappings
 $default_left_layout = [
   "P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination",
   "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology", "Psychiatry", "Orthopaedics", "Urology", "Neurology", "Cardiology", "Pulmonology", "Endocrinology",
@@ -247,41 +249,42 @@ $default_right_layout = [
 ];
 
 $module_file_map = [
-  "P/C" => "p_c.php",
+  "P/C" => "pc.php",
   "AI Analyzer" => "ai_analyzer.php",
   "History" => "history.php",
-  "P/E" => "p_e.php",
-  "O/E" => "p_e.php",
-  "Breast Examination" => "breast_exam.php",
-  "Local Examination" => "local_exam.php",
-  "Burn Assessment" => "burn_assessment.php",
-  "ENT Examination" => "ent_exam.php",
-  "Dental Chart" => "dental_chart.php",
-  "Diabetic Foot" => "diabetic_foot.php",
-  "Dermatology" => "dermatology.php",
-  "Psychiatry" => "psychiatry.php",
-  "Orthopaedics" => "orthopaedics.php",
-  "Urology" => "urology.php",
-  "Neurology" => "neurology.php",
-  "Cardiology" => "cardiology.php",
-  "Pulmonology" => "pulmonology.php",
-  "Endocrinology" => "endocrinology.php",
+  "P/E" => "pe.php",
+  "O/E" => "pe.php",
+  "Breast Examination" => "exam_breast.php",
+  "Local Examination" => "exam_local.php",
+  "Burn Assessment" => "exam_burn.php",
+  "ENT Examination" => "exam_ent.php",
+  "Dental Chart" => "exam_dental.php",
+  "Diabetic Foot" => "exam_diabetic_foot.php",
+  "Dermatology" => "exam_dermatology.php",
+  "Psychiatry" => "exam_psychiatry.php",
+  "Orthopaedics" => "exam_orthopaedics.php",
+  "Urology" => "exam_urology.php",
+  "Neurology" => "exam_neurology.php",
+  "Cardiology" => "exam_cardiology.php",
+  "Pulmonology" => "exam_pulmonology.php",
+  "Endocrinology" => "exam_endocrinology.php",
   "Dx" => "dx.php",
   "Ix" => "ix.php",
   "Plan" => "plan.php",
   "Note" => "note.php",
-  "O/H" => "o_h.php",
+  "O/H" => "oh.php",
+  "D/H" => "dh.php",
   "M/H" => "m_h.php",
-  "Paediatric History" => "paediatric_history.php",
+  "Paediatric History" => "paediatric.php",
   "Rx" => "rx.php",
-  "Drug Summary & Interaction" => "drug_summary_interaction.php",
+  "Drug Summary & Interaction" => "drug_summary.php",
   "Advice" => "advice.php",
   "Report Entry" => "report_entry.php",
   "Upload Reports & Documents" => "uploaded_reports.php",
   "Uploaded Reports" => "uploaded_reports.php",
   "Reports" => "reports.php",
   "Calculators" => "calculators.php",
-  "Ophthalmology" => "ophthalmology.php",
+  "Ophthalmology" => "exam_ophthalmology.php",
   "Text Pad" => "text_pad.php",
   "OT Note" => "ot_note.php",
   "Font Format" => "font_format.php"
@@ -392,7 +395,7 @@ if ($reportsIndex !== false) {
 }
 ?>
 
-    <div class="app-container">
+    <div class="app-container zrx-page-container">
         <aside class="sidebar" id="sidebar-modules">
             <?php
             foreach ($left_layout as $module_name) {
@@ -422,10 +425,10 @@ if ($reportsIndex !== false) {
     <script src="assets/js/layout/config.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/config.js') ?>"></script>
     <script src="assets/js/layout/dashboard.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/dashboard.js') ?>"></script>
     <script src="assets/js/modules/rx_autocomplete.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/rx_autocomplete.js') ?>"></script>
-    <script src="assets/js/modules/pc_autocomplete.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/pc_autocomplete.js') ?>"></script>
-    <script src="assets/js/modules/o_h_module.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/o_h_module.js') ?>"></script>
+    <script src="assets/js/modules/pc.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/pc.js') ?>"></script>
+    <script src="assets/js/modules/oh.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/oh.js') ?>"></script>
     <script src="assets/js/data/growth_chart_data.js?v=<?= filemtime(__DIR__ . '/assets/js/data/growth_chart_data.js') ?>"></script>
-    <script src="assets/js/modules/paediatric_module.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/paediatric_module.js') ?>"></script>
+    <script src="assets/js/modules/paediatric.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/paediatric.js') ?>"></script>
     <script src="assets/js/modules/exam_presets.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/exam_presets.js') ?>"></script>
     <script src="assets/js/modules/exam_breast.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/exam_breast.js') ?>"></script>
     <script src="assets/js/modules/exam_local.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/exam_local.js') ?>"></script>
@@ -443,16 +446,13 @@ if ($reportsIndex !== false) {
     <script src="assets/js/modules/exam_pulmonology.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/exam_pulmonology.js') ?>"></script>
     <script src="assets/js/modules/exam_endocrinology.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/exam_endocrinology.js') ?>"></script>
     <script src="assets/js/pages/prescription_preview.js?v=<?= filemtime(__DIR__ . '/assets/js/pages/prescription_preview.js') ?>"></script>
-    <script src="assets/js/modules/ho_diet_dropdown.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/ho_diet_dropdown.js') ?>"></script>
-    <script src="assets/js/modules/history_module.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/history_module.js') ?>"></script>
+    <script src="assets/js/modules/history.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/history.js') ?>"></script>
     <script src="assets/js/layout/help_guidelines.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/help_guidelines.js') ?>"></script>
     <script src="assets/js/layout/table_column_resizer.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/table_column_resizer.js') ?>"></script>
     <script src="assets/js/layout/grid_navigation.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/grid_navigation.js') ?>"></script>
     <script src="assets/js/layout/boot.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/boot.js') ?>"></script>
 
-
-
-    <script src="assets/js/modules/prescription_module.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/prescription_module.js') ?>"></script>
+    <script src="assets/js/modules/rx.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/rx.js') ?>"></script>
 <?php include 'footer.php'; ?>
 <?php
 if (ob_get_level() > $zimrx_prescription_ob_level) {

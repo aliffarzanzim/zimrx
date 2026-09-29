@@ -1,4 +1,5 @@
 <?php
+// Upload and configure full-body image prescription header for the active doctor.
 declare(strict_types=1);
 
 require_once __DIR__ . '/../config.php';
@@ -50,7 +51,7 @@ try {
         throw new RuntimeException('Only SVG, PNG, JPG, or WEBP images are allowed.');
     }
 
-    // Additional security checks
+    // Validate file integrity, MIME type, and safe SVG structure
     if ($ext === 'svg') {
         if (!zimrx_validate_safe_svg($tmpPath)) {
             throw new RuntimeException('Invalid or potentially unsafe SVG file.');

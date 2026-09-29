@@ -1,4 +1,5 @@
 <?php
+// Search laboratory investigation parameters, standard units, and reference values.
 declare(strict_types=1);
 
 define('ZIMRX_DB_LIGHTWEIGHT', true);

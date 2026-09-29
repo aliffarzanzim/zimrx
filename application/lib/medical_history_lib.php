@@ -1,11 +1,7 @@
 <?php
 declare(strict_types=1);
 
-/**
- * ZimRx Medical History Library
- * Manages static medical history catalog merging, doctor preferences,
- * custom categories/conditions, and active OPD quick-grid definitions.
- */
+// Medical history condition checklist: merges static library conditions with doctor customizations.
 
 require_once __DIR__ . '/../db.php';
 

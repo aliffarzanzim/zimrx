@@ -1,4 +1,8 @@
-<?php declare(strict_types=1); ?>
+<?php
+declare(strict_types=1);
+
+// Prescription (Rx) module: medication grid, dosage/instruction inputs, warning infobar, and Rx settings modal.
+?>
 <div class="rx-wrapper">
     <!-- Top Info Bar -->
     <div id="rx-info-bar" class="rx-info-bar" title="Drug details will appear here">
@@ -8,7 +12,7 @@
     <!-- Top Action Bar -->
     <div class="rx-top-bar" id="rx-top-bar">
         <div class="rx-symbol">Rx</div>
-        <button class="btn btn-outline btn-sm" style="background:#f1f5f9; font-weight:bold; color:#0f172a;">Drugs by Dx</button>
+        <button class="btn btn-outline btn-sm rx-btn-dx">Drugs by Dx</button>
 
         <div class="rx-search-group">
             <div class="rx-search-box">
@@ -32,31 +36,31 @@
     <div class="rx-table-container">
         <table class="rx-table" id="rx-table">
             <colgroup>
-                <col style="width: 32px;">
-                <col style="width: 36px;">
-                <col style="width: 38px;">
+                <col class="rx-col-drag">
+                <col class="rx-col-del">
+                <col class="rx-col-no">
                 <col>
-                <col style="width: 18%;">
-                <col style="width: 16%;">
-                <col style="width: 20%;">
-                <col style="width: 12%;">
+                <col class="rx-col-generic">
+                <col class="rx-col-dose">
+                <col class="rx-col-instruction">
+                <col class="rx-col-duration">
             </colgroup>
             <thead>
                 <tr>
-                    <th style="width: 32px; text-align: center;"></th>
-                    <th style="width: 36px; text-align: center;"></th>
-                    <th style="width: 38px; text-align: center; padding: 0;">#</th>
+                    <th class="rx-th-drag"></th>
+                    <th class="rx-th-del"></th>
+                    <th class="rx-th-no">#</th>
                     <th>Brand</th>
-                    <th style="width: 18%;">Generic</th>
-                    <th style="width: 16%;">Dose</th>
-                    <th style="width: 20%;">Instruction</th>
-                    <th style="width: 12%;">Duration</th>
+                    <th class="rx-th-generic">Generic</th>
+                    <th class="rx-th-dose">Dose</th>
+                    <th class="rx-th-instruction">Instruction</th>
+                    <th class="rx-th-duration">Duration</th>
                 </tr>
             </thead>
             <tbody id="rx-tbody">
                 <?php for($i=1; $i<=10; $i++): ?>
                 <tr class="pc-row rx-row" draggable="true">
-                    <td class="rx-action rx-drag pc-action pc-drag" style="padding: 0 !important;">
+                    <td class="rx-action rx-drag pc-action pc-drag">
                         <button type="button" class="pc-row-move-btn rx-row-move-btn zrx-drag-handle" title="Move Row">
                             <?= zrx_icon('move', 14) ?>
                         </button>
@@ -194,15 +198,15 @@
     </div>
 </div>
 
-<div id="rx-drug-modal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.55); z-index:10000; align-items:center; justify-content:center; padding:24px;">
-    <div style="width:min(1280px, 96vw); height:min(860px, 92vh); background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 25px 60px rgba(0,0,0,0.35); display:flex; flex-direction:column; position:relative;">
-        <div style="background:#0f172a; color:#fff; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 20px;">
-            <div id="rx-drug-modal-title" style="font-size:1rem; font-weight:700;">Drug View</div>
-            <button type="button" id="rx-drug-modal-close" style="border:none; background:transparent; color:#fff; font-size:1.5rem; line-height:1; cursor:pointer;">×</button>
+<div id="rx-drug-modal" class="rx-drug-modal-backdrop">
+    <div class="rx-drug-modal-dialog">
+        <div class="rx-drug-modal-header">
+            <div id="rx-drug-modal-title" class="rx-drug-modal-title">Drug View</div>
+            <button type="button" id="rx-drug-modal-close" class="rx-drug-modal-close">×</button>
         </div>
-        <div id="rx-drug-modal-loading" style="position:absolute; inset:56px 0 0; display:flex; align-items:center; justify-content:center; background:linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%); color:#334155; font-size:1rem; font-weight:600; letter-spacing:0.01em; z-index:1;">
+        <div id="rx-drug-modal-loading" class="rx-drug-modal-loading">
             Loading drug details...
         </div>
-        <iframe id="rx-drug-modal-frame" title="Drug View" style="flex:1; width:100%; border:none; background:#fff; visibility:hidden;"></iframe>
+        <iframe id="rx-drug-modal-frame" title="Drug View" class="rx-drug-modal-frame"></iframe>
     </div>
 </div>

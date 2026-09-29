@@ -1,4 +1,5 @@
 <?php
+// Settings and configuration endpoints for Presenting Complaints (custom terms, durations, units, hidden list, and source priority).
 declare(strict_types=1);
 
 require_once __DIR__ . '/../auth.php';
@@ -116,19 +117,19 @@ function pc_settings_search_results(PDO $pdo, int $doctorId, string $query, arra
         ], $extra);
     };
 
-    // 1. Most Used / Learned
+    // Most used / learned terms
     foreach (pc_learned_terms($pdo, $doctorId, 'PC', $query, 'usage', 20) as $row) {
         $add('most_used', (string)($row['term'] ?? ''), [
             'usage_count' => (int)($row['usage_count'] ?? 0),
         ]);
     }
 
-    // 2. Custom Terms
+    // Custom user terms
     foreach (pc_custom_terms($pdo, $doctorId, $query, 20) as $row) {
         $add('custom', (string)($row['term'] ?? ''));
     }
 
-    // 3. System Static P/C
+    // Static catalog terms
     foreach (pc_static_pc_search($query, 40) as $row) {
         $add('static_pc', (string)($row['preferred_term'] ?? ''), [
             'category' => (string)($row['category'] ?? ''),

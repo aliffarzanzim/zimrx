@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Thermal appointment slip: prints patient serial token, consultation fee, and doctor queue position.
+
 require_once 'auth.php';
 require_login();
 require_once 'db.php';

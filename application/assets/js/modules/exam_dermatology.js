@@ -1,11 +1,9 @@
-/**
- * ZimRx - Clinical Exam: Dermatology & Lesion Morphology
- */
+// Clinical dermatological exam: primary/secondary lesion morphology, distribution mapping, and bedside signs (Auspitz/Nikolsky/Koebner).
 (function() {
   'use strict';
 
   function initExamDermatology() {
-    // 9. Dermatology & Lesion Morphology Handlers
+    // Dermatology and lesion morphology handlers
     const dermaWrapper = document.getElementById('dermatology-wrapper');
     if (dermaWrapper) {
       const primarySelect = dermaWrapper.querySelector('[data-derma-field="primary-lesion"]');
@@ -132,8 +130,6 @@
         });
       }
     }
-
-    // =======================================================
   }
 
   if (document.readyState === 'loading') {

@@ -1,12 +1,11 @@
 <?php
 declare(strict_types=1);
 
+// Audit trail for patient demographic edits, change diffing, and user occupation vocabulary.
+
 require_once __DIR__ . '/../db.php';
 
-/**
- * Fail clearly if migration 014 has not created the audit table.
- * No DDL is executed at request time.
- */
+// Verifies the audit table exists without running DDL at request time
 function ensure_patient_particulars_audit_schema(PDO $pdo): void {
     if (!DbSchema::tableExists($pdo, 'zimrx_patient_particulars_audit')) {
         throw new RuntimeException(

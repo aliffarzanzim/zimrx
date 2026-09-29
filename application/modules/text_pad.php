@@ -1,4 +1,8 @@
-<?php declare(strict_types=1); ?>
+<?php
+declare(strict_types=1);
+
+// Free-text Note Pad module: rich-text documentation editor with print layout controls and document search.
+?>
 <div class="tp-wrapper">
     <!-- Main Header -->
     <div class="tp-header">
@@ -37,4 +41,5 @@
 
 <!-- Load NicEditor & Initialize -->
 <script src="vendor/nicedit/nicEdit-latest.js"></script>
+<script src="vendor/nicedit/nicEdit-zimrx-custom.js?v=<?= filemtime(dirname(__DIR__) . '/vendor/nicedit/nicEdit-zimrx-custom.js') ?>"></script>
 <script src="assets/js/modules/text_pad.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/text_pad.js') ?>"></script>

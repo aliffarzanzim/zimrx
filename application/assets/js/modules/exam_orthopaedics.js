@@ -1,12 +1,9 @@
-/**
- * ZimRx - Clinical Exam: Orthopaedics & Musculoskeletal
- */
+// Clinical orthopaedic exam: spine provocative tests (SLR/FABER), extremity range-of-motion, joint stability, and rheumatological scoring.
 (function() {
   'use strict';
 
   function initExamOrthopaedics() {
-    // 10. Orthopaedics & Musculoskeletal Exam Handlers
-    // =======================================================
+    // Orthopaedics and musculoskeletal examination handlers
     const orthoWrapper = document.getElementById('ortho-wrapper');
     if (orthoWrapper) {
       const modeTabs = orthoWrapper.querySelectorAll('.zrx-exam-mode-tab[data-ortho-tab]');
@@ -139,8 +136,6 @@
         });
       }
     }
-
-    // =======================================================
   }
 
   if (document.readyState === 'loading') {

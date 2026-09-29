@@ -1,8 +1,6 @@
-/**
- * header_nav.js - ZimRx Top Navigation & Floating Menus Controller
- */
+// Top navigation controller: floating dropdown panels, responsive horizontal overflow, and drag scrolling.
 document.addEventListener('DOMContentLoaded', () => {
-    // ── Floating Dropdown Menus Controller ────────────────────────
+    // Floating Dropdown Menus
     const initFloatingMenu = (toggleId, panelId) => {
         const toggle = document.getElementById(toggleId);
         const menu = document.getElementById(panelId);
@@ -94,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
         menus.forEach(m => { if (m && !m.menu.hidden) m.positionMenu(); });
     }, true);
 
-    // ── Top Navigation Horizontal Overflow & Scroll Controller ────
+    // Top Navigation Horizontal Overflow
     const nav = document.getElementById('app-top-nav');
     const wrap = document.getElementById('top-nav-wrapper');
     const btnLeft = document.getElementById('nav-scroll-left');

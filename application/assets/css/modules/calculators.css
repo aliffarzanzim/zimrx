@@ -1,13 +1,14 @@
+/* Medical calculators layout, tabs, inputs, and results card */
 .calc-tab-btn {
         flex: 1 1 auto; 
         padding: 12px 10px; 
         text-align: center; 
         background: transparent; 
         border: none; 
-        border-right: 1px solid #cbd5e1; 
-        border-bottom: 1px solid #cbd5e1;
+        border-right: 1px solid var(--zrx-border); 
+        border-bottom: 1px solid var(--zrx-border);
         font-weight: 600; 
-        color: #64748b; 
+        color: var(--zrx-text-muted); 
         cursor: pointer; 
         transition: all 0.2s; 
         font-size: 0.85rem;
@@ -17,14 +18,14 @@
         border-right: none; 
     }
     .calc-tab-btn.active { 
-        background: #ffffff; 
-        color: #2563eb; 
-        border-bottom: 1px solid #ffffff;
-        box-shadow: inset 0 3px 0 #2563eb; 
+        background: var(--zrx-bg-card); 
+        color: var(--zrx-primary); 
+        border-bottom: 1px solid var(--zrx-bg-card);
+        box-shadow: inset 0 3px 0 var(--zrx-primary); 
     }
     .calc-tab-btn:hover:not(.active) { 
-        background: #e2e8f0; 
-        color: #0f172a; 
+        background: var(--zrx-border-subtle); 
+        color: var(--zrx-text-main); 
     }
     .calc-pane { 
         display: none; 
@@ -38,29 +39,29 @@
     .calc-inp { 
         width: 100%; 
         height: 34px; 
-        border: 1px solid #cbd5e1; 
+        border: 1px solid var(--zrx-border); 
         border-radius: 6px; 
         padding: 0 10px; 
         font-family: inherit; 
         font-size: 0.85rem; 
-        color: #0f172a; 
+        color: var(--zrx-text-main); 
         transition: border-color 0.2s; 
         box-sizing: border-box; 
     }
     .calc-inp:focus { 
-        border-color: #2563eb; 
+        border-color: var(--zrx-primary); 
         outline: none; 
-        box-shadow: 0 0 0 3px rgba(37,99,235,0.1); 
+        box-shadow: var(--zrx-shadow-focus-ring); 
     }
     .calc-inp[readonly] { 
-        background: #f8fafc; 
+        background: var(--zrx-bg-subtle); 
         font-weight: 700; 
-        color: #1e40af; 
+        color: var(--zrx-blue-800); 
     }
     .calc-label {
         font-size: 0.75rem;
         font-weight: 700;
-        color: #475569;
+        color: var(--zrx-slate-600);
         text-transform: uppercase;
         letter-spacing: 0.04em;
         margin-bottom: 4px;
@@ -81,15 +82,15 @@
         gap: 15px;
         height: 34px;
         align-items: center;
-        background: #f8fafc;
-        border: 1px solid #cbd5e1;
+        background: var(--zrx-bg-subtle);
+        border: 1px solid var(--zrx-border);
         border-radius: 6px;
         padding: 0 10px;
     }
     .calc-radio-group label {
         font-size: 0.85rem;
         font-weight: 600;
-        color: #0f172a;
+        color: var(--zrx-text-main);
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -99,3 +100,57 @@
         from { opacity: 0; transform: translateY(2px); }
         to { opacity: 1; transform: translateY(0); }
     }
+
+/* Card container, tabs bar, and result panel styling */
+.calculators-module-wrapper {
+    background: var(--zrx-border-subtle);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    height: 100%;
+}
+.calc-header-wrap {
+    display: flex;
+    flex-direction: column;
+}
+.calc-module-heading {
+    text-align: center;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--zrx-text-main);
+    margin-top: 0;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-family: 'SolaimanLipi', sans-serif;
+}
+.calc-main-card {
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: var(--zrx-shadow-sm);
+}
+.calc-tabs-bar {
+    display: flex;
+    flex-wrap: wrap;
+    background: var(--zrx-bg-subtle);
+    border-bottom: 1px solid var(--zrx-border);
+}
+.calc-panes-body {
+    padding: 20px;
+}
+.calc-result-box {
+    background: var(--zrx-bg-subtle);
+    padding: 15px;
+    border: 1px solid var(--zrx-border);
+    border-radius: 6px;
+}
+.calc-col-flex-08 { flex: 0.8; }
+.calc-col-flex-15 { flex: 1.5; }
+.calc-col-flex-20 { flex: 2; }
+.calc-inp-dose { font-family: 'SolaimanLipi', sans-serif; font-size: 1rem; }
+.calc-inp-edd-res { color: var(--zrx-emerald-700); background: var(--zrx-emerald-100); border-color: var(--zrx-emerald-300); }
+.calc-footnote-text { margin: 0; font-size: 0.75rem; color: var(--zrx-text-muted); text-align: center; }
+

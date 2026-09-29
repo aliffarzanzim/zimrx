@@ -1,4 +1,5 @@
 <?php
+// CRUD and preference management for patient occupations (pinning, hiding, reordering, custom additions).
 declare(strict_types=1);
 
 header('Content-Type: application/json; charset=utf-8');
@@ -47,7 +48,7 @@ try {
     if ($action === 'list') {
         $includeHidden = isset($_GET['include_hidden']) ? (int)$_GET['include_hidden'] === 1 : true;
 
-        // 1. Load static occupations map (case-insensitive name => static_id)
+        // Load static occupations map
         $staticMap = [];
         $stmtStatic = $pdo_static->query("SELECT id, name FROM zimrx_static_occupations ORDER BY name ASC");
         $staticRows = $stmtStatic->fetchAll(PDO::FETCH_ASSOC) ?: [];
@@ -58,7 +59,7 @@ try {
             ];
         }
 
-        // 2. Load user records from zimrx_user_occupations for this doctor
+        // Load user occupation records for this doctor
         $userMap = [];
         $stmtUser = $pdo_user->prepare(
             "SELECT id, name, usage_count, is_pinned, is_hidden, sort_order
@@ -108,7 +109,7 @@ try {
             ];
         }
 
-        // Sort: is_pinned DESC, (sort_order > 0 ? sort_order : 99999) ASC, usage_count DESC, name ASC
+        // Sort by pinned status, custom sort order, usage frequency, then alphabetically
         usort($items, function($a, $b) {
             if ($a['is_pinned'] !== $b['is_pinned']) {
                 return $b['is_pinned'] <=> $a['is_pinned'];

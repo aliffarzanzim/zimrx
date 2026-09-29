@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Header onboarding AJAX endpoint: formats bilingual prescription header lines and updates print setup.
+
 require_once __DIR__ . '/../auth.php';
 require_login();
 require_once __DIR__ . '/../db.php';
@@ -86,25 +88,25 @@ try {
     // Right (English) Block HTML generation
     $rightHtml = [];
     if ($name_en !== '') {
-        $rightHtml[] = '<p class="zrx-header-right-line-1"><b><font face="times new roman" size="4"><span style="word-spacing:-0.05em;">' . $fmt($name_en) . '</span></font></b></p>';
+        $rightHtml[] = '<p class="zrx-header-right-line-1"><b><font face="tinos" size="4"><span style="word-spacing:-0.05em;">' . $fmt($name_en) . '</span></font></b></p>';
     }
     if ($qualifications_en !== '') {
-        $rightHtml[] = '<p class="zrx-header-right-line-2"><b><font face="times new roman"><span style="font-size:11pt;word-spacing:-0.05em;">' . $formatQualifications($qualifications_en, $qualifications_bn) . '</span></font></b></p>';
+        $rightHtml[] = '<p class="zrx-header-right-line-2"><b><font face="tinos"><span style="font-size:11pt;word-spacing:-0.05em;">' . $formatQualifications($qualifications_en, $qualifications_bn) . '</span></font></b></p>';
     }
     if ($designation_en !== '') {
-        $rightHtml[] = '<p class="zrx-header-right-line-3"><b><font face="times new roman"><span style="font-size:11pt;word-spacing:-0.05em;">' . $fmt($designation_en) . '</span></font></b></p>';
+        $rightHtml[] = '<p class="zrx-header-right-line-3"><b><font face="tinos"><span style="font-size:11pt;word-spacing:-0.05em;">' . $fmt($designation_en) . '</span></font></b></p>';
     }
     if ($institute_en !== '') {
-        $rightHtml[] = '<p class="zrx-header-right-line-4"><font face="times new roman"><span style="font-size:11pt;word-spacing:-0.05em;">' . $fmt($institute_en) . '</span></font></p>';
+        $rightHtml[] = '<p class="zrx-header-right-line-4"><font face="tinos"><span style="font-size:11pt;word-spacing:-0.05em;">' . $fmt($institute_en) . '</span></font></p>';
     }
     if ($speciality_en !== '') {
-        $rightHtml[] = '<p class="zrx-header-right-line-5"><font face="times new roman"><span style="font-size:11pt;word-spacing:-0.05em;">' . $fmt($speciality_en) . '</span></font></p>';
+        $rightHtml[] = '<p class="zrx-header-right-line-5"><font face="tinos"><span style="font-size:11pt;word-spacing:-0.05em;">' . $fmt($speciality_en) . '</span></font></p>';
     }
     if ($bmdc_en !== '') {
-        $rightHtml[] = '<p class="zrx-header-right-line-6"><font face="times new roman"><span style="font-size:11pt;word-spacing:-0.05em;">' . $fmt($bmdc_en) . '</span></font></p>';
+        $rightHtml[] = '<p class="zrx-header-right-line-6"><font face="tinos"><span style="font-size:11pt;word-spacing:-0.05em;">' . $fmt($bmdc_en) . '</span></font></p>';
     }
     if ($phone_en !== '') {
-        $rightHtml[] = '<p class="zrx-header-right-line-7"><font face="times new roman"><span style="font-size:11pt;word-spacing:-0.05em;">' . $fmt($phone_en) . '</span></font></p>';
+        $rightHtml[] = '<p class="zrx-header-right-line-7"><font face="tinos"><span style="font-size:11pt;word-spacing:-0.05em;">' . $fmt($phone_en) . '</span></font></p>';
     }
     $rightBlockHtml = implode('', $rightHtml);
     $footerHtml = '<p style="text-align: center; margin: 0; line-height: 1.5;"><font face="solaimanlipi"><span style="font-size: 10pt;"><b>চেম্বারঃ</b> ZimRx ডায়াগনস্টিক এন্ড কনসালটেশন সেন্টার, ঢাকা।<br><b>চেম্বারে আসার পূর্বে সিরিয়ালঃ ০১৪০৮-XXXXXX নম্বরে যোগাযোগ করে সিরিয়াল দিবেন।</b><br><b>রোগী দেখার সময়ঃ</b> বিকাল ৪ টা থেকে রাত ৮ টা (সপ্তাহে ৬ দিন)। ওয়েবসাইটঃ www.zimrx.guessthecase.eu.org</span></font></p>';

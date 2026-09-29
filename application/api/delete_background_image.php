@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Background image deletion endpoint: deletes doctor-specific watermark/background images.
+
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../auth.php';
 require_login();

@@ -1,3 +1,4 @@
+// Appointment settings page handling factory reset confirmation and default values.
 document.addEventListener('DOMContentLoaded', () => {
     const resetBtn = document.getElementById('factory-reset-btn');
     const modal = document.getElementById('apt-confirm-modal');

@@ -1,0 +1,246 @@
+<?php
+declare(strict_types=1);
+
+// Physical Examination (P/E) module: clinical findings table, vitals inputs, and custom parameter settings.
+
+require_once __DIR__ . '/../lib/physical_examination_lib.php';
+$peDoctorId = max(1, (int)(function_exists('current_user_doctor_id') ? current_user_doctor_id() : 1));
+$peDoctorConfig = physical_exam_get_doctor_config($peDoctorId);
+$activePeItems = $peDoctorConfig['active_items'];
+?>
+<div class="pc-wrapper" id="pe-wrapper">
+    <div class="pc-table-container">
+        <table class="pc-table" id="pe-table">
+            <thead>
+                <tr>
+                    <th class="pe-col-drag"></th>
+                    <th class="pe-col-name">Physical Examination</th>
+                    <th class="pe-col-val">Value</th>
+                    <th class="pe-col-unit">Unit</th>
+                    <th class="pe-col-action">
+                        <button type="button" class="pe-settings-btn" id="pe-settings-btn" title="Physical Examination Settings" aria-haspopup="dialog" aria-controls="pe-settings-modal">
+                            <?= zrx_icon('settings', 14) ?>
+                        </button>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="pe-tbody">
+                <?php foreach ($activePeItems as $item): 
+                    $code = htmlspecialchars($item['item_code'], ENT_QUOTES, 'UTF-8');
+                    $name = htmlspecialchars($item['display_name'], ENT_QUOTES, 'UTF-8');
+                    $unit = htmlspecialchars($item['default_unit'], ENT_QUOTES, 'UTF-8');
+                    $inputType = $item['input_type'];
+                    $delimiter = htmlspecialchars($item['delimiter'] ?: '/', ENT_QUOTES, 'UTF-8');
+                    $normalVal = htmlspecialchars($item['normal_value'] ?? '', ENT_QUOTES, 'UTF-8');
+                ?>
+                    <tr class="pc-row" draggable="true" data-item-code="<?= $code ?>" data-input-type="<?= htmlspecialchars($inputType, ENT_QUOTES, 'UTF-8') ?>" data-delimiter="<?= $delimiter ?>">
+                        <td class="pc-action pc-del"><button type="button" title="Remove Row">X</button></td>
+                        <td><textarea class="pc-input pe-input" autocomplete="off" rows="1"><?= $name ?></textarea></td>
+
+                        <?php if ($inputType === 'double_textbox'): ?>
+                            <td class="zrx-va-mid">
+                                <div class="pe-parts-wrap-2">
+                                    <input type="text" class="pe-input pe-val-part pe-val-part-2" data-part="1" autocomplete="off">
+                                    <span class="pe-part-separator"><?= $delimiter ?></span>
+                                    <input type="text" class="pe-input pe-val-part pe-val-part-2" data-part="2" autocomplete="off">
+                                </div>
+                            </td>
+                        <?php elseif ($inputType === 'multiple_textbox'): ?>
+                            <td class="zrx-va-mid">
+                                <div class="pe-parts-wrap-3">
+                                    <input type="text" class="pe-input pe-val-part pe-val-part-3" data-part="1" autocomplete="off">
+                                    <span class="pe-part-separator-sm"><?= $delimiter ?></span>
+                                    <input type="text" class="pe-input pe-val-part pe-val-part-3" data-part="2" autocomplete="off">
+                                    <span class="pe-part-separator-sm"><?= $delimiter ?></span>
+                                    <input type="text" class="pe-input pe-val-part pe-val-part-3" data-part="3" autocomplete="off">
+                                </div>
+                            </td>
+                        <?php elseif ($code === 'height'): ?>
+                            <td><input type="text" id="pe-height-val" class="pc-input pe-input" class="zrx-ta-c" autocomplete="off"></td>
+                        <?php elseif ($code === 'weight'): ?>
+                            <td><input type="text" id="pe-weight-val" class="pc-input pe-input" class="zrx-ta-c" autocomplete="off"></td>
+                        <?php elseif ($code === 'bmi'): ?>
+                            <td><input type="text" id="pe-bmi-val" class="pc-input pe-input" class="zrx-ta-c" readonly autocomplete="off"></td>
+                        <?php elseif (!empty($item['dropdown_options']) || !empty($item['finding_wordlists'])): ?>
+                            <td>
+                                <input type="text" list="pe-dl-<?= $code ?>" class="pc-input pe-input" class="zrx-ta-c" autocomplete="off" placeholder="<?= $normalVal ? 'Normal: ' . $normalVal : '' ?>">
+                                <datalist id="pe-dl-<?= $code ?>">
+                                    <?php 
+                                        $options = array_filter(array_map('trim', explode('|', $item['dropdown_options'] ?? '')));
+                                        $words = array_filter(array_map('trim', explode(',', $item['finding_wordlists'] ?? '')));
+                                        $allOpts = array_unique(array_merge($options, $words));
+                                        foreach ($allOpts as $opt): 
+                                    ?>
+                                        <option value="<?= htmlspecialchars($opt, ENT_QUOTES, 'UTF-8') ?>"></option>
+                                    <?php endforeach; ?>
+                                </datalist>
+                            </td>
+                        <?php else: ?>
+                            <td><input type="text" class="pc-input pe-input" class="zrx-ta-c" autocomplete="off"></td>
+                        <?php endif; ?>
+
+                        <td><input type="text" class="pc-input pe-input" class="zrx-ta-c" value="<?= $unit ?>" autocomplete="off"></td>
+                        <td class="pc-action pc-drag">
+                            <button type="button" class="pc-row-move-btn" title="Move Row">
+                                <?= zrx_icon('move', 14) ?>
+                            </button>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pc-footer">
+        <button type="button" class="pc-add-row-btn pe-add-row-btn">Add More</button>
+    </div>
+
+    <!-- Physical Examination Row Template -->
+    <template id="pe-row-template">
+        <tr class="pc-row" draggable="true" data-item-code="" data-input-type="textbox">
+            <td class="pc-action pc-del"><button type="button" title="Remove Row">X</button></td>
+            <td><textarea class="pc-input pe-input" autocomplete="off" rows="1"></textarea></td>
+            <td><input type="text" class="pc-input pe-input" class="zrx-ta-c" autocomplete="off"></td>
+            <td><input type="text" class="pc-input pe-input" class="zrx-ta-c" autocomplete="off"></td>
+            <td class="pc-action pc-drag">
+                <button type="button" class="pc-row-move-btn" title="Move Row">
+                    <?= zrx_icon('move', 14) ?>
+                </button>
+            </td>
+        </tr>
+    </template>
+</div>
+
+<!-- Initial Configuration JSON for Client-side JS -->
+<script type="application/json" id="zimrxInitialPeConfig">
+<?= json_encode($peDoctorConfig, JSON_UNESCAPED_UNICODE) ?>
+</script>
+
+<!-- Physical Examination Settings Modal -->
+<div class="pe-settings-modal" id="pe-settings-modal" hidden class="zrx-dn">
+    <div class="pe-settings-backdrop" data-pe-settings-close></div>
+    <div class="pe-settings-panel" role="dialog" aria-modal="true" aria-labelledby="pe-settings-title">
+        <div class="pe-settings-header">
+            <div>
+                <h3 id="pe-settings-title">Physical Examination Settings</h3>
+                <p>Configure which clinical findings appear in your examination table, adjust ordering, or add custom parameters.</p>
+            </div>
+            <button type="button" class="pe-settings-close" data-pe-settings-close aria-label="Close Settings"><?= zrx_icon('x', 16) ?></button>
+        </div>
+
+        <div class="pe-settings-toolbar">
+            <div class="pe-settings-search-box">
+                <?= zrx_icon('search', 15) ?>
+                <input type="text" id="pe-settings-search" placeholder="Search 90+ physical findings across catalog..." autocomplete="off">
+            </div>
+            <button type="button" id="pe-toggle-add-btn" class="pe-settings-btn-outline-add">
+                <?= zrx_icon('plus', 14) ?>
+                <span>+ Add Parameter</span>
+            </button>
+        </div>
+
+        <div class="pe-settings-grid">
+            <!-- Left Sidebar: Systems List -->
+            <div class="pe-settings-sidebar">
+                <div class="pe-settings-sidebar-title">
+                    <span>ORGAN SYSTEMS</span>
+                    <span id="pe-sys-total-badge" class="pe-settings-sidebar-badge"></span>
+                </div>
+                <div class="pe-settings-sys-list" id="pe-settings-sys-list">
+                    <!-- Rendered by JS -->
+                </div>
+            </div>
+
+            <!-- Right Main Pane: Table View & Collapsible Custom Form -->
+            <div class="pe-settings-main">
+                <!-- Collapsible Custom Form -->
+                <div class="pe-settings-add-card" id="pe-add-card" class="zrx-dn">
+                    <div class="pe-settings-add-card-header">
+                        <h4>+ Add Custom Physical Examination Parameter</h4>
+                        <button type="button" class="pe-settings-add-card-close" id="pe-add-card-close"><?= zrx_icon('x', 14) ?></button>
+                    </div>
+                    <div class="pe-settings-add-grid">
+                        <div>
+                            <label>System</label>
+                            <input type="text" id="pe-custom-system" placeholder="e.g. Vitals or MSK" list="pe-existing-systems" autocomplete="off">
+                            <datalist id="pe-existing-systems"></datalist>
+                        </div>
+                        <div>
+                            <label>Category</label>
+                            <input type="text" id="pe-custom-category" placeholder="e.g. General" autocomplete="off">
+                        </div>
+                        <div>
+                            <label>Display Label (on Rx)</label>
+                            <input type="text" id="pe-custom-label" placeholder="e.g. Waist Circumference" autocomplete="off">
+                        </div>
+                        <div>
+                            <label>Input Type</label>
+                            <select id="pe-custom-input-type">
+                                <option value="dropdown+textbox">Dropdown + Textbox (Hybrid)</option>
+                                <option value="textbox">Single Textbox</option>
+                                <option value="double_textbox">Double Textbox (e.g. BP 120/80)</option>
+                                <option value="multiple_textbox">Multiple Textbox (e.g. GCS E/V/M)</option>
+                                <option value="dropdown">Dropdown Only</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Delimiter (if double/multi)</label>
+                            <input type="text" id="pe-custom-delimiter" placeholder="e.g. /" value="/" autocomplete="off">
+                        </div>
+                        <div>
+                            <label>Default Unit</label>
+                            <input type="text" id="pe-custom-unit" placeholder="e.g. cm, mmHg, bpm" autocomplete="off">
+                        </div>
+                        <div>
+                            <label>Normal Value</label>
+                            <input type="text" id="pe-custom-normal" placeholder="e.g. Normal, Absent" autocomplete="off">
+                        </div>
+                        <div>
+                            <label>Wordlists / Presets (comma-separated)</label>
+                            <input type="text" id="pe-custom-wordlists" placeholder="e.g. Absent, Present, Mild, Severe" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="pe-settings-footer-actions">
+                        <button type="button" id="pe-add-custom-btn" class="pe-settings-add-btn">+ Add Parameter</button>
+                    </div>
+                </div>
+
+                <!-- Table Header Info -->
+                <div class="pe-settings-table-header-info">
+                    <span id="pe-table-section-title" class="pe-settings-current-sys-title">All Systems</span>
+                    <span id="pe-table-section-count" class="pe-settings-current-sys-count"></span>
+                </div>
+
+                <!-- Table Wrap -->
+                <div class="pe-settings-table-wrap">
+                    <table class="pe-settings-table">
+                        <thead>
+                            <tr>
+                                <th class="pe-cfg-col-drag"></th>
+                                <th class="pe-cfg-col-active">Active</th>
+                                <th class="pe-cfg-col-name">Display Name</th>
+                                <th class="pe-cfg-col-system">System</th>
+                                <th class="pe-cfg-col-type">Input Type</th>
+                                <th class="pe-cfg-col-delim">Delim</th>
+                                <th class="pe-cfg-col-unit">Unit</th>
+                                <th>Finding Wordlists / Dropdown Options</th>
+                                <th class="pe-cfg-col-del"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="pe-settings-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="pe-settings-footer">
+            <button type="button" id="pe-settings-reset-btn" class="pe-settings-btn-reset" title="Restore factory defaults">Reset to Defaults</button>
+            <div class="pe-settings-footer-right">
+                <button type="button" class="pe-settings-btn-cancel" data-pe-settings-close>Cancel</button>
+                <button type="button" id="pe-settings-save-btn" class="pe-settings-btn-save">Save Settings</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="assets/js/modules/pe.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/pe.js') ?>"></script>

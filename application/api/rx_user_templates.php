@@ -1,4 +1,5 @@
 <?php
+// Search and retrieve user prescription templates (drugs, regimens, whole prescriptions).
 declare(strict_types=1);
 
 require_once __DIR__ . '/../auth.php';
@@ -50,7 +51,7 @@ try {
         );
         $rowsStmt->execute(['group_id' => $groupId, 'doctor_id' => $doctorId]);
 
-        // Maintain strict GET idempotency (RFC 7231): usage metrics incremented exclusively on verified POST mutations
+        // Increment usage count only on verified POST requests to keep GET requests idempotent
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && zimrx_verify_csrf()) {
             $userPdo->prepare(
                 "UPDATE {$table}

@@ -76,7 +76,7 @@ function normalCdf(z) {
       z = (Math.pow(numVal / M, L) - 1.0) / (L * S);
     }
 
-    // A. WHO adjustment for extreme Z-scores (variance restriction outside [-3, +3])
+    // WHO adjustment for extreme Z-scores (variance restriction outside [-3, +3])
     if (useStandard === 'who' && (metric === 'weight' || metric === 'wfa' || metric === 'bmi' || metric === 'bmifa')) {
       if (z > 3) {
         const sd3pos = (Math.abs(L) < 0.0001) ? M * Math.exp(S * 3) : M * Math.pow(1 + L * S * 3, 1 / L);
@@ -95,7 +95,7 @@ function normalCdf(z) {
       }
     }
 
-    // B. CDC 2022 Extended BMI tracking for severe obesity (>= 95th percentile)
+    // CDC 2022 Extended BMI tracking for severe obesity (>= 95th percentile)
     let extendedBmi = null;
     if (useStandard === 'cdc' && (metric === 'bmi' || metric === 'bmifa')) {
       const z95 = 1.64485;

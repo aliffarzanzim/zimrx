@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Medication regimens: drug resolution, dosage form mapping, and bilingual instruction templates.
+
 if (!defined('ZIMRX_DB_LIGHTWEIGHT')) {
     define('ZIMRX_DB_LIGHTWEIGHT', true);
 }

@@ -1,13 +1,10 @@
-/* =======================================================
-   ZimRx EMR (Electronic Medical Record) Styling
-   Master Profile, Active Clinical Canvas, Past Rx Drawer
-======================================================= */
+/* Electronic medical record overview, vitals trends, patient profile, and prescription history */
 
 .emr-page {
     margin-bottom: 3rem;
 }
 
-/* ── Top Header / Alert Banners ── */
+/* Alert banners */
 .emr-alert-banner {
     display: flex;
     align-items: center;
@@ -18,19 +15,19 @@
     margin-bottom: 1.25rem;
     font-size: 0.88rem;
     font-weight: 600;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--zrx-shadow-sm);
 }
 
 .emr-alert-banner.allergy-alert {
-    background: #fef2f2;
-    border: 1px solid #fecaca;
-    color: #991b1b;
+    background: var(--zrx-red-50);
+    border: 1px solid var(--zrx-red-200);
+    color: var(--zrx-red-700);
 }
 
 .emr-alert-banner.due-alert {
-    background: #fffbeb;
-    border: 1px solid #fde68a;
-    color: #92400e;
+    background: var(--zrx-amber-50);
+    border: 1px solid var(--zrx-amber-200);
+    color: var(--zrx-amber-700);
 }
 
 .emr-alert-content {
@@ -40,8 +37,8 @@
 }
 
 .emr-alert-badge {
-    background: #dc2626;
-    color: #ffffff;
+    background: var(--zrx-red-600);
+    color: var(--zrx-white);
     font-size: 0.7rem;
     font-weight: 800;
     text-transform: uppercase;
@@ -50,12 +47,12 @@
     border-radius: 4px;
 }
 
-/* ── Top Bar Header (Master & Active) ── */
+/* Top header bar */
 .emr-top-card {
-    background: #ffffff;
-    border: 1px solid var(--border-color, #e2e8f0);
-    border-radius: var(--border-radius, 10px);
-    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.05));
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border-subtle);
+    border-radius: var(--zrx-border-radius);
+    box-shadow: var(--zrx-shadow-card);
     padding: 1.15rem 1.5rem;
     display: flex;
     align-items: center;
@@ -75,8 +72,8 @@
     width: 46px;
     height: 46px;
     border-radius: 10px;
-    background: #e0f2fe;
-    color: #0369a1;
+    background: var(--zrx-blue-100);
+    color: var(--zrx-blue-700);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -88,7 +85,7 @@
 .emr-title-group h1 {
     font-size: 1.35rem;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--zrx-text-main);
     margin: 0;
     line-height: 1.2;
     display: flex;
@@ -111,24 +108,24 @@
     gap: 0.3rem;
     font-size: 0.76rem;
     font-weight: 600;
-    color: #475569;
-    background: #f1f5f9;
+    color: var(--zrx-slate-600);
+    background: var(--zrx-slate-100);
     padding: 0.2rem 0.6rem;
     border-radius: 5px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--zrx-border-subtle);
 }
 
 .emr-meta-pill.reg-pill {
-    background: #ecfdf5;
-    color: #047857;
-    border-color: #a7f3d0;
+    background: var(--zrx-emerald-50);
+    color: var(--zrx-emerald-700);
+    border-color: var(--zrx-emerald-200);
     font-weight: 700;
 }
 
 .emr-meta-pill.visit-pill {
-    background: #eff6ff;
-    color: #1d4ed8;
-    border-color: #bfdbfe;
+    background: var(--zrx-blue-50);
+    color: var(--zrx-primary-hover);
+    border-color: var(--zrx-blue-200);
     font-weight: 700;
 }
 
@@ -139,12 +136,12 @@
     flex-shrink: 0;
 }
 
-/* ── Omni Search Hub Landing View ── */
+/* Universal patient search bar */
 .emr-hub-hero {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border-subtle);
     border-radius: 12px;
-    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--zrx-shadow-card);
     padding: 2.5rem 2rem;
     text-align: center;
     margin-bottom: 2rem;
@@ -153,12 +150,12 @@
 .emr-hub-hero h2 {
     font-size: 1.7rem;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--zrx-text-main);
     margin: 0 0 0.5rem;
 }
 
 .emr-hub-hero p {
-    color: #64748b;
+    color: var(--zrx-text-muted);
     font-size: 0.95rem;
     margin: 0 0 1.5rem;
 }
@@ -172,22 +169,22 @@
 .emr-omni-input {
     width: 100%;
     height: 52px;
-    border: 2px solid #cbd5e1;
+    border: 2px solid var(--zrx-border);
     border-radius: 10px;
     padding: 0 1.25rem 0 3.25rem;
     font-size: 1.05rem;
     font-weight: 500;
-    color: #0f172a;
-    background: #ffffff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    color: var(--zrx-text-main);
+    background: var(--zrx-bg-card);
+    box-shadow: var(--zrx-shadow-sm);
     outline: none;
     transition: all 0.2s ease;
     box-sizing: border-box;
 }
 
 .emr-omni-input:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+    border-color: var(--zrx-primary);
+    box-shadow: var(--zrx-shadow-focus);
 }
 
 .emr-omni-icon {
@@ -195,7 +192,7 @@
     left: 1.1rem;
     top: 50%;
     transform: translateY(-50%);
-    color: #64748b;
+    color: var(--zrx-text-muted);
     pointer-events: none;
 }
 
@@ -207,18 +204,18 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #059669;
-    background: #ecfdf5;
+    color: var(--zrx-emerald-600);
+    background: var(--zrx-emerald-50);
     padding: 0.3rem 0.75rem;
     border-radius: 20px;
     margin-top: 1rem;
-    border: 1px solid #a7f3d0;
+    border: 1px solid var(--zrx-emerald-200);
 }
 
 .emr-scanner-dot {
     width: 8px;
     height: 8px;
-    background: #10b981;
+    background: var(--zrx-emerald-500);
     border-radius: 50%;
     box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
     animation: scanner-pulse 1.8s infinite;
@@ -230,7 +227,7 @@
     100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
-/* ── Master Profile Grid Layout ── */
+/* Master patient profile grid */
 .emr-master-grid {
     display: grid;
     grid-template-columns: 340px 1fr;
@@ -238,22 +235,22 @@
     align-items: start;
 }
 
-/* Left Demographics Card */
+
 .emr-demographics-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border-subtle);
     border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: var(--zrx-shadow-card);
     padding: 1.25rem;
 }
 
 .emr-demographics-card h3 {
     font-size: 1rem;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--zrx-text-main);
     margin: 0 0 1rem;
     padding-bottom: 0.65rem;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--zrx-border-subtle);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -274,7 +271,7 @@
 }
 
 .emr-demo-item .label {
-    color: #64748b;
+    color: var(--zrx-text-muted);
     font-weight: 600;
     font-size: 0.76rem;
     text-transform: uppercase;
@@ -283,7 +280,7 @@
 }
 
 .emr-demo-item .val {
-    color: #0f172a;
+    color: var(--zrx-text-main);
     font-weight: 700;
     text-align: right;
     word-break: break-word;
@@ -292,13 +289,13 @@
 .emr-allergies-box {
     margin-top: 1rem;
     padding-top: 0.85rem;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--zrx-border-subtle);
 }
 
 .emr-allergies-box .label {
     font-size: 0.74rem;
     font-weight: 800;
-    color: #dc2626;
+    color: var(--zrx-red-600);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 0.35rem;
@@ -307,9 +304,9 @@
 
 .emr-allergy-tag {
     display: inline-block;
-    background: #fef2f2;
-    color: #b91c1c;
-    border: 1px solid #fecaca;
+    background: var(--zrx-red-50);
+    color: var(--zrx-red-700);
+    border: 1px solid var(--zrx-red-200);
     font-size: 0.76rem;
     font-weight: 700;
     padding: 0.2rem 0.55rem;
@@ -317,12 +314,12 @@
     margin: 0.15rem 0.2rem 0.15rem 0;
 }
 
-/* Right Clinical Timeline & Trends */
+
 .emr-timeline-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border-subtle);
     border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: var(--zrx-shadow-card);
     padding: 1.25rem;
     margin-bottom: 1.5rem;
 }
@@ -330,7 +327,7 @@
 .emr-timeline-card h3 {
     font-size: 1.05rem;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--zrx-text-main);
     margin: 0 0 1rem;
     display: flex;
     align-items: center;
@@ -349,34 +346,34 @@
 }
 
 .emr-timeline-table th {
-    background: #f8fafc;
-    color: #475569;
+    background: var(--zrx-bg-subtle);
+    color: var(--zrx-slate-600);
     font-size: 0.72rem;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     padding: 0.65rem 0.85rem;
-    border-bottom: 1px solid #cbd5e1;
+    border-bottom: 1px solid var(--zrx-border);
     text-align: left;
 }
 
 .emr-timeline-table td {
     padding: 0.75rem 0.85rem;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--zrx-slate-100);
     vertical-align: top;
-    color: #1e293b;
+    color: var(--zrx-slate-800);
 }
 
 .emr-timeline-table tr:hover td {
-    background: #f8fafc;
+    background: var(--zrx-bg-subtle);
 }
 
-/* ── Modular Vitals & Longitudinal Trajectories ── */
+/* Vitals trend charts and graphs */
 .emr-trends-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border-subtle);
     border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: var(--zrx-shadow-card);
     padding: 1.25rem;
 }
 
@@ -392,7 +389,7 @@
 .emr-trends-title-group h3 {
     font-size: 1.05rem;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--zrx-text-main);
     margin: 0 0 0.35rem;
 }
 
@@ -401,7 +398,7 @@
     gap: 0.85rem;
     align-items: center;
     font-size: 0.76rem;
-    color: #64748b;
+    color: var(--zrx-text-muted);
     font-weight: 600;
 }
 
@@ -419,15 +416,15 @@
 }
 
 .legend-dot.clinic-dot {
-    background: #2563eb;
-    border: 1.5px solid #ffffff;
-    box-shadow: 0 0 0 1px #2563eb;
+    background: var(--zrx-primary);
+    border: 1.5px solid var(--zrx-white);
+    box-shadow: 0 0 0 1px var(--zrx-primary);
 }
 
 .legend-dot.home-dot {
-    background: #f59e0b;
-    border: 1.5px solid #ffffff;
-    box-shadow: 0 0 0 1px #f59e0b;
+    background: var(--zrx-amber-500);
+    border: 1.5px solid var(--zrx-white);
+    box-shadow: 0 0 0 1px var(--zrx-amber-500);
 }
 
 .emr-dropdown-wrap {
@@ -440,10 +437,10 @@
     position: absolute;
     top: calc(100% + 4px);
     right: 0;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border-subtle);
     border-radius: 8px;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--zrx-shadow-xl);
     min-width: 260px;
     max-height: 440px;
     overflow-y: auto;
@@ -458,13 +455,13 @@
 .emr-dropdown-section-title {
     font-size: 0.69rem;
     font-weight: 800;
-    color: #475569;
+    color: var(--zrx-slate-600);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     padding: 0.45rem 0.95rem 0.25rem;
-    background: #f8fafc;
-    border-top: 1px solid #f1f5f9;
-    border-bottom: 1px solid #f1f5f9;
+    background: var(--zrx-bg-subtle);
+    border-top: 1px solid var(--zrx-slate-100);
+    border-bottom: 1px solid var(--zrx-slate-100);
     margin: 0.2rem 0;
 }
 
@@ -480,7 +477,7 @@
     padding: 0.48rem 0.95rem;
     font-size: 0.82rem;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--zrx-slate-800);
     background: none;
     border: none;
     cursor: pointer;
@@ -488,8 +485,8 @@
 }
 
 .emr-dropdown-item:hover {
-    background: #f1f5f9;
-    color: #0284c7;
+    background: var(--zrx-slate-100);
+    color: var(--zrx-blue-600);
 }
 
 .emr-trends-grid {
@@ -499,11 +496,11 @@
 }
 
 .emr-trend-box {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border-subtle);
     border-radius: 9px;
     padding: 0.95rem 1rem;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    box-shadow: var(--zrx-shadow-sm);
     position: relative;
     display: flex;
     flex-direction: column;
@@ -521,7 +518,7 @@
 .emr-trend-box-title {
     font-size: 0.78rem;
     font-weight: 800;
-    color: #334155;
+    color: var(--zrx-slate-700);
     text-transform: uppercase;
     letter-spacing: 0.04em;
     display: flex;
@@ -532,9 +529,9 @@
 .emr-trend-latest-val {
     font-size: 0.78rem;
     font-weight: 800;
-    color: #0284c7;
-    background: #f0f9ff;
-    border: 1px solid #bae6fd;
+    color: var(--zrx-blue-600);
+    background: var(--zrx-blue-50);
+    border: 1px solid var(--zrx-sky-400);
     border-radius: 4px;
     padding: 0.1rem 0.45rem;
 }
@@ -546,16 +543,16 @@
     border-radius: 4px;
 }
 .emr-trend-delta.delta-up {
-    background: #fff7ed;
-    color: #ea580c;
+    background: var(--zrx-orange-100);
+    color: var(--zrx-orange-700);
 }
 .emr-trend-delta.delta-down {
-    background: #f0f9ff;
-    color: #0284c7;
+    background: var(--zrx-blue-50);
+    color: var(--zrx-blue-600);
 }
 .emr-trend-delta.delta-stable {
-    background: #f8fafc;
-    color: #64748b;
+    background: var(--zrx-bg-subtle);
+    color: var(--zrx-text-muted);
 }
 
 .emr-trend-actions {
@@ -566,26 +563,26 @@
 
 .btn-trend-action {
     background: none;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--zrx-border-subtle);
     border-radius: 5px;
     padding: 0.22rem 0.5rem;
     font-size: 0.72rem;
     font-weight: 600;
-    color: #475569;
+    color: var(--zrx-slate-600);
     cursor: pointer;
     transition: all 0.15s ease;
 }
 
 .btn-trend-action:hover {
-    background: #f8fafc;
-    border-color: #cbd5e1;
-    color: #0f172a;
+    background: var(--zrx-bg-subtle);
+    border-color: var(--zrx-border);
+    color: var(--zrx-text-main);
 }
 
 .btn-trend-action.btn-trend-remove:hover {
-    background: #fef2f2;
-    border-color: #fecaca;
-    color: #dc2626;
+    background: var(--zrx-red-50);
+    border-color: var(--zrx-red-200);
+    color: var(--zrx-red-600);
 }
 
 .emr-trend-svg-wrap {
@@ -602,7 +599,7 @@
 }
 
 .emr-chart-crosshair {
-    stroke: #94a3b8;
+    stroke: var(--zrx-border-divider);
     stroke-width: 1.2;
     stroke-dasharray: 4 4;
     pointer-events: none;
@@ -614,14 +611,14 @@
 }
 
 .emr-chart-dot.active {
-    r: 6.5 !important;
-    stroke-width: 3px !important;
+    r: 6.5;
+    stroke-width: 3px;
 }
 
 .emr-chart-point-val {
     font-size: 10.5px;
     font-weight: 700;
-    fill: #475569;
+    fill: var(--zrx-slate-600);
     pointer-events: none;
     transition: opacity 0.15s ease, font-size 0.15s ease, fill 0.15s ease;
     opacity: 0;
@@ -632,10 +629,10 @@
 }
 
 .emr-chart-point-val.active {
-    opacity: 1 !important;
+    opacity: 1;
     font-size: 12.5px;
     font-weight: 800;
-    fill: #0f172a;
+    fill: var(--zrx-text-main);
 }
 
 .chart-hit-slice {
@@ -646,20 +643,20 @@
     position: absolute;
     background: rgba(255, 255, 255, 0.99);
     backdrop-filter: blur(8px);
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--zrx-border);
     border-radius: 8px;
-    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.18), 0 4px 6px -2px rgba(15, 23, 42, 0.08);
+    box-shadow: var(--zrx-shadow-lg);
     padding: 0.5rem 0.75rem;
     pointer-events: auto;
     z-index: 40;
     min-width: 175px;
     max-width: 250px;
     font-size: 0.76rem;
-    color: #1e293b;
+    color: var(--zrx-slate-800);
     transition: left 0.08s cubic-bezier(0.16, 1, 0.3, 1), top 0.08s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.12s ease;
 }
 
-/* Caret pointing down to the dot */
+
 .emr-chart-tooltip.caret-bottom::after {
     content: '';
     position: absolute;
@@ -668,11 +665,11 @@
     transform: translateX(-50%);
     border-width: 6px;
     border-style: solid;
-    border-color: #ffffff transparent transparent transparent;
+    border-color: var(--zrx-white) transparent transparent transparent;
     filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
 }
 
-/* Caret pointing up if near top border */
+
 .emr-chart-tooltip.caret-top::after {
     content: '';
     position: absolute;
@@ -681,7 +678,7 @@
     transform: translateX(-50%);
     border-width: 6px;
     border-style: solid;
-    border-color: transparent transparent #ffffff transparent;
+    border-color: transparent transparent var(--zrx-white) transparent;
 }
 
 .tooltip-header {
@@ -689,7 +686,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--zrx-slate-100);
     padding-bottom: 0.3rem;
     margin-bottom: 0.35rem;
 }
@@ -697,7 +694,7 @@
 .tooltip-date {
     font-size: 0.72rem;
     font-weight: 700;
-    color: #475569;
+    color: var(--zrx-slate-600);
 }
 
 .tooltip-metric-row {
@@ -711,7 +708,7 @@
 
 .tooltip-metric-title {
     font-weight: 600;
-    color: #334155;
+    color: var(--zrx-slate-700);
     white-space: nowrap;
 }
 
@@ -730,23 +727,23 @@
 }
 
 .tooltip-badge.badge-clinic {
-    background: #eff6ff;
-    color: #1d4ed8;
-    border: 1px solid #bfdbfe;
+    background: var(--zrx-blue-50);
+    color: var(--zrx-primary-hover);
+    border: 1px solid var(--zrx-blue-200);
 }
 
 .tooltip-badge.badge-home {
-    background: #fffbeb;
-    color: #b45309;
-    border: 1px solid #fde68a;
+    background: var(--zrx-amber-50);
+    color: var(--zrx-amber-700);
+    border: 1px solid var(--zrx-amber-200);
 }
 
 .tooltip-notes {
     margin-top: 0.3rem;
     padding-top: 0.25rem;
-    border-top: 1px dashed #e2e8f0;
+    border-top: 1px dashed var(--zrx-border-subtle);
     font-size: 0.72rem;
-    color: #64748b;
+    color: var(--zrx-text-muted);
     word-break: break-word;
 }
 
@@ -756,16 +753,16 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: #94a3b8;
+    color: var(--zrx-border-divider);
     font-size: 0.8rem;
     text-align: center;
-    border: 1px dashed #cbd5e1;
+    border: 1px dashed var(--zrx-border);
     border-radius: 6px;
-    background: #f8fafc;
+    background: var(--zrx-bg-subtle);
     padding: 1rem;
 }
 
-/* ── Active Clinical Canvas ── */
+/* Active clinical records canvas */
 .emr-active-workspace {
     display: grid;
     grid-template-columns: 320px 1fr 340px;
@@ -774,23 +771,23 @@
 }
 
 .emr-panel-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border-subtle);
     border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: var(--zrx-shadow-card);
     padding: 1.15rem;
 }
 
 .emr-panel-header {
     font-size: 0.92rem;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--zrx-text-main);
     margin: 0 0 0.85rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--zrx-slate-100);
 }
 
 .emr-form-group {
@@ -803,7 +800,7 @@
 .emr-form-group label {
     font-size: 0.72rem;
     font-weight: 700;
-    color: #64748b;
+    color: var(--zrx-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.04em;
 }
@@ -812,13 +809,13 @@
 .emr-form-group textarea,
 .emr-form-group select {
     width: 100%;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--zrx-border);
     border-radius: 6px;
     padding: 0.45rem 0.65rem;
     font-size: 0.86rem;
     font-family: inherit;
-    color: #0f172a;
-    background: #ffffff;
+    color: var(--zrx-text-main);
+    background: var(--zrx-bg-card);
     box-sizing: border-box;
     outline: none;
     transition: border-color 0.15s ease;
@@ -827,8 +824,8 @@
 .emr-form-group input:focus,
 .emr-form-group textarea:focus,
 .emr-form-group select:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    border-color: var(--zrx-primary);
+    box-shadow: var(--zrx-shadow-focus);
 }
 
 .emr-vitals-mini-grid {
@@ -837,16 +834,16 @@
     gap: 0.6rem;
 }
 
-/* ── Rx Grid in Center Panel ── */
+
 .emr-rx-entry-bar {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr 1fr auto;
     gap: 0.5rem;
     margin-bottom: 1rem;
-    background: #f8fafc;
+    background: var(--zrx-bg-subtle);
     padding: 0.75rem;
     border-radius: 8px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--zrx-border-subtle);
     align-items: end;
 }
 
@@ -859,27 +856,27 @@
 }
 
 .emr-rx-table th {
-    background: #f8fafc;
-    color: #475569;
+    background: var(--zrx-bg-subtle);
+    color: var(--zrx-slate-600);
     font-size: 0.7rem;
     font-weight: 800;
     text-transform: uppercase;
     padding: 0.55rem 0.65rem;
-    border-bottom: 1px solid #cbd5e1;
+    border-bottom: 1px solid var(--zrx-border);
     text-align: left;
 }
 
 .emr-rx-table td {
     padding: 0.6rem 0.65rem;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--zrx-slate-100);
     vertical-align: middle;
 }
 
 .emr-rx-table tr:hover td {
-    background: #f8fafc;
+    background: var(--zrx-bg-subtle);
 }
 
-/* ── Sliding Past Rx Reference Drawer ── */
+/* Historical prescriptions drawer */
 .emr-drawer-overlay {
     position: fixed;
     top: 0;
@@ -903,8 +900,8 @@
     width: 540px;
     max-width: calc(100vw - 2rem);
     height: 100vh;
-    background: #ffffff;
-    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.18);
+    background: var(--zrx-bg-card);
+    box-shadow: var(--zrx-shadow-drawer);
     z-index: 1301;
     transition: right 0.28s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
@@ -917,8 +914,8 @@
 
 .emr-drawer-header {
     padding: 1.15rem 1.5rem;
-    background: #0f172a;
-    color: #ffffff;
+    background: var(--zrx-text-main);
+    color: var(--zrx-white);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -928,7 +925,7 @@
     font-size: 1.1rem;
     font-weight: 700;
     margin: 0;
-    color: #ffffff;
+    color: var(--zrx-white);
 }
 
 .emr-drawer-body {
@@ -940,7 +937,7 @@
 .emr-drawer-close-btn {
     background: transparent;
     border: none;
-    color: #94a3b8;
+    color: var(--zrx-border-divider);
     cursor: pointer;
     font-size: 1.5rem;
     line-height: 1;
@@ -948,10 +945,10 @@
 }
 
 .emr-drawer-close-btn:hover {
-    color: #ffffff;
+    color: var(--zrx-white);
 }
 
-/* ── Modals (Edit Demographics, Print Preview) ── */
+/* Clinical modals and dialogs */
 .emr-modal {
     position: fixed;
     top: 0;
@@ -971,9 +968,9 @@
 }
 
 .emr-modal-card {
-    background: #ffffff;
+    background: var(--zrx-bg-card);
     border-radius: 12px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--zrx-shadow-modal);
     width: 100%;
     max-width: 600px;
     max-height: 90vh;
@@ -987,13 +984,13 @@
     justify-content: space-between;
     margin-bottom: 1.25rem;
     padding-bottom: 0.75rem;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--zrx-border-subtle);
 }
 
 .emr-modal-header h3 {
     font-size: 1.2rem;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--zrx-text-main);
     margin: 0;
 }
 
@@ -1010,13 +1007,13 @@
 .emr-modal-footer {
     margin-top: 1.5rem;
     padding-top: 1rem;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--zrx-border-subtle);
     display: flex;
     justify-content: flex-end;
     gap: 0.75rem;
 }
 
-/* ── Buttons & Utilities ── */
+
 .btn-emr {
     display: inline-flex;
     align-items: center;
@@ -1033,32 +1030,32 @@
 }
 
 .btn-emr-primary {
-    background: #2563eb;
-    color: #ffffff;
+    background: var(--zrx-primary);
+    color: var(--zrx-white);
 }
 
 .btn-emr-primary:hover {
-    background: #1d4ed8;
+    background: var(--zrx-primary-hover);
 }
 
 .btn-emr-success {
-    background: #059669;
-    color: #ffffff;
+    background: var(--zrx-emerald-600);
+    color: var(--zrx-white);
 }
 
 .btn-emr-success:hover {
-    background: #047857;
+    background: var(--zrx-emerald-700);
 }
 
 .btn-emr-outline {
-    background: #ffffff;
-    color: #334155;
-    border-color: #cbd5e1;
+    background: var(--zrx-bg-card);
+    color: var(--zrx-slate-700);
+    border-color: var(--zrx-border);
 }
 
 .btn-emr-outline:hover {
-    background: #f8fafc;
-    border-color: #94a3b8;
+    background: var(--zrx-bg-subtle);
+    border-color: var(--zrx-border-divider);
 }
 
 .btn-emr-sm {
@@ -1066,7 +1063,7 @@
     font-size: 0.78rem;
 }
 
-/* Responsive Breakpoints */
+
 @media (max-width: 1200px) {
     .emr-active-workspace {
         grid-template-columns: 1fr;
@@ -1077,7 +1074,7 @@
     }
 }
 
-/* ── Particulars Audit Log Modal & Timeline ── */
+/* Patient audit and change log */
 .emr-audit-modal-card {
     max-width: 680px;
 }
@@ -1095,7 +1092,7 @@
     bottom: 8px;
     left: 7px;
     width: 2px;
-    background: #e2e8f0;
+    background: var(--zrx-border-subtle);
 }
 
 .audit-timeline-event {
@@ -1114,9 +1111,9 @@
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: #ffffff;
-    border: 3px solid #2563eb;
-    box-shadow: 0 0 0 2px #eff6ff;
+    background: var(--zrx-bg-card);
+    border: 3px solid var(--zrx-primary);
+    box-shadow: 0 0 0 2px var(--zrx-blue-50);
 }
 
 .audit-event-header {
@@ -1133,12 +1130,12 @@
     align-items: center;
     gap: 0.4rem;
     font-size: 0.88rem;
-    color: #0f172a;
+    color: var(--zrx-text-main);
 }
 
 .audit-event-time {
     font-size: 0.78rem;
-    color: #64748b;
+    color: var(--zrx-text-muted);
     font-weight: 500;
 }
 
@@ -1152,21 +1149,21 @@
 }
 
 .audit-role-pill.role-doctor {
-    background: #eff6ff;
-    color: #1d4ed8;
-    border: 1px solid #bfdbfe;
+    background: var(--zrx-blue-50);
+    color: var(--zrx-primary-hover);
+    border: 1px solid var(--zrx-blue-200);
 }
 
 .audit-role-pill.role-assistant {
-    background: #fdf2f8;
-    color: #be185d;
-    border: 1px solid #fbcfe8;
+    background: var(--zrx-rose-50);
+    color: var(--zrx-rose-700);
+    border: 1px solid var(--zrx-rose-200);
 }
 
 .audit-role-pill.role-admin {
-    background: #fef3c7;
-    color: #b45309;
-    border: 1px solid #fde68a;
+    background: var(--zrx-amber-100);
+    color: var(--zrx-amber-700);
+    border: 1px solid var(--zrx-amber-200);
 }
 
 .audit-source-pill {
@@ -1174,31 +1171,31 @@
     font-weight: 600;
     padding: 0.15rem 0.5rem;
     border-radius: 999px;
-    background: #f1f5f9;
-    color: #475569;
+    background: var(--zrx-slate-100);
+    color: var(--zrx-slate-600);
 }
 
 .audit-source-pill.source-prescription {
-    background: #ecfdf5;
-    color: #047857;
-    border: 1px solid #a7f3d0;
+    background: var(--zrx-emerald-50);
+    color: var(--zrx-emerald-700);
+    border: 1px solid var(--zrx-emerald-200);
 }
 
 .audit-source-pill.source-appointment {
-    background: #f0f9ff;
-    color: #0284c7;
-    border: 1px solid #bae6fd;
+    background: var(--zrx-blue-50);
+    color: var(--zrx-blue-600);
+    border: 1px solid var(--zrx-sky-400);
 }
 
 .audit-source-pill.source-emr {
-    background: #faf5ff;
-    color: #7e22ce;
-    border: 1px solid #e9d5ff;
+    background: var(--zrx-violet-50);
+    color: var(--zrx-violet-600);
+    border: 1px solid var(--zrx-violet-200);
 }
 
 .audit-event-diffs {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: var(--zrx-bg-subtle);
+    border: 1px solid var(--zrx-border-subtle);
     border-radius: 8px;
     padding: 0.75rem 1rem;
     display: flex;
@@ -1215,19 +1212,19 @@
 }
 
 .audit-diff-item.initial-reg {
-    color: #047857;
+    color: var(--zrx-emerald-700);
     font-weight: 600;
 }
 
 .diff-field {
     font-weight: 600;
-    color: #334155;
+    color: var(--zrx-slate-700);
     min-width: 110px;
 }
 
 .diff-old {
-    color: #dc2626;
-    background: #fee2e2;
+    color: var(--zrx-red-600);
+    background: var(--zrx-red-100);
     padding: 0.1rem 0.35rem;
     border-radius: 4px;
     text-decoration: line-through;
@@ -1235,13 +1232,13 @@
 }
 
 .diff-arrow {
-    color: #94a3b8;
+    color: var(--zrx-border-divider);
     font-size: 0.8rem;
 }
 
 .diff-new {
-    color: #059669;
-    background: #d1fae5;
+    color: var(--zrx-emerald-600);
+    background: var(--zrx-emerald-100);
     padding: 0.1rem 0.35rem;
     border-radius: 4px;
     font-weight: 600;
@@ -1252,4 +1249,143 @@
     text-align: center;
     padding: 2.5rem 1rem;
 }
+
+
+.emr-header-actions-group {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+.emr-reg-val {
+    color: var(--zrx-emerald-700);
+}
+.emr-empty-note {
+    font-size: 0.82rem;
+    color: var(--zrx-border-divider);
+}
+.emr-meta-pill-green {
+    color: var(--zrx-emerald-700);
+    background: var(--zrx-emerald-50);
+    border-color: var(--zrx-emerald-200);
+}
+.emr-empty-state-grid2 {
+    text-align: center;
+    color: var(--zrx-border-divider);
+    padding: 2.5rem 1rem;
+    grid-column: span 2;
+}
+.btn-emr-add-fixed {
+    height: 34px;
+}
+.emr-schedule-call-row {
+    margin-top: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--zrx-slate-100);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.emr-check-auto,
+input.emr-check-auto {
+    width: auto;
+}
+.emr-schedule-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--zrx-slate-600);
+    cursor: pointer;
+}
+.emr-bp-val-danger {
+    color: var(--zrx-red-600);
+    font-weight: 700;
+}
+.emr-modal-subtitle {
+    font-size: 0.8rem;
+    color: var(--zrx-text-muted);
+    margin-top: 2px;
+}
+.emr-empty-state-card {
+    text-align: center;
+    color: var(--zrx-text-muted);
+    padding: 2.5rem 1rem;
+}
+.emr-modal-card-narrow {
+    max-width: 460px;
+}
+.emr-log-form-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding: 0.5rem 0;
+}
+.emr-log-input-standard {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--zrx-border);
+    border-radius: 6px;
+    font-size: 0.88rem;
+}
+.emr-log-input-notes {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--zrx-border);
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+.emr-log-reading-wrap {
+    display: flex;
+    gap: 8px;
+}
+.emr-log-reading-val {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid var(--zrx-border);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+.emr-log-grid-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+
+.emr-js-loading { text-align: center; color: var(--zrx-text-muted); padding: 2.5rem 1rem; }
+.emr-js-no-change-title { margin: 0.75rem 0 0.25rem; font-weight: 600; color: var(--zrx-slate-600); }
+.emr-js-no-change-desc { font-size: 0.82rem; color: var(--zrx-border-divider); }
+.emr-js-error-msg { color: var(--zrx-red-600); padding: 1.5rem; text-align: center; }
+.emr-js-error-grid { color: var(--zrx-red-600); padding: 1.5rem; text-align: center; grid-column: span 2; }
+.emr-js-empty-trajectory {
+    text-align: center;
+    color: var(--zrx-text-muted);
+    padding: 2.5rem 1rem;
+    grid-column: 1 / -1;
+    border: 1px dashed var(--zrx-border);
+    border-radius: 8px;
+    background: var(--zrx-bg-subtle);
+}
+.emr-js-empty-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+.emr-js-empty-title { font-weight: 700; color: var(--zrx-slate-700); margin-bottom: 0.25rem; }
+.emr-js-empty-subtitle { font-size: 0.82rem; color: var(--zrx-border-divider); margin-bottom: 1rem; }
+.emr-js-no-readings-title { font-weight: 600; }
+.emr-js-no-readings-hint { font-size: 0.72rem; color: var(--zrx-border-divider); margin-top: 4px; }
+.emr-btn-del-reading {
+    background: none;
+    border: none;
+    color: var(--zrx-red-600);
+    font-size: 0.68rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0 2px;
+}
+.emr-tooltip-unit-muted {
+    font-weight: 600;
+    color: var(--zrx-text-muted);
+}
+.emr-tooltip-del-wrap {
+    text-align: right;
+    margin-top: 4px;
+}
+
 

@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
 
-// No require_login() — this runs before any account exists
+// First launch onboarding save handler: provisions initial credentials, practice mode, and emergency recovery key.
+// Unauthenticated by design — runs only during initial system setup before accounts exist.
+
 require_once __DIR__ . '/../auth.php';
 require_once __DIR__ . '/../db.php';
 

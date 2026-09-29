@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Instruction phrase suggestions endpoint: returns medication instructions and timing advice for prescription rows.
+
 header('Content-Type: application/json');
 require_once __DIR__ . '/../auth.php';
 require_login();

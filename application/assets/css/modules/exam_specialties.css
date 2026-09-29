@@ -1,48 +1,10 @@
-/* =======================================================
-   Psychiatry & Mental State Examination (MSE) Styles
-======================================================= */
-.zrx-psych-pane[hidden] {
-    display: none !important;
-}
-
-/* =======================================================
-   Orthopaedics & Musculoskeletal Examination Styles
-======================================================= */
-.zrx-ortho-pane[hidden] {
-    display: none !important;
-}
-
-/* =======================================================
-   Urology & Nephrology Examination Styles
-======================================================= */
-.zrx-uro-pane[hidden] {
-    display: none !important;
-}
-
-/* =======================================================
-   Neurology & Stroke Assessment Styles
-======================================================= */
-.zrx-neuro-pane[hidden] {
-    display: none !important;
-}
-
-/* =======================================================
-   Cardiology & Hemodynamic Assessment Styles
-======================================================= */
-.zrx-cardio-pane[hidden] {
-    display: none !important;
-}
-
-/* =======================================================
-   Pulmonology & Respiratory Examination Styles
-======================================================= */
-.zrx-pulmo-pane[hidden] {
-    display: none !important;
-}
-
-/* =======================================================
-   Endocrinology & Metabolic Assessment Styles
-======================================================= */
+/* Hidden state rules for specialty examination panes (psychiatry, neurology, urology, etc.) */
+.zrx-psych-pane[hidden],
+.zrx-ortho-pane[hidden],
+.zrx-uro-pane[hidden],
+.zrx-neuro-pane[hidden],
+.zrx-cardio-pane[hidden],
+.zrx-pulmo-pane[hidden],
 .zrx-endo-pane[hidden] {
-    display: none !important;
+    display: none;
 }

@@ -1,17 +1,11 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Migration 012 — Mobile upload queue, visit revision locking, and patient sync schema
- */
+// Mobile photo queue, optimistic locking revisions, and distributed synchronization journals.
 class Migration012MobileQueueVisitRevisionAndSync {
 
     public function up(PDO $pdo): void {
-        // 1. Mobile Upload Queue (patient-bound, transactional queue)
-        // NOTE: This CREATE TABLE already includes patient_id, visit_record_id, and
-        // active_revision so new installations get the full schema from day one.
-        // Existing installations that applied 012 before those columns were added
-        // receive them via migration 013 (the immutable backfill migration).
+        // Mobile upload queue for incoming patient investigation photos and documents
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_mobile_upload_queue (
                 id TEXT PRIMARY KEY,
@@ -29,7 +23,7 @@ class Migration012MobileQueueVisitRevisionAndSync {
         );
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_mobile_upload_queue_pending ON zimrx_mobile_upload_queue (doctor_id, claimed_at, created_at)");
 
-        // 2. Add revision and sync_id columns to zimrx_visits for optimistic locking & sync
+        // Add optimistic concurrency locking and sync identifiers to visits
         if (DbSchema::tableExists($pdo, 'zimrx_visits')) {
             if (!DbSchema::columnExists($pdo, 'zimrx_visits', 'sync_id')) {
                 $pdo->exec("ALTER TABLE zimrx_visits ADD COLUMN sync_id TEXT NULL");
@@ -44,7 +38,7 @@ class Migration012MobileQueueVisitRevisionAndSync {
             $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS uq_visit_patient_doctor_number ON zimrx_visits(patient_id, doctor_id, visit_no)");
         }
 
-        // 3. Add delta-sync fields to zimrx_patients
+        // Add sync tracking identifiers and soft delete markers to patients
         if (DbSchema::tableExists($pdo, 'zimrx_patients')) {
             if (!DbSchema::columnExists($pdo, 'zimrx_patients', 'sync_id')) {
                 $pdo->exec("ALTER TABLE zimrx_patients ADD COLUMN sync_id TEXT NULL");
@@ -58,7 +52,7 @@ class Migration012MobileQueueVisitRevisionAndSync {
             $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS uq_patients_sync_id ON zimrx_patients(sync_id)");
         }
 
-        // 4. Backfill stable RFC 4122 v4 UUIDs for all existing records lacking sync_id
+        // Backfill RFC 4122 v4 UUIDs for pre-existing records lacking sync_id
         $uuidGen = static function (): string {
             $data = random_bytes(16);
             $data[6] = chr((ord($data[6]) & 0x0f) | 0x40);
@@ -88,7 +82,7 @@ class Migration012MobileQueueVisitRevisionAndSync {
             }
         }
 
-        // 5. Create delta-sync changes journal
+        // Audit log of database change deltas for device synchronization
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_sync_changes (
                 sequence " . DbSql::autoIncrement() . ",
@@ -104,3 +98,4 @@ class Migration012MobileQueueVisitRevisionAndSync {
         );
     }
 }
+

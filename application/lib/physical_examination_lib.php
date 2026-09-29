@@ -1,11 +1,7 @@
 <?php
 declare(strict_types=1);
 
-/**
- * ZimRx Physical Examination Library
- * Manages static physical examination catalog merging, doctor preferences,
- * custom parameters, and active OPD quick-table definitions.
- */
+// Physical examination parameters: merges system templates by organ system with per-doctor finding preferences.
 
 require_once __DIR__ . '/../db.php';
 

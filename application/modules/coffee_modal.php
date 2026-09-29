@@ -6,11 +6,10 @@ if (defined('ZIMRX_COFFEE_MODAL_LOADED')) return;
 define('ZIMRX_COFFEE_MODAL_LOADED', true);
 ?>
 
-<!-- ── Buy Me a Coffee Modal ──────────────────────────────────────────── -->
-<div id="coffee-modal-backdrop" class="coffee-backdrop" onclick="zimrxCloseCoffeeModal()">
+<!-- Buy Me a Coffee Modal -->
+<div id="coffee-modal-backdrop" class="coffee-backdrop" style="display: none;" onclick="zimrxCloseCoffeeModal()">
     <div class="coffee-dialog" onclick="event.stopPropagation()">
         
-        <!-- Close Button (Always on top) -->
         <button type="button" class="coffee-close-btn" onclick="zimrxCloseCoffeeModal()" aria-label="Close">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -18,10 +17,8 @@ define('ZIMRX_COFFEE_MODAL_LOADED', true);
             </svg>
         </button>
 
-        <!-- Scrollable Inner Wrapper -->
         <div class="coffee-scroll-area" id="coffee-scroll-area" onscroll="zimrxCheckScroll()">
             
-            <!-- Header with Glowing Icon -->
             <div class="coffee-hero">
                 <div class="coffee-icon-badge">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -42,10 +39,8 @@ define('ZIMRX_COFFEE_MODAL_LOADED', true);
                 </p>
             </div>
 
-            <!-- Main Content -->
             <div class="coffee-content">
 
-                <!-- 1. Coffee / Donation Card -->
                 <div class="support-item item-coffee">
                     <div class="item-head">
                         <div class="item-icon-circle icon-coffee">
@@ -63,7 +58,6 @@ define('ZIMRX_COFFEE_MODAL_LOADED', true);
                         </div>
                     </div>
 
-                    <!-- Side-by-Side Payment Grid to fit all items cleanly on screen -->
                     <div class="pay-methods">
                         
                         <!-- bKash -->
@@ -112,7 +106,6 @@ define('ZIMRX_COFFEE_MODAL_LOADED', true);
                     </div>
                 </div>
 
-                <!-- 2. Pay it Forward -->
                 <div class="support-item item-heart">
                     <div class="item-head">
                         <div class="item-icon-circle icon-heart">
@@ -127,7 +120,6 @@ define('ZIMRX_COFFEE_MODAL_LOADED', true);
                     </div>
                 </div>
 
-                <!-- 3. Spread the Word -->
                 <div class="support-item item-share">
                     <div class="item-head">
                         <div class="item-icon-circle icon-share">
@@ -143,7 +135,6 @@ define('ZIMRX_COFFEE_MODAL_LOADED', true);
                     </div>
                 </div>
 
-                <!-- Heartfelt Blessing Box -->
                 <div class="coffee-blessing">
                     <div class="blessing-icon">🤲</div>
                     <div class="blessing-text">
@@ -154,7 +145,6 @@ define('ZIMRX_COFFEE_MODAL_LOADED', true);
             </div>
         </div>
 
-        <!-- Dynamic Bottom Scroll Hint (appears only when content overflows) -->
         <div class="coffee-scroll-cue" id="coffee-scroll-cue" onclick="zimrxScrollDown()">
             <span>More ways to support below</span>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -165,6 +155,6 @@ define('ZIMRX_COFFEE_MODAL_LOADED', true);
     </div>
 </div>
 
-<link rel="stylesheet" href="assets/css/modules/coffee_modal.css?v=<?= filemtime(__DIR__ . '/assets/css/modules/coffee_modal.css') ?>">
+<link rel="stylesheet" href="assets/css/modules/coffee_modal.css?v=<?= filemtime(dirname(__DIR__) . '/assets/css/modules/coffee_modal.css') ?>">
 
-<script src="assets/js/layout/coffee_modal.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/coffee_modal.js') ?>"></script>
+<script src="assets/js/layout/coffee_modal.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/layout/coffee_modal.js') ?>"></script>

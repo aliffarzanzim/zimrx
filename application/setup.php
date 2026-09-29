@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Layout configurator: reorder left/right dashboard modules, history sub-sections, and dropdown highlight themes.
+
 require_once 'auth.php';
 require_login();
 require_once 'db.php';
@@ -78,6 +80,7 @@ function render_history_selects(array $layout, array $labelMap): string {
     return $html;
 }
 
+$extra_css = ['assets/css/pages/setup.css'];
 include 'header.php';
 ?>
 
@@ -103,27 +106,27 @@ include 'header.php';
             </div>
         </div>
 
-        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;">
+        <hr class="setup-divider">
 
         <div class="setup-section">
-            <h2>History Panel Elements <small style="font-weight: normal; font-size: 0.85rem; color: #64748b; margin-left: 12px;">(Set the display order of sub-sections inside the History module.)</small></h2>
-            <div id="history-side-setup" style="display:grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, auto); grid-auto-flow: column; gap: 0.75rem 3rem;">
+            <h2>History Panel Elements <small class="setup-heading-desc">(Set the display order of sub-sections inside the History module.)</small></h2>
+            <div id="history-side-setup" class="setup-history-grid">
                 <?= render_history_selects($historyLayout, $historyModuleLabels) ?>
             </div>
         </div>
 
-        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;">
+        <hr class="setup-divider">
 
         <!-- Dropdown Highlight Theme & Style -->
         <div class="setup-section">
-            <h2>Dropdown Highlight Style <small style="font-weight: normal; font-size: 0.85rem; color: #64748b; margin-left: 12px;">(Choose the hover/active selection appearance across all autocompletes and dropdown menus.)</small></h2>
+            <h2>Dropdown Highlight Style <small class="setup-heading-desc">(Choose the hover/active selection appearance across all autocompletes and dropdown menus.)</small></h2>
             
-            <div style="display: grid; grid-template-columns: 1.25fr 0.75fr; gap: 2rem; align-items: start; margin-top: 1.25rem;">
+            <div class="setup-theme-layout-grid">
                 <!-- Presets selection grid -->
                 <div class="dropdown-presets-grid" id="dropdown-presets-container">
                     <label class="dd-theme-card" data-theme="subtle-tint" data-bg="#ebedf0" data-text="#0f172a">
                         <input type="radio" name="dropdown_theme" value="subtle-tint">
-                        <div class="dd-theme-preview" style="background: #ebedf0; color: #0f172a; border: 1px solid #cbd5e1;">Aa</div>
+                        <div class="dd-theme-preview" class="dd-theme-preview dd-theme-preview-slate">Aa</div>
                         <div class="dd-theme-info">
                             <strong>Subtle Tint</strong>
                             <span>Soft neutral tint (Original text colors)</span>
@@ -132,7 +135,7 @@ include 'header.php';
 
                     <label class="dd-theme-card" data-theme="slate-gray" data-bg="#868e96" data-text="#ffffff">
                         <input type="radio" name="dropdown_theme" value="slate-gray">
-                        <div class="dd-theme-preview" style="background: #868e96; color: #ffffff;">Aa</div>
+                        <div class="dd-theme-preview" class="dd-theme-preview dd-theme-preview-gray">Aa</div>
                         <div class="dd-theme-info">
                             <strong>Neutral Slate</strong>
                             <span>Soft neutral slate (White text)</span>
@@ -141,7 +144,7 @@ include 'header.php';
 
                     <label class="dd-theme-card" data-theme="charcoal" data-bg="#475569" data-text="#ffffff">
                         <input type="radio" name="dropdown_theme" value="charcoal">
-                        <div class="dd-theme-preview" style="background: #475569; color: #ffffff;">Aa</div>
+                        <div class="dd-theme-preview" class="dd-theme-preview dd-theme-preview-dark">Aa</div>
                         <div class="dd-theme-info">
                             <strong>Charcoal Slate</strong>
                             <span>Deep slate (White text)</span>
@@ -150,7 +153,7 @@ include 'header.php';
 
                     <label class="dd-theme-card" data-theme="theme-blue" data-bg="#2563eb" data-text="#ffffff">
                         <input type="radio" name="dropdown_theme" value="theme-blue">
-                        <div class="dd-theme-preview" style="background: #2563eb; color: #ffffff;">Aa</div>
+                        <div class="dd-theme-preview" class="dd-theme-preview dd-theme-preview-blue">Aa</div>
                         <div class="dd-theme-info">
                             <strong>Theme Primary Blue</strong>
                             <span>Royal blue (White text)</span>
@@ -159,7 +162,7 @@ include 'header.php';
 
                     <label class="dd-theme-card" data-theme="soft-blue" data-bg="#eff6ff" data-text="#1d4ed8">
                         <input type="radio" name="dropdown_theme" value="soft-blue">
-                        <div class="dd-theme-preview" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;">Aa</div>
+                        <div class="dd-theme-preview" class="dd-theme-preview dd-theme-preview-softblue">Aa</div>
                         <div class="dd-theme-info">
                             <strong>Soft Blue Tint</strong>
                             <span>Light sky tint (Blue text)</span>
@@ -168,16 +171,16 @@ include 'header.php';
 
                     <label class="dd-theme-card" data-theme="emerald" data-bg="#16a34a" data-text="#ffffff">
                         <input type="radio" name="dropdown_theme" value="emerald">
-                        <div class="dd-theme-preview" style="background: #16a34a; color: #ffffff;">Aa</div>
+                        <div class="dd-theme-preview" class="dd-theme-preview dd-theme-preview-green">Aa</div>
                         <div class="dd-theme-info">
                             <strong>Emerald Green</strong>
                             <span>Clinical emerald (White text)</span>
                         </div>
                     </label>
 
-                    <label class="dd-theme-card" data-theme="custom" data-bg="#868e96" data-text="#ffffff" style="grid-column: span 2;">
+                    <label class="dd-theme-card" data-theme="custom" data-bg="#868e96" data-text="#ffffff" class="dd-theme-card dd-theme-card-custom">
                         <input type="radio" name="dropdown_theme" value="custom">
-                        <div class="dd-theme-preview" id="dd-custom-preview-swatch" style="background: #868e96; color: #ffffff; border: 1px dashed #94a3b8;">Aa</div>
+                        <div class="dd-theme-preview" id="dd-custom-preview-swatch" class="dd-theme-preview dd-theme-preview-custom">Aa</div>
                         <div class="dd-theme-info">
                             <strong>Custom Colors...</strong>
                             <span>Pick your exact highlight background & text color</span>
@@ -186,30 +189,30 @@ include 'header.php';
                 </div>
 
                 <!-- Live Interactive Dropdown Preview -->
-                <div class="dropdown-live-demo-card" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                        <span style="font-size: 0.78rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">Live Preview</span>
-                        <span style="font-size: 0.72rem; color: #94a3b8;">Hover or click below</span>
+                <div class="dropdown-live-demo-card" class="setup-preview-card">
+                    <div class="setup-preview-header">
+                        <span class="setup-preview-label">Live Preview</span>
+                        <span class="setup-preview-hint">Hover or click below</span>
                     </div>
-                    <div style="position: relative; width: 100%;">
-                        <div style="background: #2563eb; color: #fff; padding: 0.45rem 0.9rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 600;">
+                    <div class="setup-mock-anchor">
+                        <div class="setup-mock-input">
                             Dropdown button <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </div>
-                        <ul id="demo-dd-menu" style="margin-top: 6px; list-style: none; padding: 4px 0; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; box-shadow: 0 10px 25px -5px rgba(15,23,42,0.15); margin-bottom: 0;">
-                            <li class="demo-dd-item" style="padding: 6px 12px; font-size: 0.85rem; cursor: pointer; border-radius: 4px; margin: 2px 4px; transition: all 0.1s ease;">
-                                <div class="demo-code" style="font-size: 0.72rem; font-weight: 700; color: #0284c7; line-height: 1.2;">A260416002</div>
-                                <strong class="demo-name" style="color: #0f172a; font-size: 0.86rem; font-weight: 600; line-height: 1.25; display: block;">Rahim Uddin</strong>
-                                <span class="demo-meta" style="font-size: 0.74rem; color: #64748b; display: block; line-height: 1.2;">0172222222 | Mirpur, Dhaka</span>
+                        <ul id="demo-dd-menu" class="setup-mock-dropdown">
+                            <li class="demo-dd-item" class="setup-mock-item">
+                                <div class="demo-code" class="setup-mock-brand">A260416002</div>
+                                <strong class="demo-name" class="setup-mock-name">Rahim Uddin</strong>
+                                <span class="demo-meta" class="setup-mock-company">0172222222 | Mirpur, Dhaka</span>
                             </li>
-                            <li class="demo-dd-item active" id="demo-dd-active-item" style="padding: 6px 12px; font-size: 0.85rem; cursor: pointer; border-radius: 4px; margin: 2px 4px; transition: all 0.1s ease; background: #ebedf0;">
-                                <div class="demo-code" style="font-size: 0.72rem; font-weight: 700; color: #0284c7; line-height: 1.2;">A260416003</div>
-                                <strong class="demo-name" style="color: #0f172a; font-size: 0.86rem; font-weight: 600; line-height: 1.25; display: block;">Momena Begum</strong>
-                                <span class="demo-meta" style="font-size: 0.74rem; color: #64748b; display: block; line-height: 1.2;">0173333333 | Uttara, Dhaka</span>
+                            <li class="demo-dd-item active" id="demo-dd-active-item" class="setup-mock-item is-selected">
+                                <div class="demo-code" class="setup-mock-brand">A260416003</div>
+                                <strong class="demo-name" class="setup-mock-name">Momena Begum</strong>
+                                <span class="demo-meta" class="setup-mock-company">0173333333 | Uttara, Dhaka</span>
                             </li>
-                            <li class="demo-dd-item" style="padding: 6px 12px; font-size: 0.85rem; cursor: pointer; border-radius: 4px; margin: 2px 4px; transition: all 0.1s ease;">
-                                <div class="demo-code" style="font-size: 0.72rem; font-weight: 700; color: #0284c7; line-height: 1.2;">A260416004</div>
-                                <strong class="demo-name" style="color: #0f172a; font-size: 0.86rem; font-weight: 600; line-height: 1.25; display: block;">Arif Hasan</strong>
-                                <span class="demo-meta" style="font-size: 0.74rem; color: #64748b; display: block; line-height: 1.2;">0171111111 | Kazipara, Dhaka</span>
+                            <li class="demo-dd-item" class="setup-mock-item">
+                                <div class="demo-code" class="setup-mock-brand">A260416004</div>
+                                <strong class="demo-name" class="setup-mock-name">Arif Hasan</strong>
+                                <span class="demo-meta" class="setup-mock-company">0171111111 | Kazipara, Dhaka</span>
                             </li>
                         </ul>
                     </div>
@@ -217,23 +220,23 @@ include 'header.php';
             </div>
 
             <!-- Custom Color Pickers (Visible when 'custom' is selected) -->
-            <div id="dd-custom-controls" style="display: none; margin-top: 1rem; padding: 1.1rem 1.25rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; flex-wrap: wrap; gap: 1.25rem 2rem; align-items: center;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <label style="font-size: 0.85rem; font-weight: 600; color: #334155;">Highlight Background:</label>
-                    <input type="color" id="dd-custom-bg-picker" value="#ebedf0" style="width: 36px; height: 32px; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer; padding: 0;">
-                    <input type="text" id="dd-custom-bg-hex" value="#ebedf0" style="width: 90px; padding: 4px 8px; font-size: 0.82rem; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace;">
+            <div id="dd-custom-controls" class="setup-custom-editor-box">
+                <div class="zrx-flex-ac">
+                    <label class="setup-field-inline-label">Highlight Background:</label>
+                    <input type="color" id="dd-custom-bg-picker" value="#ebedf0" class="setup-color-picker-input">
+                    <input type="text" id="dd-custom-bg-hex" value="#ebedf0" class="setup-color-hex-input">
                 </div>
-                <div id="dd-custom-text-wrapper" style="display: flex; align-items: center; gap: 8px;">
-                    <label style="font-size: 0.85rem; font-weight: 600; color: #334155;">Text Color:</label>
-                    <input type="color" id="dd-custom-text-picker" value="#ffffff" style="width: 36px; height: 32px; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer; padding: 0;">
-                    <input type="text" id="dd-custom-text-hex" value="#ffffff" style="width: 90px; padding: 4px 8px; font-size: 0.82rem; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace;">
+                <div id="dd-custom-text-wrapper" class="zrx-flex-ac">
+                    <label class="setup-field-inline-label">Text Color:</label>
+                    <input type="color" id="dd-custom-text-picker" value="#ffffff" class="setup-color-picker-input">
+                    <input type="text" id="dd-custom-text-hex" value="#ffffff" class="setup-color-hex-input">
                 </div>
-                <div style="display: flex; align-items: center; gap: 6px;">
-                    <label style="display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; color: #334155; cursor: pointer; user-select: none;">
-                        <input type="checkbox" id="dd-custom-original-text-cb" style="accent-color: #2563eb; width: 16px; height: 16px; cursor: pointer;">
+                <div class="zrx-flex-ac-6">
+                    <label class="setup-checkbox-label">
+                        <input type="checkbox" id="dd-custom-original-text-cb" class="setup-checkbox-input">
                         Keep Original Text Colors
                     </label>
-                    <span style="font-size: 0.75rem; color: #64748b;">(Preserves blue codes, dark names & muted meta)</span>
+                    <span class="setup-hint-sm">(Preserves blue codes, dark names & muted meta)</span>
                 </div>
             </div>
         </div>
@@ -253,13 +256,13 @@ include 'header.php';
     </div>
 
     <div id="setup-confirm-modal" class="print-setup-toast" hidden>
-        <div class="print-setup-toast-panel" role="dialog" aria-modal="true" style="width: min(100%, 360px); text-align: center; gap: 1.25rem;">
-            <span class="print-setup-toast-icon" style="color: #b91c1c; border-color: #fecaca; background: #fef2f2;" aria-hidden="true">&#9888;</span>
-            <strong style="font-size: 1.1rem; color: #1e293b;">Reset to Defaults?</strong>
-            <p style="font-size: 0.875rem; color: #64748b; margin: 0;">Are you sure you want to restore the layout to default settings? This cannot be undone.</p>
-            <div style="display: flex; gap: 0.75rem; width: 100%; justify-content: center; margin-top: 0.5rem;">
-                <button type="button" id="confirm-reset-cancel" class="btn btn-outline" style="flex: 1; padding: 0.5rem 1rem;">Cancel</button>
-                <button type="button" id="confirm-reset-yes" class="btn btn-primary" style="flex: 1; background-color: #dc2626; border-color: #dc2626; padding: 0.5rem 1rem;">Yes, Reset</button>
+        <div class="print-setup-toast-panel" role="dialog" aria-modal="true" class="print-setup-toast-panel setup-confirm-panel">
+            <span class="print-setup-toast-icon" class="print-setup-toast-icon setup-confirm-icon" aria-hidden="true">&#9888;</span>
+            <strong class="setup-confirm-title">Reset to Defaults?</strong>
+            <p class="setup-confirm-text">Are you sure you want to restore the layout to default settings? This cannot be undone.</p>
+            <div class="setup-confirm-actions">
+                <button type="button" id="confirm-reset-cancel" class="btn btn-outline" class="btn btn-outline setup-confirm-btn">Cancel</button>
+                <button type="button" id="confirm-reset-yes" class="btn btn-primary" class="btn btn-primary setup-confirm-btn-danger">Yes, Reset</button>
             </div>
         </div>
     </div>

@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Dose phrase suggestions endpoint: returns dose templates and learned expressions for prescription rows.
+
 header('Content-Type: application/json');
 require_once __DIR__ . '/../auth.php';
 require_login();

@@ -1,76 +1,33 @@
 <?php
 declare(strict_types=1);
 
-/**
- * ZimRx Central Configuration
- *
- * This file serves as the single source of truth for:
- * - Application paths
- * - Database engine and connection settings
- * - System-wide settings
- *
- * DATABASE ARCHITECTURE NOTE:
- * ZimRx connects through a unified PDO abstraction layer (DbConnections,
- * DbSql, DbSchema, and DbMigrator).
- *
- * - SQLite 3 is the primary, actively tested, and production-supported engine,
- *   optimized with Write-Ahead Logging (WAL), 5000ms busy timeouts, and FTS5 search.
- * - Centralizing PDO connections establishes the abstraction target for multi-engine
- *   portability (MySQL/PostgreSQL), with full engine driver parity planned on the roadmap.
- */
+// Core configuration: file paths, database connection parameters, and network origins.
 
-// =====================================================================
-// 1. APPLICATION PATHS
-// =====================================================================
-
+// Application directory paths
 define('ZIMRX_BASE_DIR', __DIR__);
 define('ZIMRX_USERDATA_DIR', ZIMRX_BASE_DIR . '/userdata');
 define('ZIMRX_DB_DIR', ZIMRX_USERDATA_DIR . '/database');
 define('ZIMRX_UPLOADS_DIR', ZIMRX_USERDATA_DIR . '/uploads');
-
 define('ZIMRX_ASSETS_DB_DIR', ZIMRX_BASE_DIR . '/assets/database');
 
-// Standard database file paths
+// Database storage paths
 define('ZIMRX_DB_USERDATA', ZIMRX_DB_DIR . '/zimrx_userdata.db');
 define('ZIMRX_DB_SYSTEMDATA', ZIMRX_ASSETS_DB_DIR . '/zimrx_drugs.db');
 define('ZIMRX_DB_STATIC', ZIMRX_ASSETS_DB_DIR . '/zimrx_static.db');
 define('ZIMRX_DB_ICD11', ZIMRX_ASSETS_DB_DIR . '/zimrx_icd11_dx.db');
 define('ZIMRX_DB_ADDRESSES', ZIMRX_DB_STATIC);
 
-// =====================================================================
-// 2. DATABASE CONFIGURATION
-// =====================================================================
-
-/**
- * Database Driver: 'sqlite', 'mysql', 'mariadb', or 'pgsql'
- *
- * SQLITE (Current)
- * - Good for: Single-user, development, small deployments
- * - Connection: Uses file paths only
- *
- * MYSQL / MARIADB (Future)
- * - Good for: Multi-user, production, cloud deployments
- * - Connection: Requires host, port, user, password
- *
- * PGSQL
- * - Good for: Large-scale deployments, advanced features
- * - Connection: Similar to MySQL but PostgreSQL syntax
- */
+// Active database engine: 'sqlite', 'mysql', 'mariadb', or 'pgsql'
 define('DB_DRIVER', 'sqlite');
 
-/**
- * Database Configuration
- *
- * For SQLite: Only 'path' is used
- * For MySQL/MariaDB/PostgreSQL: host, port, user, pass are used; 'path' is database name
- */
+// Database credentials and endpoints. For SQLite, only 'path' is used.
+// For network databases (MySQL, MariaDB, Postgres), fill in host, port, user, and password.
 define('DB_CONFIG', [
-    // Current: SQLite Configuration
     'driver'   => DB_DRIVER,
 
     'userdata' => [
         'path' => ZIMRX_DB_DIR . '/zimrx_userdata.db',
-        'host' => 'localhost',      // For future MySQL/MariaDB migration
+        'host' => 'localhost',
         'port' => 3306,
         'user' => 'zimrx_user',
         'pass' => '',
@@ -93,66 +50,8 @@ define('DB_CONFIG', [
     ],
 ]);
 
-// =====================================================================
-// MIGRATION EXAMPLES
-// =====================================================================
-
-/*
-TO MIGRATE FROM SQLITE TO MYSQL:
-
-1. Export current SQLite databases to SQL:
-   sqlite3 zimrx_userdata.db .dump > zimrx_userdata.sql
-
-2. Import into MySQL:
-   mysql -u root -p zimrx_userdata < zimrx_userdata.sql
-
-3. Update DB_CONFIG in config.php:
-
-   define('DB_DRIVER', 'mysql');
-
-   define('DB_CONFIG', [
-       'driver'   => 'mysql',
-
-       'userdata' => [
-           'path' => 'zimrx_userdata',  // Database name (was file path)
-           'host' => '192.168.1.100',   // MySQL server IP
-           'port' => 3306,
-           'user' => 'zimrx_user',
-           'pass' => 'secure_password',
-       ],
-
-       'static' => [
-           'path' => 'zimrx_static',
-           'host' => '192.168.1.100',
-           'port' => 3306,
-           'user' => 'zimrx_user',
-           'pass' => 'secure_password',
-       ],
-
-       'system' => [
-           'path' => 'zimrx_system',
-           'host' => '192.168.1.100',
-           'port' => 3306,
-           'user' => 'zimrx_user',
-           'pass' => 'secure_password',
-       ],
-   ]);
-
-4. No PHP code changes needed - everything works with new database!
-
-*/
-
-// =====================================================================
-// 3. ENVIRONMENT & PUBLIC ORIGIN
-// =====================================================================
-
-// define('ZIMRX_ENV', 'development');
-
-/**
- * Public Origin for QR Codes and Mobile Document Upload
- * Set to a trusted origin (e.g. 'https://zimrx.clinic:8080' or via env var).
- * If null, mobile QR code defaults to the verified server LAN IP.
- */
+// Public origin override for mobile camera upload QR codes (e.g. 'https://clinic.local:8080').
+// When null, the system automatically detects and broadcasts the server's local LAN IP.
 if (!defined('ZIMRX_PUBLIC_ORIGIN')) {
     $envOrigin = getenv('ZIMRX_PUBLIC_ORIGIN');
     define('ZIMRX_PUBLIC_ORIGIN', ($envOrigin !== false && $envOrigin !== '') ? $envOrigin : null);

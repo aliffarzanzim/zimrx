@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Prescription print preview: renders clinical sections, drug lists, Code39 barcode, and header/footer layouts.
+
 require_once 'auth.php';
 require_login();
 require_once 'db.php';
@@ -298,7 +300,7 @@ function zrx_barcode_html(string $value): string {
         }
 
         $charCenterX = $charStartX + ($charBlockWidth / 2);
-        $texts .= '<text x="' . round($charCenterX, 2) . '" y="' . ($barHeight + 14) . '" font-family="Consolas, \'Lucida Console\', \'Courier New\', monospace" font-size="13" font-weight="bold" fill="#000000" text-anchor="middle">' . preview_escape($char) . '</text>';
+        $texts .= '<text x="' . round($charCenterX, 2) . '" y="' . ($barHeight + 14) . '" font-family="Cousine, Consolas, monospace" font-size="13" font-weight="bold" fill="#000000" text-anchor="middle">' . preview_escape($char) . '</text>';
 
         $x += $narrowWidth;
     }
@@ -819,13 +821,13 @@ function zrx_render_drug_rows(array $drugs, array $options): string {
                 <?= $numberHtml ?>
                 <td colspan="3" class="zrx-drug-name-cell">
                     <?php if ($generic !== ''): ?>
-                        <div style="margin-bottom: 3px;"><span style="font-weight: bold; font-family: 'Times New Roman';" class="zrx-lbl-generic"><?= preview_escape($lblGeneric) ?> </span><span class="zrx-drug-generic" data-generic="<?= preview_escape($generic) ?>" style="font-family: 'Times New Roman', serif; font-style: normal; font-weight: normal; font-size: <?= $brandFontSize ?>; <?= $showGeneric ? 'display: inline-block;' : 'display: none;' ?>"><?= preview_escape($generic) ?></span></div>
+                        <div class="zrx-drug-subrow"><span class="zrx-lbl-generic"><?= preview_escape($lblGeneric) ?> </span><span class="zrx-drug-generic" data-generic="<?= preview_escape($generic) ?>" style="font-size: <?= $brandFontSize ?>; <?= $showGeneric ? 'display: inline-block;' : 'display: none;' ?>"><?= preview_escape($generic) ?></span></div>
                     <?php endif; ?>
                     <?php if ($brand !== ''): ?>
-                        <div style="margin-bottom: 3px;"><span style="font-weight: bold; font-family: 'Times New Roman';" class="zrx-lbl-brand"><?= preview_escape($lblBrand) ?> </span><span class="zrx-drug-brand" style="font-weight: normal;"><?= preview_escape($brand) ?></span></div>
+                        <div class="zrx-drug-subrow"><span class="zrx-lbl-brand"><?= preview_escape($lblBrand) ?> </span><span class="zrx-drug-brand"><?= preview_escape($brand) ?></span></div>
                     <?php endif; ?>
                     <?php if ($instruction !== '' || $dose !== '' || $duration !== ''): ?>
-                        <div><span style="<?= $isContinuation ? 'visibility: hidden;' : '' ?> font-weight: bold; font-family: 'Times New Roman';" class="zrx-lbl-instruction"><?= preview_escape($lblInstruction) ?> </span>
+                        <div><span class="zrx-lbl-instruction <?= $isContinuation ? 'zrx-vis-hidden' : '' ?>"><?= preview_escape($lblInstruction) ?> </span>
                             <span class="zrx-drug-dose"><?= preview_escape($dose) ?></span>
                             <span class="zrx-drug-instruction"><?= $instruction !== '' ? '- ' . preview_escape($instruction) : '' ?></span>
                             <span class="zrx-drug-duration"><?= $duration !== '' ? '- ' . preview_escape($duration) : '' ?></span>
@@ -909,10 +911,10 @@ $options['drug_bullet'] = zrx_trim_text($options['drug_bullet'] ?? '') === 'Ã¢â‚
 
 $availableFonts = [
     'SolaimanLipi', 'AdorshoLipi', 'Kongsho', 'BenSenHandwriting', 'Nikosh', 'Siyamrupali', 'KumarkhaliUnicode', 'MangalikUnicode',
-    'Times New Roman', 'Arial', 'Calibri', 'Tahoma', 'Georgia', 'Gabriola', 'Courier New',
-    'Lucida Calligraphy', 'AkayaKanadaka', 'Birthstone', 'Charm', 'Cookie', 'Damion', 'Engagement', 
+    'Tinos', 'Arimo', 'Carlito', 'Noto Sans', 'NotoSans', 'Gelasio', 'Alex Brush', 'AlexBrush', 'Cousine',
+    'Marck Script', 'MarckScript', 'AkayaKanadaka', 'Birthstone', 'Charm', 'Cookie', 'Damion', 'Engagement', 
     'HappyMonkey', 'JimNightshade', 'Kings', 'Macondo', 'Metamorphous', 'MonteCarlo', 'Parisienne', 
-    'ShantellSans', 'TeXGyreChorus', 'Comic Sans', 'Bradley Hand ITC'
+    'ShantellSans', 'TeXGyreChorus', 'Comic Neue', 'ComicNeue', 'Caveat'
 ];
 if (!in_array((string)($options['bn_font'] ?? ''), $availableFonts, true)) {
     $options['bn_font'] = 'SolaimanLipi';
@@ -1016,7 +1018,7 @@ $revisit = trim((string)($clinical['revisit'] ?? ''));
             height: <?= $patientHeight ?>cm;
             width: <?= preview_escape((string)($options['pt_info_section_width'] ?? $pageWidth)) ?>cm;
             border-bottom: <?= ($options['dec_line_top_2'] ?? 'yes') === 'yes' ? '1px solid #000' : 'none' ?>;
-            font-family: "<?= preview_escape((string)($options['pt_info_font'] ?? 'Times New Roman')) ?>", "Times New Roman", serif;
+            font-family: "<?= preview_escape((string)($options['pt_info_font'] ?? 'Tinos')) ?>", "Tinos", serif;
             font-size: <?= preview_escape((string)($options['pt_info_font_size'] ?? '12')) ?>pt;
         }
 
@@ -1049,7 +1051,7 @@ $revisit = trim((string)($clinical['revisit'] ?? ''));
             margin-left: <?= preview_escape((string)($options['left_margin_left'] ?? '70')) ?>px;
             margin-top: <?= preview_escape((string)($options['left_margin_top'] ?? '0')) ?>px;
             width: calc(100% - <?= preview_escape((string)($options['left_margin_left'] ?? '70')) ?>px);
-            font-family: "<?= preview_escape((string)($options['left_font'] ?? 'Times New Roman')) ?>", "Times New Roman", serif;
+            font-family: "<?= preview_escape((string)($options['left_font'] ?? 'Tinos')) ?>", "Tinos", serif;
             font-size: <?= preview_escape((string)($options['left_font_size'] ?? '11')) ?>pt;
         }
 
@@ -1064,7 +1066,7 @@ $revisit = trim((string)($clinical['revisit'] ?? ''));
         .zrx-rx-symbol {
             margin-left: <?= $rxMarginLeft ?>px;
             margin-top: <?= preview_escape((string)($options['rx_block_margin_top'] ?? '7')) ?>px;
-            font-family: "<?= preview_escape((string)($options['rx_font'] ?? 'Lucida Calligraphy')) ?>", "Times New Roman", serif;
+            font-family: "<?= preview_escape((string)($options['rx_font'] ?? 'Marck Script')) ?>", "Tinos", serif;
             font-size: <?= $rxFontSize ?>pt;
         }
 
@@ -1072,7 +1074,7 @@ $revisit = trim((string)($clinical['revisit'] ?? ''));
             margin-left: <?= $presMainLeftMargin ?>px;
             margin-top: <?= preview_escape((string)($options['pres_main_margin_top'] ?? '10')) ?>px;
             width: calc(100% - <?= $presMainLeftMargin ?>px);
-            font-family: "<?= preview_escape((string)($options['right_font'] ?? 'Times New Roman')) ?>", "<?= preview_escape((string)($options['bn_font'] ?? 'SolaimanLipi')) ?>", serif;
+            font-family: "<?= preview_escape((string)($options['right_font'] ?? 'Tinos')) ?>", "<?= preview_escape((string)($options['bn_font'] ?? 'SolaimanLipi')) ?>", serif;
             font-size: <?= preview_escape((string)($options['right_font_size'] ?? '11')) ?>pt;
         }
 
@@ -1089,13 +1091,13 @@ $revisit = trim((string)($clinical['revisit'] ?? ''));
         }
 
         .zrx-drug-brand {
-            font-family: "<?= preview_escape((string)($options['right_font'] ?? 'Times New Roman')) ?>", "Times New Roman", serif;
+            font-family: "<?= preview_escape((string)($options['right_font'] ?? 'Tinos')) ?>", "Tinos", serif;
             font-size: <?= preview_escape((string)($options['right_font_size'] ?? '11')) ?>pt;
         }
 
         .zrx-drug-generic {
             display: <?= $showGeneric ? ((($options['generic_position'] ?? 'below') === 'below') ? 'block' : 'inline-block') : 'none' ?>;
-            font-family: "<?= preview_escape((string)($options['generic_font'] ?? 'Times New Roman')) ?>", "Times New Roman", serif;
+            font-family: "<?= preview_escape((string)($options['generic_font'] ?? 'Tinos')) ?>", "Tinos", serif;
             font-size: <?= preview_escape((string)($options['generic_font_size'] ?? '10')) ?>pt;
             <?php
                 $gStyle = (string)($options['generic_font_style'] ?? 'italic');
@@ -1125,13 +1127,13 @@ $revisit = trim((string)($clinical['revisit'] ?? ''));
         }
 
         .zrx-advice-table td {
-            font-family: "<?= preview_escape((string)($options['upd_font'] ?? 'SolaimanLipi')) ?>", "<?= preview_escape((string)($options['right_font'] ?? 'Times New Roman')) ?>", serif;
+            font-family: "<?= preview_escape((string)($options['upd_font'] ?? 'SolaimanLipi')) ?>", "<?= preview_escape((string)($options['right_font'] ?? 'Tinos')) ?>", serif;
             font-size: <?= $adviceFontSize ?>pt;
             line-height: <?= $adviceLineHeight ?>pt;
         }
 
         .zrx-text-pad {
-            font-family: "<?= preview_escape((string)($options['right_font'] ?? 'Times New Roman')) ?>", "<?= preview_escape((string)($options['bn_font'] ?? 'SolaimanLipi')) ?>", serif;
+            font-family: "<?= preview_escape((string)($options['right_font'] ?? 'Tinos')) ?>", "<?= preview_escape((string)($options['bn_font'] ?? 'SolaimanLipi')) ?>", serif;
             font-size: <?= preview_escape((string)($options['bn_font_size'] ?? '10.5')) ?>pt;
         }
 
@@ -1201,7 +1203,7 @@ $revisit = trim((string)($clinical['revisit'] ?? ''));
     ?>
     <div id="preview-stamp-layer" class="zrx-stamp-layer" style="<?= $stampTransformStyle ?>">
         <?php if ($stampPath !== ''): ?>
-            <div id="preview-stamp-inner" style="width: 100%; height: 100%; background-repeat: no-repeat; background-position: center center; background-size: contain; position: absolute; top: 0; left: 0; z-index: 1; <?= $stampInnerStyle ?>"></div>
+            <div id="preview-stamp-inner" class="zrx-stamp-inner" style="<?= $stampInnerStyle ?>"></div>
         <?php endif; ?>
     </div>
     <div id="pageHeader" class="zrx-print-header">

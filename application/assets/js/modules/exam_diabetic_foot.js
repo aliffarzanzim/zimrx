@@ -1,11 +1,9 @@
-/**
- * ZimRx - Clinical Exam: Diabetic Foot Assessment
- */
+// Clinical diabetic foot exam: 10g monofilament sensory testing, Wagner ulcer classification, peripheral pulses, and IWGDF risk stratification.
 (function() {
   'use strict';
 
   function initExamDiabeticFoot() {
-    // 8. Diabetic Foot Assessment Handlers
+    // Diabetic foot assessment and stratification handlers
     const dfWrapper = document.getElementById('diabetic-foot-wrapper');
     if (dfWrapper) {
       const absentPoints = new Set();

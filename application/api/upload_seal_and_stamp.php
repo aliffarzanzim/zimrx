@@ -1,4 +1,5 @@
 <?php
+// Upload and sanitize doctor seal and stamp signature images (SVG, PNG, JPEG).
 declare(strict_types=1);
 
 require_once __DIR__ . '/../config.php';
@@ -49,7 +50,7 @@ try {
         throw new RuntimeException('Only SVG, PNG, or JPG seal/stamp images are allowed.');
     }
 
-    // Additional security checks
+    // Validate image MIME type and sanitize SVG markup
     if ($ext === 'svg') {
         if (!zimrx_validate_safe_svg($tmpPath)) {
             throw new RuntimeException('Invalid or potentially unsafe SVG file.');

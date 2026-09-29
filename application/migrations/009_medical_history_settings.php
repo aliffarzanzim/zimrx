@@ -1,13 +1,11 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Migration 009 — Medical history, physical examination, diagnosis, and notepad settings
- */
+// Clinical examination schema: medical history categories, physical exam templates, diagnoses, and doctor notepads.
 class Migration009MedicalHistorySettings {
 
     public function up(PDO $pdo): void {
-        // ---- zimrx_user_medical_history_settings ----
+        // Medical history checklist items (hypertension, diabetes, asthma, surgical history)
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_medical_history_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -30,7 +28,7 @@ class Migration009MedicalHistorySettings {
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_user_med_history_doc_active ON zimrx_user_medical_history_settings(doctor_id, is_active, sort_order)");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_user_med_history_doc_cat ON zimrx_user_medical_history_settings(doctor_id, category)");
 
-        // ---- zimrx_history_settings ----
+        // Doctor UI preferences for history panel
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_history_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -40,7 +38,7 @@ class Migration009MedicalHistorySettings {
             )"
         );
 
-        // ---- zimrx_user_physical_examination_settings ----
+        // Systematic physical examination items and normal finding wordlists
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_physical_examination_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -67,7 +65,7 @@ class Migration009MedicalHistorySettings {
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_user_pe_doc_active ON zimrx_user_physical_examination_settings(doctor_id, is_active, sort_order)");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_user_pe_doc_sys ON zimrx_user_physical_examination_settings(doctor_id, system)");
 
-        // ---- zimrx_physical_examination_settings ----
+        // Doctor UI preferences for physical examination module
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_physical_examination_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -77,7 +75,7 @@ class Migration009MedicalHistorySettings {
             )"
         );
 
-        // ---- zimrx_user_diagnosis ----
+        // Doctor customized diagnosis vocabulary and frequent impressions
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_diagnosis (
                 id " . DbSql::autoIncrement() . ",
@@ -93,7 +91,7 @@ class Migration009MedicalHistorySettings {
             )"
         );
 
-        // ---- zimrx_user_diagnosis_settings ----
+        // Diagnosis lookup and presentation configuration
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_diagnosis_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -105,7 +103,7 @@ class Migration009MedicalHistorySettings {
             )"
         );
 
-        // ---- zimrx_dx_settings ----
+        // Diagnosis panel settings (layout, ICD suggestions toggle)
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_dx_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -115,7 +113,7 @@ class Migration009MedicalHistorySettings {
             )"
         );
 
-        // ---- zimrx_notepad_settings ----
+        // Free-form clinical note editor settings
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_notepad_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -125,7 +123,7 @@ class Migration009MedicalHistorySettings {
             )"
         );
 
-        // ---- zimrx_user_notepad_template ----
+        // Reusable text pad and clinical note templates
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_notepad_template (
                 id " . DbSql::autoIncrement() . ",
@@ -155,3 +153,4 @@ class Migration009MedicalHistorySettings {
         $pdo->exec("DROP TABLE IF EXISTS zimrx_user_medical_history_settings");
     }
 }
+

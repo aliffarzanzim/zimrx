@@ -1,3 +1,4 @@
+// Application bootstrap, date picker initialization, table row drag-and-drop reordering, and global modals.
 function initializeDynamicDatePickers(root = document) {
   if (typeof flatpickr !== 'function') {
     return;
@@ -114,7 +115,7 @@ function initializeSimplePcTableReorder(root = document) {
       ghostTable.style.zIndex = '999999';
       ghostTable.style.pointerEvents = 'none';
       ghostTable.style.opacity = '0.92';
-      ghostTable.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2)';
+      ghostTable.style.boxShadow = 'var(--zrx-shadow-modal)';
       ghostTable.style.background = '#ffffff';
 
       const clonedRow = row.cloneNode(true);
@@ -158,7 +159,7 @@ function initializeSimplePcTableReorder(root = document) {
       clonedDiv.style.zIndex = '999999';
       clonedDiv.style.pointerEvents = 'none';
       clonedDiv.style.opacity = '0.92';
-      clonedDiv.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.2)';
+      clonedDiv.style.boxShadow = 'var(--zrx-shadow-lg)';
       clonedDiv.style.background = '#ffffff';
 
       const origInputs = row.querySelectorAll('input, textarea, select');
@@ -296,7 +297,7 @@ function initializeSimplePcTableReorder(root = document) {
   });
 }
 
-// Auto-initialize based on the DOM elements present.
+// Bootstrap page components on DOM content loaded
 document.addEventListener('DOMContentLoaded', async () => {
   document.addEventListener('click', (event) => {
     const interactiveTarget = event.target.closest('input, textarea, select, button, a, .rx-dropdown, .patient-lookup-list');
@@ -383,9 +384,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   initializeHelpGuidelineModals();
 });
-
-
-// Help Guidelines extracted to help_guidelines.js
 
 function showZrxAlert(message, options = {}) {
   const type = options.type || 'warning';
@@ -540,7 +538,3 @@ function zrxShowFieldValidation(input, message = 'Please fill out this field.') 
 }
 
 window.zrxShowFieldValidation = zrxShowFieldValidation;
-
-
-// Table Column Resizer extracted to table_column_resizer.js
-// Grid Navigation extracted to grid_navigation.js

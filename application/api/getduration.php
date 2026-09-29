@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Duration phrase suggestions endpoint: returns duration templates and learned units for prescription rows.
+
 header('Content-Type: application/json');
 require_once __DIR__ . '/../auth.php';
 require_login();

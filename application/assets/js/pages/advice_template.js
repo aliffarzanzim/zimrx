@@ -1,3 +1,4 @@
+// Advice template management page handling grouped clinical phrases, bilingual text, modal editing, and ordering.
 (() => {
     const payloadEl = document.getElementById('phrasePayloadData');
     const initial = payloadEl ? JSON.parse(payloadEl.textContent || '{}') : {};
@@ -434,7 +435,7 @@
         }
     });
 
-    // Handle clicks inside the modal advices container (Delete)
+    // Modal advice removal handler
     document.getElementById('modal-advices-container').addEventListener('click', (event) => {
         const delBtn = event.target.closest('.btn-advice-delete-row');
         

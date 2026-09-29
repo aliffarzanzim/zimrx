@@ -1,40 +1,10 @@
 <?php
 declare(strict_types=1);
 
-/**
- * DbSql — Driver-aware SQL dialect helper
- *
- * Encapsulates every SQL fragment or DDL keyword that differs between
- * SQLite, MySQL/MariaDB, and PostgreSQL.
- *
- * Usage:
- *   $sql = DbSql::insertIgnore('zimrx_doctors', 'id, doctor_code, display_name', ':id, :code, :name');
- *   $sql = DbSql::upsert('doctor_id, source', ['sort_order', 'is_enabled', 'updated_at']);
- *   $sql = DbSql::autoIncrement();                  // DDL primary key fragment
- *   $sql = DbSql::ilike('term', ':search');         // case-insensitive LIKE
- *   $sql = DbSql::groupConcat('col', ', ');         // GROUP_CONCAT or equivalent
- *   $sql = DbSql::currentTimestamp();               // CURRENT_TIMESTAMP (portable)
- *
- * Depends on DbConnections::driver() to select the correct variant.
- * Requires: application/DbConnections.php must be loaded before this file.
- */
+// SQL dialect generator for SQLite, MySQL/MariaDB, and PostgreSQL cross-compatibility.
 class DbSql {
 
-    // ----------------------------------------------------------------
-    // INSERT OR IGNORE
-    // ----------------------------------------------------------------
-
-    /**
-     * Build an INSERT-or-ignore statement for the given table/columns/values.
-     *
-     * SQLite:     INSERT OR IGNORE INTO "t" (cols) VALUES (vals)
-     * MySQL:      INSERT IGNORE INTO `t` (cols) VALUES (vals)
-     * PostgreSQL: INSERT INTO "t" (cols) VALUES (vals) ON CONFLICT DO NOTHING
-     *
-     * @param string $table  Table name (unquoted)
-     * @param string $cols   Column list, already formatted e.g. "id, name, created_at"
-     * @param string $vals   Placeholder list, already formatted e.g. ":id, :name, CURRENT_TIMESTAMP"
-     */
+    // Handles INSERT OR IGNORE differences across engines (PostgreSQL uses ON CONFLICT DO NOTHING)
     public static function insertIgnore(string $table, string $cols, string $vals): string {
         $driver = DbConnections::driver();
         if ($driver === 'mysql' || $driver === 'mariadb') {
@@ -43,17 +13,9 @@ class DbSql {
         if ($driver === 'pgsql') {
             return "INSERT INTO \"$table\" ($cols) VALUES ($vals) ON CONFLICT DO NOTHING";
         }
-        // SQLite (default)
         return "INSERT OR IGNORE INTO \"$table\" ($cols) VALUES ($vals)";
     }
 
-    /**
-     * Build an INSERT-or-ignore statement where values come from a SELECT.
-     *
-     * SQLite:     INSERT OR IGNORE INTO "t" (cols) SELECT ...
-     * MySQL:      INSERT IGNORE INTO `t` (cols) SELECT ...
-     * PostgreSQL: INSERT INTO "t" (cols) SELECT ... ON CONFLICT DO NOTHING
-     */
     public static function insertIgnoreSelect(string $table, string $cols, string $selectSql): string {
         $driver = DbConnections::driver();
         if ($driver === 'mysql' || $driver === 'mariadb') {
@@ -65,28 +27,7 @@ class DbSql {
         return "INSERT OR IGNORE INTO \"$table\" ($cols) $selectSql";
     }
 
-    // ----------------------------------------------------------------
-    // UPSERT (INSERT ... ON CONFLICT DO UPDATE)
-    // ----------------------------------------------------------------
-
-    /**
-     * Build the ON CONFLICT ... DO UPDATE / ON DUPLICATE KEY UPDATE clause
-     * to append to an INSERT statement.
-     *
-     * SQLite / PostgreSQL:
-     *   ON CONFLICT(conflictCols) DO UPDATE SET col = EXCLUDED.col, ...
-     *
-     * MySQL / MariaDB:
-     *   ON DUPLICATE KEY UPDATE col = VALUES(col), ...
-     *
-     * @param string $conflictCols  Comma-separated conflict column(s), e.g. "doctor_id, source"
-     * @param array  $updateCols    Columns to update on conflict, e.g. ['sort_order', 'updated_at']
-     * @param array  $updateExprs   Optional map of col => raw expression override.
-     *                              E.g. ['usage_count' => 'table.usage_count + 1']
-     *                              For columns not in this map, EXCLUDED.col / VALUES(col) is used.
-     * @param string $tableAlias    The table alias used for self-reference in SQLite expressions
-     *                              (e.g. 'zimrx_user_pc' in 'zimrx_user_pc.usage_count + 1')
-     */
+    // Builds upsert clauses (ON CONFLICT DO UPDATE for SQLite/Postgres vs ON DUPLICATE KEY UPDATE for MySQL)
     public static function upsert(
         string $conflictCols,
         array  $updateCols,
@@ -99,8 +40,7 @@ class DbSql {
             $setParts = [];
             foreach ($updateCols as $col) {
                 if (isset($updateExprs[$col])) {
-                    // Replace SQLite/PG self-reference idiom with MySQL equivalent:
-                    // "tablename.col + 1" → "`col` + 1"  and  "EXCLUDED.col" → "VALUES(`col`)"
+                    // Adapt table.col or EXCLUDED.col expressions to MySQL syntax
                     $expr = str_replace(
                         ["EXCLUDED.$col", "$tableAlias.$col", "excluded.$col"],
                         ["`$col`",        "`$col`",           "`$col`"],
@@ -114,7 +54,6 @@ class DbSql {
             return "ON DUPLICATE KEY UPDATE " . implode(",\n            ", $setParts);
         }
 
-        // SQLite + PostgreSQL share the ON CONFLICT syntax
         $setParts = [];
         foreach ($updateCols as $col) {
             if (isset($updateExprs[$col])) {
@@ -126,17 +65,6 @@ class DbSql {
         return "ON CONFLICT($conflictCols) DO UPDATE SET\n            " . implode(",\n            ", $setParts);
     }
 
-    // ----------------------------------------------------------------
-    // DDL helpers
-    // ----------------------------------------------------------------
-
-    /**
-     * Return the DDL fragment for a single-column INTEGER auto-increment primary key.
-     *
-     * SQLite:     INTEGER PRIMARY KEY AUTOINCREMENT
-     * MySQL:      INT NOT NULL AUTO_INCREMENT PRIMARY KEY
-     * PostgreSQL: SERIAL PRIMARY KEY
-     */
     public static function autoIncrement(): string {
         return match (DbConnections::driver()) {
             'mysql', 'mariadb' => 'INT NOT NULL AUTO_INCREMENT PRIMARY KEY',
@@ -145,13 +73,6 @@ class DbSql {
         };
     }
 
-    /**
-     * Return the correct type for a timestamp column with a default.
-     *
-     * SQLite:     TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-     * MySQL:      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-     * PostgreSQL: TIMESTAMPTZ NOT NULL DEFAULT NOW()
-     */
     public static function timestampColumn(bool $notNull = true): string {
         $nn = $notNull ? 'NOT NULL ' : '';
         return match (DbConnections::driver()) {
@@ -161,9 +82,6 @@ class DbSql {
         };
     }
 
-    /**
-     * Return the correct NOW() / CURRENT_TIMESTAMP expression for inline SQL.
-     */
     public static function now(): string {
         return match (DbConnections::driver()) {
             'pgsql' => 'NOW()',
@@ -171,20 +89,7 @@ class DbSql {
         };
     }
 
-    // ----------------------------------------------------------------
-    // Query helpers
-    // ----------------------------------------------------------------
-
-    /**
-     * Build a case-insensitive LIKE expression.
-     *
-     * SQLite:     col LIKE :ph      (SQLite LIKE is case-insensitive for ASCII by default)
-     * MySQL:      col LIKE :ph      (depends on collation; utf8mb4_general_ci is CI)
-     * PostgreSQL: col ILIKE :ph
-     *
-     * @param string $col  Column reference, e.g. "term" or "p.full_name"
-     * @param string $ph   Placeholder, e.g. ":search" or "?"
-     */
+    // Case-insensitive LIKE expression (handles Postgres ILIKE)
     public static function ilike(string $col, string $ph): string {
         return match (DbConnections::driver()) {
             'pgsql' => "$col ILIKE $ph",
@@ -192,15 +97,6 @@ class DbSql {
         };
     }
 
-    /**
-     * Build a GROUP_CONCAT / STRING_AGG expression.
-     *
-     * SQLite / MySQL: GROUP_CONCAT(col, sep)
-     * PostgreSQL:     STRING_AGG(col, 'sep')
-     *
-     * @param string $col  Column or expression to aggregate
-     * @param string $sep  Separator string
-     */
     public static function groupConcat(string $col, string $sep = ', '): string {
         $escapedSep = str_replace("'", "''", $sep);
         return match (DbConnections::driver()) {
@@ -209,13 +105,6 @@ class DbSql {
         };
     }
 
-    /**
-     * Return the integer column type keyword.
-     *
-     * SQLite:     INTEGER
-     * MySQL:      INT
-     * PostgreSQL: INTEGER
-     */
     public static function intType(): string {
         return match (DbConnections::driver()) {
             'mysql', 'mariadb' => 'INT',
@@ -223,9 +112,6 @@ class DbSql {
         };
     }
 
-    /**
-     * Quote an identifier (table or column name) for the active driver.
-     */
     public static function quoteIdentifier(string $name): string {
         return match (DbConnections::driver()) {
             'mysql', 'mariadb' => '`' . str_replace('`', '``', $name) . '`',
@@ -233,3 +119,4 @@ class DbSql {
         };
     }
 }
+

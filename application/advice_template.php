@@ -26,7 +26,7 @@ include 'header.php';
 ?>
 <link rel="stylesheet" href="assets/css/pages/advice_template.css">
 
-<div class="phrase-template-page">
+<div class="phrase-template-page zrx-page-container">
     <div class="phrase-template-card">
         <div class="phrase-hero">
             <div>
@@ -92,9 +92,9 @@ include 'header.php';
             <table class="phrase-table">
                 <thead>
                     <tr>
-                        <th style="width:44px;"></th>
-                        <th style="width:265px; text-align:center;">Actions</th>
-                        <th class="phrase-sortable-th" style="width:60px; text-align:center;">
+                        <th class="th-phrase-drag"></th>
+                        <th class="th-phrase-actions">Actions</th>
+                        <th class="phrase-sortable-th th-phrase-sl">
                             <button type="button" class="phrase-sort-button" data-sort-direction="desc">
                                 <span class="phrase-sort-label">SL</span>
                                 <span class="phrase-sort-icon">
@@ -103,11 +103,11 @@ include 'header.php';
                                 </span>
                             </button>
                         </th>
-                        <th style="width:130px;">Tags</th>
-                        <th class="phrase-col-category" style="width:200px;">Category</th>
+                        <th class="th-phrase-tags">Tags</th>
+                        <th class="phrase-col-category th-phrase-category">Category</th>
                         <th><?= htmlspecialchars($phraseConfig['label_bn']) ?></th>
                         <th><?= htmlspecialchars($phraseConfig['label_en']) ?></th>
-                        <th class="phrase-sortable-th" style="width:90px; text-align:center;">
+                        <th class="phrase-sortable-th th-phrase-usage">
                             <button type="button" class="phrase-sort-button" data-sort-direction="desc">
                                 <span class="phrase-sort-label">USAGE<br>COUNT</span>
                                 <span class="phrase-sort-icon">
@@ -128,7 +128,7 @@ include 'header.php';
     <div class="phrase-modal">
         <header class="phrase-modal-header"><h2 id="phrase-modal-title">Edit Category & Advices</h2></header>
         <div class="phrase-modal-body">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="modal-advice-grid-2col">
                 <div class="phrase-modal-field">
                     <label>Category Bangla</label>
                     <textarea id="modal-category-bn" placeholder="Category Bangla" rows="1" class="modal-advice-textarea"></textarea>
@@ -137,21 +137,21 @@ include 'header.php';
                     <label>Category English</label>
                     <textarea id="modal-category-en" placeholder="Category English" rows="1" class="modal-advice-textarea"></textarea>
                 </div>
-                <div class="phrase-modal-field" style="grid-column: 1 / -1;">
+                <div class="phrase-modal-field modal-advice-fullwidth">
                     <label>Category Search Alias</label>
                     <textarea id="modal-category-alias" placeholder="Category Search Alias" rows="1" class="modal-advice-textarea"></textarea>
                 </div>
             </div>
             <div>
-                <label style="font-size: 0.78rem; font-weight: 800; text-transform: uppercase; color: #334155; letter-spacing: 0.04em; margin-bottom: 0.5rem; display: block;">Advices inside this Category</label>
-                <div style="display: grid; grid-template-columns: 32px 1fr 1fr 40px; gap: 0.75rem; padding: 0 0.75rem; margin-bottom: 0.5rem; align-items: center;">
+                <label class="modal-advice-section-title">Advices inside this Category</label>
+                <div class="modal-advices-header-row">
                     <div></div>
-                    <div style="font-size: 0.75rem; font-weight: 700; color: #475569; text-transform: uppercase;">Advice Bangla</div>
-                    <div style="font-size: 0.75rem; font-weight: 700; color: #475569; text-transform: uppercase;">Advice English</div>
-                    <div style="font-size: 0.75rem; font-weight: 700; color: #475569; text-transform: uppercase; text-align: center;">Delete</div>
+                    <div class="modal-advices-th">Advice Bangla</div>
+                    <div class="modal-advices-th">Advice English</div>
+                    <div class="modal-advices-th-center">Delete</div>
                 </div>
-                <div id="modal-advices-container" style="display: grid; gap: 1rem;"></div>
-                <button type="button" class="phrase-btn primary" id="modal-add-advice-btn" style="margin-top: 1rem;">+ Add Advice</button>
+                <div id="modal-advices-container" class="modal-advices-list"></div>
+                <button type="button" class="phrase-btn primary modal-add-advice-btn-spacing" id="modal-add-advice-btn">+ Add Advice</button>
             </div>
         </div>
         <div class="phrase-modal-actions">

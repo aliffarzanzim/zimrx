@@ -1,12 +1,10 @@
-@font-face {
-            font-family: SolaimanLipi;
-            src: url("../../fonts/SolaimanLipi.ttf") format("truetype");
-        }
+/* Thermal token print styles for patient appointment slips (80mm) */
+@import "../layout/fonts.css";
         body {
             margin: 0;
-            background: #fff;
-            color: #111827;
-            font-family: Arial, SolaimanLipi, sans-serif;
+            background: var(--zrx-white);
+            color: var(--zrx-text-main);
+            font-family: "Arimo", "SolaimanLipi", sans-serif;
         }
         .token-wrap {
             width: 320px;

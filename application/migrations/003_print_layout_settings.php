@@ -1,13 +1,11 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Migration 003 — Prescription print layout, header settings, OT note settings, and interface layout
- */
+// Print layout settings: margins, prescription header/footer blocks, OT notes, and UI preferences.
 class Migration003PrintLayoutSettings {
 
     public function up(PDO $pdo): void {
-        // ---- zimrx_prescription_print_layout_settings ----
+        // Physical page dimensions, margins, and typography metrics
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_prescription_print_layout_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -28,12 +26,12 @@ class Migration003PrintLayoutSettings {
             )"
         );
 
-        // Seed default row for doctor 1
+        // Seed default A4 layout for primary doctor
         $pdo->exec(
             DbSql::insertIgnore('zimrx_prescription_print_layout_settings', 'doctor_id', '1')
         );
 
-        // ---- zimrx_prescription_header_settings ----
+        // Pad header styling: clinic name, doctor credentials, watermark logos, and block texts
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_prescription_header_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -86,7 +84,7 @@ class Migration003PrintLayoutSettings {
             )"
         );
 
-        // Seed default header row for doctor 1
+        // Seed blank header profile for doctor 1
         $pdo->prepare(
             DbSql::insertIgnore(
                 'zimrx_prescription_header_settings',
@@ -95,7 +93,7 @@ class Migration003PrintLayoutSettings {
             )
         )->execute(['doctor_id' => 1, 'doctor_name' => 'Doctor']);
 
-        // ---- zimrx_ot_note_settings ----
+        // Operation theater note formatting options
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_ot_note_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -107,7 +105,7 @@ class Migration003PrintLayoutSettings {
             )"
         );
 
-        // ---- zimrx_interface_settings ----
+        // Doctor custom UI preferences (collapsed sidebar, panel layouts, theme overrides)
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_interface_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -121,3 +119,4 @@ class Migration003PrintLayoutSettings {
         );
     }
 }
+

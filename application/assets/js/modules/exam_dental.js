@@ -1,11 +1,9 @@
-/**
- * ZimRx - Clinical Exam: Dental Chart & FDI Odontogram
- */
+// Clinical dental examination: FDI 2-digit odontogram charting, surface mapping (OMDBL), DMFT scoring, and treatment plans.
 (function() {
   'use strict';
 
   function initExamDental() {
-    // 7. Dental Chart & FDI Odontogram Handlers
+    // Dental chart and FDI odontogram handlers
     const dentalWrapper = document.getElementById('dental-chart-wrapper');
     if (dentalWrapper) {
       const toothState = {}; // { toothNum: { status, surfaces: [], plan } }

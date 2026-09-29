@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Seal and stamps gallery API: lists uploaded signatures and categorized system stamp presets.
+
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../auth.php';
 require_login();
@@ -13,13 +15,12 @@ $cat     = strtolower(trim((string)($_GET['cat'] ?? '')));
 $result  = [];
 $categories = [];
 
-// 1. User Uploaded seal & stamps (newest first)
+// User-uploaded seal and stamps (newest first)
 $uploadDir = ZIMRX_UPLOADS_DIR . '/seal-and-stamps';
 $uploadUrl = '/uploads/seal-and-stamps';
 
 if (is_dir($uploadDir)) {
     $files = glob($uploadDir . '/*.{svg,png,jpg,jpeg,webp}', GLOB_BRACE) ?: [];
-    // Sort newest first by mtime
     usort($files, fn($a, $b) => filemtime($b) <=> filemtime($a));
 
     if (count($files) > 0) {
@@ -43,7 +44,7 @@ if (is_dir($uploadDir)) {
     }
 }
 
-// 2. Scan flat files from assets/presets
+// Built-in general preset stamps
 $baseDir = __DIR__ . '/../assets/images/seal_and_stamps';
 $baseUrl = 'assets/images/seal_and_stamps';
 
@@ -70,7 +71,7 @@ foreach ($flatFiles as $file) {
     ];
 }
 
-// 3. Scan subdirectories
+// Categorized preset stamps in subdirectories
 $dirs    = glob($baseDir . '/*', GLOB_ONLYDIR) ?: [];
 foreach ($dirs as $dir) {
     $category = basename($dir);

@@ -25,6 +25,7 @@ require_once __DIR__ . '/../db/db_sql.php';
 require_once __DIR__ . '/../db/db_migrator.php';
 require_once __DIR__ . '/../lib/pc_catalog_lib.php';
 require_once __DIR__ . '/../lib/user_drug_lib.php';
+require_once __DIR__ . '/../lib/Services/BillingService.php';
 
 class ZimRxTestSuite {
     private int $passed = 0;
@@ -53,6 +54,7 @@ class ZimRxTestSuite {
         $this->testWalkInUploadIsolation();
         $this->testLoginRateLimitingAndRedirectDefense();
         $this->testClinicalReportSecurityAndDeploymentHardening();
+        $this->testBillingServiceTransactionSafety();
 
         echo "\n--------------------------------------------------------\n";
         echo "Test Results: {$this->passed} passed, {$this->failed} failed\n";
@@ -552,14 +554,14 @@ class ZimRxTestSuite {
     private function testSyncJournalAndUuid(): void {
         echo "\n[13/13] Testing Delta-Sync UUID Generation & Audit Journaling...\n";
 
-        require_once __DIR__ . '/../lib/sync_service.php';
+        require_once __DIR__ . '/../lib/Services/SyncJournalService.php';
 
         // 1. UUID format
-        $uuid1 = ZimRxSyncJournal::generateUuid();
-        $uuid2 = ZimRxSyncJournal::generateUuid();
+        $uuid1 = SyncJournalService::generateUuid();
+        $uuid2 = SyncJournalService::generateUuid();
         $this->assert(
             (bool)preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $uuid1),
-            "ZimRxSyncJournal::generateUuid() generates compliant RFC 4122 v4 UUID ({$uuid1})"
+            "SyncJournalService::generateUuid() generates compliant RFC 4122 v4 UUID ({$uuid1})"
         );
         $this->assert($uuid1 !== $uuid2, "Consecutive UUIDs are unique");
 
@@ -568,7 +570,7 @@ class ZimRxTestSuite {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         (new DbMigrator())->run($pdo);
 
-        ZimRxSyncJournal::logChange(
+        SyncJournalService::logChange(
             $pdo,
             'visit',
             $uuid1,
@@ -578,7 +580,7 @@ class ZimRxTestSuite {
             ['id' => 10, 'visit_no' => 1, 'patient_id' => 42]
         );
 
-        ZimRxSyncJournal::logChange(
+        SyncJournalService::logChange(
             $pdo,
             'visit',
             $uuid1,
@@ -591,7 +593,7 @@ class ZimRxTestSuite {
         $stmt = $pdo->query("SELECT * FROM zimrx_sync_changes ORDER BY sequence ASC");
         $changes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $this->assert(count($changes) === 2, "ZimRxSyncJournal logs change entries sequentially");
+        $this->assert(count($changes) === 2, "SyncJournalService logs change entries sequentially");
         $this->assert(
             $changes[0]['operation'] === 'insert' && (int)$changes[0]['new_revision'] === 1,
             "Insert journal entry records base_revision 0 -> new_revision 1"
@@ -601,9 +603,8 @@ class ZimRxTestSuite {
             "Update journal entry records base_revision 1 -> new_revision 2"
         );
     }
-    // ─────────────────────────────────────────────────────────────────────────────
+
     // [14/15] Active Patient Ownership Validation
-    // ─────────────────────────────────────────────────────────────────────────────
     private function testActivePatientOwnershipValidation(): void {
         echo "\n[14/15] Testing Active Patient Ownership Validation...\n";
 
@@ -662,9 +663,7 @@ class ZimRxTestSuite {
         $this->assert($checkOwnership($pdo, 2, 20, 200), 'Doctor 2 can set active context to their own patient+visit');
     }
 
-    // ─────────────────────────────────────────────────────────────────────────────
     // [15/15] Walk-in Upload Isolation
-    // ─────────────────────────────────────────────────────────────────────────────
     private function testWalkInUploadIsolation(): void {
         echo "\n[15/15] Testing Walk-in Upload Isolation...\n";
 
@@ -823,6 +822,57 @@ class ZimRxTestSuite {
 
         $phraseCode = (string)file_get_contents(__DIR__ . '/../api/rx_phrase_suggestions.php');
         $this->assert(str_contains($phraseCode, 'require_login()'), 'api/rx_phrase_suggestions.php enforces require_login()');
+    }
+
+    private function testBillingServiceTransactionSafety(): void {
+        echo "\n[18/18] Testing BillingService & Financial Transaction Safety...\n";
+
+        $memPdo = new PDO('sqlite::memory:');
+        $memPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $memPdo->exec('PRAGMA foreign_keys = 1');
+        $migrator = new DbMigrator(__DIR__ . '/../migrations');
+        $migrator->run($memPdo);
+
+        $billingService = new BillingService($memPdo);
+
+        // 1. Seed patient, appointment
+        $memPdo->exec("INSERT OR IGNORE INTO zimrx_doctors (id, display_name, full_name_en) VALUES (1, 'Dr. Tester', 'Dr. Tester')");
+        $memPdo->exec("INSERT INTO zimrx_patients (id, doctor_id, reg_no, full_name) VALUES (10, 1, 'P-001', 'Test Patient')");
+        $memPdo->exec(
+            "INSERT INTO zimrx_appointments (id, doctor_id, patient_id, appointment_no, appointment_date, patient_name, visit_fee, discount, paid_amount)
+             VALUES (100, 1, 10, 'A-01', '2026-09-28', 'Test Patient', 500, 50, 450)"
+        );
+
+        // 2. Reconcile missing payment atomically
+        $synced = $billingService->reconcileMissingAppointmentPayments(1);
+        $this->assert($synced === 1, 'BillingService atomically reconciles 1 unbilled paid appointment');
+
+        // 3. Verify ledger payment entry created with generated receipt
+        $payment = $memPdo->query("SELECT * FROM zimrx_payments WHERE appointment_id = 100")->fetch(PDO::FETCH_ASSOC);
+        $this->assert($payment !== false, 'Payment record successfully inserted into ledger');
+        $this->assert((float)$payment['visit_fee'] === 500.0, 'Payment gross fee accurately stored');
+        $this->assert((float)$payment['discount'] === 50.0, 'Payment discount accurately stored');
+        $this->assert((float)$payment['paid_amount'] === 450.0, 'Payment paid amount accurately stored');
+        $this->assert($payment['payment_status'] === 'paid', 'Payment status calculated as paid');
+        $this->assert(!empty($payment['receipt_no']) && str_starts_with($payment['receipt_no'], 'INV-'), 'Receipt number automatically generated');
+
+        // 4. Test idempotency (calling again must not duplicate or re-insert)
+        $syncedAgain = $billingService->reconcileMissingAppointmentPayments(1);
+        $this->assert($syncedAgain === 0, 'Reconciliation is idempotent (0 records synced on re-run)');
+
+        // 5. Test Date Range Presets
+        $rangeToday = $billingService->resolveDateRange('today');
+        $this->assert($rangeToday['from'] === date('Y-m-d') && $rangeToday['to'] === date('Y-m-d'), 'Date range resolver handles today preset');
+
+        $rangeMonth = $billingService->resolveDateRange('this_month');
+        $this->assert($rangeMonth['from'] === date('Y-m-01') && $rangeMonth['to'] === date('Y-m-d'), 'Date range resolver handles this_month preset');
+
+        // 6. Test filtered queries and aggregates
+        $result = $billingService->getFilteredTransactions(1, ['from' => date('Y-m-d'), 'to' => date('Y-m-d'), 'status' => 'all']);
+        $this->assert(count($result['transactions']) === 1, 'Filtered transaction query retrieves seeded transaction');
+        $this->assert($result['aggregates']['collected'] === 450.0, 'Filtered aggregates calculate collected revenue accurately');
+        $this->assert($result['aggregates']['invoiced'] === 500.0, 'Filtered aggregates calculate invoiced total accurately');
+        $this->assert($result['aggregates']['due'] === 0.0, 'Filtered aggregates calculate zero due on fully paid item');
     }
 }
 

@@ -1,4 +1,5 @@
 <?php
+// Saves new or learned patient occupation to the user database.
 declare(strict_types=1);
 
 define('ZIMRX_DB_LIGHTWEIGHT', true);

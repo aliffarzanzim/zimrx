@@ -1,12 +1,16 @@
 <?php
 declare(strict_types=1);
 
+// Generates collision-free patient registration codes and daily consultation visit numbers.
+
 require_once __DIR__ . '/../db.php';
 
+// Calculate minimum zero-padding width from expected patient volume
 function zimrx_digits_from_flow(int $flow): int {
     return max(1, strlen((string)max(1, $flow)));
 }
 
+// Load EMR identifier settings (flow capacities, sequential vs random generation, auto-expanding width)
 function zimrx_get_emr_settings(PDO $pdo): array {
     $isMulti = function_exists('zimrx_is_multi_doctor') ? zimrx_is_multi_doctor($pdo) : false;
     $defaultDaily = 999;

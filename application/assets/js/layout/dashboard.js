@@ -1,3 +1,4 @@
+// Layout persistence, module grid arrangement, dropdown theme customization, and cookie sync.
 function getLayoutConfig() {
   const savedLeft = localStorage.getItem(storageKeys.leftLayout);
   const savedRight = localStorage.getItem(storageKeys.rightLayout);
@@ -51,17 +52,13 @@ function getLayoutConfig() {
   };
 }
 
-/**
- * Main UI: Render the modules dynamically into the grid via AJAX
- */
+// Main UI dynamic module renderer
 async function renderMainUI() {
   // Modules are fully prerendered on the server using PHP for instant, seamless load!
   return Promise.resolve();
 }
 
-/**
- * Setup UI: Populate dropdowns and handle saving
- */
+// Initialize layout setup controls and event listeners
 function initSetupUI() {
   const btnSave = document.getElementById('btn-save-settings');
   const btnReset = document.getElementById('btn-reset-settings');
@@ -470,7 +467,7 @@ if (document.readyState === 'loading') {
   initSetupUI();
 }
 
-// Auto-Sync Hook: Bidirectional sync between Cookies and LocalStorage
+// Sync layout settings between localStorage and cookies
 (function() {
   try {
     const localLeft = localStorage.getItem(storageKeys.leftLayout);
@@ -478,7 +475,7 @@ if (document.readyState === 'loading') {
     const localHistory = localStorage.getItem(storageKeys.historyLayout);
     let needsCookieSync = false;
 
-    // 1. LocalStorage -> Cookies (e.g. cookies cleared or fresh browser with local data)
+    // Sync from localStorage to cookies
     if (localLeft && !document.cookie.includes('zimrx_left_layout')) {
       document.cookie = `zimrx_left_layout=${encodeURIComponent(localLeft)}; path=/; max-age=31536000; SameSite=Lax`;
       needsCookieSync = true;
@@ -497,7 +494,7 @@ if (document.readyState === 'loading') {
       return;
     }
 
-    // 2. Cookies -> LocalStorage (e.g. server pulled new layout from DB and updated the cookie)
+    // Sync from cookies to localStorage
     const getCookieValue = (name) => {
       const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
       return match ? decodeURIComponent(match[2]) : null;
@@ -520,7 +517,3 @@ if (document.readyState === 'loading') {
     console.error("Layout cookie auto-sync failed:", e);
   }
 })();
-
-/**
- * Handle Rx Autocomplete Dropdown Logic
- */

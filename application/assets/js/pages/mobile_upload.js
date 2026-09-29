@@ -1,3 +1,4 @@
+// Mobile document upload client for scanning reports directly into active patient visits.
 window.ZimRxCsrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
     (function () {
         const cardPatientName = document.getElementById('card-patient-name');
@@ -37,7 +38,7 @@ window.ZimRxCsrfToken = document.querySelector('meta[name="csrf-token"]')?.getAt
         let currentVisitRecordId = 0;
         let currentActiveRevision = 1;
 
-        // Live Poll Active Patient from Doctor's Desktop
+        // Poll active patient from doctor desktop
         async function fetchActivePatient() {
             try {
                 const res = await fetch('api/mobile_sync.php?action=get_active_patient');
@@ -97,7 +98,7 @@ window.ZimRxCsrfToken = document.querySelector('meta[name="csrf-token"]')?.getAt
             galleryInput.value = '';
         });
 
-        // Quick Preset Chips
+        // Quick preset chips
         document.querySelectorAll('.chip').forEach(chip => {
             chip.addEventListener('click', () => {
                 if (reportNameInput) {
@@ -148,7 +149,7 @@ window.ZimRxCsrfToken = document.querySelector('meta[name="csrf-token"]')?.getAt
             }
         });
 
-        // Upload Action
+        // Upload handler
         btnSubmit?.addEventListener('click', async () => {
             if (!selectedFile) {
                 alert('Please take a photo or select a file to upload first.');

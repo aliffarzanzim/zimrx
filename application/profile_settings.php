@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Doctor profile settings: update professional credentials, BMDC registration, login username, and password.
+
 require_once 'auth.php';
 require_login();
 require_once 'db.php';
@@ -101,24 +103,24 @@ include 'header.php';
     </section>
 
     <?php if ($flash): ?>
-        <div class="admin-flash" style="<?= $flashType === 'error' ? 'background: #fef2f2; color: #b91c1c; border: 1px solid #fca5a5;' : '' ?>">
+        <div class="admin-flash<?= $flashType === 'error' ? ' error' : '' ?>">
             <?= htmlspecialchars($flash) ?>
         </div>
     <?php endif; ?>
 
-    <section class="admin-layout" style="grid-template-columns: minmax(0, 720px);">
+    <section class="admin-layout" class="admin-layout admin-layout-single">
         <div class="admin-panel">
             <h2>Personal &amp; Professional Details</h2>
             <form class="admin-form" method="post" autocomplete="off">
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="admin-grid-2col">
                     <label>
                         Doctor ID / Code
-                        <input type="text" value="<?= htmlspecialchars($doctor['doctor_code'] ?? 'D001') ?>" readonly style="background: #f8fafc; color: #64748b; cursor: not-allowed;">
+                        <input type="text" value="<?= htmlspecialchars($doctor['doctor_code'] ?? 'D001') ?>" readonly class="admin-input-disabled">
                     </label>
 
                     <label>
-                        Doctor Full Name <span style="color: #ef4444;">*</span>
+                        Doctor Full Name <span class="admin-text-danger">*</span>
                         <input type="text" name="display_name" value="<?= htmlspecialchars($doctor['display_name'] ?? '') ?>" required placeholder="e.g. Dr. John Doe">
                     </label>
                 </div>
@@ -128,7 +130,7 @@ include 'header.php';
                     <textarea name="qualifications" rows="2" placeholder="e.g. MBBS, FCPS (Medicine), MD (Cardiology)"><?= htmlspecialchars($doctor['qualifications'] ?? $doctor['qualifications_en'] ?? '') ?></textarea>
                 </label>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="admin-grid-2col">
                     <label>
                         Specialty / Designation
                         <input type="text" name="specialty" value="<?= htmlspecialchars($doctor['specialty'] ?? $doctor['specialty_en'] ?? '') ?>" placeholder="e.g. Medicine Specialist">
@@ -140,10 +142,10 @@ include 'header.php';
                     </label>
                 </div>
 
-                <div style="border-top: 1px solid #e2e8f0; margin-top: 1.25rem; padding-top: 1.25rem;">
-                    <h3 style="font-size: 1rem; font-weight: 700; color: #0f172a; margin-bottom: 0.85rem;">Account &amp; Security</h3>
+                <div class="admin-section-divider">
+                    <h3 class="admin-section-title">Account &amp; Security</h3>
                     
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="admin-grid-2col">
                         <label>
                             Login Username
                             <input type="text" name="username" value="<?= htmlspecialchars($userAccount['username'] ?? '') ?>" placeholder="doctor username">
@@ -156,7 +158,7 @@ include 'header.php';
                     </div>
                 </div>
 
-                <div style="margin-top: 1.25rem;">
+                <div class="btn btn-primary admin-mt-20">
                     <button class="btn btn-primary" type="submit">Save Profile Changes</button>
                 </div>
             </form>

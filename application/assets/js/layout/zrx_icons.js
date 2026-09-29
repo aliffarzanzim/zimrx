@@ -1,8 +1,5 @@
-/**
- * ZimRx Global Icon Registry (JavaScript)
- * Reads the master icon dictionary directly from window.ZimRxIconsMap (generated from zrx_icons.php).
- * Ensures single source of truth without duplicating SVG strings!
- */
+// Global icon registry: renders SVG icons defined in window.ZimRxIconsMap (from zrx_icons.php).
+
 
 (function () {
     window.ZimRxIcon = {

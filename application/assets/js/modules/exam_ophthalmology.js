@@ -1,11 +1,9 @@
-/**
- * ZimRx - Clinical Exam: Ophthalmology
- */
+// Clinical ophthalmology exam: visual acuity (DVA/NVA), slit-lamp anterior segment, IOP tonometry, and fundoscopy.
 (function() {
   'use strict';
 
   function initExamOphthalmology() {
-    // 4. Ophthalmology Handlers
+    // Ophthalmology examination handlers
     const ophWrapper = document.getElementById('ophthalmology-wrapper');
     if (ophWrapper) {
       const normalBtn = ophWrapper.querySelector('[data-action="normal-eye"]');

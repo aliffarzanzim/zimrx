@@ -1,4 +1,5 @@
 <?php
+// Search drug brands and generics by name, strength, dosage form, and manufacturer preference.
 declare(strict_types=1);
 
 define('ZIMRX_DB_LIGHTWEIGHT', true);
@@ -29,9 +30,7 @@ try {
         exit;
     }
 
-    /**
-     * Normalizes strength strings for comparison (removes spaces, sorts components).
-     */
+    // Normalize strength strings for comparison (strip spaces and sort compound components)
     function normalizeStrength($s) {
         if (!$s) return '';
         $s = strtolower(trim($s));
@@ -45,9 +44,7 @@ try {
         return $s;
     }
 
-    /**
-     * Normalizes dosage forms for comparison.
-     */
+    // Normalize dosage forms for matching
     function normalizeForm($f) {
         if (!$f) return '';
         $f = strtolower(trim($f));

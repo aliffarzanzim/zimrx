@@ -1,4 +1,4 @@
-/* ── Unified EMR Settings Layout matching Print Setup ──────────────────── */
+/* EMR workspace configuration, workflow mode selector, and live layout preview */
 .emr-settings-body {
     margin-top: 1.25rem;
 }
@@ -17,10 +17,10 @@
 }
 
 .emr-section-card {
-    background: var(--print-surface, #ffffff);
-    border: 1px solid var(--print-border-soft, #e2e8f0);
-    border-radius: var(--border-radius, 8px);
-    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.05));
+    background: var(--print-surface, var(--zrx-white));
+    border: 1px solid var(--print-border-soft, var(--zrx-border-subtle));
+    border-radius: var(--zrx-border-radius);
+    box-shadow: var(--zrx-shadow-sm);
     padding: 1.25rem 1.5rem;
     margin-bottom: 1.25rem;
 }
@@ -31,14 +31,14 @@
     justify-content: space-between;
     margin-bottom: 1rem;
     padding-bottom: 0.65rem;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--zrx-slate-100);
 }
 
 .emr-card-head h2 {
     font-size: 1.05rem;
     font-weight: 700;
     margin: 0;
-    color: #0f172a;
+    color: var(--zrx-text-main);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -49,9 +49,9 @@
     font-weight: 700;
     padding: 0.2rem 0.55rem;
     border-radius: 999px;
-    background: #eff6ff;
-    color: #2563eb;
-    border: 1px solid #bfdbfe;
+    background: var(--zrx-blue-50);
+    color: var(--zrx-primary);
+    border: 1px solid var(--zrx-blue-200);
 }
 
 .emr-field-group {
@@ -72,18 +72,18 @@
 .emr-label-wrap label {
     font-size: 0.85rem;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--zrx-slate-800);
 }
 
 .emr-label-wrap span {
     font-size: 0.75rem;
     font-weight: 600;
-    color: #2563eb;
+    color: var(--zrx-primary);
 }
 
 .emr-field-hint {
     font-size: 0.78rem;
-    color: #64748b;
+    color: var(--zrx-text-muted);
     line-height: 1.4;
     margin-top: 0.35rem;
 }
@@ -92,21 +92,21 @@
     width: 100%;
     height: 38px;
     padding: 0 0.75rem;
-    border: 1px solid var(--print-border, #cbd5e1);
+    border: 1px solid var(--print-border, var(--zrx-border));
     border-radius: 6px;
     font-size: 0.92rem;
     font-weight: 700;
-    color: #0f172a;
-    background: #f8fafc;
+    color: var(--zrx-text-main);
+    background: var(--zrx-bg-subtle);
     transition: all 0.15s ease;
     box-sizing: border-box;
 }
 
 .emr-input-num:focus {
     outline: none;
-    border-color: var(--primary, #2563eb);
-    background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    border-color: var(--zrx-primary);
+    background: var(--zrx-bg-card);
+    box-shadow: var(--zrx-shadow-focus-ring);
 }
 
 .preset-chip-list {
@@ -121,7 +121,7 @@
     font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
-    color: #94a3b8;
+    color: var(--zrx-border-divider);
     margin-right: 0.15rem;
 }
 
@@ -130,20 +130,20 @@
     font-weight: 600;
     padding: 0.22rem 0.55rem;
     border-radius: 5px;
-    border: 1px solid #cbd5e1;
-    background: #ffffff;
-    color: #334155;
+    border: 1px solid var(--zrx-border);
+    background: var(--zrx-bg-card);
+    color: var(--zrx-slate-700);
     cursor: pointer;
     transition: all 0.15s ease;
 }
 
 .preset-chip-btn:hover {
-    background: #eff6ff;
-    border-color: #2563eb;
-    color: #2563eb;
+    background: var(--zrx-blue-50);
+    border-color: var(--zrx-primary);
+    color: var(--zrx-primary);
 }
 
-/* ── Mode Selection Cards ──────────────────────────────────────────────── */
+/* Clinical mode selector cards */
 .mode-card-deck {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -158,26 +158,26 @@
 }
 
 .mode-select-card {
-    border: 1.5px solid #e2e8f0;
+    border: 1.5px solid var(--zrx-border-subtle);
     border-radius: 8px;
     padding: 0.9rem;
     cursor: pointer;
     transition: all 0.15s ease;
-    background: #ffffff;
+    background: var(--zrx-bg-card);
     display: flex;
     flex-direction: column;
     gap: 0.3rem;
 }
 
 .mode-select-card:hover {
-    border-color: #93c5fd;
-    background: #f8fafc;
+    border-color: var(--zrx-blue-300);
+    background: var(--zrx-bg-subtle);
 }
 
 .mode-select-card.selected {
-    border-color: #2563eb;
-    background: #f0f7ff;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+    border-color: var(--zrx-primary);
+    background: var(--zrx-blue-50);
+    box-shadow: var(--zrx-shadow-focus);
 }
 
 .mode-head-row {
@@ -185,12 +185,12 @@
     align-items: center;
     gap: 0.5rem;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--zrx-text-main);
     font-size: 0.9rem;
 }
 
 .mode-head-row input[type="radio"] {
-    accent-color: #2563eb;
+    accent-color: var(--zrx-primary);
     width: 16px;
     height: 16px;
     margin: 0;
@@ -198,7 +198,7 @@
 
 .mode-desc-text {
     font-size: 0.78rem;
-    color: #64748b;
+    color: var(--zrx-text-muted);
     line-height: 1.35;
     padding-left: 1.5rem;
 }
@@ -207,9 +207,9 @@
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.75rem;
     font-weight: 700;
-    color: #2563eb;
-    background: #eff6ff;
-    border: 1px solid #dbeafe;
+    color: var(--zrx-primary);
+    background: var(--zrx-blue-50);
+    border: 1px solid var(--zrx-blue-100);
     padding: 0.15rem 0.45rem;
     border-radius: 4px;
     display: inline-block;
@@ -218,15 +218,15 @@
     margin-left: 1.5rem;
 }
 
-/* ── Live Preview Console ──────────────────────────────────────────────── */
+/* Live layout preview console */
 .emr-preview-shell {
-    background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
-    color: #f8fafc;
-    border-radius: var(--border-radius, 8px);
+    background: linear-gradient(145deg, var(--zrx-text-main) 0%, var(--zrx-slate-800) 100%);
+    color: var(--zrx-bg-subtle);
+    border-radius: var(--zrx-border-radius);
     padding: 1.25rem 1.5rem;
     margin-top: 1.25rem;
-    border: 1px solid #334155;
-    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.15);
+    border: 1px solid var(--zrx-slate-700);
+    box-shadow: var(--zrx-shadow-lg);
 }
 
 .emr-preview-head {
@@ -243,7 +243,7 @@
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #38bdf8;
+    color: var(--zrx-sky-400);
     margin: 0;
     display: flex;
     align-items: center;
@@ -264,7 +264,7 @@
 
 .emr-preview-item {
     background: rgba(15, 23, 42, 0.7);
-    border: 1px solid #334155;
+    border: 1px solid var(--zrx-slate-700);
     border-radius: 6px;
     padding: 0.85rem 1rem;
 }
@@ -272,7 +272,7 @@
 .emr-preview-label {
     font-size: 0.72rem;
     font-weight: 600;
-    color: #94a3b8;
+    color: var(--zrx-border-divider);
     margin-bottom: 0.35rem;
     display: flex;
     align-items: center;
@@ -283,23 +283,23 @@
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 1.2rem;
     font-weight: 800;
-    color: #4ade80;
+    color: var(--zrx-emerald-400);
     letter-spacing: 0.05em;
     margin-bottom: 0.25rem;
 }
 
 .emr-preview-sub {
     font-size: 0.72rem;
-    color: #cbd5e1;
+    color: var(--zrx-border);
 }
 
-/* ── Checkbox Switch ──────────────────────────────────────────────────── */
+/* Configuration toggle switch */
 .emr-toggle-card {
     display: flex;
     align-items: flex-start;
     gap: 0.85rem;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: var(--zrx-bg-subtle);
+    border: 1px solid var(--zrx-border-subtle);
     border-radius: 6px;
     padding: 0.85rem 1rem;
     cursor: pointer;
@@ -307,14 +307,57 @@
 }
 
 .emr-toggle-card:hover {
-    border-color: #cbd5e1;
-    background: #ffffff;
+    border-color: var(--zrx-border);
+    background: var(--zrx-bg-card);
 }
 
 .emr-toggle-card input[type="checkbox"] {
     margin-top: 0.15rem;
-    accent-color: #2563eb;
+    accent-color: var(--zrx-primary);
     width: 17px;
     height: 17px;
     flex-shrink: 0;
 }
+
+/* Alert banners and dimension chips */
+.emr-dimension-chip {
+    color: var(--zrx-primary);
+    background: var(--zrx-blue-50);
+    border-color: var(--zrx-blue-200);
+}
+.emr-flash-alert {
+    margin-top: 1rem;
+    margin-bottom: 0;
+}
+.emr-flash-error {
+    background: var(--zrx-red-50);
+    color: var(--zrx-red-700);
+    border: 1px solid var(--zrx-red-200);
+}
+.emr-flash-success {
+    background: var(--zrx-emerald-50);
+    color: var(--zrx-emerald-700);
+    border: 1px solid var(--zrx-emerald-200);
+}
+.emr-reset-modal-panel {
+    width: min(100%, 380px);
+    text-align: center;
+    gap: 1.25rem;
+    background: var(--zrx-bg-card);
+    padding: 1.75rem;
+    border-radius: 12px;
+    box-shadow: var(--zrx-shadow-modal);
+    border: 1px solid var(--zrx-border);
+}
+.emr-reset-modal-icon { font-size: 2.25rem; line-height: 1; }
+.emr-reset-modal-title { font-size: 1.15rem; color: var(--zrx-slate-800); display: block; }
+.emr-reset-modal-desc { font-size: 0.875rem; color: var(--zrx-text-muted); margin: 0; line-height: 1.5; }
+.emr-reset-modal-actions { display: flex; gap: 0.75rem; width: 100%; justify-content: center; margin-top: 0.5rem; }
+.emr-btn-modal-cancel { flex: 1; padding: 0.5rem 1rem; }
+.emr-btn-modal-confirm { flex: 1; padding: 0.5rem 1rem; background: var(--zrx-red-600); border-color: var(--zrx-red-600); }
+.emr-toggle-title { color: var(--zrx-text-main); font-size: 0.88rem; }
+.emr-field-hint-spacing { margin-top: 0.2rem; }
+.emr-field-hint-mb { margin-bottom: 0.5rem; }
+.emr-preview-badge-status { font-size: 0.72rem; color: var(--zrx-border-divider); font-family: monospace; }
+.emr-preview-tag-cyan { color: var(--zrx-sky-400); }
+

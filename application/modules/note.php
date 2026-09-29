@@ -1,4 +1,8 @@
-<?php declare(strict_types=1); ?>
+<?php
+declare(strict_types=1);
+
+// Clinical Notes module: tabular free-text clinical notes with row ordering and templates.
+?>
 <div class="pc-wrapper" id="note-wrapper">
     <div class="pc-table-container">
         <table class="pc-table" id="note-table">
@@ -60,4 +64,4 @@
     </template>
 </div>
 
-<script src="assets/js/modules/note_module.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/note_module.js') ?>"></script>
+<script src="assets/js/modules/note.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/note.js') ?>"></script>

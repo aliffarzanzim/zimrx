@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Page setup manager: physical sheet dimensions, header/sidebar/footer region heights and widths in centimeters.
+
 require_once 'auth.php';
 require_login();
 require_once 'db.php';
@@ -99,7 +101,7 @@ $sections = [
 include 'header.php';
 ?>
 
-<div class="zps-page">
+<div class="zps-page zrx-page-container">
     <div class="zps-heading-card">
         <div class="zps-heading">
             <div>
@@ -117,7 +119,7 @@ include 'header.php';
     </div>
 
     <div class="zps-note">
-        If you are using a pre-printed pad, measure the pad with a scale in centimeters (cm) and enter the corresponding dimensions here. You can turn off header and patient info printing on the <a href="print_setup.php" style="color: var(--primary); text-decoration: underline; font-weight: 500;">Print Setup page</a>.
+        If you are using a pre-printed pad, measure the pad with a scale in centimeters (cm) and enter the corresponding dimensions here. You can turn off header and patient info printing on the <a href="print_setup.php" class="zps-link-action">Print Setup page</a>.
     </div>
 
     <form id="page-setup-form" class="zps-grid" method="post">
@@ -208,7 +210,7 @@ include 'header.php';
                         <td colspan="4">
                             <b><?= preview_escape($section['title']) ?> : (<?= preview_escape($section['index']) ?>)</b>
                             <?php if ($section['part'] === 'page'): ?>
-                                <button type="button" id="btn-page-sizes-help" class="zps-help-circle-btn" title="Common Page Sizes" style="margin-left: 8px;">?</button>
+                                <button type="button" id="btn-page-sizes-help" class="zps-help-circle-btn" title="Common Page Sizes" class="zps-help-circle-btn zps-help-btn-spacing">?</button>
                             <?php endif; ?>
                         </td>
                     </tr>
@@ -252,47 +254,47 @@ include 'header.php';
 </div>
 
 <div id="page-setup-confirm-modal" class="print-setup-toast" hidden>
-    <div class="print-setup-toast-panel" role="dialog" aria-modal="true" style="width: min(100%, 360px); text-align: center; gap: 1.25rem;">
-        <span class="print-setup-toast-icon" style="color: #b91c1c; border-color: #fecaca; background: #fef2f2;" aria-hidden="true">&#9888;</span>
-        <strong style="font-size: 1.1rem; color: #1e293b;">Reset to Defaults?</strong>
-        <p style="font-size: 0.875rem; color: #64748b; margin: 0;">Are you sure you want to restore the sizes to default settings? This cannot be undone.</p>
-        <div style="display: flex; gap: 0.75rem; width: 100%; justify-content: center; margin-top: 0.5rem;">
-            <button type="button" id="confirm-page-reset-cancel" class="btn btn-outline" style="flex: 1; padding: 0.5rem 1rem;">Cancel</button>
-            <button type="button" id="confirm-page-reset-yes" class="btn btn-primary" style="flex: 1; background-color: #dc2626; border-color: #dc2626; padding: 0.5rem 1rem;">Yes, Reset</button>
+    <div class="print-setup-toast-panel" role="dialog" aria-modal="true" class="print-setup-toast-panel zps-confirm-panel">
+        <span class="print-setup-toast-icon" class="print-setup-toast-icon zps-confirm-icon" aria-hidden="true">&#9888;</span>
+        <strong class="zps-confirm-title">Reset to Defaults?</strong>
+        <p class="zps-confirm-text">Are you sure you want to restore the sizes to default settings? This cannot be undone.</p>
+        <div class="zps-confirm-actions">
+            <button type="button" id="confirm-page-reset-cancel" class="btn btn-outline" class="btn btn-outline zps-confirm-btn">Cancel</button>
+            <button type="button" id="confirm-page-reset-yes" class="btn btn-primary" class="btn btn-primary zps-confirm-btn-danger">Yes, Reset</button>
         </div>
     </div>
 </div>
 
 <div id="page-sizes-modal" class="print-setup-toast" hidden>
-    <div class="print-setup-toast-panel" style="width: min(100%, 400px); color: var(--text-dark); border-color: #cbd5e1; text-align: left; align-items: stretch;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; border-bottom: 1px solid #cbd5e1; padding-bottom: 0.5rem;">
-            <strong style="font-size: 1.1rem; color: #0f172a;">Common Page Sizes</strong>
-            <button type="button" id="page-sizes-close-x" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:#64748b; font-weight:700; padding:0; line-height:1;">&times;</button>
+    <div class="print-setup-toast-panel" class="print-setup-toast-panel zps-preset-modal-panel">
+        <div class="zps-preset-modal-header">
+            <strong class="zps-preset-modal-title">Common Page Sizes</strong>
+            <button type="button" id="page-sizes-close-x" class="zps-preset-modal-close">&times;</button>
         </div>
-        <p style="font-size: 0.85rem; color:#64748b; margin-bottom: 1rem; margin-top: 0;">Click a preset to apply it as your complete prescription dimensions:</p>
-        <div style="display: flex; flex-direction: column; gap: 0.6rem;">
-            <button type="button" class="btn btn-outline page-size-opt-btn" data-width="21.0" data-height="29.7" style="display:flex; justify-content:space-between; align-items:center; text-align:left; padding: 0.6rem 0.85rem; width: 100%;">
+        <p class="zps-preset-modal-desc">Click a preset to apply it as your complete prescription dimensions:</p>
+        <div class="zps-preset-list">
+            <button type="button" class="btn btn-outline page-size-opt-btn" data-width="21.0" data-height="29.7" class="btn btn-outline zps-preset-btn">
                 <strong>A4 Size</strong>
-                <span style="font-size:0.8rem; color:#64748b; font-weight:normal;">21.0 x 29.7 cm</span>
+                <span class="zps-preset-dims">21.0 x 29.7 cm</span>
             </button>
-            <button type="button" class="btn btn-outline page-size-opt-btn" data-width="14.8" data-height="21.0" style="display:flex; justify-content:space-between; align-items:center; text-align:left; padding: 0.6rem 0.85rem; width: 100%;">
+            <button type="button" class="btn btn-outline page-size-opt-btn" data-width="14.8" data-height="21.0" class="btn btn-outline zps-preset-btn">
                 <strong>A5 Size</strong>
-                <span style="font-size:0.8rem; color:#64748b; font-weight:normal;">14.8 x 21.0 cm</span>
+                <span class="zps-preset-dims">14.8 x 21.0 cm</span>
             </button>
-            <button type="button" class="btn btn-outline page-size-opt-btn" data-width="21.6" data-height="27.9" style="display:flex; justify-content:space-between; align-items:center; text-align:left; padding: 0.6rem 0.85rem; width: 100%;">
+            <button type="button" class="btn btn-outline page-size-opt-btn" data-width="21.6" data-height="27.9" class="btn btn-outline zps-preset-btn">
                 <strong>Letter Size</strong>
-                <span style="font-size:0.8rem; color:#64748b; font-weight:normal;">21.6 x 27.9 cm</span>
+                <span class="zps-preset-dims">21.6 x 27.9 cm</span>
             </button>
-            <button type="button" class="btn btn-outline page-size-opt-btn" data-width="21.6" data-height="35.6" style="display:flex; justify-content:space-between; align-items:center; text-align:left; padding: 0.6rem 0.85rem; width: 100%;">
+            <button type="button" class="btn btn-outline page-size-opt-btn" data-width="21.6" data-height="35.6" class="btn btn-outline zps-preset-btn">
                 <strong>Legal Size</strong>
-                <span style="font-size:0.8rem; color:#64748b; font-weight:normal;">21.6 x 35.6 cm</span>
+                <span class="zps-preset-dims">21.6 x 35.6 cm</span>
             </button>
-            <button type="button" class="btn btn-outline page-size-opt-btn" data-width="17.6" data-height="25.0" style="display:flex; justify-content:space-between; align-items:center; text-align:left; padding: 0.6rem 0.85rem; width: 100%;">
+            <button type="button" class="btn btn-outline page-size-opt-btn" data-width="17.6" data-height="25.0" class="btn btn-outline zps-preset-btn">
                 <strong>B5 Size</strong>
-                <span style="font-size:0.8rem; color:#64748b; font-weight:normal;">17.6 x 25.0 cm</span>
+                <span class="zps-preset-dims">17.6 x 25.0 cm</span>
             </button>
         </div>
-        <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem; border-top: 1px solid #cbd5e1; padding-top: 0.75rem;">
+        <div class="zps-preset-modal-footer">
             <button type="button" id="page-sizes-close-btn" class="btn btn-secondary">Close</button>
         </div>
     </div>

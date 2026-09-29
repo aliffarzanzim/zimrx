@@ -1,13 +1,4 @@
-/**
- * ZimRx Clinical Internal Messaging Client
- * Features:
- * - Real-time Smart Polling
- * - Delivery & Seen Statuses (✓ Sent, ✓✓ Delivered, ✓✓ Seen)
- * - File / Media Attachments (Photos, Scans, Lab PDFs)
- * - Dropdown Attachment Menu
- * - Customizable Quick Messages with Settings Modal
- * - Message Deletion and Hiding
- */
+// Clinical internal messaging client with real-time polling, attachments, and quick phrases.
 
 (function () {
     'use strict';
@@ -103,7 +94,7 @@
                             <button type="button" class="chat-btn-new" id="btn-new-chat">+ New</button>
                         </div>
                         <div class="chat-conversations-scroll" id="chat-conversations-scroll">
-                            <div style="padding: 1.5rem; text-align: center; color: #94a3b8; font-size: 0.82rem;">Loading conversations...</div>
+                            <div class="chat-loading-state">Loading conversations...</div>
                         </div>
                     </div>
 
@@ -139,7 +130,7 @@
                         <!-- Pending Attachment Strip -->
                         <div class="chat-pending-attachment-strip" id="chat-pending-attachment-strip">
                             <div class="chat-pending-thumb-wrap">
-                                <img id="chat-pending-thumb" class="chat-pending-thumb" src="" alt="Thumbnail" style="display: none;">
+                                <img id="chat-pending-thumb" class="chat-pending-thumb" src="" alt="Thumbnail" class="chat-file-hidden">
                                 <span id="chat-pending-filename" class="chat-pending-name">filename.pdf</span>
                             </div>
                             <button type="button" class="btn-remove-attachment" id="btn-remove-attachment" title="Remove attachment">&times;</button>
@@ -147,8 +138,8 @@
 
                         <!-- Input Bar with Attachment Dropdown -->
                         <div class="chat-input-bar">
-                            <input type="file" id="chat-file-photo" accept="image/*" style="display: none;">
-                            <input type="file" id="chat-file-doc" accept=".pdf,image/*" style="display: none;">
+                            <input type="file" id="chat-file-photo" accept="image/*" class="chat-file-hidden">
+                            <input type="file" id="chat-file-doc" accept=".pdf,image/*" class="chat-file-hidden">
 
                             <!-- Attachment Trigger Button -->
                             <button type="button" class="btn-chat-attach-trigger" id="btn-chat-attach-trigger" title="Attach Patient, Image, or PDF">
@@ -203,7 +194,7 @@
                 <div class="chat-modal-card">
                     <div class="chat-modal-header">
                         <div class="chat-modal-title">Select Colleague to Message</div>
-                        <button type="button" class="chat-header-btn" id="btn-close-colleague-modal" style="color: #64748b;">✕</button>
+                        <button type="button" class="chat-header-btn chat-close-btn" id="btn-close-colleague-modal">✕</button>
                     </div>
                     <div class="chat-colleague-list" id="chat-colleague-list"></div>
                 </div>
@@ -214,12 +205,12 @@
                 <div class="chat-modal-card">
                     <div class="chat-modal-header">
                         <div class="chat-modal-title">Customise Quick Action Messages</div>
-                        <button type="button" class="chat-header-btn" id="btn-close-quick-settings" style="color: #64748b;">✕</button>
+                        <button type="button" class="chat-header-btn chat-close-btn" id="btn-close-quick-settings">✕</button>
                     </div>
                     <div class="chat-modal-body">
                         <div id="quick-settings-list"></div>
                         <div class="quick-add-form">
-                            <div style="font-size: 0.80rem; font-weight: 700; color: #0f172a;">Add New Quick Message</div>
+                            <div class="chat-section-label">Add New Quick Message</div>
                             <input type="text" id="quick-input-title" class="quick-form-input" placeholder="Button Title (e.g. Next Patient)" autocomplete="off">
                             <input type="text" id="quick-input-msg" class="quick-form-input" placeholder="Full Message (e.g. Please send next patient inside)" autocomplete="off">
                             <button type="button" id="btn-submit-quick-msg" class="btn-add-quick-msg">+ Save Quick Message</button>
@@ -352,9 +343,7 @@
         fetchConversations();
     }
 
-    // -------------------------------------------------------------------------
-    // Attachment Handling
-    // -------------------------------------------------------------------------
+    // Attachment handling
     function handleAttachmentSelected(file) {
         if (!file) return;
         pendingAttachmentFile = file;
@@ -385,9 +374,7 @@
         if (pendingAttachmentStripEl) pendingAttachmentStripEl.style.display = 'none';
     }
 
-    // -------------------------------------------------------------------------
-    // Conversations & Messages
-    // -------------------------------------------------------------------------
+    // Conversations and messages
     async function fetchConversations() {
         try {
             const res = await fetch('api/chat.php?action=list_conversations');
@@ -416,7 +403,7 @@
         if (!convListEl) return;
         if (!conversations.length) {
             convListEl.innerHTML = `
-                <div style="padding: 2rem 1rem; text-align: center; color: #94a3b8; font-size: 0.84rem;">
+                <div class="chat-empty-state">
                     No messages yet.<br>Click <strong>+ New</strong> to chat with a colleague.
                 </div>
             `;
@@ -530,7 +517,7 @@
         }
 
         viewMessagesEl?.classList.add('open');
-        messagesContainerEl.innerHTML = '<div style="padding: 2rem; text-align: center; color: #94a3b8; font-size: 0.82rem;">Loading messages...</div>';
+        messagesContainerEl.innerHTML = '<div class="chat-empty-state-lg">Loading messages...</div>';
 
         try {
             const res = await fetch(`api/chat.php?action=get_messages&conversation_id=${convId}&limit=50`);
@@ -542,7 +529,7 @@
                 if (chatTextareaEl) chatTextareaEl.focus();
             }
         } catch (e) {
-            messagesContainerEl.innerHTML = '<div style="padding: 1rem; color: #ef4444; font-size: 0.82rem;">Failed to load messages.</div>';
+            messagesContainerEl.innerHTML = '<div class="chat-error-state">Failed to load messages.</div>';
         }
     }
 
@@ -786,9 +773,7 @@
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Quick Messages & Customizer
-    // -------------------------------------------------------------------------
+    // Quick messages and preset customization
     async function fetchQuickMessages() {
         try {
             const res = await fetch('api/chat.php?action=get_quick_messages');
@@ -897,9 +882,7 @@
         } catch (e) {}
     };
 
-    // -------------------------------------------------------------------------
-    // Colleague Modal
-    // -------------------------------------------------------------------------
+    // Colleague selection modal
     function openColleagueModal() {
         if (!colleagueModalEl) return;
         const listEl = document.getElementById('chat-colleague-list');
@@ -950,9 +933,7 @@
         } catch (e) {}
     }
 
-    // -------------------------------------------------------------------------
-    // Smart Polling
-    // -------------------------------------------------------------------------
+    // Smart polling
     function startSmartPolling() {
         if (pollIntervalId) clearInterval(pollIntervalId);
 

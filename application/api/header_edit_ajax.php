@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Header editor AJAX endpoint: saves doctor prescription header text blocks, logo, watermark, and seal settings.
+
 require_once __DIR__ . '/../auth.php';
 require_login();
 require_once __DIR__ . '/../db.php';

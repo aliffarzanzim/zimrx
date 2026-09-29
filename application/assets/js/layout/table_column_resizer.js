@@ -1,4 +1,4 @@
-// ZimRx Universal Table Column Resizer & Layout Actions
+// Universal table column resizer, textarea auto-sizing, and persistent layout manager.
 
 function autoResizeTableTextareas(table) {
   if (!table) return;

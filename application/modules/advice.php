@@ -1,4 +1,8 @@
-<?php declare(strict_types=1); ?>
+<?php
+declare(strict_types=1);
+
+// Advice module: patient instructions and next follow-up visit scheduling.
+?>
 <div class="advice-wrapper" id="advice-wrapper">
     <div class="advice-left">
         <div class="advice-header-row">
@@ -63,4 +67,4 @@
     </template>
 </div>
 
-<script src="assets/js/modules/advice_module.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/advice_module.js') ?>"></script>
+<script src="assets/js/modules/advice.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/modules/advice.js') ?>"></script>

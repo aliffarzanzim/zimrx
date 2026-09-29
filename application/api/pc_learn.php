@@ -1,4 +1,5 @@
 <?php
+// Records and increments usage frequency for presenting complaints (PC terms, durations, and units).
 declare(strict_types=1);
 
 require_once __DIR__ . '/../auth.php';

@@ -1,12 +1,9 @@
-/**
- * ZimRx - Clinical Exam: Endocrinology & Metabolic
- */
+// Clinical endocrinology exam: glycemic regulation, thyroid gland palpation/signs, and adrenal/metabolic stigmata.
 (function() {
   'use strict';
 
   function initExamEndocrinology() {
-    // 15. Endocrinology & Metabolic Assessment Handlers
-    // =======================================================
+    // Endocrinology and metabolic examination handlers
     const endoWrapper = document.getElementById('endo-wrapper');
     if (endoWrapper) {
       const modeTabs = endoWrapper.querySelectorAll('.zrx-exam-mode-tab[data-endo-tab]');
@@ -137,7 +134,6 @@
         });
       }
     }
-  }
   }
 
   if (document.readyState === 'loading') {

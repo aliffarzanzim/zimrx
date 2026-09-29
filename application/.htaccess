@@ -18,9 +18,10 @@ ServerSignature Off
     # 2. Block direct HTTP access to private clinic database, cache, and backups
     RewriteRule ^userdata/(database|cache|backups)(/.*)?$ - [F,L,NC]
 
-    # 3. Block direct HTTP access to confidential patient reports
+    # 3. Block direct HTTP access to confidential patient reports and internal chat media
     #    (All clinical reports must be accessed via authenticated endpoint: api/view_report.php)
     RewriteRule ^(userdata/)?uploads/reports(/.*)?$ - [F,L,NC]
+    RewriteRule ^(userdata/)?uploads/chat(/.*)?$ - [F,L,NC]
 
     # 4. Block vendor directory except for public browser assets (NicEdit)
     RewriteCond %{REQUEST_URI} !^/vendor/nicedit/ [NC]
@@ -28,7 +29,7 @@ ServerSignature Off
 </IfModule>
 
 # 5. Prevent direct downloading of database files, logs, and sensitive configs
-<FilesMatch "(?i)\.(db|db3|sqlite|sqlite3|sql|mdb|accdb|log|env|bak|tmp|db-wal|db-shm|sqlite-wal|sqlite-shm)$">
+<FilesMatch "(?i)\.(db|db3|sqlite|sqlite3|sql|mdb|accdb|log|env|bak|tmp|phar|db-wal|db-shm|sqlite-wal|sqlite-shm)$">
     <IfModule mod_authz_core.c>
         Require all denied
     </IfModule>

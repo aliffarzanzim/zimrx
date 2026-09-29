@@ -1,3 +1,4 @@
+// Prescription print preview renderer generating HTML layout, slots, drug table, and interactive doctor stamp.
 const previewOptionsEl = document.getElementById('previewOptionsData');
 let previewOptions = previewOptionsEl ? JSON.parse(previewOptionsEl.textContent || '{}') : {};
 const previewDefaultEl = document.getElementById('previewDefaultDataJson');
@@ -368,25 +369,25 @@ function renderHistorySection(clinical, bullet) {
     const hypersensitivityLabel = previewOptions.lbl_history_hypersensitivity || 'Hypersensitivity:';
     const drugLabel = previewOptions.lbl_history_drug || 'Drug History:';
 
-    // 1. medical
+    // Medical history
     const medicalItems = history.medical || [];
     if (medicalItems.length) {
         submoduleHtml['medical'] = `<tr><td><span class="zrx-history-label zrx-history-label--medical">${escapeHtml(medicalLabel)}</span> ${escapeHtml(medicalItems.join(', '))}</td></tr>`;
     }
 
-    // 2. treatment
+    // Treatment history
     const treatmentItems = history.treatments || [];
     if (treatmentItems.length) {
         submoduleHtml['treatment'] = `<tr><td><span class="zrx-history-label zrx-history-label--treatments">${escapeHtml(treatmentsLabel)}</span> ${escapeHtml(treatmentItems.join(', '))}</td></tr>`;
     }
 
-    // 3. habits
+    // Habits and lifestyle
     const habitsItems = history.habits || [];
     if (habitsItems.length) {
         submoduleHtml['habits'] = `<tr><td><span class="zrx-history-label zrx-history-label--habits">${escapeHtml(habitsLabel)}</span> ${escapeHtml(habitsItems.join(', '))}</td></tr>`;
     }
 
-    // 4. diet-hypersensitivity
+    // Diet and hypersensitivity
     let dietHypersensitivityHtml = '';
     if (history.diet) {
         dietHypersensitivityHtml += `<tr><td><span class="zrx-history-label zrx-history-label--diet">${escapeHtml(dietLabel)}</span> ${escapeHtml(history.diet)}</td></tr>`;
@@ -398,7 +399,7 @@ function renderHistorySection(clinical, bullet) {
         submoduleHtml['diet-hypersensitivity'] = dietHypersensitivityHtml;
     }
 
-    // 5. drug-history
+    // Drug history
     if (history.drug_history.length) {
         const drugLines = history.drug_history.map(drug => `<span class="zrx-history-bullet">&#9675; ${escapeHtml(drug)}</span>`).join('');
         submoduleHtml['drug-history'] = `<tr><td><span class="zrx-history-label zrx-history-label--drug-history">${escapeHtml(drugLabel)}</span>${drugLines}</td></tr>`;
@@ -586,13 +587,13 @@ function renderDrugRows(drugs) {
             const lblInstruction = previewOptions.lbl_instruction || 'Instruction:';
             html += `<tr class="zrx-drug-name-row">${numberHtml}<td colspan="3" class="zrx-drug-name-cell">`;
             if (generic) {
-                html += `<div style="margin-bottom: 3px;"><span style="font-weight: bold; font-family: 'Times New Roman';" class="zrx-lbl-generic">${escapeHtml(lblGeneric)} </span><span class="zrx-drug-generic" data-generic="${escapeHtml(generic)}" style="font-family: 'Times New Roman', serif; font-style: normal; font-weight: normal; font-size: ${brandFontSize}; ${showGeneric ? 'display: inline-block;' : 'display: none;'}">${escapeHtml(generic)}</span></div>`;
+                html += `<div style="margin-bottom: 3px;"><span style="font-weight: bold; font-family: 'Tinos';" class="zrx-lbl-generic">${escapeHtml(lblGeneric)} </span><span class="zrx-drug-generic" data-generic="${escapeHtml(generic)}" style="font-family: 'Tinos', serif; font-style: normal; font-weight: normal; font-size: ${brandFontSize}; ${showGeneric ? 'display: inline-block;' : 'display: none;'}">${escapeHtml(generic)}</span></div>`;
             }
             if (brand) {
-                html += `<div style="margin-bottom: 3px;"><span style="font-weight: bold; font-family: 'Times New Roman';" class="zrx-lbl-brand">${escapeHtml(lblBrand)} </span><span class="zrx-drug-brand" style="font-weight: normal;">${escapeHtml(brand)}</span></div>`;
+                html += `<div style="margin-bottom: 3px;"><span style="font-weight: bold; font-family: 'Tinos';" class="zrx-lbl-brand">${escapeHtml(lblBrand)} </span><span class="zrx-drug-brand" style="font-weight: normal;">${escapeHtml(brand)}</span></div>`;
             }
             if (dose || instruction || duration) {
-                html += `<div><span style="${isContinuation ? 'visibility: hidden;' : ''} font-weight: bold; font-family: 'Times New Roman';" class="zrx-lbl-instruction">${escapeHtml(lblInstruction)} </span><span class="zrx-drug-dose">${escapeHtml(dose)}</span><span class="zrx-drug-instruction">${instruction ? '- ' + escapeHtml(instruction) : ''}</span><span class="zrx-drug-duration">${duration ? '- ' + escapeHtml(duration) : ''}</span></div>`;
+                html += `<div><span style="${isContinuation ? 'visibility: hidden;' : ''} font-weight: bold; font-family: 'Tinos';" class="zrx-lbl-instruction">${escapeHtml(lblInstruction)} </span><span class="zrx-drug-dose">${escapeHtml(dose)}</span><span class="zrx-drug-instruction">${instruction ? '- ' + escapeHtml(instruction) : ''}</span><span class="zrx-drug-duration">${duration ? '- ' + escapeHtml(duration) : ''}</span></div>`;
             }
             html += `</td></tr>`;
         } else {
@@ -705,7 +706,7 @@ function barcodeHtml(value) {
         }
 
         const charCenterX = charStartX + (charBlockWidth / 2);
-        texts += `<text x="${charCenterX.toFixed(2)}" y="${barHeight + 14}" font-family="Consolas, 'Lucida Console', 'Courier New', monospace" font-size="13" font-weight="bold" fill="#000000" text-anchor="middle">${escapeHtml(char)}</text>`;
+        texts += `<text x="${charCenterX.toFixed(2)}" y="${barHeight + 14}" font-family="Cousine, Consolas, monospace" font-size="13" font-weight="bold" fill="#000000" text-anchor="middle">${escapeHtml(char)}</text>`;
 
         x += narrowWidth;
     }
@@ -867,7 +868,7 @@ window.addEventListener('message', event => {
     }, () => finish('zrx-fonts-timeout'));
 })();
 
-// Interactive Stamp Dragging & Resizing/Deletion in Print Preview (for direct preview mode)
+// Interactive stamp dragging, rotation, and resizing in preview
 (function initStampDragging() {
     const stamp = document.getElementById('preview-stamp-layer');
     if (!stamp) return;

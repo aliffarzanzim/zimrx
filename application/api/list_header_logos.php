@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Header logos gallery API: lists uploaded logos and built-in preset images for prescription headers.
+
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../auth.php';
 require_login();
@@ -9,13 +11,12 @@ header('Content-Type: application/json');
 
 $result = [];
 
-// 1. User-uploaded logos (newest first)
+// User-uploaded logos (newest first)
 $uploadDir = ZIMRX_UPLOADS_DIR . '/header-logos';
 $uploadUrl = 'userdata/uploads/header-logos';
 
 if (is_dir($uploadDir)) {
     $files = glob($uploadDir . '/*.{jpg,jpeg,png,gif,webp}', GLOB_BRACE) ?: [];
-    // Sort newest first by mtime
     usort($files, fn($a, $b) => filemtime($b) <=> filemtime($a));
     foreach ($files as $file) {
         $name = pathinfo($file, PATHINFO_FILENAME);
@@ -28,7 +29,7 @@ if (is_dir($uploadDir)) {
     }
 }
 
-// 2. Asset logos
+// Built-in system preset logos
 $assetDir = __DIR__ . '/../assets/images/logos';
 $assetUrl = 'assets/images/logos';
 

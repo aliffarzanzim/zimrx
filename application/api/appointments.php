@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Appointments API endpoint: manages patient slots, tokens, schedule overrides, fees, and queue state.
+
 require_once __DIR__ . '/../auth.php';
 require_login();
 require_once __DIR__ . '/../db.php';

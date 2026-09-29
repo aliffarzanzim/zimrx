@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Instruction template management API: manages dosage form associations, custom phrases, and display ordering.
+
 require_once __DIR__ . '/../auth.php';
 require_login();
 require_once __DIR__ . '/../db.php';

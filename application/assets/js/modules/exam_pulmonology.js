@@ -1,12 +1,9 @@
-/**
- * ZimRx - Clinical Exam: Pulmonology & Respiratory
- */
+// Pulmonology and respiratory examination module handling findings sync and presets.
 (function() {
   'use strict';
 
   function initExamPulmonology() {
-    // 14. Pulmonology & Respiratory Examination Handlers
-    // =======================================================
+    // Respiratory examination handlers
     const pulmoWrapper = document.getElementById('pulmo-wrapper');
     if (pulmoWrapper) {
       const modeTabs = pulmoWrapper.querySelectorAll('.zrx-exam-mode-tab[data-pulmo-tab]');
@@ -143,7 +140,7 @@
       }
     }
 
-    // =======================================================
+
   }
 
   if (document.readyState === 'loading') {

@@ -1,4 +1,5 @@
 <?php
+// Persists doctor UI customization settings (column widths, module layouts, and themes).
 declare(strict_types=1);
 
 require_once __DIR__ . '/../auth.php';

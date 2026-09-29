@@ -1,10 +1,7 @@
 <?php
 declare(strict_types=1);
 
-/**
- * ZimRx Physical Examination Settings API Endpoint
- * Handles GET (fetch configuration) and POST (save_config, reset_default).
- */
+// Physical examination template and layout configuration endpoint (fetch, update, and reset defaults).
 
 require_once __DIR__ . '/../auth.php';
 require_login();

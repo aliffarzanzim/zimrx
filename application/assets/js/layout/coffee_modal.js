@@ -1,10 +1,11 @@
+// Support and donation modal controller: scroll cue detection and payment info copying.
 function zimrxOpenCoffeeModal() {
     const modal = document.getElementById('coffee-modal-backdrop');
     if (!modal) return;
+    modal.style.display = 'flex';
     modal.classList.add('open');
     document.body.style.overflow = 'hidden';
     
-    // Check if scroll cue should be shown
     setTimeout(zimrxCheckScroll, 80);
 }
 
@@ -12,6 +13,7 @@ function zimrxCloseCoffeeModal() {
     const modal = document.getElementById('coffee-modal-backdrop');
     if (!modal) return;
     modal.classList.remove('open');
+    modal.style.display = 'none';
     document.body.style.overflow = '';
 }
 
@@ -20,15 +22,12 @@ function zimrxCheckScroll() {
     const cue = document.getElementById('coffee-scroll-cue');
     if (!scrollArea || !cue) return;
     
-    // Find the last support option box ("Spread the word")
     const lastItem = scrollArea.querySelector('.item-share');
     if (!lastItem) {
         cue.classList.remove('visible');
         return;
     }
     
-    // Show cue ONLY if the last box is completely invisible (its top is below the viewport)
-    // If all boxes are shown (even if the last one or prayer is partial), cue stays hidden
     const visibleBottom = scrollArea.scrollTop + scrollArea.clientHeight;
     const isAnyBoxFullyInvisible = lastItem.offsetTop >= (visibleBottom - 5);
     

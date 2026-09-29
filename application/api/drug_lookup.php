@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Fast drug search lookup endpoint: autocomplete brands and generics via SQLite FTS5 with LIKE fallback.
+
 define('ZIMRX_DB_LIGHTWEIGHT', true);
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/../lib/user_drug_lib.php';

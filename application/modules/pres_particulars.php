@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-// modules/pres_particulars.php
+// Patient particulars header section: demographics, visit identifiers, vitals, and action buttons.
 $prescription_prefill = is_array($prescription_prefill ?? null) ? $prescription_prefill : [];
 $pres_value = static function (string $key, string $default = '') use ($prescription_prefill): string {
     return htmlspecialchars((string)($prescription_prefill[$key] ?? $default), ENT_QUOTES, 'UTF-8');
@@ -10,7 +10,7 @@ $pres_selected = static function (string $key, string $value, string $default = 
     return (string)($prescription_prefill[$key] ?? $default) === $value ? ' selected' : '';
 };
 ?>
-<section class="patient-particulars">
+<section class="patient-particulars zrx-page-container">
     <div class="patient-info">
         <input type="hidden" id="patient-id" value="<?= $pres_value('patient_id') ?>">
         <input type="hidden" id="appointment-id" value="<?= $pres_value('appointment_id') ?>">

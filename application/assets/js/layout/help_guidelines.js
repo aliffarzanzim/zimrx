@@ -1,4 +1,4 @@
-// ZimRx Clinical Help Guidelines Modal Controller
+// Clinical help guidelines modal controller for patient particulars, address directories, and occupation management.
 
 function showHelpGuidelineModal(type) {
   const guidelines = {
@@ -85,7 +85,7 @@ function showHelpGuidelineModal(type) {
           <div class="zrx-help-step-text">
             <strong>DOB এন্ট্রি করলে Age ও Unit অটো-ক্যালকুলেট হবে:</strong><br>
             ক্যালেন্ডার থেকে Date of Birth সিলেক্ট করলে, সিস্টেম নিজে থেকেই রোগীর বয়স এবং সঠিক Unit নির্ধারণ করে নিবে:
-            <ul style="margin: 6px 0 0 16px; padding: 0; line-height: 1.6;">
+            <ul class="zrx-help-list">
               <li><strong>১ বছর বা তার বেশি (&ge; 1 Year):</strong> Age দেখাবে পূর্ণ বছরে এবং <code>Unit = "Years"</code> সিলেক্ট হবে।</li>
               <li><strong>১ বছরের কম, কিন্তু ১ মাসের বেশি:</strong> Age দেখাবে মাসে এবং <code>Unit = "Months"</code> সিলেক্ট হবে।</li>
               <li><strong>১ মাসের কম, কিন্তু ৭ দিনের বেশি:</strong> Age দেখাবে সপ্তাহে এবং <code>Unit = "Weeks"</code> সিলেক্ট হবে।</li>
@@ -99,7 +99,7 @@ function showHelpGuidelineModal(type) {
           <div class="zrx-help-step-text">
             <strong>Age এন্ট্রি করলে আনুমানিক DOB সেট হবে:</strong><br>
             আপনি যদি শুধু বয়স টাইপ করে Unit সিলেক্ট করেন, তবে সিস্টেম ব্যাকএন্ডে একটি আনুমানিক (Estimated) DOB তৈরি করে নিবে:
-            <ul style="margin: 6px 0 0 16px; padding: 0; line-height: 1.6;">
+            <ul class="zrx-help-list">
               <li><strong>Years (যেমন: 25 Years):</strong> ওই হিসাবকৃত বছরের শুরুর তারিখটিকে (যেমন: ০১/০১/XXXX) DOB হিসেবে সেট করবে।</li>
               <li><strong>Months (যেমন: 6 Months):</strong> ৬ মাস আগের মাসের ১ তারিখকে DOB হিসেবে ধরবে।</li>
               <li><strong>Weeks (যেমন: 3 Weeks):</strong> বর্তমান তারিখ থেকে ২১ দিন (৩ &times; ৭) মাইনাস করে DOB সেট করবে।</li>
@@ -169,15 +169,15 @@ function showHelpGuidelineModal(type) {
         <table class="zrx-occ-table">
           <thead>
             <tr>
-              <th style="width: 44px; text-align: center;">Move</th>
-              <th style="width: 190px; text-align: center;">Actions</th>
-              <th style="width: 85px; text-align: center;">Type</th>
-              <th style="text-align: left;">Occupation Name</th>
-              <th style="width: 65px; text-align: center;">Usage</th>
+              <th class="zrx-help-th-drag">Move</th>
+              <th class="zrx-help-th-actions">Actions</th>
+              <th class="zrx-help-th-sl">Type</th>
+              <th class="zrx-ta-l">Occupation Name</th>
+              <th class="zrx-help-th-usage">Usage</th>
             </tr>
           </thead>
           <tbody id="zrx-occ-table-body">
-            <tr><td colspan="5" style="text-align:center; padding:15px; color:#64748b;">Loading occupations...</td></tr>
+            <tr><td colspan="5" class="zrx-empty-cell">Loading occupations...</td></tr>
           </tbody>
         </table>
       `
@@ -197,7 +197,7 @@ function showHelpGuidelineModal(type) {
           <div class="zrx-help-step-icon">২</div>
           <div class="zrx-help-step-text">
             <strong>জাতীয় ডাটাবেস ও কাস্টম এড্রেস:</strong> সাজেশন লিস্টটি একসাথে দুটি জায়গা থেকে ডাটা দেখায়:
-            <ul style="margin: 4px 0 0 16px; padding: 0; line-height: 1.5;">
+            <ul class="zrx-help-list-compact">
               <li>বাংলাদেশের সমস্ত জেলা, উপজেলা, থানা, ইউনিয়ন ও পোস্ট কোড (English &amp; বাংলা)।</li>
               <li>আপনার নিজের সেইভ করা বা বেশি ব্যবহৃত কাস্টম ঠিকানাগুলো।</li>
             </ul>
@@ -223,16 +223,16 @@ function showHelpGuidelineModal(type) {
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
               প্র্যাক্টিস জেলা ফিল্টার (Practice Districts Filter)
             </div>
-            <div style="display:flex;gap:6px;">
-              <button type="button" id="zrx-btn-dist-all" class="zrx-btn-outline" style="height:28px;font-size:0.75rem;padding:0 8px;">All (সমগ্র বাংলাদেশ)</button>
-              <button type="button" id="zrx-btn-dist-save" class="zrx-btn-primary" style="height:28px;font-size:0.75rem;padding:0 10px;">Save Districts</button>
+            <div class="zrx-help-flex-gap6">
+              <button type="button" id="zrx-btn-dist-all" class="zrx-btn-outline" class="zrx-help-btn-sm">All (সমগ্র বাংলাদেশ)</button>
+              <button type="button" id="zrx-btn-dist-save" class="zrx-btn-primary" class="zrx-help-btn-sm-px10">Save Districts</button>
             </div>
           </div>
           <div class="zrx-district-search-bar">
             <input type="text" id="zrx-district-filter-input" placeholder="জেলা সার্চ করুন (Search District)..." autocomplete="off">
           </div>
           <div class="zrx-district-chips-wrap" id="zrx-district-chips-container">
-            <span style="color:#64748b;font-size:0.8rem;">Loading districts...</span>
+            <span class="zrx-help-text-meta">Loading districts...</span>
           </div>
         </div>
 
@@ -243,7 +243,7 @@ function showHelpGuidelineModal(type) {
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
               ঠিকানা ডিরেক্টরি ও ম্যানেজমেন্ট (Address Directory — Top 100)
             </div>
-            <button type="button" id="zrx-btn-reset-addr" class="zrx-btn-outline" style="height:28px;font-size:0.75rem;padding:0 10px;" title="Reset all address customizations to default">Reset to Default</button>
+            <button type="button" id="zrx-btn-reset-addr" class="zrx-btn-outline" class="zrx-help-btn-sm-px10" title="Reset all address customizations to default">Reset to Default</button>
           </div>
 
           <!-- Search & Filter Controls -->
@@ -259,24 +259,24 @@ function showHelpGuidelineModal(type) {
             </div>
           </div>
 
-          <div class="zrx-occ-toolbar" style="margin-top:8px;">
+          <div class="zrx-occ-toolbar" class="zrx-help-mt8">
             <div class="zrx-occ-add-form">
               <input type="text" id="zrx-new-addr-input" placeholder="নতুন কাস্টম ঠিকানা (New Address/Area) লিখুন..." autocomplete="off">
               <button type="button" id="zrx-btn-add-addr" class="zrx-btn-primary">+ Add</button>
             </div>
           </div>
 
-          <table class="zrx-occ-table" style="margin-top:8px;">
+          <table class="zrx-occ-table" class="zrx-help-mt8">
             <thead>
               <tr>
-                <th style="width: 170px; text-align: center;">Actions</th>
-                <th style="width: 80px; text-align: center;">Type</th>
-                <th style="text-align: left;">Address / Combination</th>
-                <th style="width: 65px; text-align: center;">Usage</th>
+                <th class="zrx-help-th-actions-alt">Actions</th>
+                <th class="zrx-help-th-sl-alt">Type</th>
+                <th class="zrx-ta-l">Address / Combination</th>
+                <th class="zrx-help-th-usage">Usage</th>
               </tr>
             </thead>
             <tbody id="zrx-addr-table-body">
-              <tr><td colspan="4" style="text-align:center; padding:15px; color:#64748b;">Loading addresses...</td></tr>
+              <tr><td colspan="4" class="zrx-empty-cell">Loading addresses...</td></tr>
             </tbody>
           </table>
         </div>
@@ -360,7 +360,7 @@ function showHelpGuidelineModal(type) {
         .then(resData => {
           const list = resData.occupations || [];
           if (!list.length) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:15px; color:#64748b;">No occupations found.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="zrx-empty-cell">No occupations found.</td></tr>';
             return;
           }
 
@@ -376,13 +376,13 @@ function showHelpGuidelineModal(type) {
             
             return `
               <tr class="pc-row phrase-row ${isPinned ? 'pinned' : ''} ${isHidden ? 'hidden' : ''}" data-name="${name}" draggable="true">
-                <td class="pc-action pc-move phrase-handle" style="position: relative; width: 44px; text-align: center; padding: 0 !important; height: 100%;">
-                  ${isPinned ? '<img class="phrase-handle-pin" src="assets/images/pin.svg" alt="Pinned" style="position:absolute;top:4px;left:4px;width:14px;height:14px;object-fit:contain;pointer-events:none;z-index:2;">' : ''}
+                <td class="pc-action pc-move phrase-handle" class="zrx-help-cell-drag">
+                  ${isPinned ? '<img class="phrase-handle-pin" src="assets/images/pin.svg" alt="Pinned" class="zrx-help-pin-img">' : ''}
                   <button type="button" class="pc-row-move-btn zrx-drag-handle" title="Move Row">${moveIcon}</button>
                 </td>
-                <td style="text-align: center;">
-                  <div class="phrase-actions" style="display:flex;gap:4px;justify-content:center;">
-                    <button type="button" class="phrase-btn ${isPinned ? 'active' : ''}" data-occ-action="pin" data-name="${name}" style="${isPinned ? 'background:#fef3c7;border-color:#f59e0b;color:#b45309;font-weight:700;' : ''}">${isPinned ? 'Unpin' : 'Pin'}</button>
+                <td class="zrx-ta-c">
+                  <div class="phrase-actions" class="zrx-help-actions-flex">
+                    <button type="button" class="phrase-btn ${isPinned ? 'active' : ''}" data-occ-action="pin" data-name="${name}" class="${isPinned ? 'zrx-help-pin-btn-active' : ''}">${isPinned ? 'Unpin' : 'Pin'}</button>
                     <button type="button" class="phrase-btn" data-occ-action="edit" data-name="${name}">Edit</button>
                     ${isSystem
                       ? (isHidden
@@ -392,16 +392,16 @@ function showHelpGuidelineModal(type) {
                     }
                   </div>
                 </td>
-                <td style="text-align: center;">
-                  <div class="phrase-tags" style="justify-content: center;">
+                <td class="zrx-ta-c">
+                  <div class="phrase-tags" class="zrx-help-justify-center">
                     <span class="phrase-tag ${isSystem ? 'system' : (kind || 'custom')}">${isSystem ? 'System' : (kind ? kind.charAt(0).toUpperCase() + kind.slice(1) : 'Custom')}</span>
-                    ${isHidden ? '<span class="phrase-tag hidden" style="background:#fee2e2;color:#b91c1c;margin-left:4px;">Hidden</span>' : ''}
+                    ${isHidden ? '<span class="phrase-tag hidden" class="zrx-help-badge-danger">Hidden</span>' : ''}
                   </div>
                 </td>
                 <td>
-                  <div class="phrase-text" style="font-weight:600;color:${isHidden ? '#94a3b8' : '#0f172a'};">${name}</div>
+                  <div class="phrase-text" class="${isHidden ? 'zrx-help-row-hidden' : 'zrx-help-row-visible'}">${name}</div>
                 </td>
-                <td class="phrase-usage" style="text-align: center; font-weight: 700; color: #1d4ed8;">
+                <td class="phrase-usage" class="zrx-help-usage-val">
                   ${Number(occ.usage_count || 0)}
                 </td>
               </tr>
@@ -506,7 +506,7 @@ function showHelpGuidelineModal(type) {
           tbody.addEventListener('zrx:reordered', tbody.onreorder);
         })
         .catch(() => {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:15px; color:#ef4444;">Failed to load occupations.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5" class="zrx-empty-cell-err">Failed to load occupations.</td></tr>';
         });
     };
 
@@ -566,7 +566,7 @@ function showHelpGuidelineModal(type) {
     const loadAddressSettings = () => {
       const tbody = document.getElementById('zrx-addr-table-body');
       if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#64748b;">Loading addresses (Top 100)...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="zrx-empty-cell">Loading addresses (Top 100)...</td></tr>';
       }
 
       const url = `api/address_settings.php?action=list&q=${encodeURIComponent(currentSearchQ)}&filter=${encodeURIComponent(currentFilter)}`;
@@ -576,19 +576,19 @@ function showHelpGuidelineModal(type) {
         .then(resData => {
           if (!resData.ok) return;
 
-          // 1. Render Districts Chips (only if not already loaded)
+          // Render district filter chips if not loaded yet
           if (!allDistricts.length) {
             allDistricts = resData.districts || [];
             selectedDistrictNames = resData.preferred_districts || [];
             renderDistrictChips();
           }
 
-          // 2. Render Custom & System Addresses Table (Top 100)
+          // Render custom and system address records (top 100)
           const list = resData.addresses || [];
           if (!tbody) return;
 
           if (!list.length) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#64748b;">No matching addresses found. Try typing another search keyword or add a new custom address.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" class="zrx-empty-cell">No matching addresses found. Try typing another search keyword or add a new custom address.</td></tr>';
             return;
           }
 
@@ -600,10 +600,10 @@ function showHelpGuidelineModal(type) {
             const isSystem = addr.kind === 'system';
 
             const actionsHtml = isSystem
-              ? `<span style="color:#94a3b8;font-size:0.75rem;font-style:italic;">National Database</span>`
+              ? `<span class="zrx-help-italic-muted">National Database</span>`
               : `
-                <div class="phrase-actions" style="display:flex;gap:4px;justify-content:center;">
-                  <button type="button" class="phrase-btn ${isPinned ? 'active' : ''}" data-addr-action="pin" data-name="${name}" style="${isPinned ? 'background:#fef3c7;border-color:#f59e0b;color:#b45309;font-weight:700;' : ''}">${isPinned ? 'Unpin' : 'Pin'}</button>
+                <div class="phrase-actions" class="zrx-help-actions-flex">
+                  <button type="button" class="phrase-btn ${isPinned ? 'active' : ''}" data-addr-action="pin" data-name="${name}" class="${isPinned ? 'zrx-help-pin-btn-active' : ''}">${isPinned ? 'Unpin' : 'Pin'}</button>
                   <button type="button" class="phrase-btn" data-addr-action="edit" data-name="${name}">Edit</button>
                   <button type="button" class="phrase-btn ${isHidden ? 'primary' : ''}" data-addr-action="toggle_hide" data-name="${name}">${isHidden ? 'Unhide' : 'Hide'}</button>
                   <button type="button" class="phrase-btn danger" data-addr-action="delete" data-name="${name}">Delete</button>
@@ -612,19 +612,19 @@ function showHelpGuidelineModal(type) {
 
             return `
               <tr class="pc-row ${isPinned ? 'pinned' : ''} ${isHidden ? 'hidden' : ''}">
-                <td style="text-align: center;">
+                <td class="zrx-ta-c">
                   ${actionsHtml}
                 </td>
-                <td style="text-align: center;">
-                  <div class="phrase-tags" style="justify-content: center;">
+                <td class="zrx-ta-c">
+                  <div class="phrase-tags" class="zrx-help-justify-center">
                     <span class="phrase-tag ${isSystem ? 'system' : (kind || 'custom')}">${isSystem ? 'System' : (kind ? kind.charAt(0).toUpperCase() + kind.slice(1) : 'Custom')}</span>
-                    ${isHidden ? '<span class="phrase-tag hidden" style="background:#fee2e2;color:#b91c1c;margin-left:4px;">Hidden</span>' : ''}
+                    ${isHidden ? '<span class="phrase-tag hidden" class="zrx-help-badge-danger">Hidden</span>' : ''}
                   </div>
                 </td>
                 <td>
-                  <div class="phrase-text" style="font-weight:600;color:${isHidden ? '#94a3b8' : '#0f172a'};">${name}</div>
+                  <div class="phrase-text" class="${isHidden ? 'zrx-help-row-hidden' : 'zrx-help-row-visible'}">${name}</div>
                 </td>
-                <td style="text-align: center; font-weight: 700; color: #1d4ed8;">
+                <td class="zrx-help-usage-val">
                   ${isSystem ? '—' : Number(addr.usage_count || 0)}
                 </td>
               </tr>
@@ -682,7 +682,7 @@ function showHelpGuidelineModal(type) {
           });
         })
         .catch(() => {
-          if (tbody) tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#ef4444;">Failed to load address settings.</td></tr>';
+          if (tbody) tbody.innerHTML = '<tr><td colspan="4" class="zrx-empty-cell-err">Failed to load address settings.</td></tr>';
         });
     };
 
@@ -698,7 +698,7 @@ function showHelpGuidelineModal(type) {
       });
 
       if (!filtered.length) {
-        chipsWrap.innerHTML = '<span style="color:#64748b;font-size:0.8rem;padding:4px;">No matching districts.</span>';
+        chipsWrap.innerHTML = '<span class="zrx-help-muted-p4">No matching districts.</span>';
         return;
       }
 

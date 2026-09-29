@@ -1,11 +1,9 @@
-/**
- * ZimRx - Clinical Exam: Preset Exam Chip Handlers
- */
+// Clinical exam preset chips: appends pre-configured exam phrases to module textareas.
 (function() {
   'use strict';
 
   function initExamPresets() {
-    // 1. Preset chip click handlers across all exam modules
+    // Click handlers for preset examination chips
     document.querySelectorAll('.zrx-exam-chip').forEach(btn => {
       btn.addEventListener('click', function(e) {
         e.preventDefault();

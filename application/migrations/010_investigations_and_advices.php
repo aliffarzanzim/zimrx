@@ -1,13 +1,11 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Migration 010 — Investigations, advices, and their templates and settings
- */
+// Clinical investigations (lab/imaging tests) and patient advice templates schema.
 class Migration010InvestigationsAndAdvices {
 
     public function up(PDO $pdo): void {
-        // ---- zimrx_user_investigations ----
+        // Doctor lab tests and diagnostic imaging catalog with pricing and frequency
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_investigations (
                 id " . DbSql::autoIncrement() . ",
@@ -25,7 +23,7 @@ class Migration010InvestigationsAndAdvices {
             )"
         );
 
-        // ---- zimrx_user_investigations_settings ----
+        // Investigation module settings and search order
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_investigations_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -37,7 +35,7 @@ class Migration010InvestigationsAndAdvices {
             )"
         );
 
-        // ---- zimrx_user_investigations_templates ----
+        // Multi-test investigation panels (e.g. routine antenatal profile, fever panel)
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_investigations_templates (
                 id " . DbSql::autoIncrement() . ",
@@ -52,7 +50,7 @@ class Migration010InvestigationsAndAdvices {
             )"
         );
 
-        // ---- zimrx_user_advices ----
+        // Lifestyle and dietary advice items (bilingual Bengali/English)
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_advices (
                 id " . DbSql::autoIncrement() . ",
@@ -77,7 +75,7 @@ class Migration010InvestigationsAndAdvices {
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_zimrx_user_advices_doctor_static ON zimrx_user_advices(doctor_id, static_id)");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_zimrx_user_advices_doctor_usage ON zimrx_user_advices(doctor_id, usage_count DESC, sort_order ASC, id ASC)");
 
-        // ---- zimrx_user_advices_settings ----
+        // Advice module display and sorting preferences
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_advices_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -91,7 +89,7 @@ class Migration010InvestigationsAndAdvices {
         );
         $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_zimrx_user_advices_settings_doctor_setting ON zimrx_user_advices_settings(doctor_id, advice_id, setting_key)");
 
-        // ---- zimrx_user_advices_template ----
+        // Predefined advice bundles grouped by medical condition
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_advices_template (
                 id " . DbSql::autoIncrement() . ",
@@ -107,3 +105,4 @@ class Migration010InvestigationsAndAdvices {
         );
     }
 }
+

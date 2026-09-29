@@ -1,11 +1,8 @@
 <?php
 declare(strict_types=1);
 
-/**
- * ZimRx Mobile Sync API
- * Provides live synchronization between desktop prescription and mobile upload page
- * per doctor, eliminating per-patient tokens.
- */
+// Mobile sync API: mirrors active desktop patient context and receives mobile photo uploads.
+
 
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../auth.php';
@@ -26,9 +23,7 @@ $doctorId = current_user_doctor_id();
 $doctorName = current_user_name();
 $activePatientFile = $cacheDir . '/doctor_' . $doctorId . '_patient.json';
 
-/**
- * Fail clearly if migration 013 has not created the mobile context table.
- */
+// Verify mobile active context table exists before processing requests
 function zimrx_assert_mobile_context_table(PDO $pdo): void {
     if (!DbSchema::tableExists($pdo, 'zimrx_mobile_active_context')) {
         throw new RuntimeException(
@@ -38,9 +33,7 @@ function zimrx_assert_mobile_context_table(PDO $pdo): void {
     }
 }
 
-/**
- * Detect server LAN IP across Windows, Linux, and macOS.
- */
+// Detect server LAN IP across Windows, Linux, and macOS
 function zimrx_get_server_lan_ip(): string {
     if (extension_loaded('sockets')) {
         $sock = @socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
@@ -129,7 +122,7 @@ function zimrx_get_mobile_url(): string {
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
 try {
-    // 1. Get QR code & Permanent mobile upload URL
+    // QR code and mobile upload URL
     if ($action === 'get_qr') {
         $url = zimrx_get_mobile_url();
         $qrCode = new QRCode();
@@ -144,7 +137,7 @@ try {
         exit();
     }
 
-    // 2. Desktop publishes current active patient
+    // Publish active patient context from desktop
     if ($action === 'update_active_patient') {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             throw new RuntimeException('Invalid request method.');
@@ -162,7 +155,7 @@ try {
         $patientId     = (int)($_POST['patient_id']      ?? 0);
         $visitRecordId = (int)($_POST['visit_record_id'] ?? 0);
 
-        // ── Ownership validation ───────────────────────────────────────────────────
+        // Ownership validation
         // Prove supplied IDs belong to the signed-in doctor before persisting them.
         // Walk-in mode (both IDs = 0) is always permitted.
         if ($patientId > 0 || $visitRecordId > 0) {
@@ -292,7 +285,7 @@ try {
         exit();
     }
 
-    // 3. Mobile phone fetches the current active patient of this doctor
+    // Fetch active patient context on mobile device
     if ($action === 'get_active_patient') {
         $pdo = db();
         zimrx_assert_mobile_context_table($pdo);
@@ -339,7 +332,7 @@ try {
         exit();
     }
 
-    // 4. Mobile uploads a report for the doctor's active patient
+    // Upload report photo from mobile device
     if ($action === 'upload') {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
@@ -399,7 +392,7 @@ try {
             $reportDate = date('d/m/Y');
         }
 
-        // ── Read active patient state and validate BEFORE moving the file ────────────
+        // Validate active patient state before moving file
         // If the phone's context is stale we must reject here; once the file is on
         // disk an early-exit would leave an orphaned file with no queue record.
         $pdo = db();
@@ -432,7 +425,7 @@ try {
             exit();
         }
 
-        // ── Move the file only after all pre-conditions pass ─────────────────────────
+        // Save uploaded file
         $filename         = sprintf('report-%d-%d-%s.%s', $doctorId, time(), bin2hex(random_bytes(4)), $ext);
         $targetPath       = $targetDir . '/' . $filename;
         $authenticatedUrl = 'api/view_report.php?file=' . rawurlencode($filename);
@@ -441,7 +434,7 @@ try {
             throw new RuntimeException('Failed to save file on server.');
         }
 
-        // ── Insert queue record; clean up orphaned file on any DB failure ─────────────
+        // Insert queue record
         try {
             $uploadId = 'up_' . bin2hex(random_bytes(8));
             $pdo = db();
@@ -492,7 +485,7 @@ try {
         exit();
     }
 
-    // 5. Desktop checks for new uploads (atomic transactional exclusive claim)
+    // Poll for new mobile uploads with transactional claim
     if ($action === 'check_uploads') {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);

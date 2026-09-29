@@ -1,3 +1,4 @@
+// Free-text notepad module initializing the rich-text NicEditor instance.
 document.addEventListener("DOMContentLoaded", function() {
     if (typeof bkLib !== 'undefined') {
         bkLib.onDomLoaded(function() {
@@ -7,8 +8,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 iconsPath: 'vendor/nicedit/images/nicEditIcons-latest.gif'
             }).panelInstance('textpad-editor');
 
-            // Force NicEditor container and main editing area to be 100% width
-            // NicEditor sometimes sets hardcoded inline widths, this overrides it
+            // Override hardcoded inline widths to keep editor full width
             setTimeout(() => {
                 const nicContainers = document.querySelectorAll('.nicEdit-panelContain');
                 const nicMains = document.querySelectorAll('.nicEdit-main');
