@@ -75,18 +75,18 @@ Standard web frameworks rely on pointing the web server's DocumentRoot to a `/pu
 
 ZimRx balances instant plug-and-play portability with strict security boundaries through directory-level access controls:
 
-* **`application/userdata/` (Isolated Clinic Vault)**:
+* **`application/userdata/`**:
   Contains all mutable state—SQLite databases, encrypted backups, user uploads, and cache. 
   * *Why this design*: A doctor can back up, clone, or migrate their entire clinic practice simply by copying this single folder to a flash drive, eliminating database dump scripts or cloud dependencies.
   * *Security*: Non-media subdirectories (`database/`, `backups/`, `cache/`) are strictly blocked from HTTP requests via `.htaccess` (`Require all denied`) and Caddyfile route blocks.
-* **`application/lib/` & `application/db/` (Core Engine & PDO Migrations)**:
+* **`application/lib/` & `application/db/`**:
   Houses the database abstraction layer, query builders, and automated migration engine (`DbMigrator`). Direct execution via browser URL is barred by web server rules and code-level entry guards.
-* **`application/api/` (Controlled RPC Gateway)**:
+* **`application/api/`**:
   All frontend communication routes through here. Every endpoint enforces active session checks, CSRF token verification, and doctor data isolation.
-* **`application/assets/` (Zero-Build Frontend Layer)**:
+* **`application/assets/`**:
   Clean 3-tier presentation structure (`layout/`, `modules/`, `pages/`) using native CSS tokens and vanilla JavaScript. Eliminates Node/NPM build pipelines, so files can be inspected, customized, and run offline without compile steps.
 
-> **Roadmap Note**: For high-security institutional and hospital LAN deployments where dedicated IT staff manage the web server, a native `public/` document-root separation mode is planned in future alongside MariaDB/PostgreSQL multi-user support.
+> **Roadmap**: For high-security institutional and hospital LAN deployments where dedicated IT staff manage the web server, a native `public/` document-root separation mode is planned in future alongside MariaDB/PostgreSQL multi-user support.
 
 
 ---
