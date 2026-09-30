@@ -2,7 +2,7 @@
 
 .dash-container {
     margin-bottom: 3rem;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
     color: var(--zrx-text-main);
 }
 

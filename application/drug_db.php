@@ -246,7 +246,6 @@ if ($rx_popup_mode) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($page_title) ?></title>
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/layout/global.css?v=<?= $globalCssVersion ?>">
     <link rel="stylesheet" href="assets/css/pages/drug_db_base_sidebar.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/drug_db_base_sidebar.css') ?>">
     <link rel="stylesheet" href="assets/css/pages/drug_db_detail.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/drug_db_detail.css') ?>">

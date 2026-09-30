@@ -9,7 +9,7 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: var(--font-family, -apple-system, BlinkMacSystemFont, sans-serif);
             background: var(--zrx-bg-subtle);
             color: var(--zrx-text-main);
             min-height: 100vh;

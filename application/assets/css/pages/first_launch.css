@@ -3,7 +3,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: var(--font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
             background: linear-gradient(135deg, var(--zrx-text-main) 0%, var(--zrx-slate-800) 50%, var(--zrx-text-main) 100%);
             min-height: 100vh;
             display: flex;

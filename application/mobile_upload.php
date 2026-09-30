@@ -18,7 +18,6 @@ $doctorName = current_user_name();
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ZimRx - Mobile Document Upload</title>
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/layout/global.css?v=<?= filemtime(__DIR__ . '/assets/css/layout/global.css') ?>">
     <link rel="stylesheet" href="assets/css/pages/mobile_upload.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/mobile_upload.css') ?>">
 </head>
