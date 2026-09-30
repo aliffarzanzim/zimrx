@@ -228,7 +228,7 @@ $zrx_dd_theme = $_COOKIE['zimrx_dropdown_theme'] ?? 'subtle-tint';
             <a href="#" class="nav-link">Medical Calculators</a>
 
             <div class="floating-nav-subtitle">Software &amp; Support</div>
-            <button type="button" class="nav-link nav-button" onclick="zimrxOpenCoffeeModal()">Buy me a Coffee ☕</button>
+            <button type="button" class="nav-link nav-button" onclick="zimrxOpenSupportModal()">❤️ Support ZimRx</button>
             <a href="#" class="nav-link">Documentation</a>
             <a href="#" class="nav-link">Updates</a>
             <a href="#" class="nav-link">About</a>
