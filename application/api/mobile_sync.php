@@ -33,21 +33,13 @@ function zimrx_assert_mobile_context_table(PDO $pdo): void {
     }
 }
 
-// Detect server LAN IP across Windows, Linux, and macOS
+// Detect server LAN IP across Windows, Linux, and macOS (strictly offline with zero remote telemetry)
 function zimrx_get_server_lan_ip(): string {
-    if (extension_loaded('sockets')) {
-        $sock = @socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
-        if ($sock) {
-            if (@socket_connect($sock, '8.8.8.8', 53)) {
-                @socket_getsockname($sock, $localIp);
-                @socket_close($sock);
-                if (!empty($localIp) && filter_var($localIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-                    if (!str_starts_with($localIp, '127.')) {
-                        return $localIp;
-                    }
-                }
-            }
-            @socket_close($sock);
+    // 1. Inspect server-bound address if bound to a local LAN interface
+    $serverAddr = $_SERVER['SERVER_ADDR'] ?? '';
+    if (!empty($serverAddr) && filter_var($serverAddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+        if (!str_starts_with($serverAddr, '127.') && !str_starts_with($serverAddr, '169.254.')) {
+            return $serverAddr;
         }
     }
 
