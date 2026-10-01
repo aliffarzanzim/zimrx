@@ -420,7 +420,7 @@ if ($reportsIndex !== false) {
         </main>
     </div>
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="vendor/flatpickr/flatpickr.min.js"></script>
     <script src="assets/js/modules/dosage_form_icons.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/dosage_form_icons.js') ?>"></script>
     <script src="assets/js/layout/config.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/config.js') ?>"></script>
     <script src="assets/js/layout/dashboard.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/dashboard.js') ?>"></script>

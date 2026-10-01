@@ -863,7 +863,7 @@ function loadBrand(id, preloadedData = null) {
         return `
             <div class="pubmed-query-box">
                 <div>${escapeHtml(q)}</div>
-                <a href="${href}" target="_blank" rel="noopener">Search PubMed <i class="fas fa-external-link-alt"></i></a>
+                <a href="${href}" target="_blank" rel="noopener">Search PubMed ${window.ZimRxIcon ? ZimRxIcon.render('external-link', 13) : ''}</a>
             </div>
         `;
     }
@@ -915,8 +915,8 @@ function loadBrand(id, preloadedData = null) {
         const therapeuticContent = clsVal ? `
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span>${clsVal}</span>
-                <i class="fas fa-eye" onclick="searchByClass('${clsVal.replace(/'/g, "\\'")}')"
-                   style="color: var(--accent-blue); cursor: pointer; padding: 5px;" title="Browse this class"></i>
+                <span onclick="searchByClass('${clsVal.replace(/'/g, "\\'")}')"
+                   style="color: var(--accent-blue); cursor: pointer; padding: 5px; display: inline-flex;" title="Browse this class">${window.ZimRxIcon ? ZimRxIcon.render('eye', 14) : ''}</span>
             </div>
         ` : '';
 
@@ -952,7 +952,7 @@ function loadBrand(id, preloadedData = null) {
                     <div class="acc-item">
                         <div class="acc-header">
                             <span class="acc-title">${s.title}</span>
-                            <i class="fas fa-chevron-down acc-icon"></i>
+                            <span class="acc-icon">${window.ZimRxIcon ? ZimRxIcon.render('chevron-down', 14) : '▾'}</span>
                         </div>
                         <div class="${contentClass}">${formattedVal}</div>
                     </div>
@@ -1291,7 +1291,7 @@ function loadBrand(id, preloadedData = null) {
             const id = String(row.id || row.local_drug_id || '');
             list.append(`
                 <div class="res-row" data-custom-id="${escapeHtml(id)}">
-                    <i class="fas fa-capsules new-drug-row-icon"></i>
+                    ${window.ZimRxIcon ? ZimRxIcon.render('pill', 14, { class: 'new-drug-row-icon' }) : ''}
                     <div class="res-info">
                         <div class="res-line-1">
                             <span class="res-brand">${escapeHtml(row.brand_name || '')}</span>
@@ -1471,7 +1471,7 @@ function loadBrand(id, preloadedData = null) {
             const id = String(row.system_brand_id || row.id || '');
             list.append(`
                 <div class="res-row" data-override-id="${escapeHtml(id)}">
-                    <i class="fas fa-pen new-drug-row-icon"></i>
+                    ${window.ZimRxIcon ? ZimRxIcon.render('edit', 14, { class: 'new-drug-row-icon' }) : ''}
                     <div class="res-info">
                         <div class="res-line-1">
                             <span class="res-brand">${escapeHtml(row.brand_name || '')}</span>
@@ -1660,7 +1660,7 @@ function loadBrand(id, preloadedData = null) {
             deletedDrugRowStore.set(id, row);
             list.append(`
                 <div class="res-row" data-hidden-id="${escapeHtml(id)}">
-                    <i class="fas fa-trash new-drug-row-icon"></i>
+                    ${window.ZimRxIcon ? ZimRxIcon.render('trash', 14, { class: 'new-drug-row-icon' }) : ''}
                     <div class="res-info">
                         <div class="res-line-1">
                             <span class="res-brand">${escapeHtml(row.brand_name || id)}</span>

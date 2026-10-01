@@ -1070,3 +1070,19 @@ textarea.zrx-input-invalid,
 .app-footer-support:hover .support-label::after { width: 100%; }
 .app-footer-support:hover .support-icon { transform: scale(1.25); }
 .app-footer-support:active .support-icon { transform: scale(1.05); }
+
+/* Global SVG Icons & Spin animation */
+.zrx-icon {
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+@keyframes zrxSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.zrx-icon-spin, .fa-spin {
+    animation: zrxSpin 1s infinite linear;
+    display: inline-block;
+}
+

@@ -855,7 +855,7 @@ if (!function_exists('appointment_page_dmy_to_iso')) {
     ],
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
 </script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="vendor/flatpickr/flatpickr.min.js"></script>
 <script src="assets/js/layout/help_guidelines.js?v=<?= filemtime(__DIR__ . '/../assets/js/layout/help_guidelines.js') ?>"></script>
 <script src="assets/js/layout/table_column_resizer.js?v=<?= filemtime(__DIR__ . '/../assets/js/layout/table_column_resizer.js') ?>"></script>
 <script src="assets/js/layout/grid_navigation.js?v=<?= filemtime(__DIR__ . '/../assets/js/layout/grid_navigation.js') ?>"></script>

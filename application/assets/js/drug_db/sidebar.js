@@ -37,7 +37,7 @@ function renderSearchResults(data, mode = currentMode) {
             const attrName = encodeURIComponent(item.generic || '');
             html = `
                 <div class="res-row" onclick="loadGenericBrands('${escapedId}', decodeURIComponent('${attrName}'))">
-                    <i class="fas fa-microscope" class="db-text-muted"></i>
+                    ${window.ZimRxIcon ? ZimRxIcon.render('microscope', 14, { class: 'db-text-muted' }) : ''}
                     <div class="res-info">
                         <span class="res-brand" class="db-text-accent">${escapedName}</span>
                         <span class="res-price">${escapeHtml(item.brand_count)} Brands</span>
@@ -49,7 +49,7 @@ function renderSearchResults(data, mode = currentMode) {
             const attrCls = encodeURIComponent(item.cls || '');
             html = `
                 <div class="res-row" onclick="loadClassDetail(decodeURIComponent('${attrCls}'))">
-                    <i class="fas fa-layer-group" class="db-item-lead-title"></i>
+                    ${window.ZimRxIcon ? ZimRxIcon.render('layers', 14, { class: 'db-item-lead-title' }) : ''}
                     <div class="res-info">
                         <span class="res-brand" class="db-text-navy">${escapedCls}</span>
                     </div>
@@ -61,7 +61,7 @@ function renderSearchResults(data, mode = currentMode) {
             const attrIndName = encodeURIComponent(item.indication_name || '');
             html = `
                 <div class="res-row" onclick="loadIndicationDetail('${escapedIndId}', decodeURIComponent('${attrIndName}'))">
-                    <i class="fas fa-stethoscope" class="db-item-icon-lead"></i>
+                    ${window.ZimRxIcon ? ZimRxIcon.render('stethoscope', 14, { class: 'db-item-icon-lead' }) : ''}
                     <div class="res-info">
                         <span class="res-brand" class="db-text-navy">${escapedIndName}</span>
                     </div>
@@ -121,7 +121,7 @@ function renderDocsBookmarks(query = '') {
     rows.forEach(item => {
         $('#resultsList').append(`
             <div class="res-row docs-bookmark-row" data-target="${escapeHtml(item.id)}">
-                <i class="fas fa-bookmark" class="db-text-accent"></i>
+                ${window.ZimRxIcon ? ZimRxIcon.render('bookmark', 14, { class: 'db-text-accent' }) : ''}
                 <div class="res-info">
                     <span class="res-brand" class="db-text-navy">${escapeHtml(item.title)}</span>
                     <div class="res-line-2">Jump to ${escapeHtml(item.title)} section</div>
@@ -390,7 +390,7 @@ function loadIndicationDetail(id, name) {
     toggleSidebarMoaButton(false);
     $('#sidebarNav').css('display', 'flex');
     $('#sidebarNavTitle').text(name);
-    $('#resultsList').empty().append('<div class="db-status-empty-box"><i class="fas fa-spinner fa-spin"></i> Loading medications...</div>');
+    $('#resultsList').empty().append(`<div class="db-status-empty-box">${window.ZimRxIcon ? ZimRxIcon.render('loader', 14, { class: 'zrx-icon-spin' }) : ''} Loading medications...</div>`);
 
     $.getJSON(`api/drug_explorer.php?type=indication_generics&id=${id}`, function(data) {
         $('#resultsList').empty();
@@ -403,8 +403,8 @@ function loadIndicationDetail(id, name) {
             const escapedName = escapeHtml(item.name);
             const attrName = encodeURIComponent(item.name || '');
             const html = `
-                <div class="res-row" onclick="loadGenericBrands('${escapeHtml(item.id)}', decodeURIComponent('${attrName}'))">
-                    <i class="fas fa-microscope" class="db-item-lead-title"></i>
+                <div class="res-row" onclick="loadGenericBrands('${escapedId}', decodeURIComponent('${attrName}'))">
+                    ${window.ZimRxIcon ? ZimRxIcon.render('microscope', 14, { class: 'db-item-lead-title' }) : ''}
                     <div class="res-info">
                         <span class="res-brand" class="db-text-accent">${escapedName}</span>
                         <span class="res-price">${escapeHtml(item.brand_count)} Brands</span>
@@ -427,7 +427,7 @@ function loadClassDetail(cls, autoGenericId = '', autoGenericName = '') {
 
     $('#sidebarNav').css('display', 'flex');
     $('#sidebarNavTitle').text(className);
-    $('#resultsList').empty().append('<div class="db-status-empty-box"><i class="fas fa-spinner fa-spin"></i> Loading generics...</div>');
+    $('#resultsList').empty().append(`<div class="db-status-empty-box">${window.ZimRxIcon ? ZimRxIcon.render('loader', 14, { class: 'zrx-icon-spin' }) : ''} Loading generics...</div>`);
 
     $.getJSON(`api/drug_explorer.php?type=class_generics&id=${encodeURIComponent(className)}`, function(data) {
         $('#resultsList').empty();
@@ -440,8 +440,8 @@ function loadClassDetail(cls, autoGenericId = '', autoGenericName = '') {
             const escapedName = escapeHtml(item.name);
             const attrName = encodeURIComponent(item.name || '');
             const html = `
-                <div class="res-row" onclick="loadGenericBrands('${escapeHtml(item.id)}', decodeURIComponent('${attrName}'))">
-                    <i class="fas fa-microscope" class="db-item-lead-title"></i>
+                <div class="res-row" onclick="loadGenericBrands('${escapedId}', decodeURIComponent('${attrName}'))">
+                    ${window.ZimRxIcon ? ZimRxIcon.render('microscope', 14, { class: 'db-item-lead-title' }) : ''}
                     <div class="res-info">
                         <span class="res-brand" class="db-text-accent">${escapedName}</span>
                         <span class="res-price">${escapeHtml(item.brand_count)} Brands</span>
@@ -476,7 +476,7 @@ function goBackToSidebarResults() {
 function runDrillDown(type, id) {
     $.getJSON(`api/drug_explorer.php?type=${type}&id=${encodeURIComponent(id)}`, function(data) {
         $('#resultsList').empty();
-        $('#resultsList').append('<div class="db-dropdown-item-hover" onclick="performSearch(\'\')"><i class="fas fa-arrow-left"></i> BACK</div>');
+        $('#resultsList').append(`<div class="db-dropdown-item-hover" onclick="performSearch('')">${window.ZimRxIcon ? ZimRxIcon.render('arrow-left', 14) : ''} BACK</div>`);
         data.forEach(item => {
             const iconPath = getDosageFormIcon(item.form, item.pres_new_upper);
             const iconHtml = iconPath ? `<img src="${iconPath}" class="res-icon">` : '<span class="res-star">â˜…</span>';

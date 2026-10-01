@@ -234,6 +234,8 @@ function drug_db_initial_sidebar_state() {
     }
 }
 
+require_once __DIR__ . '/api/zrx_icons.php';
+
 if ($rx_popup_mode) {
     require_once 'auth.php';
     $page_title = 'Drug View';
@@ -251,6 +253,10 @@ if ($rx_popup_mode) {
     <link rel="stylesheet" href="assets/css/pages/drug_db_detail.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/drug_db_detail.css') ?>">
     <link rel="stylesheet" href="assets/css/pages/drug_db_modals_tables.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/drug_db_modals_tables.css') ?>">
     <link rel="stylesheet" href="assets/css/pages/drug_db_middle_sidebar_nav.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/drug_db_middle_sidebar_nav.css') ?>">
+    <script>
+    window.ZimRxIconsMap = <?= json_encode(ZimRxIcon::getAll(), JSON_UNESCAPED_SLASHES) ?>;
+    </script>
+    <script src="assets/js/layout/zrx_icons.js"></script>
 </head>
 <body class="rx-popup-mode">
 <?php
@@ -269,8 +275,7 @@ $initialSidebarState = drug_db_initial_sidebar_state();
 require __DIR__ . '/modules/drug_db_layout.php';
 ?>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="assets/js/layout/jquery.min.js"></script>
 <script>
 window.ZIMRX_INITIAL_DRUG_DETAIL = <?= json_encode($initialDrugDetail, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: 'null' ?>;
 window.ZIMRX_INITIAL_SIDEBAR_STATE = <?= json_encode($initialSidebarState, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: 'null' ?>;

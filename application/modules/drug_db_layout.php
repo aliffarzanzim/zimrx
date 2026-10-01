@@ -380,7 +380,7 @@ function drug_db_view_initial_accordions_html($brand, $clinical, $pregDesc = '')
 
     $therapeuticClass = trim((string)($brand['cls'] ?? ''));
     $therapeuticContent = $therapeuticClass !== ''
-        ? '<div class="db-flex-between"><span>' . drug_db_view_e($therapeuticClass) . '</span><i class="fas fa-eye" onclick="searchByClass(\'' . drug_db_view_e(str_replace("'", "\\'", $therapeuticClass)) . '\')" class="db-accent-btn" title="Browse this class"></i></div>'
+        ? '<div class="db-flex-between"><span>' . drug_db_view_e($therapeuticClass) . '</span><span onclick="searchByClass(\'' . drug_db_view_e(str_replace("'", "\\'", $therapeuticClass)) . '\')" class="db-accent-btn" title="Browse this class">' . zrx_icon('eye', 14) . '</span></div>'
         : '';
 
     $sections = [
@@ -411,7 +411,7 @@ function drug_db_view_initial_accordions_html($brand, $clinical, $pregDesc = '')
             continue;
         }
         $html .= '<div class="acc-item">';
-        $html .= '<div class="acc-header"><span class="acc-title">' . drug_db_view_e($section['title']) . '</span><i class="fas fa-chevron-down acc-icon"></i></div>';
+        $html .= '<div class="acc-header"><span class="acc-title">' . drug_db_view_e($section['title']) . '</span><span class="acc-icon">' . zrx_icon('chevron-down', 14) . '</span></div>';
         $html .= '<div class="acc-content html-content">' . $section['val'] . '</div>';
         $html .= '</div>';
     }
@@ -459,7 +459,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
         $id = (string)($item['generic_id'] ?? '');
         return '
             <div class="res-row" onclick="' . drug_db_view_e(drug_db_view_js_call('loadGenericBrands', $id, $name)) . '">
-                <i class="fas fa-microscope" class="zrx-c-muted"></i>
+                ' . zrx_icon('microscope', 14, ['class' => 'zrx-c-muted']) . '
                 <div class="res-info">
                     <span class="res-brand" class="db-text-accent">' . drug_db_view_e($name) . '</span>
                     <span class="res-price">' . drug_db_view_e($item['brand_count'] ?? '') . ' Brands</span>
@@ -472,7 +472,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
         $name = (string)($item['cls'] ?? '');
         return '
             <div class="res-row" onclick="' . drug_db_view_e(drug_db_view_js_call('loadClassDetail', $name)) . '">
-                <i class="fas fa-layer-group" class="db-item-lead-title"></i>
+                ' . zrx_icon('layers', 14, ['class' => 'db-item-lead-title']) . '
                 <div class="res-info">
                     <span class="res-brand" class="db-text-navy">' . drug_db_view_e($name) . '</span>
                 </div>
@@ -485,7 +485,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
         $id = (string)($item['indication_id'] ?? '');
         return '
             <div class="res-row" onclick="' . drug_db_view_e(drug_db_view_js_call('loadIndicationDetail', $id, $name)) . '">
-                <i class="fas fa-stethoscope" class="db-item-icon-lead"></i>
+                ' . zrx_icon('stethoscope', 14, ['class' => 'db-item-icon-lead']) . '
                 <div class="res-info">
                     <span class="res-brand" class="db-text-navy">' . drug_db_view_e($name) . '</span>
                 </div>
@@ -513,7 +513,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
         </div>
         <div class="new-drug-sidebar-panel" id="newDrugSidebarPanel"<?= $isInitialNewDrugMode ? ' class="zrx-df"' : '' ?>>
             <button type="button" class="new-drug-add-btn" id="addNewDrugBtn">
-                <i class="fas fa-plus"></i>
+                <?= zrx_icon('plus', 14) ?>
                 Add New Drug
             </button>
             <div class="new-drug-sidebar-title">New Drugs</div>
@@ -524,7 +524,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
         </div>
         <div class="new-drug-sidebar-panel" id="editDrugSidebarPanel"<?= $isInitialEditDrugMode ? ' class="zrx-df"' : '' ?>>
             <button type="button" class="new-drug-add-btn" id="editDrugPickBtn">
-                <i class="fas fa-pen"></i>
+                <?= zrx_icon('edit', 14) ?>
                 Edit a drug
             </button>
             <div class="new-drug-sidebar-title">Edited Drug</div>
@@ -535,7 +535,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
         </div>
         <div class="new-drug-sidebar-panel" id="deleteDrugSidebarPanel"<?= $isInitialDeleteDrugMode ? ' class="zrx-df"' : '' ?>>
             <button type="button" class="new-drug-add-btn danger" id="deleteDrugPickBtn">
-                <i class="fas fa-trash"></i>
+                <?= zrx_icon('trash', 14) ?>
                 Delete a drug
             </button>
             <div class="new-drug-sidebar-title">Deleted Drug</div>
@@ -549,11 +549,11 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
         </div>
         
         <div class="sidebar-nav" id="sidebarNav">
-            <div class="btn-back-sidebar" onclick="goBackToSidebarResults()"><i class="fas fa-arrow-left"></i></div>
+            <div class="btn-back-sidebar" onclick="goBackToSidebarResults()"><?= zrx_icon('arrow-left', 14) ?></div>
             <div class="sidebar-nav-main">
                 <div class="sidebar-nav-title" id="sidebarNavTitle">Indication Name</div>
                 <button class="btn-moa-table" id="sidebarMoaBtn" onclick="openMoaTable()">
-                    <i class="fas fa-table"></i> MOA Table
+                    <?= zrx_icon('table', 14) ?> MOA Table
                 </button>
             </div>
         </div>
@@ -587,7 +587,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
                     <h2 class="mid-title" id="midGenericName">Generic Brands</h2>
                     <span class="mid-count" id="midCountLabel"></span>
                 </div>
-                <button class="mid-view-btn" onclick="openGenericTable()"><i class="fas fa-table"></i> Table View</button>
+                <button class="mid-view-btn" onclick="openGenericTable()"><?= zrx_icon('table', 14) ?> Table View</button>
             </div>
             <div class="mid-search-group">
                 <input type="text" id="midSearchInput" class="mid-input" placeholder="Search company or brand...">
@@ -604,7 +604,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
     <main class="db-content">
         <section class="new-drug-workspace" id="newDrugWorkspace"<?= $isInitialNewDrugMode ? ' class="zrx-df"' : '' ?>>
             <div class="new-drug-workspace-empty" id="newDrugWorkspaceEmpty">
-                <i class="fas fa-capsules"></i>
+                <?= zrx_icon('pill', 32) ?>
                 <strong>Select a new drug or add one.</strong>
             </div>
 
@@ -667,10 +667,10 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
                     </div>
                     <div class="new-drug-view-actions">
                         <button type="button" class="btn-light" id="editCustomDrugBtn">
-                            <i class="fas fa-pen"></i> Edit
+                            <?= zrx_icon('edit', 14) ?> Edit
                         </button>
                         <button type="button" class="btn-danger" id="deleteCustomDrugBtn">
-                            <i class="fas fa-trash"></i> Delete
+                            <?= zrx_icon('trash', 14) ?> Delete
                         </button>
                     </div>
                 </div>
@@ -688,7 +688,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
 
         <section class="new-drug-workspace" id="editDrugWorkspace"<?= $isInitialEditDrugMode ? ' class="zrx-df"' : '' ?>>
             <div class="new-drug-workspace-empty" id="editDrugWorkspaceEmpty">
-                <i class="fas fa-pen-to-square"></i>
+                <?= zrx_icon('edit', 32) ?>
                 <strong>Select an edited drug or search a drug to edit.</strong>
             </div>
 
@@ -766,10 +766,10 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
                     </div>
                     <div class="new-drug-view-actions">
                         <button type="button" class="btn-light" id="editOverrideDrugBtn">
-                            <i class="fas fa-pen"></i> Edit
+                            <?= zrx_icon('edit', 14) ?> Edit
                         </button>
                         <button type="button" class="btn-danger" id="deleteOverrideDrugBtn">
-                            <i class="fas fa-trash"></i> Delete Edit
+                            <?= zrx_icon('trash', 14) ?> Delete Edit
                         </button>
                     </div>
                 </div>
@@ -787,7 +787,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
 
         <section class="new-drug-workspace" id="deleteDrugWorkspace"<?= $isInitialDeleteDrugMode ? ' class="zrx-df"' : '' ?>>
             <div class="new-drug-workspace-empty" id="deleteDrugWorkspaceEmpty">
-                <i class="fas fa-trash"></i>
+                <?= zrx_icon('trash', 32) ?>
                 <strong>Select a deleted drug or search a drug to delete.</strong>
             </div>
 
@@ -813,10 +813,10 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
                     </div>
                     <div class="new-drug-view-actions">
                         <button type="button" class="btn-light" id="restoreDeletedDrugBtn">
-                            <i class="fas fa-undo"></i> Restore
+                            <?= zrx_icon('undo', 14) ?> Restore
                         </button>
                         <button type="button" class="btn-danger" id="confirmDeleteDrugBtn">
-                            <i class="fas fa-trash"></i> Delete
+                            <?= zrx_icon('trash', 14) ?> Delete
                         </button>
                     </div>
                 </div>
@@ -832,7 +832,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
         </section>
 
         <div id="emptyState" class="db-empty-state-view <?= ($initialBrand || $isInitialNewDrugMode || $isInitialEditDrugMode || $isInitialDeleteDrugMode || $isInitialDocsMode) ? 'is-hidden' : '' ?>">
-            <i class="fas fa-search-plus" class="db-empty-state-icon"></i>
+            <?= zrx_icon('search', 40, ['class' => 'db-empty-state-icon']) ?>
             <p>Search and select a medication to view clinical details.</p>
         </div>
 
@@ -858,7 +858,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
                             <span class="meta-label-small">Pregnancy Category:</span>
                             <span id="h_preg_letter" class="preg-clickable" onclick="togglePregPopup(event)" style="<?= drug_db_view_e(drug_db_view_preg_style($initialBrand['preg_cat'] ?? '')) ?>"><?= drug_db_view_e(($initialBrand['preg_cat'] ?? '') ?: 'Not Classified') ?></span>
                             <div class="preg-popup" id="pregPopup">
-                                <div class="preg-popup-title"><i class="fas fa-info-circle"></i> Pregnancy Details</div>
+                                <div class="preg-popup-title"><?= zrx_icon('alert-circle', 14) ?> Pregnancy Details</div>
                                 <div class="preg-popup-body" id="pregPopupDesc"><?= drug_db_view_e($initialDrugDetail['preg_desc'] ?? '') ?></div>
                             </div>
                         </div>
@@ -950,7 +950,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
     <div class="modal-content drug-editor-modal" onclick="event.stopPropagation()">
         <div class="modal-head">
             <div class="modal-title" id="drugEditorTitle">New Drug</div>
-            <i class="fas fa-times" class="db-btn-pointer-lg" onclick="closeDrugEditor()"></i>
+            <span class="db-btn-pointer-lg" onclick="closeDrugEditor()"><?= zrx_icon('x', 16) ?></span>
         </div>
         <form class="drug-editor-body" id="drugEditorForm">
             <input type="hidden" name="source_type" id="drugEditorSourceType" value="custom">
@@ -1003,7 +1003,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
     <div class="modal-content drug-hidden-modal" onclick="event.stopPropagation()">
         <div class="modal-head">
             <div class="modal-title">Delete / Restore Drugs</div>
-            <i class="fas fa-times" class="db-btn-pointer-lg" onclick="closeHiddenDrugModal()"></i>
+            <span class="db-btn-pointer-lg" onclick="closeHiddenDrugModal()"><?= zrx_icon('x', 16) ?></span>
         </div>
         <div class="drug-hidden-body">
             <div class="drug-hide-current">
@@ -1029,17 +1029,17 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
                     <option value="">All Forms</option>
                 </select>
             </div>
-            <i class="fas fa-times" class="db-btn-pointer-lg" onclick="closeModal()"></i>
+            <span class="db-btn-pointer-lg" onclick="closeModal()"><?= zrx_icon('x', 16) ?></span>
         </div>
         <div class="modal-body">
             <table class="alt-table" id="altTable">
                 <thead>
                     <tr>
-                        <th onclick="sortAltTable(0)">Brand Name <i class="fas fa-sort"></i></th>
-                        <th onclick="sortAltTable(1)">Strength <i class="fas fa-sort"></i></th>
-                        <th onclick="sortAltTable(2)">Form <i class="fas fa-sort"></i></th>
-                        <th onclick="sortAltTable(3)">Company Name <i class="fas fa-sort"></i></th>
-                        <th onclick="sortAltTable(4)">Price <i class="fas fa-sort"></i></th>
+                        <th onclick="sortAltTable(0)">Brand Name <?= zrx_icon('sort', 12) ?></th>
+                        <th onclick="sortAltTable(1)">Strength <?= zrx_icon('sort', 12) ?></th>
+                        <th onclick="sortAltTable(2)">Form <?= zrx_icon('sort', 12) ?></th>
+                        <th onclick="sortAltTable(3)">Company Name <?= zrx_icon('sort', 12) ?></th>
+                        <th onclick="sortAltTable(4)">Price <?= zrx_icon('sort', 12) ?></th>
                     </tr>
                 </thead>
                 <tbody id="altTableBody"></tbody>
@@ -1055,7 +1055,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
             <div class="modal-search">
                 <input type="text" id="moaSearchInput" placeholder="Search generic, brands, or mode of action...">
             </div>
-            <i class="fas fa-times" class="db-btn-pointer-lg" onclick="closeMoaModal()"></i>
+            <span class="db-btn-pointer-lg" onclick="closeMoaModal()"><?= zrx_icon('x', 16) ?></span>
         </div>
         <div class="modal-body">
             <table class="alt-table moa-table" id="moaTable">

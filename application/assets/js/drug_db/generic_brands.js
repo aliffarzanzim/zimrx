@@ -29,7 +29,7 @@ function loadGenericBrands(gid, gname) {
         brands.forEach(b => {
             const activeCls = (b.id == currentBrandId) ? 'active' : '';
             const iconPath = getDosageFormIcon(b.form_new, b.pres_new_upper);
-            const iconHtml = iconPath ? `<img src="${iconPath}" class="mid-icon">` : '<div class="mid-icon" style="color:#cbd5e1;"><i class="fas fa-capsules"></i></div>';
+            const iconHtml = iconPath ? `<img src="${iconPath}" class="mid-icon">` : `<div class="mid-icon" style="color:#cbd5e1;">${window.ZimRxIcon ? ZimRxIcon.render('pill', 14) : ''}</div>`;
             
             const row = `
                 <div class="mid-row ${activeCls}" id="mid_row_${escapeHtml(b.id)}" onclick="loadBrand('${escapeHtml(b.id)}')">
@@ -78,7 +78,7 @@ function loadGenericBrands(gid, gname) {
 
         $('#moaTableTitle').text(targetClass + ' - MOA Table');
         $('#moaSearchInput').val('');
-        $('#moaTableBody').html('<tr><td colspan="3" style="text-align:center; padding: 24px; color:#64748b;"><i class="fas fa-spinner fa-spin"></i> Loading MOA table...</td></tr>');
+        $('#moaTableBody').html(`<tr><td colspan="3" style="text-align:center; padding: 24px; color:#64748b;">${window.ZimRxIcon ? ZimRxIcon.render('loader', 14, { class: 'zrx-icon-spin' }) : ''} Loading MOA table...</td></tr>`);
         $('#moaTableModal').css('display', 'flex');
 
         $.getJSON(`api/drug_explorer.php?type=class_moa_table&id=${encodeURIComponent(targetClass)}`, function(data) {
