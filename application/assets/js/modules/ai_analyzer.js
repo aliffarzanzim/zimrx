@@ -1,13 +1,14 @@
-// Clinical AI assistant: extracts active consultation details, formats clinical prompts, and queries LLM endpoints.
+// Clinical AI assistant: extracts active consultation details, formats clinical prompts, and queries local LLM endpoints.
 (function() {
-    // AI provider configuration and credential settings
+    // Purge any legacy API keys from browser storage
+    try { localStorage.removeItem('ZIMRX_AI_API_KEY'); } catch (e) {}
+
     const settingsToggle = document.getElementById('ai-settings-toggle');
     const settingsPanel = document.getElementById('ai-settings-panel');
     const providerSelect = document.getElementById('ai-provider');
     const customUrlGroup = document.getElementById('custom-url-group');
     const baseUrlInput = document.getElementById('ai-base-url');
     const modelNameInput = document.getElementById('ai-model-name');
-    const apiKeyInput = document.getElementById('ai-api-key');
     const saveBtn = document.getElementById('ai-save-settings');
     const fetchModelsBtn = document.getElementById('ai-fetch-models');
     const modelDataList = document.getElementById('ai-model-list');
@@ -46,18 +47,16 @@
             baseUrlInput.value = savedBaseUrl;
         }
     } else {
-        baseUrlInput.value = providerSelect.value; // default
+        baseUrlInput.value = providerSelect.value;
     }
 
     modelNameInput.value = localStorage.getItem('ZIMRX_AI_MODEL_NAME') || '';
-    apiKeyInput.value = localStorage.getItem('ZIMRX_AI_API_KEY') || '';
 
     // Save Settings
     saveBtn.addEventListener('click', () => {
         const finalBaseUrl = (providerSelect.value === 'custom') ? baseUrlInput.value.trim() : providerSelect.value;
         localStorage.setItem('ZIMRX_AI_BASE_URL', finalBaseUrl);
         localStorage.setItem('ZIMRX_AI_MODEL_NAME', modelNameInput.value.trim());
-        localStorage.setItem('ZIMRX_AI_API_KEY', apiKeyInput.value.trim());
 
         const originalText = saveBtn.textContent;
         saveBtn.textContent = 'Saved!';
@@ -67,14 +66,12 @@
         }, 1000);
     });
 
-    // Fetch Models Dynamically
+    // Fetch Available Local Models
     fetchModelsBtn.addEventListener('click', async () => {
-        const apiKey = apiKeyInput.value.trim();
         const finalBaseUrl = (providerSelect.value === 'custom') ? baseUrlInput.value.trim() : providerSelect.value;
-        const isLocal = finalBaseUrl.includes('localhost') || finalBaseUrl.includes('127.0.0.1');
 
-        if (!finalBaseUrl || (!apiKey && !isLocal)) {
-            alert('Please select a Provider (and enter an API Key for cloud providers) to fetch models.');
+        if (!finalBaseUrl) {
+            alert('Please configure a local provider endpoint first.');
             return;
         }
 
@@ -82,24 +79,19 @@
         fetchModelsBtn.style.opacity = '0.5';
 
         try {
-            const reqHeaders = { "Content-Type": "application/json" };
-            if (apiKey) {
-                reqHeaders["Authorization"] = `Bearer ${apiKey}`;
-            }
             const response = await fetch(`${finalBaseUrl.replace(/\/$/, '')}/models`, {
                 method: "GET",
-                headers: reqHeaders
+                headers: { "Content-Type": "application/json" }
             });
 
-            if (!response.ok) throw new Error("Failed to fetch models (Check API Key or CORS restrictions)");
+            if (!response.ok) throw new Error("Could not connect to local endpoint (ensure Ollama/LM Studio is running)");
 
             const data = await response.json();
             const modelsArray = data.data || data.models || [];
 
             if (modelsArray.length === 0) {
-                alert('No models returned by the provider.');
+                alert('No models found on local endpoint.');
             } else {
-                // Populate Datalist
                 modelDataList.innerHTML = '';
                 modelsArray.forEach(model => {
                     const opt = document.createElement('option');
@@ -107,15 +99,13 @@
                     modelDataList.appendChild(opt);
                 });
 
-                // Alert success and focus input so they can see dropdown
                 modelNameInput.focus();
-                // Optionally clear and prompt to select
-                if(!modelNameInput.value) {
+                if (!modelNameInput.value) {
                     modelNameInput.placeholder = "Select from list...";
                 }
             }
         } catch (error) {
-            alert(`Could not fetch models automatically: ${error.message}\n\nYou can still type the model name manually (e.g. gpt-4o-mini).`);
+            alert(`Could not fetch models: ${error.message}\nYou can still type the model name manually (e.g. llama3.2).`);
         } finally {
             fetchModelsBtn.disabled = false;
             fetchModelsBtn.style.opacity = '1';
@@ -243,13 +233,11 @@
 
     // Start Analysis Action
     startBtn.addEventListener('click', async () => {
-        const apiKey = apiKeyInput.value.trim();
         const finalBaseUrl = (providerSelect.value === 'custom') ? baseUrlInput.value.trim() : providerSelect.value;
         const modelName = modelNameInput.value.trim();
-        const isLocal = finalBaseUrl.includes('localhost') || finalBaseUrl.includes('127.0.0.1');
 
-        if (!finalBaseUrl || !modelName || (!apiKey && !isLocal)) {
-            alert('Please configure Provider and Model Name in the settings. (Cloud providers also require an API Key)');
+        if (!finalBaseUrl || !modelName) {
+            alert('Please configure local Provider and Model Name in the settings.');
             settingsPanel.classList.add('active');
             return;
         }
@@ -259,7 +247,6 @@
         showTyping();
         startBtn.disabled = true;
 
-        // Universal AI Payload
         const payload = {
             model: modelName,
             messages: [
@@ -274,31 +261,27 @@
         };
 
         try {
-            const reqHeaders = { "Content-Type": "application/json" };
-            if (apiKey) {
-                reqHeaders["Authorization"] = `Bearer ${apiKey}`;
-            }
             const response = await fetch(`${finalBaseUrl.replace(/\/$/, '')}/chat/completions`, {
                 method: "POST",
-                headers: reqHeaders,
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
 
             if (!response.ok) {
-                const errData = await response.json();
-                throw new Error(errData.error?.message || "API Connection Failed");
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error?.message || `HTTP ${response.status}`);
             }
 
             const data = await response.json();
-            const resultText = data.choices[0].message.content;
+            const resultText = data.choices?.[0]?.message?.content || "No response received.";
 
             hideTyping();
             appendMessage('ai', resultText);
 
         } catch (error) {
-            console.error("Universal AI Error:", error.message);
+            console.error("Local AI Error:", error.message);
             hideTyping();
-            appendMessage('ai', `❌ Error: ${error.message}\n\nPlease check your API keys and Provider settings.`);
+            appendMessage('ai', `Connection failed: ${error.message}\n\nPlease ensure Ollama (ollama serve) or LM Studio is running locally on ${finalBaseUrl}.`);
         } finally {
             startBtn.disabled = false;
         }

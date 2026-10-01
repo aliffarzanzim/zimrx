@@ -16,42 +16,32 @@ declare(strict_types=1);
     <div id="ai-settings-panel" class="ai-settings-panel">
         <div class="ai-settings-grid">
             <div>
-                <label class="ai-label">Provider</label>
+                <label class="ai-label">Local Provider</label>
                 <select id="ai-provider" class="ai-inp">
-                    <option value="http://localhost:11434/v1">Local Ollama (100% Offline & Private)</option>
-                    <option value="http://localhost:1234/v1">LM Studio (Local Offline)</option>
-                    <option value="https://api.openai.com/v1">OpenAI (Cloud)</option>
-                    <option value="https://generativelanguage.googleapis.com/v1beta/openai">Google Gemini (Cloud)</option>
-                    <option value="https://api.x.ai/v1">xAI Grok (Cloud)</option>
-                    <option value="https://api.deepseek.com/v1">DeepSeek (Cloud)</option>
-                    <option value="custom">Custom Endpoint</option>
+                    <option value="http://127.0.0.1:11434/v1">Local Ollama (127.0.0.1:11434)</option>
+                    <option value="http://127.0.0.1:1234/v1">LM Studio (127.0.0.1:1234)</option>
+                    <option value="custom">Custom Local Endpoint</option>
                 </select>
-            </div>
-            <div id="custom-url-group" style="display: none;">
-                <label class="ai-label">Custom Base URL</label>
-                <input type="text" id="ai-base-url" class="ai-inp" placeholder="http://localhost:11434/v1">
-            </div>
-        </div>
-
-        <div style="font-size: 0.72rem; color: var(--zrx-slate-600); background: var(--zrx-bg-canvas); border: 1px solid var(--zrx-border); border-radius: 4px; padding: 6px 10px; margin-bottom: 8px; line-height: 1.4;">
-            <strong>Privacy &amp; Data Sovereignty:</strong> Local Ollama/LM Studio processes clinical queries entirely offline with <em>zero external network transmission</em>. Cloud providers transmit de-identified prompts (patient names and contacts are never sent) over the internet.
-        </div>
-
-        <div class="ai-settings-grid">
-            <div>
-                <label class="ai-label">API Key</label>
-                <input type="password" id="ai-api-key" class="ai-inp" placeholder="Enter API Key">
             </div>
             <div>
                 <label class="ai-label">Model Name</label>
                 <div style="display: flex; gap: 6px;">
-                    <input type="text" id="ai-model-name" class="ai-inp" list="ai-model-list" placeholder="Select or type model..." autocomplete="off">
+                    <input type="text" id="ai-model-name" class="ai-inp" list="ai-model-list" placeholder="e.g. llama3.2, meditron..." autocomplete="off">
                     <datalist id="ai-model-list"></datalist>
-                    <button type="button" id="ai-fetch-models" class="ai-btn ai-btn-outline" style="flex: 0 0 36px; height: 32px; padding: 0;" title="Fetch Available Models">
+                    <button type="button" id="ai-fetch-models" class="ai-btn ai-btn-outline" style="flex: 0 0 36px; height: 32px; padding: 0;" title="Fetch Available Local Models">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.92-10.24l5.58 5.58"/></svg>
                     </button>
                 </div>
             </div>
+        </div>
+
+        <div id="custom-url-group" style="display: none; margin-bottom: 8px;">
+            <label class="ai-label">Custom Base URL</label>
+            <input type="text" id="ai-base-url" class="ai-inp" placeholder="http://127.0.0.1:11434/v1">
+        </div>
+
+        <div style="font-size: 0.72rem; color: var(--zrx-slate-600); background: var(--zrx-bg-canvas); border: 1px solid var(--zrx-border); border-radius: 4px; padding: 6px 10px; margin-bottom: 8px; line-height: 1.4;">
+            <strong>Offline Inference:</strong> Clinical queries are processed entirely on your local machine with zero external network transmission.
         </div>
 
         <div style="display: flex; justify-content: flex-end;">
