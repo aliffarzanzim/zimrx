@@ -4,6 +4,8 @@ declare(strict_types=1);
 // Drug interaction checker: evaluates pairwise drug-drug interactions and food/lifestyle cautions for prescribed generics.
 
 define('ZIMRX_DB_LIGHTWEIGHT', true);
+require_once __DIR__ . '/../auth.php';
+require_login();
 require_once __DIR__ . '/../db.php';
 header('Content-Type: application/json');
 

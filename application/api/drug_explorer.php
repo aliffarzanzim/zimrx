@@ -4,6 +4,8 @@ declare(strict_types=1);
 // Drug database explorer API: searches brands, generics, pharmacological classes, and variants.
 
 define('ZIMRX_DB_LIGHTWEIGHT', true);
+require_once __DIR__ . '/../auth.php';
+require_login();
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/../lib/drug_catalog_lib.php';
 

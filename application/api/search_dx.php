@@ -5,6 +5,8 @@ declare(strict_types=1);
 if (!defined('ZIMRX_DB_LIGHTWEIGHT')) {
     define('ZIMRX_DB_LIGHTWEIGHT', true);
 }
+require_once __DIR__ . '/../auth.php';
+require_login();
 require_once __DIR__ . '/../db.php';
 header('Content-Type: application/json; charset=utf-8');
 

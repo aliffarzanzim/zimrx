@@ -816,12 +816,30 @@ class ZimRxTestSuite {
         $rxTemplateCode = (string)file_get_contents(__DIR__ . '/../api/rx_user_templates.php');
         $this->assert(str_contains($rxTemplateCode, "REQUEST_METHOD'] === 'POST'"), 'api/rx_user_templates.php enforces GET idempotency for usage metrics');
 
-        // 8. Authentication verification on clinic phrase & address lookups
+        // 8. Authentication verification on clinic search & data lookups
         $addrCode = (string)file_get_contents(__DIR__ . '/../api/search_address.php');
         $this->assert(str_contains($addrCode, 'require_login()'), 'api/search_address.php enforces require_login()');
 
         $phraseCode = (string)file_get_contents(__DIR__ . '/../api/rx_phrase_suggestions.php');
         $this->assert(str_contains($phraseCode, 'require_login()'), 'api/rx_phrase_suggestions.php enforces require_login()');
+
+        $interactCode = (string)file_get_contents(__DIR__ . '/../api/check_drug_interactions.php');
+        $this->assert(str_contains($interactCode, 'require_login()'), 'api/check_drug_interactions.php enforces require_login()');
+
+        $searchDrugCode = (string)file_get_contents(__DIR__ . '/../api/search_drug.php');
+        $this->assert(str_contains($searchDrugCode, 'require_login()'), 'api/search_drug.php enforces require_login()');
+
+        $drugLookupCode = (string)file_get_contents(__DIR__ . '/../api/drug_lookup.php');
+        $this->assert(str_contains($drugLookupCode, 'require_login()'), 'api/drug_lookup.php enforces require_login()');
+
+        $drugExplorerCode = (string)file_get_contents(__DIR__ . '/../api/drug_explorer.php');
+        $this->assert(str_contains($drugExplorerCode, 'require_login()'), 'api/drug_explorer.php enforces require_login()');
+
+        $searchDxCode = (string)file_get_contents(__DIR__ . '/../api/search_dx.php');
+        $this->assert(str_contains($searchDxCode, 'require_login()'), 'api/search_dx.php enforces require_login()');
+
+        $occupationsCode = (string)file_get_contents(__DIR__ . '/../api/get_occupations.php');
+        $this->assert(str_contains($occupationsCode, 'require_login()'), 'api/get_occupations.php enforces require_login()');
     }
 
     private function testBillingServiceTransactionSafety(): void {

@@ -6,10 +6,11 @@ declare(strict_types=1);
 define('ZIMRX_DB_LIGHTWEIGHT', true);
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/../auth.php';
+require_login();
 header('Content-Type: application/json');
 
 try {
-    $doctorId = function_exists('current_user_doctor_id') ? current_user_doctor_id() : 1;
+    $doctorId = current_user_doctor_id();
     $pdo_static = DbConnections::staticDb();
     $pdo_user = DbConnections::userdata();
 
