@@ -93,7 +93,7 @@ try {
     ]);
 
     rx_json($stmt->fetchAll());
-} catch (Exception $e) {
+} catch (Throwable $e) {
     error_log('[ZimRx] rx_user_templates error: ' . $e->getMessage());
     rx_json(['error' => 'An internal error occurred. Please try again.']);
 }

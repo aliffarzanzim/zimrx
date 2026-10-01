@@ -172,7 +172,7 @@ function zimrx_record_user_occupation(PDO $pdo, int $doctorId, string $occupatio
             'doctor_id' => $doctorId,
             'name' => $occupation,
         ]);
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         // Silently ignore if table doesn't exist or concurrent write
     }
 }

@@ -31,7 +31,7 @@ if ($hasOnboarded === 0 && (trim((string)($header['left_block_html'] ?? '')) !==
         $advancedData['has_onboarded'] = 1;
         $pdo->prepare("UPDATE zimrx_prescription_print_layout_settings SET print_settings_json = :json WHERE doctor_id = :doctor_id")
             ->execute(['json' => json_encode($advancedData), 'doctor_id' => $doctorId]);
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         // Ignore
     }
 }

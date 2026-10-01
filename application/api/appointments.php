@@ -1125,9 +1125,11 @@ try {
     }
 
     throw new RuntimeException('Could not allocate a unique appointment serial. Please try again.');
-} catch (Exception $e) {
-    if ($pdo->inTransaction()) {
-        $pdo->rollBack();
+} catch (Throwable $e) {
+    if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
+        try {
+            $pdo->rollBack();
+        } catch (Throwable) {}
     }
     error_log('[ZimRx] appointments error: ' . $e->getMessage());
     respond(['error' => 'An internal error occurred. Please try again.']);

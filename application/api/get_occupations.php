@@ -88,7 +88,7 @@ try {
     });
 
     echo json_encode($items, JSON_UNESCAPED_UNICODE);
-} catch (Exception $e) {
+} catch (Throwable $e) {
     http_response_code(500);
     error_log('[ZimRx] get_occupations error: ' . $e->getMessage());
     echo json_encode(['error' => 'Failed to load occupations.']);

@@ -257,7 +257,7 @@ try {
         return ($b['score'] <=> $a['score']) ?: strcmp($a['label'], $b['label']);
     });
     rx_json(array_slice(array_values($suggestions), 0, 15));
-} catch (Exception $e) {
+} catch (Throwable $e) {
     error_log('[ZimRx] pc_suggestions error: ' . $e->getMessage());
     rx_json(['error' => 'An internal error occurred. Please try again.']);
 }

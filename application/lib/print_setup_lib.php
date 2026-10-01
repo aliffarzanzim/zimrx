@@ -226,7 +226,7 @@ function zimrx_print_load_header_settings(PDO $pdo, int $doctorId): array {
                 'doctor_id' => $doctorId,
                 'doctor_name' => current_user_name(),
             ]);
-        } catch (PDOException $e) {
+        } catch (Throwable) {
             // Ignore if already inserted concurrently
         }
     }
@@ -605,7 +605,7 @@ function zimrx_print_save_setup(PDO $pdo, int $doctorId, array $data): void {
                 'doctor_id' => $doctorId,
                 'doctor_name' => current_user_name(),
             ]);
-        } catch (PDOException $e) {
+        } catch (Throwable) {
             // Ignore if already inserted concurrently
         }
     }

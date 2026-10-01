@@ -17,7 +17,7 @@ try {
         rx_instruction_suggestions($term, rx_active_doctor_id(), 100)
     );
     echo json_encode($results);
-} catch (Exception $e) {
+} catch (Throwable $e) {
     error_log('[ZimRx] getinstruction error: ' . $e->getMessage());
     echo json_encode([]);
 }

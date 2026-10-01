@@ -302,7 +302,7 @@ try {
             $currentRevision = (int)($currentVisitRow['revision'] ?? 1);
             if ($expectedRevision > 0 && $currentRevision !== $expectedRevision) {
                 if ($pdo->inTransaction()) {
-                    $pdo->rollBack();
+                    try { $pdo->rollBack(); } catch (Throwable) {}
                 }
                 http_response_code(409);
                 respond(['ok' => false, 'error' => 'Conflict: This visit has been updated by another session. Please reload before saving.']);
@@ -590,9 +590,11 @@ try {
         'visit_code' => $publicVisitId,
         'revision' => 1,
     ]);
-} catch (Exception $e) {
-    if ($pdo->inTransaction()) {
-        $pdo->rollBack();
+} catch (Throwable $e) {
+    if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
+        try {
+            $pdo->rollBack();
+        } catch (Throwable) {}
     }
     error_log('[ZimRx] save_prescription_visit error: ' . $e->getMessage());
     respond(['error' => 'An internal error occurred. Please try again.']);

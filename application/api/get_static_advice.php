@@ -33,7 +33,7 @@ try {
         ORDER BY category_en COLLATE NOCASE, sort_order, advice_bn COLLATE NOCASE
     ");
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
-} catch (Exception $e) {
+} catch (Throwable $e) {
     error_log('[ZimRx] get_static_advice error: ' . $e->getMessage());
     echo json_encode([]);
 }

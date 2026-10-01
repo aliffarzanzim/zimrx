@@ -255,7 +255,7 @@ try {
 
     echo json_encode($final);
 
-} catch (Exception $e) {
+} catch (Throwable $e) {
     error_log('[ZimRx] search_address error: ' . $e->getMessage());
     echo json_encode([]);
 }

@@ -47,7 +47,7 @@ try {
     zimrx_record_user_occupation($pdo_user, $doctorId, $occupation);
 
     echo json_encode(['status' => 'success']);
-} catch (Exception $e) {
+} catch (Throwable $e) {
     error_log('[ZimRx] save_custom_occupation error: ' . $e->getMessage());
     echo json_encode(['error' => 'Failed to save custom occupation.']);
 }

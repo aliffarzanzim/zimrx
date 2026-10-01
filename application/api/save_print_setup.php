@@ -35,7 +35,7 @@ try {
     zimrx_print_save_setup($pdo, $doctorId, $data);
 
     echo json_encode(['ok' => true]);
-} catch (Exception $e) {
+} catch (Throwable $e) {
     error_log('[ZimRx] save_print_setup error: ' . $e->getMessage());
     echo json_encode(['error' => 'Failed to save print setup.']);
 }

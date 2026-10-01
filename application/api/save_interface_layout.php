@@ -108,9 +108,11 @@ try {
 
     $pdo->commit();
     echo json_encode(['ok' => true]);
-} catch (Exception $e) {
-    if ($pdo->inTransaction()) {
-        $pdo->rollBack();
+} catch (Throwable $e) {
+    if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
+        try {
+            $pdo->rollBack();
+        } catch (Throwable) {}
     }
     error_log('[ZimRx] save_interface_layout error: ' . $e->getMessage());
     echo json_encode(['error' => 'Failed to save interface layout.']);
