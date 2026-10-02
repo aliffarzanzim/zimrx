@@ -75,7 +75,7 @@ try {
         throw new RuntimeException('Unable to create full body header upload directory.');
     }
 
-    $filename = sprintf('doctor-%d-%d.%s', $doctorId, time(), $allowedExts[$ext]);
+    $filename = sprintf('doctor-%d-%d-%s.%s', $doctorId, time(), bin2hex(random_bytes(8)), $allowedExts[$ext]);
     $targetPath = $targetDir . '/' . $filename;
     if (!move_uploaded_file($tmpPath, $targetPath)) {
         throw new RuntimeException('Could not save uploaded image.');

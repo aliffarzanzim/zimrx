@@ -54,7 +54,7 @@ try {
         throw new RuntimeException('Unable to create header logo directory.');
     }
 
-    $filename = sprintf('doctor-%d-%d.%s', $doctorId, time(), $allowed[$mime]);
+    $filename = sprintf('doctor-%d-%d-%s.%s', $doctorId, time(), bin2hex(random_bytes(8)), $allowed[$mime]);
     $targetPath = $targetDir . '/' . $filename;
     if (!move_uploaded_file($tmpPath, $targetPath)) {
         throw new RuntimeException('Could not save uploaded logo.');

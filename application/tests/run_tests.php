@@ -398,6 +398,24 @@ class ZimRxTestSuite {
         @unlink($xssSvg);
         @unlink($xxeSvg);
         @unlink($onloadSvg);
+
+        // Verify cryptographically randomized upload filenames
+        $uploadScripts = [
+            'upload_header_logo.php',
+            'upload_full_body_header.php',
+            'upload_background_image.php',
+            'upload_seal_and_stamp.php',
+            'upload_report.php',
+        ];
+        $allRandomized = true;
+        foreach ($uploadScripts as $script) {
+            $code = (string)file_get_contents(__DIR__ . '/../api/' . $script);
+            if (!str_contains($code, 'random_bytes')) {
+                $allRandomized = false;
+                break;
+            }
+        }
+        $this->assert($allRandomized, "All file upload endpoints append cryptographically secure random bytes (random_bytes) to filenames");
     }
 
     private function testEndpointMutationGuards(): void {
