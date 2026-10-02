@@ -12,7 +12,6 @@ $page_title = 'EMR - Electronic Medical Records | ZimRx';
 $current_page = 'emr.php';
 
 try {
-    global $pdo;
     $pdo = $pdo instanceof PDO ? $pdo : DbConnections::userdata();
     $pdo->exec('PRAGMA busy_timeout = 5000');
 } catch (Throwable $e) {

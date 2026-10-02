@@ -134,7 +134,6 @@ function prescription_query_prefill(): array {
     $appointmentId = (int)$prefill['appointment_id'];
 
     try {
-        global $pdo;
         $pdo = $pdo instanceof PDO ? $pdo : DbConnections::userdata();
         $pdo->exec('PRAGMA busy_timeout = 5000');
         $doctorId = prescription_active_doctor_id();

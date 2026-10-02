@@ -26,8 +26,7 @@ function doctor_code_for_visit(PDO $pdo, int $doctorId): string {
 }
 
 function format_visit_id(string $regNo, int $visitNo, string $doctorCode): string {
-    global $pdo;
-    return isset($pdo) ? zimrx_generate_visit_id($pdo) : ('V' . date('ymd') . str_pad((string)$visitNo, 3, '0', STR_PAD_LEFT));
+    return zimrx_generate_visit_id(DbConnections::userdata());
 }
 
 function next_visit_no(PDO $pdo, int $patientId, int $doctorId): int {

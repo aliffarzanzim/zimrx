@@ -27,7 +27,6 @@ function emr_enforce_mutation(): void {
 }
 
 try {
-    global $pdo;
     $pdo = $pdo instanceof PDO ? $pdo : DbConnections::userdata();
     $pdo->exec('PRAGMA busy_timeout = 5000');
 } catch (Throwable $e) {
@@ -860,7 +859,7 @@ switch ($action) {
             $baseRevision = (int)($delRow['revision'] ?? 1);
             $newRevision  = $baseRevision + 1;
 
-            // Stable sync_id — assign one if the column exists but the row pre-dates migration.
+            // Stable sync_id - assign one if the column exists but the row pre-dates migration.
             $delSyncId = (string)($delRow['sync_id'] ?? '');
             if ($delSyncId === '') {
                 $delSyncId = SyncJournalService::generateUuid();
