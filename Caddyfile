@@ -10,7 +10,8 @@
 		respond 204
 	}
 
-	# 1. Allow non-clinical media (clinic logos & prescription header backgrounds)
+	# 1. Public stationery media (clinic logos & print headers) needed for prescription preview.
+	# Safe to serve: filenames use random tokens, directory listing is off, and clinical reports stay blocked below.
 	handle_path /userdata/uploads/header-logos/* {
 		root * ./application/userdata/uploads/header-logos
 		file_server
