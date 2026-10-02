@@ -17,6 +17,9 @@ $adminExists = admin_has_active_admin($pdo);
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     try {
+        if (!zimrx_verify_csrf()) {
+            throw new Exception('Session expired or invalid security token. Please refresh and try again.');
+        }
         $action = admin_value($_POST, 'action') ?: 'save';
         $assistantId = (int)admin_value($_POST, 'id');
 
@@ -73,6 +76,7 @@ $flash = admin_flash();
         <div class="admin-panel">
             <h2>Add / Update Assistant</h2>
             <form class="admin-form" method="post">
+                <?= zimrx_csrf_field() ?>
                 <input type="hidden" name="action" value="save">
                 <label>Existing Assistant ID <input name="id" placeholder="Blank for new"></label>
                 <label>Username <input name="username" placeholder="assistant username"></label>
@@ -109,6 +113,7 @@ $flash = admin_flash();
                         <td><span class="admin-pill <?= (int)$assistant['is_active'] ? '' : 'off' ?>"><?= (int)$assistant['is_active'] ? 'Active' : 'Inactive' ?></span></td>
                         <td>
                             <form method="post" class="admin-actions">
+                                <?= zimrx_csrf_field() ?>
                                 <input type="hidden" name="id" value="<?= (int)$assistant['id'] ?>">
                                 <button class="btn btn-secondary btn-sm" name="action" value="disassign" type="submit">Disassign</button>
                                 <?php if (!$adminExists): ?>

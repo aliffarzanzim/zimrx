@@ -15,6 +15,9 @@ $flashType = 'success';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
+        if (!zimrx_verify_csrf()) {
+            throw new Exception('Session expired or invalid security token. Please refresh and try again.');
+        }
         $displayName   = trim((string)($_POST['display_name'] ?? ''));
         $qualifications = trim((string)($_POST['qualifications'] ?? ''));
         $specialty     = trim((string)($_POST['specialty'] ?? ''));
@@ -111,6 +114,7 @@ include 'header.php';
         <div class="admin-panel">
             <h2>Personal &amp; Professional Details</h2>
             <form class="admin-form" method="post" autocomplete="off">
+                <?= zimrx_csrf_field() ?>
                 
                 <div class="admin-grid-2col">
                     <label>

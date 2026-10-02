@@ -7,6 +7,9 @@ require_once ZIMRX_BASE_DIR . '/lib/admin_lib.php';
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     try {
+        if (!zimrx_verify_csrf()) {
+            throw new Exception('Session expired or invalid security token. Please refresh and try again.');
+        }
         admin_upsert_doctor($pdo, $_POST);
         admin_set_flash('Doctor saved.');
         header('Location: admin_doctors.php');
@@ -40,6 +43,7 @@ $flash = admin_flash();
         <div class="admin-panel">
             <h2>Add / Update Doctor</h2>
             <form class="admin-form" method="post">
+                <?= zimrx_csrf_field() ?>
                 <label>Existing Doctor ID <input name="id" placeholder="Blank for new"></label>
                 <label>Doctor Code <input name="doctor_code" placeholder="D001"></label>
                 <label>Doctor Name <input name="display_name" required placeholder="Dr. Name"></label>

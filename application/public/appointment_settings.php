@@ -45,6 +45,9 @@ $defaultSettings = [
 // Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
+        if (!zimrx_verify_csrf()) {
+            throw new Exception('Session expired or invalid security token. Please refresh and try again.');
+        }
         $startTime = trim((string)($_POST['default_start_time'] ?? '14:00'));
         if (!preg_match('/^\d{2}:\d{2}$/', $startTime)) {
             $startTime = '14:00';
@@ -178,6 +181,7 @@ include 'header.php';
 
     <!-- Settings Form -->
     <form method="POST" id="appointment-settings-form" class="apt-settings-form-body" action="appointment_settings.php<?= $selectedDoctorId ? '?doctor_id=' . $selectedDoctorId : '' ?>">
+        <?= zimrx_csrf_field() ?>
 
         <div class="apt-layout-grid">
 

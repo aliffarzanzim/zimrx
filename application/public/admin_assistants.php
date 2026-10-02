@@ -7,6 +7,9 @@ require_once ZIMRX_BASE_DIR . '/lib/admin_lib.php';
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     try {
+        if (!zimrx_verify_csrf()) {
+            throw new Exception('Session expired or invalid security token. Please refresh and try again.');
+        }
         $doctorIds = $_POST['doctor_ids'] ?? [];
         admin_upsert_assistant($pdo, $_POST, is_array($doctorIds) ? $doctorIds : []);
         admin_set_flash('Assistant saved.');
@@ -42,6 +45,7 @@ $flash = admin_flash();
         <div class="admin-panel">
             <h2>Add / Update Assistant</h2>
             <form class="admin-form" method="post">
+                <?= zimrx_csrf_field() ?>
                 <label>Existing Assistant ID <input name="id" placeholder="Blank for new"></label>
                 <label>Username <input name="username" placeholder="assistant username"></label>
                 <label>Assistant Name <input name="display_name" required placeholder="Assistant name"></label>

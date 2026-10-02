@@ -637,9 +637,22 @@ document.addEventListener('DOMContentLoaded', () => {
             confirmYes.onclick = async () => {
                 confirmModal.hidden = true;
                 try {
-                    const response = await fetch('api/reset_print_setup.php');
-                    if ((await response.text()).trim() === '1') window.location.reload();
-                    else showToast('Reset failed', 'error');
+                    const formData = new URLSearchParams();
+                    formData.append('csrf_token', window.ZimRxCsrfToken || '');
+                    const response = await fetch('api/reset_print_setup.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRF-Token': window.ZimRxCsrfToken || ''
+                        },
+                        body: formData.toString()
+                    });
+                    const res = await response.json().catch(() => null);
+                    if (res && res.ok) {
+                        window.location.reload();
+                    } else {
+                        showToast(res && res.error ? res.error : 'Reset failed', 'error');
+                    }
                 } catch (e) { showToast('Network error', 'error'); }
             };
 

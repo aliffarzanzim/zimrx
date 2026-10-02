@@ -728,7 +728,7 @@ class ZimRxTestSuite {
         // Confirm the two result sets are disjoint
         $this->assert(
             empty(array_intersect($boundResults, $walkinResults)),
-            'Bound and walk-in upload sets are disjoint — no cross-contamination'
+            'Bound and walk-in upload sets are disjoint: no cross-contamination'
         );
     }
 
@@ -847,6 +847,27 @@ class ZimRxTestSuite {
 
         $headerOnboardCode = (string)file_get_contents(__DIR__ . '/../public/api/header_onboarding_ajax.php');
         $this->assert(str_contains($headerOnboardCode, 'zimrx_verify_csrf()'), 'api/header_onboarding_ajax.php enforces zimrx_verify_csrf()');
+
+        $resetPrintCode = (string)file_get_contents(__DIR__ . '/../public/api/reset_print_setup.php');
+        $this->assert(str_contains($resetPrintCode, 'zimrx_verify_csrf()'), 'api/reset_print_setup.php enforces zimrx_verify_csrf()');
+
+        $profileSettingsCode = (string)file_get_contents(__DIR__ . '/../public/profile_settings.php');
+        $this->assert(str_contains($profileSettingsCode, 'zimrx_verify_csrf()'), 'profile_settings.php enforces zimrx_verify_csrf()');
+
+        $emrSettingsCode = (string)file_get_contents(__DIR__ . '/../public/emr_settings.php');
+        $this->assert(str_contains($emrSettingsCode, 'zimrx_verify_csrf()'), 'emr_settings.php enforces zimrx_verify_csrf()');
+
+        $aptSettingsCode = (string)file_get_contents(__DIR__ . '/../public/appointment_settings.php');
+        $this->assert(str_contains($aptSettingsCode, 'zimrx_verify_csrf()'), 'appointment_settings.php enforces zimrx_verify_csrf()');
+
+        $adminDocCode = (string)file_get_contents(__DIR__ . '/../public/admin_doctors.php');
+        $this->assert(str_contains($adminDocCode, 'zimrx_verify_csrf()'), 'admin_doctors.php enforces zimrx_verify_csrf()');
+
+        $adminAsstCode = (string)file_get_contents(__DIR__ . '/../public/admin_assistants.php');
+        $this->assert(str_contains($adminAsstCode, 'zimrx_verify_csrf()'), 'admin_assistants.php enforces zimrx_verify_csrf()');
+
+        $docAsstCode = (string)file_get_contents(__DIR__ . '/../public/doctor_assistants.php');
+        $this->assert(str_contains($docAsstCode, 'zimrx_verify_csrf()'), 'doctor_assistants.php enforces zimrx_verify_csrf()');
 
         // 7. GET Idempotency verification on template endpoints (RFC 7231)
         $rxTemplateCode = (string)file_get_contents(__DIR__ . '/../public/api/rx_user_templates.php');

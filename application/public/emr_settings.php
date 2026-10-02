@@ -20,6 +20,9 @@ $flashType = 'success';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
+        if (!zimrx_verify_csrf()) {
+            throw new Exception('Session expired or invalid security token. Please refresh and try again.');
+        }
         $daily = max(10, (int)($_POST['daily_patient_flow'] ?? 999));
         $yearly = max(100, (int)($_POST['yearly_patient_flow'] ?? 99999));
         $regMode = strtolower((string)($_POST['reg_id_mode'] ?? 'sequential')) === 'random' ? 'random' : 'sequential';
@@ -91,6 +94,7 @@ include 'header.php';
 
     <!-- Settings Form -->
     <form method="post" id="emr-settings-form" class="emr-settings-body">
+        <?= zimrx_csrf_field() ?>
 
         <div class="emr-layout-grid">
 
