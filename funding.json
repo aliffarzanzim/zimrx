@@ -23,7 +23,7 @@
         "url": "https://github.com/aliffarzanzim/zimrx"
       },
       "licenses": [
-        "spdx:AGPL-3.0-only"
+        "spdx:AGPL-3.0-or-later"
       ],
       "tags": [
         "healthcare",
@@ -41,6 +41,12 @@
         "type": "bank",
         "address": "Direct bank wire (details upon request)",
         "description": "Direct bank wire transfer to project account"
+      },
+      {
+        "guid": "nlnet-grant",
+        "type": "grant",
+        "address": "https://nlnet.nl",
+        "description": "NLnet Foundation NGI Zero grant program"
       }
     ],
     "plans": [
@@ -53,7 +59,8 @@
         "currency": "USD",
         "frequency": "one-time",
         "channels": [
-          "bank-wire"
+          "bank-wire",
+          "nlnet-grant"
         ]
       }
     ]

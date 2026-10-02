@@ -1,6 +1,6 @@
 # ZimRx Container Runtime (FrankenPHP + Alpine)
-# Official FrankenPHP image by Kévin Dunglas
-FROM dunglas/frankenphp:1-php8.2-alpine
+# Official FrankenPHP image (PHP 8.3; compatible with PHP >=8.2)
+FROM dunglas/frankenphp:1-php8.3-alpine
 
 LABEL maintainer="Alif Farzan Zim <aliffarzanzim@gmail.com>"
 LABEL description="ZimRx: Open-source, local-first offline prescription & EMR engine"
