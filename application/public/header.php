@@ -13,27 +13,21 @@ $is_multi_doctor = isset($pdo) ? zimrx_is_multi_doctor($pdo) : false;
 
 $setup_menu_pages = [
     'profile_settings.php', 'setup.php', 'page_setup.php', 'print_setup.php',
-    'header_footer_background_setup.php', 'appointment_settings.php', 'front_desk_settings.php', 'health_card_settings.php',
-    'invoice_settings.php', 'emr_settings.php', 'backup_restore.php', 'audit_log.php',
-    'doctor_assistants.php',
+    'header_footer_background_setup.php', 'appointment_settings.php',
+    'emr_settings.php', 'doctor_assistants.php',
 ];
 $setup_menu_active = in_array($current_page, $setup_menu_pages, true);
 
 $template_menu_pages = [
     'instruction_template.php', 'dose_template.php', 'duration_template.php',
-    'advice_template.php', 'regimen_templates.php', 'full_prescription_template.php',
-    'investigation_template.php', 'drug_template.php', 'referral_settings.php',
-    'drug_company_priority.php',
+    'advice_template.php', 'manufacturer_preferences.php',
 ];
 $template_menu_active = in_array($current_page, $template_menu_pages, true);
 
 $finance_menu_pages = ['billings.php', 'performance_dashboard.php'];
 $finance_menu_active = in_array($current_page, $finance_menu_pages, true);
 
-$help_menu_pages = [
-    'study_materials.php', 'treatment_guidelines.php', 'medical_calculators.php',
-    'documentation.php', 'updates.php', 'about.php',
-];
+$help_menu_pages = [];
 $help_menu_active = in_array($current_page, $help_menu_pages, true);
 
 $page_title = isset($page_title) ? $page_title : "ZimRx - Professional EMR";
@@ -179,20 +173,13 @@ $zrx_dd_theme = $_COOKIE['zimrx_dropdown_theme'] ?? 'subtle-tint';
         <?php if ($user_role === 'doctor'): ?>
         <!-- Templates Menu Panel -->
         <div id="template-menu-panel" class="floating-nav-menu" hidden>
-            <div class="floating-nav-subtitle">Templates</div>
-            <a href="#" class="nav-link">Rx Template</a>
-            <a href="#" class="nav-link">Full Prescription Template</a>
-            <a href="advice_template.php" class="nav-link <?= $current_page == 'advice_template.php' ? 'active' : '' ?>">Advice Templates</a>
-            <a href="#" class="nav-link">Investigation Templates</a>
-
-            <div class="floating-nav-subtitle">Presets</div>
-            <a href="#" class="nav-link">Drug Presets</a>
+            <div class="floating-nav-subtitle">Presets &amp; Templates</div>
             <a href="instruction_template.php" class="nav-link <?= $current_page == 'instruction_template.php' ? 'active' : '' ?>">Instruction Presets</a>
             <a href="dose_template.php" class="nav-link <?= $current_page == 'dose_template.php' ? 'active' : '' ?>">Dose Presets</a>
             <a href="duration_template.php" class="nav-link <?= $current_page == 'duration_template.php' ? 'active' : '' ?>">Duration Presets</a>
+            <a href="advice_template.php" class="nav-link <?= $current_page == 'advice_template.php' ? 'active' : '' ?>">Advice Templates</a>
 
-            <div class="floating-nav-subtitle">Others</div>
-            <a href="#" class="nav-link">Referrals</a>
+            <div class="floating-nav-subtitle">Preferences</div>
             <a href="manufacturer_preferences.php" class="nav-link <?= $current_page == 'manufacturer_preferences.php' ? 'active' : '' ?>">Manufacturer Preferences</a>
         </div>
 
@@ -214,31 +201,18 @@ $zrx_dd_theme = $_COOKIE['zimrx_dropdown_theme'] ?? 'subtle-tint';
 
             <div class="floating-nav-subtitle">Clinic &amp; Operations</div>
             <a href="appointment_settings.php" class="nav-link <?= $current_page == 'appointment_settings.php' ? 'active' : '' ?>">Appointment Settings</a>
-            <a href="#" class="nav-link">Front Desk Screen Settings</a>
-            <a href="#" class="nav-link">Health Card Settings</a>
-            <a href="#" class="nav-link">Invoice Settings</a>
             <?php if (!$is_multi_doctor): ?>
             <a href="emr_settings.php" class="nav-link <?= $current_page == 'emr_settings.php' ? 'active' : '' ?>">EMR Settings</a>
             <?php endif; ?>
 
-            <div class="floating-nav-subtitle">Administration &amp; Security</div>
+            <div class="floating-nav-subtitle">Administration</div>
             <a href="doctor_assistants.php" class="nav-link <?= $current_page == 'doctor_assistants.php' ? 'active' : '' ?>">Staff Management</a>
-            <a href="#" class="nav-link">Backup &amp; Restore</a>
-            <a href="#" class="nav-link">Audit Log</a>
         </div>
 
         <!-- Help Menu Panel -->
         <div id="help-menu-panel" class="floating-nav-menu" hidden>
-            <div class="floating-nav-subtitle">Clinical Reference</div>
-            <a href="#" class="nav-link">Study Materials</a>
-            <a href="#" class="nav-link">National Guidelines</a>
-            <a href="#" class="nav-link">Medical Calculators</a>
-
             <div class="floating-nav-subtitle">Software &amp; Support</div>
             <button type="button" class="nav-link nav-button" onclick="zimrxOpenSupportModal()">❤️ Support ZimRx</button>
-            <a href="#" class="nav-link">Documentation</a>
-            <a href="#" class="nav-link">Updates</a>
-            <a href="#" class="nav-link">About</a>
         </div>
         <?php endif; ?>
         
