@@ -17,12 +17,12 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../auth.php';
-require_once __DIR__ . '/../db/db_connections.php';
-require_once __DIR__ . '/../db/db_schema.php';
-require_once __DIR__ . '/../db/db_sql.php';
-require_once __DIR__ . '/../db/db_migrator.php';
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../lib/auth.php';
+require_once __DIR__ . '/../lib/db/db_connections.php';
+require_once __DIR__ . '/../lib/db/db_schema.php';
+require_once __DIR__ . '/../lib/db/db_sql.php';
+require_once __DIR__ . '/../lib/db/db_migrator.php';
 require_once __DIR__ . '/../lib/pc_catalog_lib.php';
 require_once __DIR__ . '/../lib/user_drug_lib.php';
 require_once __DIR__ . '/../lib/Services/BillingService.php';
@@ -55,6 +55,7 @@ class ZimRxTestSuite {
         $this->testLoginRateLimitingAndRedirectDefense();
         $this->testClinicalReportSecurityAndDeploymentHardening();
         $this->testBillingServiceTransactionSafety();
+        $this->testInitGatewayAndPathDiscovery();
 
         echo "\n--------------------------------------------------------\n";
         echo "Test Results: {$this->passed} passed, {$this->failed} failed\n";
@@ -409,7 +410,7 @@ class ZimRxTestSuite {
         ];
         $allRandomized = true;
         foreach ($uploadScripts as $script) {
-            $code = (string)file_get_contents(__DIR__ . '/../api/' . $script);
+            $code = (string)file_get_contents(__DIR__ . '/../public/api/' . $script);
             if (!str_contains($code, 'random_bytes')) {
                 $allRandomized = false;
                 break;
@@ -773,8 +774,8 @@ class ZimRxTestSuite {
         echo "\n[17/17] Testing Clinical Report Security & Deployment Hardening...\n";
 
         // 1. Root Apache/cPanel .htaccess verification
-        $rootHtaccess = __DIR__ . '/../.htaccess';
-        $this->assert(file_exists($rootHtaccess), 'Root application/.htaccess exists for plug-and-play cPanel deployment');
+        $rootHtaccess = __DIR__ . '/../public/.htaccess';
+        $this->assert(file_exists($rootHtaccess), 'Root application/public/.htaccess exists for plug-and-play cPanel deployment');
         $rootHtContent = (string)file_get_contents($rootHtaccess);
         $this->assert(str_contains($rootHtContent, 'Options -Indexes'), 'application/.htaccess disables directory indexing (Options -Indexes)');
         $this->assert(str_contains($rootHtContent, 'uploads/reports'), 'application/.htaccess blocks direct HTTP access to clinical reports');
@@ -787,7 +788,7 @@ class ZimRxTestSuite {
         $this->assert(str_contains($reportsHtContent, 'Require all denied') || str_contains($reportsHtContent, 'Deny from all'), 'reports/.htaccess strictly denies all direct HTTP access');
 
         // 3. Authenticated viewer endpoint verification
-        $viewerScript = __DIR__ . '/../api/view_report.php';
+        $viewerScript = __DIR__ . '/../public/api/view_report.php';
         $this->assert(file_exists($viewerScript), 'api/view_report.php authenticated report viewer endpoint exists');
         $viewerCode = (string)file_get_contents($viewerScript);
         $this->assert(str_contains($viewerCode, 'declare(strict_types=1);'), 'api/view_report.php enforces strict types');
@@ -821,42 +822,42 @@ class ZimRxTestSuite {
         $this->assert($currentDoctor !== $reportOwner, 'Cross-doctor report access detected and blocked');
 
         // 6. Anti-CSRF verification on layout & header mutation endpoints
-        $printSaveCode = (string)file_get_contents(__DIR__ . '/../api/print_setup_save.php');
+        $printSaveCode = (string)file_get_contents(__DIR__ . '/../public/api/print_setup_save.php');
         $this->assert(str_contains($printSaveCode, 'zimrx_verify_csrf()'), 'api/print_setup_save.php enforces zimrx_verify_csrf()');
 
-        $headerEditCode = (string)file_get_contents(__DIR__ . '/../api/header_edit_ajax.php');
+        $headerEditCode = (string)file_get_contents(__DIR__ . '/../public/api/header_edit_ajax.php');
         $this->assert(str_contains($headerEditCode, 'zimrx_verify_csrf()'), 'api/header_edit_ajax.php enforces zimrx_verify_csrf()');
 
-        $headerOnboardCode = (string)file_get_contents(__DIR__ . '/../api/header_onboarding_ajax.php');
+        $headerOnboardCode = (string)file_get_contents(__DIR__ . '/../public/api/header_onboarding_ajax.php');
         $this->assert(str_contains($headerOnboardCode, 'zimrx_verify_csrf()'), 'api/header_onboarding_ajax.php enforces zimrx_verify_csrf()');
 
         // 7. GET Idempotency verification on template endpoints (RFC 7231)
-        $rxTemplateCode = (string)file_get_contents(__DIR__ . '/../api/rx_user_templates.php');
+        $rxTemplateCode = (string)file_get_contents(__DIR__ . '/../public/api/rx_user_templates.php');
         $this->assert(str_contains($rxTemplateCode, "REQUEST_METHOD'] === 'POST'"), 'api/rx_user_templates.php enforces GET idempotency for usage metrics');
 
         // 8. Authentication verification on clinic search & data lookups
-        $addrCode = (string)file_get_contents(__DIR__ . '/../api/search_address.php');
+        $addrCode = (string)file_get_contents(__DIR__ . '/../public/api/search_address.php');
         $this->assert(str_contains($addrCode, 'require_login()'), 'api/search_address.php enforces require_login()');
 
-        $phraseCode = (string)file_get_contents(__DIR__ . '/../api/rx_phrase_suggestions.php');
+        $phraseCode = (string)file_get_contents(__DIR__ . '/../public/api/rx_phrase_suggestions.php');
         $this->assert(str_contains($phraseCode, 'require_login()'), 'api/rx_phrase_suggestions.php enforces require_login()');
 
-        $interactCode = (string)file_get_contents(__DIR__ . '/../api/check_drug_interactions.php');
+        $interactCode = (string)file_get_contents(__DIR__ . '/../public/api/check_drug_interactions.php');
         $this->assert(str_contains($interactCode, 'require_login()'), 'api/check_drug_interactions.php enforces require_login()');
 
-        $searchDrugCode = (string)file_get_contents(__DIR__ . '/../api/search_drug.php');
+        $searchDrugCode = (string)file_get_contents(__DIR__ . '/../public/api/search_drug.php');
         $this->assert(str_contains($searchDrugCode, 'require_login()'), 'api/search_drug.php enforces require_login()');
 
-        $drugLookupCode = (string)file_get_contents(__DIR__ . '/../api/drug_lookup.php');
+        $drugLookupCode = (string)file_get_contents(__DIR__ . '/../public/api/drug_lookup.php');
         $this->assert(str_contains($drugLookupCode, 'require_login()'), 'api/drug_lookup.php enforces require_login()');
 
-        $drugExplorerCode = (string)file_get_contents(__DIR__ . '/../api/drug_explorer.php');
+        $drugExplorerCode = (string)file_get_contents(__DIR__ . '/../public/api/drug_explorer.php');
         $this->assert(str_contains($drugExplorerCode, 'require_login()'), 'api/drug_explorer.php enforces require_login()');
 
-        $searchDxCode = (string)file_get_contents(__DIR__ . '/../api/search_dx.php');
+        $searchDxCode = (string)file_get_contents(__DIR__ . '/../public/api/search_dx.php');
         $this->assert(str_contains($searchDxCode, 'require_login()'), 'api/search_dx.php enforces require_login()');
 
-        $occupationsCode = (string)file_get_contents(__DIR__ . '/../api/get_occupations.php');
+        $occupationsCode = (string)file_get_contents(__DIR__ . '/../public/api/get_occupations.php');
         $this->assert(str_contains($occupationsCode, 'require_login()'), 'api/get_occupations.php enforces require_login()');
     }
 
@@ -910,6 +911,64 @@ class ZimRxTestSuite {
         $this->assert($result['aggregates']['collected'] === 450.0, 'Filtered aggregates calculate collected revenue accurately');
         $this->assert($result['aggregates']['invoiced'] === 500.0, 'Filtered aggregates calculate invoiced total accurately');
         $this->assert($result['aggregates']['due'] === 0.0, 'Filtered aggregates calculate zero due on fully paid item');
+    }
+
+    private function testInitGatewayAndPathDiscovery(): void {
+        echo "\n[19/19] Testing init.php Gateway Architecture & Path Auto-Discovery...\n";
+
+        $initPath = __DIR__ . '/../public/init.php';
+        $this->assert(file_exists($initPath), 'public/init.php gateway file exists');
+
+        $initCode = (string)file_get_contents($initPath);
+        $this->assert(str_contains($initCode, "define('ZIMRX_BASE_DIR'"), 'init.php defines ZIMRX_BASE_DIR');
+        $this->assert(str_contains($initCode, "define('ZIMRX_PUBLIC_DIR'"), 'init.php defines ZIMRX_PUBLIC_DIR');
+        $this->assert(str_contains($initCode, "/../config/config.php"), 'init.php supports offline standalone / USB mode');
+        $this->assert(str_contains($initCode, "/application/config/config.php"), 'init.php supports shared cPanel / public_html mode');
+        $this->assert(file_exists(__DIR__ . '/../lib/auth.php'), 'Core auth engine located at lib/auth.php');
+        $this->assert(file_exists(__DIR__ . '/../lib/db/db.php'), 'Core database bootstrapper located at lib/db/db.php');
+        $this->assert(!file_exists(__DIR__ . '/../auth.php'), 'Zero loose auth.php in application root');
+        $this->assert(!is_dir(__DIR__ . '/../db'), 'Zero loose db folder in application root');
+        $this->assert(!is_dir(__DIR__ . '/../system_database'), 'system_database legacy folder removed');
+        $this->assert(!is_dir(__DIR__ . '/../modules'), 'Zero loose modules folder in application root (nested under views/modules)');
+        $this->assert(is_dir(__DIR__ . '/../views/modules'), 'Prescription workspace modules centralized in views/modules');
+        $this->assert(file_exists(__DIR__ . '/../systemdata/database/zimrx_drugs.db'), 'System drug reference DB located in systemdata/database');
+        $this->assert(file_exists(__DIR__ . '/../systemdata/database/zimrx_static.db'), 'System static reference DB located in systemdata/database');
+        $this->assert(is_dir(__DIR__ . '/../systemdata/seeds'), 'System SQL seeds directory located in systemdata/seeds');
+        $this->assert(!file_exists(__DIR__ . '/../lib/visit_identity.php'), 'Orphan visit_identity.php consolidated into emr_identity_lib.php');
+
+        // Check public pages use init.php
+        $publicFiles = glob(__DIR__ . '/../public/*.php');
+        $pagesUsingInit = 0;
+        $pagesWithRawDirname = 0;
+        foreach ($publicFiles as $pf) {
+            if (basename($pf) === 'init.php') continue;
+            $code = (string)file_get_contents($pf);
+            if (str_contains($code, "init.php")) {
+                $pagesUsingInit++;
+            }
+            if (str_contains($code, "dirname(__DIR__)")) {
+                $pagesWithRawDirname++;
+            }
+        }
+        $this->assert($pagesUsingInit >= 30, "All public page controllers wire through init.php (got: {$pagesUsingInit})");
+        $this->assert($pagesWithRawDirname === 0, "No raw dirname(__DIR__) path escapes remain in public pages");
+
+        // Check public APIs use init.php
+        $apiFiles = glob(__DIR__ . '/../public/api/*.php');
+        $apisUsingInit = 0;
+        $apisWithRawDirname2 = 0;
+        foreach ($apiFiles as $af) {
+            if (basename($af) === 'zrx_icons.php') continue;
+            $code = (string)file_get_contents($af);
+            if (str_contains($code, "init.php")) {
+                $apisUsingInit++;
+            }
+            if (str_contains($code, "dirname(__DIR__, 2)")) {
+                $apisWithRawDirname2++;
+            }
+        }
+        $this->assert($apisUsingInit >= 55, "All public API endpoints wire through init.php (got: {$apisUsingInit})");
+        $this->assert($apisWithRawDirname2 === 0, "No raw dirname(__DIR__, 2) path escapes remain in public APIs");
     }
 }
 

@@ -4,7 +4,7 @@
 }
 
 :{$ZIMRX_HTTP_PORT:8080} {
-	root * ./application
+	root * ./application/public
 
 	handle /favicon.ico {
 		respond 204
@@ -28,14 +28,19 @@
 		file_server
 	}
 
+
 	# 2. Block direct HTTP access to confidential clinical reports.
 	# Patient medical records and imaging must be streamed via authenticated api/view_report.php
 	@clinicalReports path /userdata/uploads/reports/* /uploads/reports/*
 	respond @clinicalReports 404
 
 	# 3. Never expose local data stores, private uploads, or internal engine directories.
-	@privateData path /userdata/* /uploads/* /obsolete/* /migrations/* /tests/* /lib/* /db/*
+	@privateData path /userdata/* /systemdata/* /uploads/* /obsolete/* /migrations/* /tests/* /lib/* /db/* /modules/* /views/*
 	respond @privateData 404
+
+	# 3b. Block direct HTTP invocation of internal framework scripts and manifests
+	@privateFiles path /config.php /auth.php /db.php /header.php /footer.php /composer.json /composer.lock
+	respond @privateFiles 404
 
 	# 4. Block sensitive database and configuration files
 	@databaseFiles path *.db *.db3 *.sqlite *.sqlite3 *.sql *.mdb *.accdb *.db-wal *.db-shm *.sqlite-wal *.sqlite-shm
@@ -46,6 +51,7 @@
 	@privateVendor {
 		path /vendor/*
 		not path /vendor/nicedit/*
+		not path /vendor/flatpickr/*
 	}
 	respond @privateVendor 404
 

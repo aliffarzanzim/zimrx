@@ -29,7 +29,7 @@ function pc_priority_default_rows(): array {
 }
 
 function pc_lookup_db_path(string $filename): string {
-    return ZIMRX_ASSETS_DB_DIR . '/' . $filename;
+    return ZIMRX_SYSTEM_DB_DIR . '/' . $filename;
 }
 
 function pc_source_label(string $source): string {

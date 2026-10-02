@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 // Generates collision-free patient registration codes and daily consultation visit numbers.
 
-require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/db/db.php';
 
 // Calculate minimum zero-padding width from expected patient volume
 function zimrx_digits_from_flow(int $flow): int {
@@ -304,3 +304,15 @@ function zimrx_next_visit_info(PDO $pdo, int $patientId, string $regNo, int $doc
         'visit_code' => $visitId,
     ];
 }
+
+// Asserts that visit-identity and intake vitals columns from migration 014 exist before handling requests.
+function zimrx_ensure_visit_identity_schema(PDO $pdo): void {
+    if (!DbSchema::tableExists($pdo, 'zimrx_appointments') ||
+        !DbSchema::columnExists($pdo, 'zimrx_appointments', 'vitals_note')) {
+        throw new RuntimeException(
+            'Visit-identity schema is incomplete. ' .
+            'Run database migrations before serving clinical requests.'
+        );
+    }
+}
+

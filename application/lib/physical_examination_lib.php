@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 // Physical examination parameters: merges system templates by organ system with per-doctor finding preferences.
 
-require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/db/db.php';
 
 function physical_exam_user_pdo(): PDO {
     return DbConnections::userdata();

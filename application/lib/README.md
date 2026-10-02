@@ -22,7 +22,7 @@ Procedural functions in `lib/*.php` handle discrete, stateless domain calculatio
 |------|--------|------------|
 | `admin_lib.php` | Doctor/assistant account management | `zimrx_admin_*` |
 | `drug_catalog_lib.php` | System drug catalog queries (PDO) | `drug_catalog_*` |
-| `emr_identity_lib.php` | Visit/registration ID generation | `zimrx_get_emr_*`, `zimrx_digits_*` |
+| `emr_identity_lib.php` | Visit/registration ID generation & schema assertions | `zimrx_get_emr_*`, `zimrx_digits_*`, `zimrx_ensure_visit_*` |
 | `medical_history_lib.php` | Medical history templates | `zimrx_mh_*` |
 | `particulars_audit_lib.php` | Patient demographic lookups | `zimrx_pa_*` |
 | `pc_catalog_lib.php` | Presenting Complaint catalog (FTS) | `pc_*` |
@@ -31,7 +31,6 @@ Procedural functions in `lib/*.php` handle discrete, stateless domain calculatio
 | `rx_regimen_lib.php` | Prescription regimen CRUD | `rx_*` |
 | `rx_template_lib.php` | Dose/duration/instruction templates | `zimrx_rx_template_*` |
 | `user_drug_lib.php` | Doctor-specific user drug customisation | `zimrx_user_drug_*`, `zimrx_resolve_doctor_id` |
-| `visit_identity.php` | Visit schema integrity assertions | `zimrx_ensure_visit_identity_schema` |
 
 ## Services/ (new OOP layer)
 

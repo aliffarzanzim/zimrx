@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 // Medical history condition checklist: merges static library conditions with doctor customizations.
 
-require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/db/db.php';
 
 function med_history_user_pdo(): PDO {
     return DbConnections::userdata();

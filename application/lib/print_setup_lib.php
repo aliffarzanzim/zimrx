@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 // Prescription print setup: layout dimensions, font styling, bilingual header rendering, watermark stamps, and CSS compilation.
 
-require_once __DIR__ . '/../auth.php';
-require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/db/db.php';
 
 function zimrx_print_normalize_header_line(string $value): string {
     return trim(preg_replace('/\s+/', ' ', $value));
@@ -17,7 +17,10 @@ function preview_escape(?string $value): string {
 function zimrx_print_default_options(): array {
     static $defaults = null;
     if ($defaults === null) {
-        $defaults = require __DIR__ . '/../config/print_defaults.php';
+        $defaultsPath = is_file(dirname(__DIR__, 2) . '/config/print_defaults.php')
+            ? dirname(__DIR__, 2) . '/config/print_defaults.php'
+            : __DIR__ . '/../config/print_defaults.php';
+        $defaults = require $defaultsPath;
     }
     return $defaults;
 }

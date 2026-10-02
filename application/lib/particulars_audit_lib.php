@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 // Audit trail for patient demographic edits, change diffing, and user occupation vocabulary.
 
-require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/db/db.php';
 
 // Verifies the audit table exists without running DDL at request time
 function ensure_patient_particulars_audit_schema(PDO $pdo): void {
