@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 // Physical Examination (P/E) module: clinical findings table, vitals inputs, and custom parameter settings.
 
-require_once __DIR__ . '/../lib/physical_examination_lib.php';
+require_once ZIMRX_BASE_DIR . '/lib/physical_examination_lib.php';
 $peDoctorId = max(1, (int)(function_exists('current_user_doctor_id') ? current_user_doctor_id() : 1));
 $peDoctorConfig = physical_exam_get_doctor_config($peDoctorId);
 $activePeItems = $peDoctorConfig['active_items'];

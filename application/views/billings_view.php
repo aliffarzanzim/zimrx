@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 // Billings view: transaction ledger, financial summaries, receipts, and payment collection modal.
 ?>
-<link rel="stylesheet" href="assets/css/pages/billings.css?v=<?= filemtime(__DIR__ . '/../assets/css/pages/billings.css') ?>">
+<link rel="stylesheet" href="assets/css/pages/billings.css?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/css/pages/billings.css') ?>">
 
 <div class="billings-container zrx-page-container">
     <!-- Page Header -->
@@ -469,4 +469,4 @@ declare(strict_types=1);
     </div>
 </div>
 
-<script src="assets/js/pages/billings.js?v=<?= filemtime(__DIR__ . '/../assets/js/pages/billings.js') ?>"></script>
+<script src="assets/js/pages/billings.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/pages/billings.js') ?>"></script>

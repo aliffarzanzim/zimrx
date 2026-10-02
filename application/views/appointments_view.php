@@ -856,9 +856,9 @@ if (!function_exists('appointment_page_dmy_to_iso')) {
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
 </script>
 <script src="assets/vendor/flatpickr/flatpickr.min.js"></script>
-<script src="assets/js/layout/help_guidelines.js?v=<?= filemtime(__DIR__ . '/../assets/js/layout/help_guidelines.js') ?>"></script>
-<script src="assets/js/layout/table_column_resizer.js?v=<?= filemtime(__DIR__ . '/../assets/js/layout/table_column_resizer.js') ?>"></script>
-<script src="assets/js/layout/grid_navigation.js?v=<?= filemtime(__DIR__ . '/../assets/js/layout/grid_navigation.js') ?>"></script>
-<script src="assets/js/layout/boot.js?v=<?= filemtime(__DIR__ . '/../assets/js/layout/boot.js') ?>"></script>
-<script src="assets/js/pages/appointments.js?v=<?= filemtime(__DIR__ . '/../assets/js/pages/appointments.js') ?>"></script>
+<script src="assets/js/layout/help_guidelines.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/layout/help_guidelines.js') ?>"></script>
+<script src="assets/js/layout/table_column_resizer.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/layout/table_column_resizer.js') ?>"></script>
+<script src="assets/js/layout/grid_navigation.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/layout/grid_navigation.js') ?>"></script>
+<script src="assets/js/layout/boot.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/layout/boot.js') ?>"></script>
+<script src="assets/js/pages/appointments.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/pages/appointments.js') ?>"></script>
 

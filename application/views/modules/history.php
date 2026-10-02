@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 // Patient history module: past medical history, surgical treatments, habits, diet, and drug allergies.
 
-require_once __DIR__ . '/../lib/medical_history_lib.php';
+require_once ZIMRX_BASE_DIR . '/lib/medical_history_lib.php';
 $medHistoryDoctorId = max(1, (int)(function_exists('current_user_doctor_id') ? current_user_doctor_id() : 1));
 $medHistoryDoctorConfig = med_history_get_doctor_config($medHistoryDoctorId);
 $activeMedicalHistoryGroups = $medHistoryDoctorConfig['active_groups'];
