@@ -1,10 +1,38 @@
 {
+    "name": "aliffarzanzim/zimrx",
+    "description": "Privacy-first, local-first digital prescription and EMR suite for solo doctors and clinics",
+    "type": "project",
+    "license": "AGPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Alif Farzan Zim",
+            "email": "aliffarzanzim@gmail.com",
+            "role": "Lead Architect & Maintainer"
+        }
+    ],
+    "homepage": "https://github.com/aliffarzanzim/zimrx",
+    "support": {
+        "email": "aliffarzanzim@gmail.com",
+        "issues": "https://github.com/aliffarzanzim/zimrx/issues",
+        "source": "https://github.com/aliffarzanzim/zimrx"
+    },
     "require": {
+        "php": ">=8.2",
+        "ext-pdo": "*",
+        "ext-pdo_sqlite": "*",
         "chillerlan/php-qrcode": "^6.0"
     },
     "autoload": {
         "psr-4": {
             "ZimRx\\Services\\": "lib/Services/"
         }
+    },
+    "scripts": {
+        "test": "php tests/run_tests.php"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
     }
 }
