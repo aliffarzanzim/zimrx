@@ -18,6 +18,9 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../config/config.php';
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+}
 require_once __DIR__ . '/../lib/auth.php';
 require_once __DIR__ . '/../lib/db/db_connections.php';
 require_once __DIR__ . '/../lib/db/db_schema.php';
@@ -1005,8 +1008,34 @@ class ZimRxTestSuite {
                 $apisWithRawDirname2++;
             }
         }
-        $this->assert($apisUsingInit >= 55, "All public API endpoints wire through init.php (got: {$apisUsingInit})");
+        $this->assert($apisUsingInit >= 52, "All public API endpoints wire through init.php (got: {$apisUsingInit})");
         $this->assert($apisWithRawDirname2 === 0, "No raw dirname(__DIR__, 2) path escapes remain in public APIs");
+
+        // Enforce centralized PDO abstraction: zero raw new PDO instantiations in public APIs or lib
+        $allSourceFiles = array_merge(
+            glob(__DIR__ . '/../public/api/*.php') ?: [],
+            glob(__DIR__ . '/../lib/*.php') ?: []
+        );
+        $rawPdoCount = 0;
+        foreach ($allSourceFiles as $sf) {
+            $code = (string)file_get_contents($sf);
+            if (preg_match('/\bnew\s+PDO\s*\(/i', $code)) {
+                $rawPdoCount++;
+            }
+        }
+        $this->assert($rawPdoCount === 0, "Zero raw new PDO instantiations in public APIs or lib (enforcing DbConnections)");
+
+        // Verify PSR-4 autoloading alignment for ZimRx\Services
+        $serviceClasses = [
+            'ZimRx\\Services\\SyncJournalService',
+            'ZimRx\\Services\\BillingService',
+            'ZimRx\\Services\\AppointmentService',
+            'ZimRx\\Services\\DrugInteractionService',
+            'ZimRx\\Services\\PrintLayoutService',
+        ];
+        foreach ($serviceClasses as $cls) {
+            $this->assert(class_exists($cls), "Composer PSR-4 class {$cls} resolves and loads");
+        }
     }
 
     private function testOfflinePrivacyAndFontIntegrity(): void {

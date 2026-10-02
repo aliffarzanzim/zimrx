@@ -6,6 +6,42 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/init.php';
 require_login();
 
+// Attachment streaming must bypass the JSON header - handle early and exit.
+$earlyAction = $_GET['action'] ?? '';
+if ($earlyAction === 'view_attachment') {
+    $rawFile = trim((string)($_GET['file'] ?? ''));
+    $safeFile = basename($rawFile);
+    // Allow only expected filename pattern: chat-{convId}-{timestamp}-{hex}.{ext}
+    if (!preg_match('/^chat-\d+-\d+-[0-9a-f]+\.(jpg|png|webp|pdf)$/i', $safeFile)) {
+        http_response_code(400);
+        exit('Invalid attachment filename.');
+    }
+    $attachDir = ZIMRX_UPLOADS_DIR . '/chat';
+    $filePath  = $attachDir . '/' . $safeFile;
+    // Resolve real paths to prevent traversal even if basename is somehow bypassed
+    $realDir   = realpath($attachDir);
+    $realFile  = realpath($filePath);
+    if ($realDir === false || $realFile === false || strncmp($realFile, $realDir . DIRECTORY_SEPARATOR, strlen($realDir) + 1) !== 0) {
+        http_response_code(404);
+        exit('Attachment not found.');
+    }
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime  = $finfo->file($realFile) ?: 'application/octet-stream';
+    $allowed = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+    if (!in_array($mime, $allowed, true)) {
+        http_response_code(403);
+        exit('Unsupported attachment type.');
+    }
+    $isInline = in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true);
+    header('Content-Type: ' . $mime);
+    header('Content-Length: ' . filesize($realFile));
+    header('X-Content-Type-Options: nosniff');
+    header('Content-Disposition: ' . ($isInline ? 'inline' : 'attachment') . '; filename="' . $safeFile . '"');
+    header('Cache-Control: private, max-age=3600');
+    readfile($realFile);
+    exit;
+}
+
 header('Content-Type: application/json');
 
 $pdo = DbConnections::userdata();

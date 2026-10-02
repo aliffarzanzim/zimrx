@@ -25,10 +25,7 @@ Endpoints handling prescription authoring, dosage templates, regimen persistence
 | `rx_template.php` | GET, POST | Auth + CSRF | Standard dose, duration, and instruction template management |
 | `rx_user_templates.php` | GET, POST | Auth + CSRF | Doctor-specific custom drug templates with usage frequency tracking |
 | `rx_learn.php` | POST | Auth + CSRF | Adaptive frequency learning algorithm updating regimen suggestions based on prescribing patterns |
-| `rx_phrase_suggestions.php` | GET | Auth | Prescribing shorthand phrase auto-completion and snippet expansion |
-| `getdose.php` | GET | Auth | Lookup pre-configured dosage options for a given drug form |
-| `getduration.php` | GET | Auth | Lookup pre-configured treatment duration presets |
-| `getinstruction.php` | GET | Auth | Lookup predefined administration instructions |
+| `rx_phrase_suggestions.php` | GET | Auth | Unified prescribing phrase auto-completion for dose, duration, and instruction fields (replaces removed legacy `getdose`, `getduration`, `getinstruction` micro-endpoints) |
 | `user_drugs.php` | GET, POST, DELETE | Auth + CSRF | Doctor custom drug catalog additions, overrides, and personal generics |
 
 ---
@@ -116,5 +113,5 @@ Brand imagery, digital seals, signature stamps, and icon rendering.
 | `upload_seal_and_stamp.php` | POST | Auth + CSRF | Doctor signature seal and certification stamp upload |
 | `delete_seal_and_stamp.php` | POST | Auth + CSRF | Remove custom stamp asset |
 | `list_seal_and_stamps.php` | GET | Auth | List available seal and stamp assets |
-| `chat.php` | GET, POST | Auth + CSRF | Local LAN clinic communication and realtime assistance queue notifications |
+| `chat.php` | GET, POST | Auth + CSRF | Local LAN clinic communication, realtime assistance notifications, and authenticated private attachment streaming (`?action=view_attachment`) |
 | `zrx_icons.php` | GET | Public Registry | Single-source-of-truth SVG icon registry mapping exported to client-side window.ZimRxIconsMap |

@@ -575,8 +575,10 @@
                 `;
             } else {
                 function safeAttachmentPath(value) {
-                    const path = String(value || '');
-                    return /^uploads\/chat\/[A-Za-z0-9._-]+$/.test(path) ? path : '';
+                    const file = String(value || '').replace(/^uploads\/chat\//, '');
+                    // Only allow filenames matching the expected chat upload pattern
+                    if (!/^chat-\d+-\d+-[0-9a-f]+\.(jpg|png|webp|pdf)$/i.test(file)) return '';
+                    return 'api/chat.php?action=view_attachment&file=' + encodeURIComponent(file);
                 }
 
                 let attachmentHtml = '';
