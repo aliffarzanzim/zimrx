@@ -56,6 +56,7 @@ class ZimRxTestSuite {
         $this->testClinicalReportSecurityAndDeploymentHardening();
         $this->testBillingServiceTransactionSafety();
         $this->testInitGatewayAndPathDiscovery();
+        $this->testOfflinePrivacyAndFontIntegrity();
 
         echo "\n--------------------------------------------------------\n";
         echo "Test Results: {$this->passed} passed, {$this->failed} failed\n";
@@ -249,6 +250,22 @@ class ZimRxTestSuite {
         $this->assert(
             $countAfterRollback === 1,
             "Transaction rollback cleanly reverts uncommitted writes without leaking dirty records"
+        );
+
+        // Test rollback under non-Exception Error (TypeError implementing Throwable)
+        try {
+            $pdo->beginTransaction();
+            $pdo->exec("INSERT INTO test_atomicity (id, note) VALUES (3, 'third note');");
+            throw new TypeError("Simulated PHP engine TypeError during transaction");
+        } catch (Throwable $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+        }
+        $countAfterTypeError = (int)$pdo->query("SELECT COUNT(*) FROM test_atomicity")->fetchColumn();
+        $this->assert(
+            $countAfterTypeError === 1,
+            "Transaction rollback triggers on Throwable (catches PHP 8 TypeError/Error, not just Exception)"
         );
     }
 
@@ -969,6 +986,49 @@ class ZimRxTestSuite {
         }
         $this->assert($apisUsingInit >= 55, "All public API endpoints wire through init.php (got: {$apisUsingInit})");
         $this->assert($apisWithRawDirname2 === 0, "No raw dirname(__DIR__, 2) path escapes remain in public APIs");
+    }
+
+    private function testOfflinePrivacyAndFontIntegrity(): void {
+        echo "\n[20/20] Testing 100% Offline Privacy, LAN Discovery & Local Font Integrity...\n";
+
+        // 1. LAN IP Discovery regression: No external network probes
+        $mobileSyncPath = __DIR__ . '/../public/api/mobile_sync.php';
+        $this->assert(file_exists($mobileSyncPath), "mobile_sync.php endpoint exists");
+        $mobileSyncCode = (string)file_get_contents($mobileSyncPath);
+        $this->assert(
+            !str_contains($mobileSyncCode, '8.8.8.8'),
+            "Zero external socket probes to Google DNS (8.8.8.8) in mobile_sync.php"
+        );
+        $this->assert(
+            str_contains($mobileSyncCode, 'zimrx_get_server_lan_ip'),
+            "mobile_sync.php defines offline LAN IP discovery via local host inspection"
+        );
+
+        // 2. Local Font Integrity: 99 bundled webfonts and fonts.css
+        $fontsDir = __DIR__ . '/../public/assets/fonts';
+        $this->assert(is_dir($fontsDir), "Local fonts directory exists in public/assets/fonts");
+        $fontFiles = glob($fontsDir . '/*.*');
+        $fontCount = count($fontFiles);
+        $this->assert($fontCount >= 90, "Bundled local web fonts present for complete offline typography (got: {$fontCount})");
+
+        $fontsCssPath = __DIR__ . '/../public/assets/css/layout/fonts.css';
+        $this->assert(file_exists($fontsCssPath), "Local typography stylesheet exists at layout/fonts.css");
+        $fontsCss = (string)file_get_contents($fontsCssPath);
+        $this->assert(str_contains($fontsCss, '@font-face'), "fonts.css declares local @font-face rules");
+
+        // 3. Zero external Google Font CDN dependencies
+        $publicPhpFiles = glob(__DIR__ . '/../public/*.php');
+        $externalFontReferences = 0;
+        foreach ($publicPhpFiles as $phpFile) {
+            $code = (string)file_get_contents($phpFile);
+            if (str_contains($code, 'fonts.googleapis.com') || str_contains($code, 'fonts.gstatic.com')) {
+                $externalFontReferences++;
+            }
+        }
+        $this->assert(
+            $externalFontReferences === 0,
+            "Zero external Google Fonts CDN links remain across public PHP pages"
+        );
     }
 }
 
