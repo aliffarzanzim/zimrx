@@ -71,22 +71,20 @@ Patient health records should **never** be monetized, tracked, or leaked to cent
 
 ### Directory Architecture & Security Boundaries
 
-Standard web frameworks rely on pointing the web server's DocumentRoot to a `/public` folder to keep source code and databases out of the web path. While that is effective on dedicated servers, it breaks "drop-in" portability for non-technical doctors using USB drives, portable runtimes, or local setups (like XAMPP) where modifying virtual host configurations is difficult or impossible for them.
+ZimRx implements a hardened **public webroot boundary** (`application/public/`) configured directly in Caddy and `.htaccess`. Sensitive backend engines, private user databases, and reference seeds sit outside the web root:
 
-ZimRx balances instant plug-and-play portability with strict security boundaries through directory-level access controls:
-
-* **`application/userdata/`**:
-  Contains all mutable state—SQLite databases, encrypted backups, user uploads, and cache. 
-  * *Why this design*: A doctor can back up, clone, or migrate their entire clinic practice simply by copying this single folder to a flash drive, eliminating database dump scripts or cloud dependencies.
-  * *Security*: Non-media subdirectories (`database/`, `backups/`, `cache/`) are strictly blocked from HTTP requests via `.htaccess` (`Require all denied`) and Caddyfile route blocks.
-* **`application/lib/` & `application/db/`**:
-  Houses the database abstraction layer, query builders, and automated migration engine (`DbMigrator`). Direct execution via browser URL is barred by web server rules and code-level entry guards.
-* **`application/api/`**:
-  All frontend communication routes through here. Every endpoint enforces active session checks, CSRF token verification, and doctor data isolation.
-* **`application/assets/`**:
-  Clean 3-tier presentation structure (`layout/`, `modules/`, `pages/`) using native CSS tokens and vanilla JavaScript. Eliminates Node/NPM build pipelines, so files can be inspected, customized, and run offline without compile steps.
-
-> **Roadmap**: For high-security institutional and hospital LAN deployments where dedicated IT staff manage the web server, a native `public/` document-root separation mode is planned in future alongside MariaDB/PostgreSQL multi-user support.
+* **`application/public/` (Web Root)**:
+  The only directory exposed to the web server (`root * ./application/public`). Houses entry controllers (`index.php`, `prescription.php`, `emr.php`), the `public/api/` domain controllers, and static browser assets (`public/assets/`). Direct execution is routed through `init.php`.
+* **`application/userdata/` (Private State)**:
+  Contains all mutable doctor state: SQLite user database (`zimrx_userdata.db`), local backups, and uploads.
+  * *Portability*: A doctor can back up, clone, or migrate their entire clinic simply by copying this single folder to a flash drive, with zero database dump scripts.
+  * *Security*: Protected with `Require all denied` in `.htaccess` and 404 route blocks in Caddy. Patient clinical reports in `userdata/uploads/reports/` cannot be accessed directly via URLs; they are securely streamed only to authenticated doctors via `api/view_report.php`.
+* **`application/systemdata/` (Clinical Reference Catalogs)**:
+  Houses static read-only clinical reference databases (`systemdata/database/zimrx_drugs.db` and `zimrx_static.db`) and SQL seeds (`systemdata/seeds/`). Blocked from direct web access.
+* **`application/lib/` (Core Logic & Database Layer)**:
+  Houses authentication (`lib/auth.php`), the central PDO database connection layer (`lib/db/db.php`), versioned schema migrations (`lib/db/db_migrator.php`), and clinical helper services.
+* **`application/views/` (Module Templates)**:
+  Prescription grid workspace modules (`views/modules/`) and page templates included securely by server-side controllers.
 
 
 ---
@@ -124,9 +122,9 @@ setup-franken-for-dev.bat
 ```
 
 ### Database Migrations
-Database schemas and versioning are managed through `DbMigrator` (`application/db/db_migrator.php`). Run the application or execute `db.php` to apply any pending schema migrations automatically:
+Database schemas and versioning are managed through `DbMigrator` (`application/lib/db/db_migrator.php`). Pending schema migrations are applied automatically on boot or can be checked via CLI:
 ```bash
-php -r "require_once 'application/db.php';"
+php -r "require_once 'application/lib/db/db.php';"
 ```
 
 ### Automated Test Suite
@@ -197,7 +195,7 @@ Patient safety comes first. While AI tools can be used to accelerate development
 ZimRx application source code, UI components, database migration engine (`DbMigrator`), and backend APIs are licensed under the **[GNU Affero General Public License v3.0 (AGPL-3.0)](LICENSE)**.
 
 ### Clinical Catalogs & Data Aggregation
-The standalone reference databases bundled in `application/assets/database/` are distributed alongside the software under a mere aggregation model:
+The standalone reference databases bundled in `application/systemdata/database/` are distributed alongside the software under a mere aggregation model:
 * **Presenting Complaints (`zimrx_static_pc`)**: 
   The medical terminology catalogs represent standard, public clinical vocabulary curated from standard medical literature & textbooks, clinical practitioner notes, and the **SNOMED CT Global Patient Set (GPS)** for workflow efficiency and rapid autocomplete. They do not incorporate proprietary code systems or relational ontologies. Applicable SNOMED descriptions are used under the SNOMED International GPS Open License:
   > *"This material includes SNOMED Clinical Terms ® (SNOMED CT ®) which is used by permission of SNOMED International. All rights reserved. SNOMED CT ® was originally created by the College of American Pathologists."*
