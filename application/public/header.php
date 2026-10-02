@@ -144,9 +144,7 @@ $zrx_dd_theme = $_COOKIE['zimrx_dropdown_theme'] ?? 'subtle-tint';
                 <a href="emr.php" class="nav-link <?= $current_page == 'emr.php' ? 'active' : '' ?>">EMR</a>
                 <a href="admin_doctors.php" class="nav-link <?= $current_page == 'admin_doctors.php' ? 'active' : '' ?>">Manage Doctors</a>
                 <a href="admin_assistants.php" class="nav-link <?= $current_page == 'admin_assistants.php' ? 'active' : '' ?>">Manage Assistants</a>
-                <a href="admin_patients.php" class="nav-link <?= $current_page == 'admin_patients.php' ? 'active' : '' ?>">Manage Patients</a>
-                <a href="admin_payments.php" class="nav-link <?= $current_page == 'admin_payments.php' ? 'active' : '' ?>">Payments</a>
-                <a href="admin_settings.php" class="nav-link <?= $current_page == 'admin_settings.php' ? 'active' : '' ?>">Settings</a>
+                <a href="billings.php" class="nav-link <?= $current_page == 'billings.php' ? 'active' : '' ?>">Billings</a>
                 <a href="emr_settings.php" class="nav-link <?= $current_page == 'emr_settings.php' ? 'active' : '' ?>">EMR Settings</a>
                 <?php elseif ($user_role === 'assistant'): ?>
                 <a href="appointments.php" class="nav-link <?= $current_page == 'appointments.php' ? 'active' : '' ?>">Appointments</a>

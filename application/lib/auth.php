@@ -120,8 +120,7 @@ function require_login() {
     $role = current_user_role();
     $adminPages = [
         'admin.php', 'admin_doctors.php', 'admin_assistants.php',
-        'admin_patients.php', 'admin_payments.php', 'admin_settings.php',
-        'emr_settings.php',
+        'billings.php', 'emr.php', 'emr_settings.php',
         'logout.php',
     ];
     if ($role === 'admin' && !in_array($page, $adminPages, true)) {

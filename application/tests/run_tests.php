@@ -950,7 +950,7 @@ class ZimRxTestSuite {
                 $pagesWithRawDirname++;
             }
         }
-        $this->assert($pagesUsingInit >= 30, "All public page controllers wire through init.php (got: {$pagesUsingInit})");
+        $this->assert($pagesUsingInit >= 28, "All public page controllers wire through init.php (got: {$pagesUsingInit})");
         $this->assert($pagesWithRawDirname === 0, "No raw dirname(__DIR__) path escapes remain in public pages");
 
         // Check public APIs use init.php
