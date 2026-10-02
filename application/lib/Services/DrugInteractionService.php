@@ -1,10 +1,15 @@
 <?php
 declare(strict_types=1);
 
+namespace ZimRx\Services;
+
+use PDO;
+use PDOException;
+
 // Checks drug-drug interactions between prescribed generic IDs.
 final class DrugInteractionService
 {
-    public function __construct(private readonly \PDO $pdo) {}
+    public function __construct(private readonly PDO $pdo) {}
 
     // Query interactions between all pairs in the given generic ID list, ordered by clinical severity
     public function findInteractions(array $genericIds): array
@@ -55,3 +60,8 @@ final class DrugInteractionService
         return isset($cols['drug_a_generic_id'], $cols['drug_b_generic_id']);
     }
 }
+
+if (!class_exists('DrugInteractionService', false)) {
+    class_alias(DrugInteractionService::class, 'DrugInteractionService');
+}
+

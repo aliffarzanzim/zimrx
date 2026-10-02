@@ -1,6 +1,10 @@
 <?php
 declare(strict_types=1);
 
+namespace ZimRx\Services;
+
+use PDO;
+
 // Consultation invoicing, receipt generation, payment status reconciliation, and financial reports.
 final class BillingService
 {
@@ -254,3 +258,8 @@ final class BillingService
         ];
     }
 }
+
+if (!class_exists('BillingService', false)) {
+    class_alias(BillingService::class, 'BillingService');
+}
+

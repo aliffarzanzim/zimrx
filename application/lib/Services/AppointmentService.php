@@ -1,6 +1,11 @@
 <?php
 declare(strict_types=1);
 
+namespace ZimRx\Services;
+
+use PDO;
+use DateTime;
+
 // Daily patient queues, slot timing calculation, revisit discounts, and follow-up schedules.
 final class AppointmentService
 {
@@ -302,3 +307,8 @@ final class AppointmentService
         return $stats;
     }
 }
+
+if (!class_exists('AppointmentService', false)) {
+    class_alias(AppointmentService::class, 'AppointmentService');
+}
+

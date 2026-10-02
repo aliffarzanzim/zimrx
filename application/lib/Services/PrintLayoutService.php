@@ -1,10 +1,14 @@
 <?php
 declare(strict_types=1);
 
+namespace ZimRx\Services;
+
+use PDO;
+
 // Resolves print layout configurations and paper dimensions for doctors and profiles.
 final class PrintLayoutService
 {
-    public function __construct(private readonly \PDO $pdo) {}
+    public function __construct(private readonly PDO $pdo) {}
 
     // Fetch doctor's active layout settings merged with system defaults
     public function resolveLayout(int $doctorId, int $profileId = 0): array
@@ -29,3 +33,8 @@ final class PrintLayoutService
         ];
     }
 }
+
+if (!class_exists('PrintLayoutService', false)) {
+    class_alias(PrintLayoutService::class, 'PrintLayoutService');
+}
+
