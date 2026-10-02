@@ -26,7 +26,7 @@ $fileName = basename(urldecode($rawFile));
 
 $configuredReportsDir = defined('ZIMRX_UPLOADS_DIR')
     ? (ZIMRX_UPLOADS_DIR . '/reports')
-    : (ZIMRX_UPLOADS_DIR . '/reports');
+    : (ZIMRX_BASE_DIR . '/userdata/uploads/reports');
 if (!is_dir($configuredReportsDir)) {
     @mkdir($configuredReportsDir, 0750, true);
 }

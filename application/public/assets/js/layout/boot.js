@@ -1,4 +1,18 @@
 // Application bootstrap, date picker initialization, table row drag-and-drop reordering, and global modals.
+window.ZimRxUtils = window.ZimRxUtils || {};
+if (!window.ZimRxUtils.escapeHtml) {
+  window.ZimRxUtils.escapeHtml = function (value) {
+    if (value == null) return '';
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  };
+}
+window.escapeHtml = window.escapeHtml || window.ZimRxUtils.escapeHtml;
+
 function initializeDynamicDatePickers(root = document) {
   if (typeof flatpickr !== 'function') {
     return;
@@ -375,7 +389,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   if (document.getElementById('left-side-setup')) {
-    // Selects are pre-rendered by PHP — just wire the buttons
+    // Selects are pre-rendered by PHP: just wire the buttons
     const saveBtn = document.getElementById('btn-save-settings');
     const resetBtn = document.getElementById('btn-reset-settings');
     if (saveBtn) saveBtn.addEventListener('click', saveSettings);

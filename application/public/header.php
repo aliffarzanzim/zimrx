@@ -93,6 +93,17 @@ $zrx_dd_theme = $_COOKIE['zimrx_dropdown_theme'] ?? 'subtle-tint';
     window.ZimRxIconsMap = <?= json_encode(ZimRxIcon::getAll(), JSON_UNESCAPED_SLASHES) ?>;
     window.ZimRxSavedTableColumns = <?= json_encode($zrx_saved_tbl_cols, JSON_UNESCAPED_SLASHES) ?>;
     window.ZimRxCsrfToken = <?= json_encode(function_exists('zimrx_csrf_token') ? zimrx_csrf_token() : '') ?>;
+    window.ZimRxUtils = window.ZimRxUtils || {};
+    window.ZimRxUtils.escapeHtml = function(value) {
+        if (value == null) return '';
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    };
+    window.escapeHtml = window.ZimRxUtils.escapeHtml;
     (function() {
         if (!window.fetch || !window.ZimRxCsrfToken) return;
         const _origFetch = window.fetch;
