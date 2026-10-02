@@ -39,7 +39,7 @@ function saveSetup() {
     const adminUser = document.getElementById('adminUsername')?.value ?? '';
 
     if (!password) { showError('Please enter a password.'); return; }
-    if (password.length < 14) { showError('Password must be at least 14 characters.'); return; }
+    if (password.length < 8) { showError('Password must be at least 8 characters.'); return; }
     if (password !== confirm) { showError('Passwords do not match.'); return; }
 
     const btn = document.getElementById('btnSaveSetup');

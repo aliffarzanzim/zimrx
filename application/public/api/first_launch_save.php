@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 // First launch onboarding save handler: provisions initial credentials, practice mode, and emergency recovery key.
-// Unauthenticated by design — runs only during initial system setup before accounts exist.
+// Unauthenticated by design - runs only during initial system setup before accounts exist.
 
 require_once dirname(__DIR__) . '/init.php';
 
@@ -73,9 +73,9 @@ try {
         echo json_encode(['error' => 'Password is required.']);
         exit;
     }
-    if (mb_strlen($password) < 14) {
+    if (mb_strlen($password) < 8) {
         http_response_code(422);
-        echo json_encode(['error' => 'Password must contain at least 14 characters.']);
+        echo json_encode(['error' => 'Password must contain at least 8 characters.']);
         exit;
     }
 
@@ -165,7 +165,7 @@ try {
     if (file_put_contents($recoveryPath, $recoveryKey, LOCK_EX) === false) {
         throw new RuntimeException('Cannot write recovery key.');
     }
-    @chmod($recoveryPath, 0600); // owner read-only — no group, no world
+    @chmod($recoveryPath, 0600); // owner read-only - no group, no world
 
     // Start session and log in
     if ($practiceType === 'solo') {

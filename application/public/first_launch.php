@@ -50,7 +50,7 @@ if ($step === 3 && !is_logged_in()) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZimRx — Setup</title>
+    <title>ZimRx - Setup</title>
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
     <link rel="stylesheet" href="assets/css/layout/global.css?v=<?= filemtime(__DIR__ . '/assets/css/layout/global.css') ?>">
     <link rel="stylesheet" href="assets/css/pages/first_launch.css?v=<?= filemtime(__DIR__ . '/assets/css/pages/first_launch.css') ?>">
@@ -153,12 +153,12 @@ if ($step === 3 && !is_logged_in()) {
                 <div class="section-label">Security</div>
                 <div class="field-row">
                     <div class="field">
-                        <label>Password <span class="fl-label-opt">(min 14 chars)</span></label>
-                        <input type="password" id="password" placeholder="At least 14 characters">
+                        <label>Password <span class="fl-label-opt">(min 8 chars)</span></label>
+                        <input type="password" id="password" placeholder="At least 8 characters">
                     </div>
                     <div class="field">
                         <label>Confirm Password</label>
-                        <input type="password" id="confirmPassword" placeholder="••••••••••••••">
+                        <input type="password" id="confirmPassword" placeholder="••••••••">
                     </div>
                 </div>
 
@@ -173,7 +173,7 @@ if ($step === 3 && !is_logged_in()) {
                         <input type="checkbox" id="autoLogin" checked>
                         <div>
                             <span>Auto-login on startup</span>
-                            <small>Opens directly to prescription — recommended for personal devices</small>
+                            <small>Opens directly to prescription - recommended for personal devices</small>
                         </div>
                     </label>
                 </div>
@@ -292,7 +292,7 @@ if ($step === 3 && !is_logged_in()) {
                     <button class="btn btn-primary" id="btnSaveDoctor" onclick="saveDoctor()">Save & Enter ZimRx →</button>
                 </div>
                 <div class="step3-skip">
-                    <a href="prescription.php">Skip — I'll fill this in later</a>
+                    <a href="prescription.php">Skip - I'll fill this in later</a>
                 </div>
             </div>
             <?php endif; ?>
