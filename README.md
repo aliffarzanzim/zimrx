@@ -181,6 +181,16 @@ Heartfelt gratitude to the contributors and researchers who supported the ZimRx 
 
 ---
 
+## Generative AI & Development Policy
+
+Patient safety comes first. While AI tools can be used to accelerate development and write tests, all clinical rules, drug interactions, edge cases and database logic are strictly designed and checked by real physicians and human developers.
+
+* **Clinical & Architectural Integrity:** All medical workflows, pediatric dosing models, and database schemas are manually verified against standard clinical reference literature and our automated regression tests.
+* **Open Source & License Compliance:** All contributions must be legally compatible with the GNU AGPL-3.0 license and free of third-party copyrighted materials.
+* **Contributor Guidelines:** Contributors using AI assistance for pull requests must ensure all changes are human-audited, deterministic, and fully explained.
+
+---
+
 ## License & Medical Data Attribution
 
 ### Software Code (GNU AGPLv3)
