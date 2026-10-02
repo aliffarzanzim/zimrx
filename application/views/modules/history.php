@@ -653,7 +653,7 @@ $dietOptions = [
             </div>
         </div>
 
-        <!-- Tab Pane 2: Habits (Coming Soon) -->
+        <!-- Tab Pane 2: Habits -->
         <div class="history-tab-pane" id="history-tab-pane-habits" class="zrx-dn">
             <div class="history-coming-soon-card">
                 <div class="coming-soon-badge">Coming soon</div>
@@ -672,7 +672,7 @@ $dietOptions = [
             </div>
         </div>
 
-        <!-- Tab Pane 3: Treatment History (Coming Soon) -->
+        <!-- Tab Pane 3: Treatment History -->
         <div class="history-tab-pane" id="history-tab-pane-treatment" class="zrx-dn">
             <div class="history-coming-soon-card">
                 <div class="coming-soon-badge">Coming soon</div>
@@ -689,7 +689,7 @@ $dietOptions = [
             </div>
         </div>
 
-        <!-- Tab Pane 4: Diet & Hypersensitivity (Coming Soon) -->
+        <!-- Tab Pane 4: Diet & Hypersensitivity -->
         <div class="history-tab-pane" id="history-tab-pane-diet" class="zrx-dn">
             <div class="history-coming-soon-card">
                 <div class="coming-soon-badge">Coming soon</div>
@@ -704,7 +704,7 @@ $dietOptions = [
             </div>
         </div>
 
-        <!-- Tab Pane 5: Drug History (Coming Soon) -->
+        <!-- Tab Pane 5: Drug History -->
         <div class="history-tab-pane" id="history-tab-pane-drug" class="zrx-dn">
             <div class="history-coming-soon-card">
                 <div class="coming-soon-badge">Coming soon</div>
