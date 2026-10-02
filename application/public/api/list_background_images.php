@@ -4,7 +4,6 @@ declare(strict_types=1);
 // Background images gallery API: lists user uploads and categorized system watermark presets.
 
 require_once dirname(__DIR__) . '/init.php';
-require_once dirname(__DIR__) . '/init.php';
 require_login();
 
 header('Content-Type: application/json');

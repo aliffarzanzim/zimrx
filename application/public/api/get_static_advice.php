@@ -4,7 +4,6 @@ declare(strict_types=1);
 // Static advice catalog endpoint: loads standard bilingual clinical advice items sorted by category.
 
 require_once dirname(__DIR__) . '/init.php';
-require_once dirname(__DIR__) . '/init.php';
 require_login();
 
 header('Content-Type: application/json');

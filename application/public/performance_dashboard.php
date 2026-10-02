@@ -5,7 +5,6 @@ declare(strict_types=1);
 
 $page_title = "Performance Dashboard - ZimRx";
 require_once __DIR__ . '/init.php';
-require_once __DIR__ . '/init.php';
 require_login();
 
 $pdo = DbConnections::userdata();

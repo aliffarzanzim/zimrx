@@ -4,7 +4,6 @@ declare(strict_types=1);
 // Mobile upload route: snaps photos or chooses PDFs from mobile devices and syncs directly into the desktop prescription.
 
 require_once __DIR__ . '/init.php';
-require_once __DIR__ . '/init.php';
 require_login();
 
 $doctorId = current_user_doctor_id();

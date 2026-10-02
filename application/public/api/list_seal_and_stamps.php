@@ -4,7 +4,6 @@ declare(strict_types=1);
 // Seal and stamps gallery API: lists uploaded signatures and categorized system stamp presets.
 
 require_once dirname(__DIR__) . '/init.php';
-require_once dirname(__DIR__) . '/init.php';
 require_login();
 
 header('Content-Type: application/json');

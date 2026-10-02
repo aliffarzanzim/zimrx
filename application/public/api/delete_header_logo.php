@@ -4,7 +4,6 @@ declare(strict_types=1);
 // Header logo deletion endpoint: deletes doctor-specific header logo image files.
 
 require_once dirname(__DIR__) . '/init.php';
-require_once dirname(__DIR__) . '/init.php';
 require_login();
 
 header('Content-Type: application/json');

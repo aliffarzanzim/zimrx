@@ -4,7 +4,6 @@ declare(strict_types=1);
 // Manufacturer preferences API: manages doctor-specific pharmaceutical company ranking and visibility.
 
 require_once dirname(__DIR__) . '/init.php';
-require_once dirname(__DIR__) . '/init.php';
 require_login();
 
 header('Content-Type: application/json');

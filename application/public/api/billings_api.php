@@ -4,7 +4,6 @@ declare(strict_types=1);
 // Billings API endpoint: payment records, receipt generation, and manual transaction logging.
 
 require_once dirname(__DIR__) . '/init.php';
-require_once dirname(__DIR__) . '/init.php';
 require_login();
 
 header('Content-Type: application/json');

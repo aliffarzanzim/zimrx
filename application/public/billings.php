@@ -6,7 +6,6 @@ declare(strict_types=1);
 $page_title = "Billings & Financials - ZimRx";
 
 require_once __DIR__ . '/init.php';
-require_once __DIR__ . '/init.php';
 require_login();
 require_once ZIMRX_BASE_DIR . '/lib/Services/BillingService.php';
 

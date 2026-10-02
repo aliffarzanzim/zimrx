@@ -5,7 +5,6 @@ declare(strict_types=1);
 
 $page_title = "Manufacturer Preferences - ZimRx";
 require_once __DIR__ . '/init.php';
-require_once __DIR__ . '/init.php';
 require_login();
 
 $doctorId = max(1, (int)(function_exists('current_user_doctor_id') ? current_user_doctor_id() : 1));
