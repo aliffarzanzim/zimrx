@@ -6,6 +6,10 @@ declare(strict_types=1);
 require_once __DIR__ . '/init.php';
 require_once __DIR__ . '/api/zrx_icons.php';
 
+if (!headers_sent()) {
+    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob:; connect-src 'self' http://127.0.0.1:* http://localhost:*; frame-ancestors 'self'; base-uri 'self'; form-action 'self';");
+}
+
 // Active route detection for navigation bar highlighting
 $current_page = basename($_SERVER['PHP_SELF']);
 $user_role = current_user_role();
