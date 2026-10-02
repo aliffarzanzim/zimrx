@@ -98,14 +98,30 @@ ZimRx implements a hardened **public webroot boundary** (`application/public/`) 
 
 ---
 
-## Quick Start (Windows)
+## Quick Start
 
-1. **Download or Clone the Repository**:
+### Windows
+1. Clone or download the repository:
    ```bash
    git clone https://github.com/aliffarzanzim/zimrx.git
    ```
-2. Double-click **`start.bat`** (it will automatically configure the FrankenPHP runtime if needed).
+2. Double-click **`start.bat`** (downloads and configures FrankenPHP automatically on first run).
 3. ZimRx automatically opens in your browser at `http://localhost:8080`.
+
+### Linux & macOS
+1. Clone or download the repository.
+2. Run the startup script:
+   ```bash
+   chmod +x start.sh
+   ./start.sh
+   ```
+3. Open `http://localhost:8080` in your browser.
+
+### Docker (Multi-Platform)
+```bash
+docker compose up
+```
+Open `http://localhost:8080` in your browser. User data and prescriptions are automatically persisted in `./application/userdata`.
 
 ---
 
