@@ -115,6 +115,9 @@ function zimrx_sync_interface_layout(PDO $pdo): void {
     $stmt->execute(['doctor_id' => $doctorId]);
     $dbSettings = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
+
     $keys = ['left_layout', 'right_layout', 'history_layout'];
     foreach ($keys as $key) {
         $cookieName = 'zimrx_' . $key;
@@ -122,7 +125,13 @@ function zimrx_sync_interface_layout(PDO $pdo): void {
         $cookieVal = $_COOKIE[$cookieName] ?? '';
 
         if ($dbVal !== '' && $dbVal !== $cookieVal) {
-            setcookie($cookieName, $dbVal, time() + 31536000, '/', '', false, false);
+            setcookie($cookieName, $dbVal, [
+                'expires'  => time() + 31536000,
+                'path'     => '/',
+                'secure'   => $isHttps,
+                'httponly' => false,
+                'samesite' => 'Lax',
+            ]);
             $_COOKIE[$cookieName] = $dbVal;
         }
     }
