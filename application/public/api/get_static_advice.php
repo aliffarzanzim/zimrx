@@ -9,14 +9,7 @@ require_login();
 header('Content-Type: application/json');
 
 try {
-    $dbPath = ZIMRX_DB_STATIC;
-
-    if (!file_exists($dbPath)) {
-        throw new Exception("Database file not found at: " . $dbPath);
-    }
-
-    $pdo = new PDO("sqlite:" . $dbPath);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = DbConnections::staticDb();
 
     $stmt = $pdo->query("
         SELECT

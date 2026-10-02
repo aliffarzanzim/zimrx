@@ -46,17 +46,31 @@ function pc_catalog_db(string $filename): ?PDO {
         return $connections[$filename];
     }
 
+    if ($filename === 'zimrx_static.db') {
+        try {
+            $pdo = DbConnections::staticDb();
+            $connections[$filename] = $pdo;
+            return $pdo;
+        } catch (Throwable $e) {
+            $connections[$filename] = null;
+            return null;
+        }
+    }
+
     $dbFile = pc_lookup_db_path($filename);
     if (!is_file($dbFile)) {
         $connections[$filename] = null;
         return null;
     }
 
-    $pdo = new PDO('sqlite:' . $dbFile);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-    $connections[$filename] = $pdo;
-    return $pdo;
+    try {
+        $pdo = DbConnections::openSqlite($dbFile);
+        $connections[$filename] = $pdo;
+        return $pdo;
+    } catch (Throwable $e) {
+        $connections[$filename] = null;
+        return null;
+    }
 }
 
 function pc_fts_prefix_query(string $query): string {

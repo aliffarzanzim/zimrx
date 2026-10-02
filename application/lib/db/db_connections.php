@@ -100,7 +100,15 @@ class DbConnections {
         $pdo->exec('PRAGMA foreign_keys = ON;');
         $pdo->exec('PRAGMA busy_timeout = 5000;');
 
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
         return $pdo;
+    }
+
+    // Opens an arbitrary SQLite database configured with WAL mode, foreign keys, and busy timeout
+    public static function openSqlite(string $path): PDO {
+        return self::createSqliteConnection(['path' => $path]);
     }
 
     private static function createMysqlConnection(array $config): PDO {
