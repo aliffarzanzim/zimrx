@@ -537,7 +537,8 @@ include 'header.php';
                 <h2>Doctor Profile Setup</h2>
                 <p>Welcome! Enter your professional details below to auto-generate your prescription header. You can edit or format this anytime later.</p>
             </div>
-            <form id="zrx-onboard-form" class="zrx-onboard-form" autocomplete="off">
+            <?php $onboardDefaults = zimrx_onboarding_defaults()['doctor_profile'] ?? []; ?>
+            <form id="zrx-onboard-form" class="zrx-onboard-form" autocomplete="off" data-defaults="<?= htmlspecialchars(json_encode($onboardDefaults, JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') ?>">
                 <div class="zrx-onboard-grid">
                     <!-- Bangla Side (Left Column) -->
                     <div class="zrx-onboard-column">

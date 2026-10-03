@@ -108,7 +108,8 @@ try {
         $rightHtml[] = '<p class="zrx-header-right-line-7"><font face="tinos"><span style="font-size:11pt;word-spacing:-0.05em;">' . $fmt($phone_en) . '</span></font></p>';
     }
     $rightBlockHtml = implode('', $rightHtml);
-    $footerHtml = '<p style="text-align: center; margin: 0; line-height: 1.5;"><font face="solaimanlipi"><span style="font-size: 10pt;"><b>চেম্বারঃ</b> ZimRx ডায়াগনস্টিক এন্ড কনসালটেশন সেন্টার, ঢাকা।<br><b>চেম্বারে আসার পূর্বে সিরিয়ালঃ ০১৪০৮-XXXXXX নম্বরে যোগাযোগ করে সিরিয়াল দিবেন।</b><br><b>রোগী দেখার সময়ঃ</b> বিকাল ৪ টা থেকে রাত ৮ টা (সপ্তাহে ৬ দিন)। ওয়েবসাইটঃ www.zimrx.guessthecase.eu.org</span></font></p>';
+    $onboardDefaults = zimrx_onboarding_defaults();
+    $footerHtml = (string)($onboardDefaults['footer_html'] ?? '');
 
     // Assemble DB payload
     $payload = [

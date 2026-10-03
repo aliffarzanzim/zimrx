@@ -25,6 +25,17 @@ function zimrx_print_default_options(): array {
     return $defaults;
 }
 
+function zimrx_onboarding_defaults(): array {
+    static $defaults = null;
+    if ($defaults === null) {
+        $defaultsPath = is_file(dirname(__DIR__, 2) . '/config/onboarding_defaults.php')
+            ? dirname(__DIR__, 2) . '/config/onboarding_defaults.php'
+            : __DIR__ . '/../config/onboarding_defaults.php';
+        $defaults = is_file($defaultsPath) ? require $defaultsPath : [];
+    }
+    return $defaults;
+}
+
 function zimrx_print_right_lines(array $header): array {
     $addressLines = preg_split('/\r\n|\r|\n/', trim((string)($header['chamber_address'] ?? '')));
     $addressLines = array_values(array_filter(array_map('zimrx_print_normalize_header_line', $addressLines), static fn($line) => $line !== ''));

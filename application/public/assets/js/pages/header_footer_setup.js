@@ -46,23 +46,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (onboardSkipBtn && onboardForm) {
         onboardSkipBtn.addEventListener('click', () => {
-            // Populate Bangla defaults
-            onboardForm.querySelector('[name="name_bn"]').value = 'ডা. শাফায়েত মাহমুদ';
-            onboardForm.querySelector('[name="qualifications_bn"]').value = 'এমবিবিএস, এমডি (কার্ডিওলজি), এফসিপিএস (মেডিসিন), বিসিএস(স্বাস্থ্য)';
-            onboardForm.querySelector('[name="designation_bn"]').value = 'চিফ কনসালটেন্ট ও বিভাগীয় প্রধান (কার্ডিওলজি)';
-            onboardForm.querySelector('[name="institute_bn"]').value = 'এপেক্স কার্ডিয়াক ইনস্টিটিউট';
-            onboardForm.querySelector('[name="speciality_bn"]').value = 'হৃদরোগ, উচ্চ রক্তচাপ ও মেডিসিন বিশেষজ্ঞ';
-            onboardForm.querySelector('[name="bmdc_bn"]').value = 'বিএমডিসি রেজি নং: A-112233';
-            onboardForm.querySelector('[name="phone_bn"]').value = 'মোবাইলঃ ০১৭১০-XXXXXX';
+            let defaults = {};
+            try {
+                defaults = JSON.parse(onboardForm.dataset.defaults || '{}');
+            } catch (e) {
+                defaults = {};
+            }
 
-            // Populate English defaults
-            onboardForm.querySelector('[name="name_en"]').value = 'Dr. Shafayet Mahmud';
-            onboardForm.querySelector('[name="qualifications_en"]').value = 'MBBS, MD (Cardiology), FCPS (Medicine), BCS (Health)';
-            onboardForm.querySelector('[name="designation_en"]').value = 'Chief Consultant & HOD (Cardiology)';
-            onboardForm.querySelector('[name="institute_en"]').value = 'Apex Cardiac Institute';
-            onboardForm.querySelector('[name="speciality_en"]').value = 'Cardiology, Hypertension & Medicine Specialist';
-            onboardForm.querySelector('[name="bmdc_en"]').value = 'BMDC Reg. No: A-112233';
-            onboardForm.querySelector('[name="phone_en"]').value = 'Mobile: 01710-XXXXXX';
+            Object.entries(defaults).forEach(([key, val]) => {
+                const input = onboardForm.querySelector(`[name="${key}"]`);
+                if (input) input.value = val;
+            });
 
             // Submit form
             const submitBtn = document.getElementById('zrx-onboard-submit-btn');
