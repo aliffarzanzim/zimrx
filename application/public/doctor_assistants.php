@@ -47,6 +47,11 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 
         header('Location: doctor_assistants.php');
         exit;
+    } catch (PDOException $e) {
+        error_log('[ZimRx] doctor_assistants database error: ' . $e->getMessage());
+        admin_set_flash('Unable to process assistant due to an internal error. Please try again.');
+        header('Location: doctor_assistants.php');
+        exit;
     } catch (Throwable $e) {
         admin_set_flash($e->getMessage());
         header('Location: doctor_assistants.php');

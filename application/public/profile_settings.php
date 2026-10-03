@@ -74,6 +74,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $flash = 'Profile settings updated successfully.';
+    } catch (PDOException $e) {
+        error_log('[ZimRx] profile_settings database error: ' . $e->getMessage());
+        $flash = 'Unable to save profile due to an internal error. Please try again.';
+        $flashType = 'error';
     } catch (Throwable $e) {
         $flash = $e->getMessage();
         $flashType = 'error';

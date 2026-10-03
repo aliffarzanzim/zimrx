@@ -105,6 +105,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
 
         $flashMessage = 'Appointment settings saved successfully!';
+    } catch (PDOException $e) {
+        error_log('[ZimRx] appointment_settings database error: ' . $e->getMessage());
+        $flashMessage = 'Unable to save settings due to an internal error. Please try again.';
+        $flashType = 'error';
     } catch (Throwable $e) {
         $flashMessage = 'Error saving settings: ' . $e->getMessage();
         $flashType = 'error';

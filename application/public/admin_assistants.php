@@ -15,6 +15,11 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         admin_set_flash('Assistant saved.');
         header('Location: admin_assistants.php');
         exit;
+    } catch (PDOException $e) {
+        error_log('[ZimRx] admin_assistants database error: ' . $e->getMessage());
+        admin_set_flash('Unable to save assistant due to an internal error. Please try again.');
+        header('Location: admin_assistants.php');
+        exit;
     } catch (Throwable $e) {
         admin_set_flash($e->getMessage());
         header('Location: admin_assistants.php');

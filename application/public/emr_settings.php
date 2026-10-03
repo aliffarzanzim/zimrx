@@ -38,6 +38,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
 
         $flash = 'EMR configuration saved successfully.';
+    } catch (PDOException $e) {
+        error_log('[ZimRx] emr_settings database error: ' . $e->getMessage());
+        $flash = 'Unable to save settings due to an internal error. Please try again.';
+        $flashType = 'error';
     } catch (Throwable $e) {
         $flash = 'Error saving settings: ' . $e->getMessage();
         $flashType = 'error';

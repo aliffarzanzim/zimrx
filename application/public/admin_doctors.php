@@ -14,6 +14,11 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         admin_set_flash('Doctor saved.');
         header('Location: admin_doctors.php');
         exit;
+    } catch (PDOException $e) {
+        error_log('[ZimRx] admin_doctors database error: ' . $e->getMessage());
+        admin_set_flash('Unable to save doctor due to an internal error. Please try again.');
+        header('Location: admin_doctors.php');
+        exit;
     } catch (Throwable $e) {
         admin_set_flash($e->getMessage());
         header('Location: admin_doctors.php');
