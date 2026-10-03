@@ -57,20 +57,23 @@ function zimrx_get_server_lan_ip(): string {
         }
     }
 
-    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-        $output = @shell_exec('ipconfig 2>nul');
-        if ($output && preg_match_all('/IPv4 Address[.\s]+:\s*([0-9.]+)/i', $output, $matches)) {
-            foreach ($matches[1] as $ip) {
-                if (!str_starts_with($ip, '127.') && !str_starts_with($ip, '169.254.')) {
-                    return trim($ip);
+    // Best-effort LAN adapter discovery via static OS commands
+    if (function_exists('shell_exec')) {
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $output = @shell_exec('ipconfig 2>nul');
+            if ($output && preg_match_all('/IPv4 Address[.\s]+:\s*([0-9.]+)/i', $output, $matches)) {
+                foreach ($matches[1] as $ip) {
+                    if (!str_starts_with($ip, '127.') && !str_starts_with($ip, '169.254.')) {
+                        return trim($ip);
+                    }
                 }
             }
-        }
-    } else {
-        $output = @shell_exec("hostname -I 2>/dev/null || ip route get 1 2>/dev/null | awk '{print $7;exit}' || ifconfig 2>/dev/null");
-        if ($output && preg_match_all('/\b(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(?:1[6-9]|2\d|3[01])\.\d+\.\d+)\b/', $output, $matches)) {
-            foreach ($matches[0] as $ip) {
-                return trim($ip);
+        } else {
+            $output = @shell_exec("hostname -I 2>/dev/null || ip route get 1 2>/dev/null | awk '{print $7;exit}' || ifconfig 2>/dev/null");
+            if ($output && preg_match_all('/\b(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(?:1[6-9]|2\d|3[01])\.\d+\.\d+)\b/', $output, $matches)) {
+                foreach ($matches[0] as $ip) {
+                    return trim($ip);
+                }
             }
         }
     }
@@ -513,7 +516,7 @@ try {
             $whereClauses[] = 'patient_id = :patient_id';
             $params['patient_id'] = $patientId;
         } else {
-            // No patient context supplied — return only unbound (walk-in) uploads
+            // No patient context supplied - return only unbound (walk-in) uploads
             $whereClauses[] = '(patient_id IS NULL OR patient_id = 0)';
         }
 

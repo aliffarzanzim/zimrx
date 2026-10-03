@@ -83,7 +83,6 @@ Doctor-specific prescription layout formatting, print margins, and examination p
 | `header_onboarding_ajax.php` | POST | Auth + CSRF | Initial wizard setup for clinic branding and contact headers |
 | `first_launch_save.php` | POST | Setup Token (Pre-auth) | First-run setup initialization, master admin password hashing, and clinic registration (one-time setup token gated) |
 | `print_setup_save.php` | POST | Auth + CSRF | Print layout margins, page size (A4, Letter, Custom), and padding geometry persistence |
-| `save_print_setup.php` | POST | Auth + CSRF | Secondary print configuration handler for custom layout preferences |
 | `reset_print_setup.php` | POST | Auth + CSRF | Reset print geometry to factory defaults |
 | `save_interface_layout.php` | POST | Auth + CSRF | Doctor workspace layout customization (left/right module card ordering and visibility) |
 | `manufacturer_preference_api.php` | GET, POST | Auth + CSRF | Pharmaceutical brand weighting and manufacturer preference scoring |

@@ -22,9 +22,6 @@
         "ext-pdo_sqlite": "*",
         "chillerlan/php-qrcode": "^6.0"
     },
-    "require-dev": {
-        "phpunit/phpunit": "^10.5"
-    },
     "autoload": {
         "psr-4": {
             "ZimRx\\Services\\": "lib/Services/"
@@ -32,9 +29,6 @@
     },
     "scripts": {
         "test": "php tests/run_tests.php"
-    },
-    "scripts-descriptions": {
-        "test": "Run the automated test suite (tests/run_tests.php)"
     },
     "config": {
         "optimize-autoloader": true,
