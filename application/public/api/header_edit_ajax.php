@@ -110,6 +110,7 @@ try {
     zimrx_print_save_setup($pdo, current_user_doctor_id(), $payload);
     echo '1';
 } catch (Throwable $e) {
+    error_log('[ZimRx] header_edit_ajax error: ' . $e->getMessage());
     http_response_code(500);
-    echo $e->getMessage();
+    echo 'Save failed. Please try again.';
 }

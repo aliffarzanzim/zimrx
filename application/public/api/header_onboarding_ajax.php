@@ -144,6 +144,7 @@ try {
     
     echo '1';
 } catch (Throwable $e) {
+    error_log('[ZimRx] header_onboarding_ajax error: ' . $e->getMessage());
     http_response_code(500);
-    echo $e->getMessage();
+    echo 'Save failed. Please try again.';
 }
