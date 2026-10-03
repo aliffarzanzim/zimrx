@@ -10,11 +10,15 @@ function admin_value(array $data, string $key): string {
 // Fetch all doctors with legacy aliases for admin templates
 function admin_all_doctors(PDO $pdo, bool $activeOnly = false): array {
     $sql = "SELECT *, qualifications_en AS qualifications, specialty_en AS specialty, bmdc_no_en AS bmdc_no, id AS doctor_id, display_name AS doctor_name, is_active AS status FROM zimrx_doctors";
+    $params = [];
     if ($activeOnly) {
-        $sql .= " WHERE is_active = 1";
+        $sql .= " WHERE is_active = ?";
+        $params[] = 1;
     }
     $sql .= " ORDER BY display_name ASC, id ASC";
-    return $pdo->query($sql)->fetchAll();
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetchAll();
 }
 
 // Active doctor IDs assigned to an assistant
