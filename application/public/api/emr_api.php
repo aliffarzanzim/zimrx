@@ -27,7 +27,7 @@ function emr_enforce_mutation(): void {
 }
 
 try {
-    $pdo = $pdo instanceof PDO ? $pdo : DbConnections::userdata();
+    $pdo = DbConnections::userdata();
     $pdo->exec('PRAGMA busy_timeout = 5000');
 } catch (Throwable $e) {
     error_log('[ZimRx] emr_api DB connection error: ' . $e->getMessage());
