@@ -18,9 +18,10 @@ if (!defined('ZIMRX_DB_LIGHTWEIGHT')) {
     try {
         $pdo = DbConnections::userdata();
     } catch (Throwable $e) {
-        header('Content-Type: application/json');
+        error_log('[ZimRx] Database Connection failed: ' . $e->getMessage());
+        header('Content-Type: application/json; charset=utf-8');
         http_response_code(500);
-        exit((string)json_encode(["error" => "Database Connection failed: " . $e->getMessage()]));
+        exit((string)json_encode(["error" => "Database connection unavailable. Please try again."]));
     }
 }
 

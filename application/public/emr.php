@@ -12,10 +12,12 @@ $page_title = 'EMR - Electronic Medical Records | ZimRx';
 $current_page = 'emr.php';
 
 try {
-    $pdo = $pdo instanceof PDO ? $pdo : DbConnections::userdata();
+    $pdo = DbConnections::userdata();
     $pdo->exec('PRAGMA busy_timeout = 5000');
 } catch (Throwable $e) {
-    die('Database connection error: ' . htmlspecialchars($e->getMessage()));
+    error_log('[ZimRx] emr.php database error: ' . $e->getMessage());
+    http_response_code(500);
+    die('Database connection unavailable. Please try again.');
 }
 
 function zimrx_calculate_current_age(?string $dob, ?string $fallbackAge, ?string $fallbackUnit = 'Years'): array {
