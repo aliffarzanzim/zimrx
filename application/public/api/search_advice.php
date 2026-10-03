@@ -7,7 +7,6 @@ require_once dirname(__DIR__) . '/init.php';
 require_once ZIMRX_BASE_DIR . '/lib/rx_template_lib.php';
 require_login();
 
-ini_set('display_errors', '0');
 header('Content-Type: application/json');
 
 try {

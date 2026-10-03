@@ -3,6 +3,12 @@ declare(strict_types=1);
 
 // Core configuration: file paths, database connection parameters, and network origins.
 
+// Production error handling: log technical errors, suppress raw notices from client
+if (getenv('ZIMRX_DEBUG') !== '1') {
+    ini_set('display_errors', '0');
+    ini_set('log_errors', '1');
+}
+
 // Application directory paths
 if (!defined('ZIMRX_BASE_DIR')) {
     define('ZIMRX_BASE_DIR', dirname(__DIR__));

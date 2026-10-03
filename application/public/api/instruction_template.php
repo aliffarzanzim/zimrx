@@ -7,8 +7,6 @@ require_once dirname(__DIR__) . '/init.php';
 require_login();
 require_once ZIMRX_BASE_DIR . '/lib/rx_regimen_lib.php';
 
-ini_set('display_errors', '0');
-
 function instruction_template_payload(int $doctorId): array {
     return [
         'settings' => rx_instruction_template_settings($doctorId),

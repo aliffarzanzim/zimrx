@@ -52,7 +52,7 @@ elif [ -f "runtime/frankenphp/frankenphp" ]; then
     SERVER_PID=$!
 elif command -v php >/dev/null 2>&1; then
     echo "[1/2] FrankenPHP not detected. Falling back to PHP built-in server on port $ZIMRX_PORT..."
-    php -S "0.0.0.0:$ZIMRX_PORT" -t application/public >> logs/php-server.log 2>&1 &
+    php -d display_errors=0 -d log_errors=1 -S "0.0.0.0:$ZIMRX_PORT" -t application/public >> logs/php-server.log 2>&1 &
     SERVER_PID=$!
 else
     echo "[ERROR] Neither 'frankenphp' nor 'php' CLI was found in your PATH."

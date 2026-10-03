@@ -6,8 +6,6 @@ require_once dirname(__DIR__) . '/init.php';
 require_login();
 require_once ZIMRX_BASE_DIR . '/lib/print_setup_lib.php';
 
-ini_set('display_errors', '0');
-
 header('Content-Type: text/plain; charset=utf-8');
 
 if (!zimrx_verify_csrf()) {

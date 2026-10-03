@@ -7,7 +7,8 @@ LABEL description="ZimRx: Open-source, local-first offline prescription & EMR en
 
 # Install recommended dependencies and sqlite driver
 RUN apk add --no-cache bash curl sqlite && \
-    install-php-extensions pdo_sqlite
+    install-php-extensions pdo_sqlite && \
+    cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 WORKDIR /app
 
