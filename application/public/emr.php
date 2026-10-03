@@ -278,7 +278,7 @@ if ($patient && !empty($patient['id'])) {
                     </div>
                     <div class="emr-demo-item">
                         <span class="label">Blood Group</span>
-                        <span class="val" class="zrx-c-danger"><?= htmlspecialchars($patient['blood_group'] ?: '--') ?></span>
+                        <span class="val zrx-c-danger"><?= htmlspecialchars($patient['blood_group'] ?: '--') ?></span>
                     </div>
                     <div class="emr-demo-item">
                         <span class="label">Phone / Mobile</span>
@@ -517,19 +517,19 @@ if ($patient && !empty($patient['id'])) {
                 <div class="emr-panel-header">2. Prescription (Rx) Medication Grid</div>
                 
                 <div class="emr-rx-entry-bar">
-                    <div class="emr-form-group" class="zrx-m0">
+                    <div class="emr-form-group zrx-m0">
                         <label>Drug Search</label>
                         <input type="text" id="emr-rx-drug-name" placeholder="Search Brand / Generic..." autocomplete="off">
                     </div>
-                    <div class="emr-form-group" class="zrx-m0">
+                    <div class="emr-form-group zrx-m0">
                         <label>Dose</label>
                         <input type="text" id="emr-rx-dose" placeholder="1+0+1">
                     </div>
-                    <div class="emr-form-group" class="zrx-m0">
+                    <div class="emr-form-group zrx-m0">
                         <label>Duration</label>
                         <input type="text" id="emr-rx-duration" placeholder="7 Days">
                     </div>
-                    <div class="emr-form-group" class="zrx-m0">
+                    <div class="emr-form-group zrx-m0">
                         <label>Instruction</label>
                         <input type="text" id="emr-rx-instruction" placeholder="After meal">
                     </div>

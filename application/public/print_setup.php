@@ -175,13 +175,13 @@ include 'header.php';
     </div>
 
     <div id="print-setup-confirm-modal" class="print-setup-toast" hidden>
-        <div class="print-setup-toast-panel" role="dialog" aria-modal="true" class="print-setup-toast-panel ple-confirm-panel">
-            <span class="print-setup-toast-icon" class="print-setup-toast-icon ple-confirm-icon" aria-hidden="true">&#9888;</span>
+        <div class="print-setup-toast-panel ple-confirm-panel" role="dialog" aria-modal="true">
+            <span class="print-setup-toast-icon ple-confirm-icon" aria-hidden="true">&#9888;</span>
             <strong class="ple-confirm-title">Reset to Defaults?</strong>
             <p class="ple-confirm-text">Are you sure you want to restore the print layout and decoration sizes to default settings? This cannot be undone.</p>
             <div class="ple-confirm-actions">
-                <button type="button" id="confirm-reset-cancel" class="btn btn-outline" class="btn btn-outline ple-confirm-btn">Cancel</button>
-                <button type="button" id="confirm-reset-yes" class="btn btn-primary" class="btn btn-primary ple-confirm-btn-danger">Yes, Reset</button>
+                <button type="button" id="confirm-reset-cancel" class="btn btn-outline ple-confirm-btn">Cancel</button>
+                <button type="button" id="confirm-reset-yes" class="btn btn-primary ple-confirm-btn-danger">Yes, Reset</button>
             </div>
         </div>
     </div>
@@ -875,7 +875,7 @@ include 'header.php';
                     <input type="hidden" name="dx_name" value="<?= preview_escape((string)($options['dx_name'] ?? 'Dx')) ?>">
                 </div>
 
-                <div class="print-advanced-split" class="ple-2col-grid">
+                <div class="print-advanced-split ple-2col-grid">
                     <div class="zrx-ox-auto">
                         <table class="print-advanced-table slot-table">
                             <thead>
@@ -946,7 +946,7 @@ include 'header.php';
                     <input type="hidden" name="lbl_history_drug" value="<?= preview_escape((string)($options['lbl_history_drug'] ?? 'Drug History:')) ?>">
                 </div>
 
-                <div class="print-advanced-split" class="ple-2col-grid">
+                <div class="print-advanced-split ple-2col-grid">
                     <div class="zrx-ox-auto">
                         <table class="print-advanced-table history-slot-table">
                             <thead>

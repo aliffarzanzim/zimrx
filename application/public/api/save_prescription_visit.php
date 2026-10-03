@@ -286,11 +286,7 @@ try {
         $visitRecordId = (int)$appointment['visit_record_id'];
         $publicVisitId = (string)($appointment['visit_id'] ?? '');
 
-        if (DbConnections::driver() === 'sqlite') {
-            $pdo->exec('BEGIN IMMEDIATE');
-        } else {
-            $pdo->beginTransaction();
-        }
+        $pdo->beginTransaction();
 
         $stmtEx = $pdo->prepare("SELECT * FROM zimrx_visits WHERE id = :id AND doctor_id = :doctor_id LIMIT 1");
         $stmtEx->execute(['id' => $visitRecordId, 'doctor_id' => $doctorId]);
@@ -366,11 +362,7 @@ try {
     }
 
     if ($appointmentId > 0) {
-        if (DbConnections::driver() === 'sqlite') {
-            $pdo->exec('BEGIN IMMEDIATE');
-        } else {
-            $pdo->beginTransaction();
-        }
+        $pdo->beginTransaction();
 
         $stmt = $pdo->prepare("SELECT * FROM zimrx_visits WHERE appointment_id = :appointment_id AND doctor_id = :doctor_id LIMIT 1");
         $stmt->execute(['appointment_id' => $appointmentId, 'doctor_id' => $doctorId]);
@@ -499,11 +491,7 @@ try {
 
     $syncId = SyncJournalService::generateUuid();
 
-    if (DbConnections::driver() === 'sqlite') {
-        $pdo->exec('BEGIN IMMEDIATE');
-    } else {
-        $pdo->beginTransaction();
-    }
+    $pdo->beginTransaction();
     $stmt = $pdo->prepare(
         "INSERT INTO zimrx_visits (
             doctor_id, appointment_id, patient_id, patient_reg_no, patient_name, visit_no, visit_id,

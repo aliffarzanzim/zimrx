@@ -551,9 +551,6 @@ body.zimrx-appointments-hold.zimrx-appointments-ready { opacity: 1; }
 .module-header span:first-child { font-size: 14px; font-weight: 600; letter-spacing: 0; }
 .module-header span:last-child { font-size: 0.7rem; font-weight: 500; color: var(--zrx-text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
 .module-body { padding: 1rem; font-size: 0.85rem; }
-.mock-list { list-style: none; margin-bottom: 0.75rem; }
-.mock-list li { padding: 4px 0; border-bottom: 1px dashed var(--zrx-border-subtle); color: var(--zrx-slate-600); }
-.mock-list li:last-child { border-bottom: none; }
 .module-input { width: 100%; padding: 6px 10px; border: 1px solid var(--zrx-border); border-radius: 4px; font-size: 0.85rem; transition: var(--transition); }
 .module-input:focus { border-color: var(--zrx-primary); outline: none; }
 

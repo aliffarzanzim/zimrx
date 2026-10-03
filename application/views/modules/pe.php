@@ -56,14 +56,14 @@ $activePeItems = $peDoctorConfig['active_items'];
                                 </div>
                             </td>
                         <?php elseif ($code === 'height'): ?>
-                            <td><input type="text" id="pe-height-val" class="pc-input pe-input" class="zrx-ta-c" autocomplete="off"></td>
+                            <td><input type="text" id="pe-height-val" class="pc-input pe-input zrx-ta-c" autocomplete="off"></td>
                         <?php elseif ($code === 'weight'): ?>
-                            <td><input type="text" id="pe-weight-val" class="pc-input pe-input" class="zrx-ta-c" autocomplete="off"></td>
+                            <td><input type="text" id="pe-weight-val" class="pc-input pe-input zrx-ta-c" autocomplete="off"></td>
                         <?php elseif ($code === 'bmi'): ?>
-                            <td><input type="text" id="pe-bmi-val" class="pc-input pe-input" class="zrx-ta-c" readonly autocomplete="off"></td>
+                            <td><input type="text" id="pe-bmi-val" class="pc-input pe-input zrx-ta-c" readonly autocomplete="off"></td>
                         <?php elseif (!empty($item['dropdown_options']) || !empty($item['finding_wordlists'])): ?>
                             <td>
-                                <input type="text" list="pe-dl-<?= $code ?>" class="pc-input pe-input" class="zrx-ta-c" autocomplete="off" placeholder="<?= $normalVal ? 'Normal: ' . $normalVal : '' ?>">
+                                <input type="text" list="pe-dl-<?= $code ?>" class="pc-input pe-input zrx-ta-c" autocomplete="off" placeholder="<?= $normalVal ? 'Normal: ' . $normalVal : '' ?>">
                                 <datalist id="pe-dl-<?= $code ?>">
                                     <?php 
                                         $options = array_filter(array_map('trim', explode('|', $item['dropdown_options'] ?? '')));
@@ -76,10 +76,10 @@ $activePeItems = $peDoctorConfig['active_items'];
                                 </datalist>
                             </td>
                         <?php else: ?>
-                            <td><input type="text" class="pc-input pe-input" class="zrx-ta-c" autocomplete="off"></td>
+                            <td><input type="text" class="pc-input pe-input zrx-ta-c" autocomplete="off"></td>
                         <?php endif; ?>
 
-                        <td><input type="text" class="pc-input pe-input" class="zrx-ta-c" value="<?= $unit ?>" autocomplete="off"></td>
+                        <td><input type="text" class="pc-input pe-input zrx-ta-c" value="<?= $unit ?>" autocomplete="off"></td>
                         <td class="pc-action pc-drag">
                             <button type="button" class="pc-row-move-btn" title="Move Row">
                                 <?= zrx_icon('move', 14) ?>
@@ -100,8 +100,8 @@ $activePeItems = $peDoctorConfig['active_items'];
         <tr class="pc-row" draggable="true" data-item-code="" data-input-type="textbox">
             <td class="pc-action pc-del"><button type="button" title="Remove Row">X</button></td>
             <td><textarea class="pc-input pe-input" autocomplete="off" rows="1"></textarea></td>
-            <td><input type="text" class="pc-input pe-input" class="zrx-ta-c" autocomplete="off"></td>
-            <td><input type="text" class="pc-input pe-input" class="zrx-ta-c" autocomplete="off"></td>
+            <td><input type="text" class="pc-input pe-input zrx-ta-c" autocomplete="off"></td>
+            <td><input type="text" class="pc-input pe-input zrx-ta-c" autocomplete="off"></td>
             <td class="pc-action pc-drag">
                 <button type="button" class="pc-row-move-btn" title="Move Row">
                     <?= zrx_icon('move', 14) ?>

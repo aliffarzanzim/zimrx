@@ -92,6 +92,8 @@ class DbConnections {
             throw new RuntimeException("Unable to create the database directory: {$directory}");
         }
 
+        self::ensureReferenceDatabaseExists($path);
+
         $pdo = new PDO("sqlite:$path");
         
         // WAL mode and busy timeout help avoid database locked errors under concurrency
@@ -104,6 +106,38 @@ class DbConnections {
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
         return $pdo;
+    }
+
+    // Automatically compiles master reference databases from SQL seeds if missing on first launch
+    private static function ensureReferenceDatabaseExists(string $path): void {
+        if (file_exists($path) && filesize($path) > 1024 * 1024) {
+            return;
+        }
+
+        $filename = basename($path);
+        if ($filename !== 'zimrx_drugs.db' && $filename !== 'zimrx_static.db') {
+            return;
+        }
+
+        $baseDir = defined('ZIMRX_BASE_DIR') ? ZIMRX_BASE_DIR : dirname(__DIR__, 2);
+        $builderFile = $baseDir . '/systemdata/seeds/build_db.php';
+        if (!file_exists($builderFile)) {
+            return;
+        }
+
+        require_once $builderFile;
+
+        if (!function_exists('buildDatabaseFromSql')) {
+            return;
+        }
+
+        if ($filename === 'zimrx_drugs.db') {
+            $sql = $baseDir . '/systemdata/seeds/zimrx_drugs.sql';
+            buildDatabaseFromSql($sql, $path, 'drug_generic', 2000, false);
+        } elseif ($filename === 'zimrx_static.db') {
+            $sql = $baseDir . '/systemdata/seeds/zimrx_static.sql';
+            buildDatabaseFromSql($sql, $path, 'zimrx_static_dx', 1000, false);
+        }
     }
 
     // Opens an arbitrary SQLite database configured with WAL mode, foreign keys, and busy timeout

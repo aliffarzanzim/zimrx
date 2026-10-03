@@ -28,7 +28,10 @@ if not exist "runtime\frankenphp\frankenphp.exe" (
 
 if not exist "application\userdata\database" mkdir application\userdata\database
 if not exist "application\userdata\uploads" mkdir application\userdata\uploads
+if not exist "application\systemdata\database" mkdir application\systemdata\database
 if not exist "logs" mkdir logs
+
+
 
 :: Kill any leftover frankenphp instances before starting
 taskkill /f /im frankenphp.exe >nul 2>&1

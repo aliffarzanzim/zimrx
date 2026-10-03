@@ -1,6 +1,6 @@
 # ==============================================================================
-# ZimRx Clinical Reports Storage - Confidential Patient Data
-# Direct HTTP access is forbidden. Access exclusively via api/view_report.php
+# ZimRx Chat Attachments Storage - Confidential Clinical Communications
+# Direct HTTP access is forbidden. Access exclusively via api/chat.php?action=view_attachment
 # ==============================================================================
 <IfModule mod_authz_core.c>
     Require all denied

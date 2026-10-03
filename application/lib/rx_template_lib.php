@@ -399,7 +399,9 @@ function rx_phrase_learn(string $type, string $value, int $doctorId): void {
         return;
     }
 
-    $sortOrder = (int)$userPdo->query("SELECT COALESCE(MAX(sort_order), 0) + 1 FROM {$table} WHERE doctor_id = " . (int)$doctorId)->fetchColumn();
+    $sortStmt = $userPdo->prepare("SELECT COALESCE(MAX(sort_order), 0) + 1 FROM {$table} WHERE doctor_id = :doctor_id");
+    $sortStmt->execute(['doctor_id' => $doctorId]);
+    $sortOrder = (int)$sortStmt->fetchColumn();
     $columns = "doctor_id, static_id, {$bn}, {$en}, usage_count, sort_order, is_edited, created_at, updated_at";
     $values = ":doctor_id, 0, :bn, '', 1, :sort_order, 1, " . DbSql::now() . ", " . DbSql::now();
     if ($type !== 'advice') {

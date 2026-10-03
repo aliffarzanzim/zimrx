@@ -12,9 +12,18 @@ if ($earlyAction === 'view_attachment') {
     $rawFile = trim((string)($_GET['file'] ?? ''));
     $safeFile = basename($rawFile);
     // Allow only expected filename pattern: chat-{convId}-{timestamp}-{hex}.{ext}
-    if (!preg_match('/^chat-\d+-\d+-[0-9a-f]+\.(jpg|png|webp|pdf)$/i', $safeFile)) {
+    if (!preg_match('/^chat-(\d+)-\d+-[0-9a-f]+\.(jpg|png|webp|pdf)$/i', $safeFile, $matches)) {
         http_response_code(400);
         exit('Invalid attachment filename.');
+    }
+    $convId = (int)$matches[1];
+    $authPdo = DbConnections::userdata();
+    $currentUserId = current_user_id();
+    $partStmt = $authPdo->prepare("SELECT 1 FROM zimrx_chat_participants WHERE conversation_id = :conv_id AND user_id = :user_id LIMIT 1");
+    $partStmt->execute([':conv_id' => $convId, ':user_id' => $currentUserId]);
+    if (!$partStmt->fetchColumn() && !is_admin_user()) {
+        http_response_code(403);
+        exit('Access denied: attachment belongs to another conversation.');
     }
     $attachDir = ZIMRX_UPLOADS_DIR . '/chat';
     $filePath  = $attachDir . '/' . $safeFile;

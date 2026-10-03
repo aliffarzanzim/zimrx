@@ -461,7 +461,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
             <div class="res-row" onclick="' . drug_db_view_e(drug_db_view_js_call('loadGenericBrands', $id, $name)) . '">
                 ' . zrx_icon('microscope', 14, ['class' => 'zrx-c-muted']) . '
                 <div class="res-info">
-                    <span class="res-brand" class="db-text-accent">' . drug_db_view_e($name) . '</span>
+                    <span class="res-brand db-text-accent">' . drug_db_view_e($name) . '</span>
                     <span class="res-price">' . drug_db_view_e($item['brand_count'] ?? '') . ' Brands</span>
                 </div>
             </div>
@@ -474,7 +474,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
             <div class="res-row" onclick="' . drug_db_view_e(drug_db_view_js_call('loadClassDetail', $name)) . '">
                 ' . zrx_icon('layers', 14, ['class' => 'db-item-lead-title']) . '
                 <div class="res-info">
-                    <span class="res-brand" class="db-text-navy">' . drug_db_view_e($name) . '</span>
+                    <span class="res-brand db-text-navy">' . drug_db_view_e($name) . '</span>
                 </div>
             </div>
         ';
@@ -487,7 +487,7 @@ function drug_db_view_sidebar_row(array $item, string $mode, ?string $activeBran
             <div class="res-row" onclick="' . drug_db_view_e(drug_db_view_js_call('loadIndicationDetail', $id, $name)) . '">
                 ' . zrx_icon('stethoscope', 14, ['class' => 'db-item-icon-lead']) . '
                 <div class="res-info">
-                    <span class="res-brand" class="db-text-navy">' . drug_db_view_e($name) . '</span>
+                    <span class="res-brand db-text-navy">' . drug_db_view_e($name) . '</span>
                 </div>
             </div>
         ';

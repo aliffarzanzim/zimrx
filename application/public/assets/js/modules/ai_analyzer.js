@@ -52,9 +52,23 @@
 
     modelNameInput.value = localStorage.getItem('ZIMRX_AI_MODEL_NAME') || '';
 
+    function isLoopbackUrl(urlStr) {
+        try {
+            const parsed = new URL(urlStr);
+            const host = parsed.hostname.toLowerCase();
+            return host === 'localhost' || host === '127.0.0.1' || host === '::1' || host === '[::1]';
+        } catch (e) {
+            return false;
+        }
+    }
+
     // Save Settings
     saveBtn.addEventListener('click', () => {
         const finalBaseUrl = (providerSelect.value === 'custom') ? baseUrlInput.value.trim() : providerSelect.value;
+        if (providerSelect.value === 'custom' && !isLoopbackUrl(finalBaseUrl)) {
+            alert('Security restriction: AI Analyzer operates strictly offline on loopback (127.0.0.1 or localhost). External URLs are blocked to protect patient privacy.');
+            return;
+        }
         localStorage.setItem('ZIMRX_AI_BASE_URL', finalBaseUrl);
         localStorage.setItem('ZIMRX_AI_MODEL_NAME', modelNameInput.value.trim());
 
@@ -72,6 +86,10 @@
 
         if (!finalBaseUrl) {
             alert('Please configure a local provider endpoint first.');
+            return;
+        }
+        if (providerSelect.value === 'custom' && !isLoopbackUrl(finalBaseUrl)) {
+            alert('Security restriction: Custom endpoint must be a local loopback address (127.0.0.1 or localhost).');
             return;
         }
 
@@ -238,6 +256,12 @@
 
         if (!finalBaseUrl || !modelName) {
             alert('Please configure local Provider and Model Name in the settings.');
+            settingsPanel.classList.add('active');
+            return;
+        }
+
+        if (providerSelect.value === 'custom' && !isLoopbackUrl(finalBaseUrl)) {
+            alert('Security restriction: AI Analyzer operates strictly offline on loopback (127.0.0.1 or localhost). External URLs are blocked.');
             settingsPanel.classList.add('active');
             return;
         }

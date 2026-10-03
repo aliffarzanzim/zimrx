@@ -125,7 +125,7 @@ include 'header.php';
                 <div class="dropdown-presets-grid" id="dropdown-presets-container">
                     <label class="dd-theme-card" data-theme="subtle-tint" data-bg="#ebedf0" data-text="#0f172a">
                         <input type="radio" name="dropdown_theme" value="subtle-tint">
-                        <div class="dd-theme-preview" class="dd-theme-preview dd-theme-preview-slate">Aa</div>
+                        <div class="dd-theme-preview dd-theme-preview-slate">Aa</div>
                         <div class="dd-theme-info">
                             <strong>Subtle Tint</strong>
                             <span>Soft neutral tint (Original text colors)</span>
@@ -134,7 +134,7 @@ include 'header.php';
 
                     <label class="dd-theme-card" data-theme="slate-gray" data-bg="#868e96" data-text="#ffffff">
                         <input type="radio" name="dropdown_theme" value="slate-gray">
-                        <div class="dd-theme-preview" class="dd-theme-preview dd-theme-preview-gray">Aa</div>
+                        <div class="dd-theme-preview dd-theme-preview-gray">Aa</div>
                         <div class="dd-theme-info">
                             <strong>Neutral Slate</strong>
                             <span>Soft neutral slate (White text)</span>
@@ -143,7 +143,7 @@ include 'header.php';
 
                     <label class="dd-theme-card" data-theme="charcoal" data-bg="#475569" data-text="#ffffff">
                         <input type="radio" name="dropdown_theme" value="charcoal">
-                        <div class="dd-theme-preview" class="dd-theme-preview dd-theme-preview-dark">Aa</div>
+                        <div class="dd-theme-preview dd-theme-preview-dark">Aa</div>
                         <div class="dd-theme-info">
                             <strong>Charcoal Slate</strong>
                             <span>Deep slate (White text)</span>
@@ -152,7 +152,7 @@ include 'header.php';
 
                     <label class="dd-theme-card" data-theme="theme-blue" data-bg="#2563eb" data-text="#ffffff">
                         <input type="radio" name="dropdown_theme" value="theme-blue">
-                        <div class="dd-theme-preview" class="dd-theme-preview dd-theme-preview-blue">Aa</div>
+                        <div class="dd-theme-preview dd-theme-preview-blue">Aa</div>
                         <div class="dd-theme-info">
                             <strong>Theme Primary Blue</strong>
                             <span>Royal blue (White text)</span>
@@ -161,7 +161,7 @@ include 'header.php';
 
                     <label class="dd-theme-card" data-theme="soft-blue" data-bg="#eff6ff" data-text="#1d4ed8">
                         <input type="radio" name="dropdown_theme" value="soft-blue">
-                        <div class="dd-theme-preview" class="dd-theme-preview dd-theme-preview-softblue">Aa</div>
+                        <div class="dd-theme-preview dd-theme-preview-softblue">Aa</div>
                         <div class="dd-theme-info">
                             <strong>Soft Blue Tint</strong>
                             <span>Light sky tint (Blue text)</span>
@@ -170,16 +170,16 @@ include 'header.php';
 
                     <label class="dd-theme-card" data-theme="emerald" data-bg="#16a34a" data-text="#ffffff">
                         <input type="radio" name="dropdown_theme" value="emerald">
-                        <div class="dd-theme-preview" class="dd-theme-preview dd-theme-preview-green">Aa</div>
+                        <div class="dd-theme-preview dd-theme-preview-green">Aa</div>
                         <div class="dd-theme-info">
                             <strong>Emerald Green</strong>
                             <span>Clinical emerald (White text)</span>
                         </div>
                     </label>
 
-                    <label class="dd-theme-card" data-theme="custom" data-bg="#868e96" data-text="#ffffff" class="dd-theme-card dd-theme-card-custom">
+                    <label class="dd-theme-card dd-theme-card-custom" data-theme="custom" data-bg="#868e96" data-text="#ffffff">
                         <input type="radio" name="dropdown_theme" value="custom">
-                        <div class="dd-theme-preview" id="dd-custom-preview-swatch" class="dd-theme-preview dd-theme-preview-custom">Aa</div>
+                        <div class="dd-theme-preview dd-theme-preview-custom" id="dd-custom-preview-swatch">Aa</div>
                         <div class="dd-theme-info">
                             <strong>Custom Colors...</strong>
                             <span>Pick your exact highlight background & text color</span>
@@ -188,7 +188,7 @@ include 'header.php';
                 </div>
 
                 <!-- Live Interactive Dropdown Preview -->
-                <div class="dropdown-live-demo-card" class="setup-preview-card">
+                <div class="dropdown-live-demo-card setup-preview-card">
                     <div class="setup-preview-header">
                         <span class="setup-preview-label">Live Preview</span>
                         <span class="setup-preview-hint">Hover or click below</span>
@@ -198,20 +198,20 @@ include 'header.php';
                             Dropdown button <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </div>
                         <ul id="demo-dd-menu" class="setup-mock-dropdown">
-                            <li class="demo-dd-item" class="setup-mock-item">
-                                <div class="demo-code" class="setup-mock-brand">A260416002</div>
-                                <strong class="demo-name" class="setup-mock-name">Rahim Uddin</strong>
-                                <span class="demo-meta" class="setup-mock-company">0172222222 | Mirpur, Dhaka</span>
+                            <li class="demo-dd-item setup-mock-item">
+                                <div class="demo-code setup-mock-brand">A260416002</div>
+                                <strong class="demo-name setup-mock-name">Rahim Uddin</strong>
+                                <span class="demo-meta setup-mock-company">0172222222 | Mirpur, Dhaka</span>
                             </li>
-                            <li class="demo-dd-item active" id="demo-dd-active-item" class="setup-mock-item is-selected">
-                                <div class="demo-code" class="setup-mock-brand">A260416003</div>
-                                <strong class="demo-name" class="setup-mock-name">Momena Begum</strong>
-                                <span class="demo-meta" class="setup-mock-company">0173333333 | Uttara, Dhaka</span>
+                            <li class="demo-dd-item active is-selected" id="demo-dd-active-item">
+                                <div class="demo-code setup-mock-brand">A260416003</div>
+                                <strong class="demo-name setup-mock-name">Momena Begum</strong>
+                                <span class="demo-meta setup-mock-company">0173333333 | Uttara, Dhaka</span>
                             </li>
-                            <li class="demo-dd-item" class="setup-mock-item">
-                                <div class="demo-code" class="setup-mock-brand">A260416004</div>
-                                <strong class="demo-name" class="setup-mock-name">Arif Hasan</strong>
-                                <span class="demo-meta" class="setup-mock-company">0171111111 | Kazipara, Dhaka</span>
+                            <li class="demo-dd-item setup-mock-item">
+                                <div class="demo-code setup-mock-brand">A260416004</div>
+                                <strong class="demo-name setup-mock-name">Arif Hasan</strong>
+                                <span class="demo-meta setup-mock-company">0171111111 | Kazipara, Dhaka</span>
                             </li>
                         </ul>
                     </div>
@@ -255,13 +255,13 @@ include 'header.php';
     </div>
 
     <div id="setup-confirm-modal" class="print-setup-toast" hidden>
-        <div class="print-setup-toast-panel" role="dialog" aria-modal="true" class="print-setup-toast-panel setup-confirm-panel">
-            <span class="print-setup-toast-icon" class="print-setup-toast-icon setup-confirm-icon" aria-hidden="true">&#9888;</span>
+        <div class="print-setup-toast-panel setup-confirm-panel" role="dialog" aria-modal="true">
+            <span class="print-setup-toast-icon setup-confirm-icon" aria-hidden="true">&#9888;</span>
             <strong class="setup-confirm-title">Reset to Defaults?</strong>
             <p class="setup-confirm-text">Are you sure you want to restore the layout to default settings? This cannot be undone.</p>
             <div class="setup-confirm-actions">
-                <button type="button" id="confirm-reset-cancel" class="btn btn-outline" class="btn btn-outline setup-confirm-btn">Cancel</button>
-                <button type="button" id="confirm-reset-yes" class="btn btn-primary" class="btn btn-primary setup-confirm-btn-danger">Yes, Reset</button>
+                <button type="button" id="confirm-reset-cancel" class="btn btn-outline setup-confirm-btn">Cancel</button>
+                <button type="button" id="confirm-reset-yes" class="btn btn-primary setup-confirm-btn-danger">Yes, Reset</button>
             </div>
         </div>
     </div>

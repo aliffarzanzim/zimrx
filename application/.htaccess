@@ -1,0 +1,42 @@
+# ==============================================================================
+# ZimRx Application Root Hardening & Fallback Protection
+# ==============================================================================
+
+# Disable directory browsing
+Options -Indexes
+
+# Disable server signature
+ServerSignature Off
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 1. Block direct HTTP access to internal PHP engine, migrations, system data, and tests
+    RewriteRule ^(db|lib|migrations|tests|systemdata)(/.*)?$ - [F,L,NC]
+
+    # 2. Block direct HTTP access to private user databases, cache, and backups
+    RewriteRule ^userdata/(database|cache|backups)(/.*)?$ - [F,L,NC]
+    RewriteRule ^userdata/uploads/(reports|chat)(/.*)?$ - [F,L,NC]
+
+    # 3. If Apache DocumentRoot is set to application/, redirect root requests to public/
+    RewriteCond %{REQUEST_URI} ^/?$
+    RewriteRule ^$ public/ [R=301,L]
+</IfModule>
+
+# Prevent direct downloading of database files, seeds, and sensitive configs
+<FilesMatch "(?i)\.(db|db3|sqlite|sqlite3|sql|log|env|bak|tmp|phar|db-wal|db-shm|sqlite-wal|sqlite-shm)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Global security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

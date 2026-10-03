@@ -307,12 +307,7 @@ function extractListModuleLines(title) {
   }
 
   const lines = [];
-  root.querySelectorAll('.mock-list li').forEach((item) => {
-    const text = item.textContent.trim();
-    if (text) {
-      lines.push(text);
-    }
-  });
+
 
   root.querySelectorAll('input[type="checkbox"]:checked').forEach((field) => {
     const label = (field.dataset.lineLabel || '').trim();

@@ -32,7 +32,7 @@ declare(strict_types=1);
                             <th class="th-rep-first"></th>
                             <th class="zrx-ta-c">#</th>
                             <th>
-                                <div class="pc-header-flex" class="zrx-w100">
+                                <div class="pc-header-flex zrx-w100">
                                     <span>Report Name</span>
                                 </div>
                             </th>
@@ -51,7 +51,7 @@ declare(strict_types=1);
                                 <input type="text" class="pc-input rep-name-input" autocomplete="off" placeholder="e.g. Hb, Cr, ALT, Lipid">
                             </td>
                             <td>
-                                <div class="zimrx-date-field" class="zrx-h100">
+                                <div class="zimrx-date-field zrx-h100">
                                     <input type="text" class="pc-input custom-date-picker rep-date-input" autocomplete="off" placeholder="DD/MM/YYYY">
                                 </div>
                             </td>
@@ -89,7 +89,7 @@ declare(strict_types=1);
             <span class="reports-section-badge">Files</span>
         </div>
 
-        <div id="reports-upload-table-container" class="reports-panel reports-upload-table-container" class="zrx-dn">
+        <div id="reports-upload-table-container" class="reports-panel reports-upload-table-container zrx-dn">
             <div class="pc-table-container reports-table-container">
                 <table class="pc-table reports-upload-table" id="reports-upload-table">
                     <colgroup>
@@ -136,7 +136,7 @@ declare(strict_types=1);
                 <input type="text" class="pc-input rep-name-input" autocomplete="off" placeholder="e.g. Hb, Cr, ALT, Lipid">
             </td>
             <td>
-                <div class="zimrx-date-field" class="zrx-h100">
+                <div class="zimrx-date-field zrx-h100">
                     <input type="text" class="pc-input custom-date-picker rep-date-input" autocomplete="off" placeholder="DD/MM/YYYY">
                 </div>
             </td>
@@ -167,7 +167,7 @@ declare(strict_types=1);
                 <input type="text" class="pc-input upload-name-input" autocomplete="off" placeholder="Report Name">
             </td>
             <td>
-                <div class="zimrx-date-field" class="zrx-h100">
+                <div class="zimrx-date-field zrx-h100">
                     <input type="text" class="pc-input custom-date-picker upload-date-input" autocomplete="off" placeholder="DD/MM/YYYY">
                 </div>
             </td>

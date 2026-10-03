@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-// AI Analyzer widget: local LLM (Ollama/LM Studio) or cloud provider clinical decision support.
+// AI Analyzer widget: offline local inference via Ollama or LM Studio for clinical decision support.
 ?>
 <div class="ai-wrapper">
     <!-- Header -->
@@ -29,7 +29,7 @@ declare(strict_types=1);
                     <input type="text" id="ai-model-name" class="ai-inp" list="ai-model-list" placeholder="e.g. llama3.2, meditron..." autocomplete="off">
                     <datalist id="ai-model-list"></datalist>
                     <button type="button" id="ai-fetch-models" class="ai-btn ai-btn-outline" style="flex: 0 0 36px; height: 32px; padding: 0;" title="Fetch Available Local Models">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.92-10.24l5.58 5.58"/></svg>
+                        <?= zrx_icon('refresh-cw', 14) ?>
                     </button>
                 </div>
             </div>

@@ -21,6 +21,9 @@ application/userdata/uploads/*
 !application/userdata/uploads/reports/
 application/userdata/uploads/reports/*
 !application/userdata/uploads/reports/.htaccess
+!application/userdata/uploads/chat/
+application/userdata/uploads/chat/*
+!application/userdata/uploads/chat/.htaccess
 !application/userdata/**/.gitkeep
 
 # 2. Binary Database Files

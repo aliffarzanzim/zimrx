@@ -10,6 +10,7 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/aliffarzanzim/zimrx/actions/workflows/tests.yml"><img src="https://github.com/aliffarzanzim/zimrx/actions/workflows/tests.yml/badge.svg" alt="Tests"></a>
   <a href="https://www.gnu.org/licenses/agpl-3.0"><img src="https://img.shields.io/badge/License-AGPL_v3-blue.svg" alt="License: AGPL v3"></a>
   <a href="#architecture--data-sovereignty"><img src="https://img.shields.io/badge/Architecture-Local--First-green.svg" alt="Local-First"></a>
   <a href="https://www.php.net/"><img src="https://img.shields.io/badge/PHP-8.2%2B%20%7C%20PDO-8892BF.svg" alt="PHP"></a>
@@ -117,6 +118,13 @@ ZimRx implements a hardened **public webroot boundary** (`application/public/`) 
    ```
 3. Open `http://localhost:8080` in your browser.
 
+### Web Server / cPanel / Shared Hosting (Apache, Nginx, LiteSpeed)
+1. Deploy the `application/` directory to your web root (or configure your virtual host root to `application/public`).
+2. Ensure `application/userdata/` is writable by the web server process.
+3. Open the application URL in your browser:
+   * ZimRx automatically provisions the master drug catalog, clinical lookup databases, and doctor user schemas in-process on first visit.
+   * No terminal access, SSH, or external command-line database tools are required.
+
 ### Docker (Multi-Platform)
 ```bash
 docker compose up
@@ -128,8 +136,9 @@ Open `http://localhost:8080` in your browser. User data and prescriptions are au
 ## Development & Deployment
 
 ### Requirements
-* PHP 8.2+ with PDO SQLite extension (or Docker / FrankenPHP)
-* Caddy / Apache / Nginx (optional for production web servers)
+* **PHP 8.2+** with standard extensions: `pdo_sqlite`, `mbstring`, `curl`, `fileinfo`, `gd`, `intl`, `openssl` (or Docker / FrankenPHP).
+* **Zero External CLI Dependencies**: No `sqlite3` CLI binary, no Python, and no Node.js are required at runtime or deployment.
+* **Web Server**: Caddy (included with FrankenPHP), Apache, Nginx, or PHP built-in web server.
 
 ### Automated Setup for Developers
 Windows developers can run the included setup script to configure FrankenPHP and required extensions with one click:
@@ -137,17 +146,31 @@ Windows developers can run the included setup script to configure FrankenPHP and
 setup-franken-for-dev.bat
 ```
 
+### Reference Database Auto-Provisioning & Seeds
+Master reference databases (`zimrx_drugs.db` and `zimrx_static.db`) are compiled directly from plain-text SQL seeds (`application/systemdata/seeds/*.sql`) using native PHP PDO. Compilation occurs automatically on first application launch, or can be triggered manually via CLI:
+```bash
+# Verify or compile reference databases (skips if healthy databases already exist)
+php application/systemdata/seeds/build_db.php
+
+# Force recompilation from seeds
+php application/systemdata/seeds/build_db.php --force
+```
+
 ### Database Migrations
-Database schemas and versioning are managed through `DbMigrator` (`application/lib/db/db_migrator.php`). Pending schema migrations are applied automatically on boot or can be checked via CLI:
+Doctor user database schemas (`application/userdata/database/zimrx_userdata.db`) and versioning are managed through `DbMigrator` (`application/lib/db/db_migrator.php`). Pending schema migrations are applied automatically on boot or can be checked via CLI:
 ```bash
 php -r "require_once 'application/lib/db/db.php';"
 ```
 
 ### Automated Test Suite
-ZimRx includes an automated security, SQLite concurrency, and clinical calculation test suite:
+ZimRx includes an automated test suite covering security controls, static source integrity checks, SQLite concurrency, and clinical calculations:
 ```bash
 php application/tests/run_tests.php
 ```
+
+### Code Organization & Repository Notes
+* **Repository Size & Seed Integrity**: The reference catalog seeds (`application/systemdata/seeds/*.sql`) are tracked as plain-text SQL. Line-ending normalization churn is prevented via `.gitattributes` (`-text` directive for large seeds), keeping the repository free from binary bloat.
+* **Code Organization**: Several frontend modules (`drug_detail.js`, `history.js`, `appointments.js`, `pc.js`) and `prescription_preview.php` exceed 1,000 lines. These files originated during initial feature prototyping; refactoring them into smaller, focused components is scheduled for the next development cycle.
 
 ---
 

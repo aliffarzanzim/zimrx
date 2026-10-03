@@ -142,8 +142,8 @@ if ($step === 3 && !is_logged_in()) {
                 </div>
 
                 <?php if (!$isLoopback): ?>
-                <div class="section-label" class="fl-warn-icon">Server Setup Token</div>
-                <div class="field" class="recovery-box fl-mb-20">
+                <div class="section-label fl-warn-icon">Server Setup Token</div>
+                <div class="field recovery-box fl-mb-20">
                     <label>Setup Token <span class="fl-label-opt">(from userdata/setup_token.txt)</span></label>
                     <input type="text" id="setupToken" value="<?= htmlspecialchars($queryToken, ENT_QUOTES, 'UTF-8') ?>" placeholder="Paste setup token generated on server host" autocomplete="off" class="fl-mono">
                     <small class="fl-field-hint">Because this setup wizard is accessed over the network, please enter the security token found in <code>userdata/setup_token.txt</code> on the server to claim administration.</small>
@@ -288,7 +288,7 @@ if ($step === 3 && !is_logged_in()) {
                     </div>
                 </div>
 
-                <div class="btn-row" class="fl-mt-24">
+                <div class="btn-row fl-mt-24">
                     <button class="btn btn-primary" id="btnSaveDoctor" onclick="saveDoctor()">Save & Enter ZimRx →</button>
                 </div>
                 <div class="step3-skip">

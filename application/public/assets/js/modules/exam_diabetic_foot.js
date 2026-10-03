@@ -68,7 +68,7 @@
         const lines = [
           'Diabetic Foot Assessment & Stratification:',
           `• Wagner Staging: ${wagner}`,
-          `• 10g Monofilament Sensation: ${intactCount}/10 sites intact ${hasLops ? '— Loss of Protective Sensation (LOPS) Present' : '— Protective Sensation Intact'}`,
+          `• 10g Monofilament Sensation: ${intactCount}/10 sites intact ${hasLops ? '- Loss of Protective Sensation (LOPS) Present' : '- Protective Sensation Intact'}`,
           `• Vascular Pulses: ${dp}; ${pt}; CRT: ${crtSelect?.value || '<2s'}`,
           `• Foot Biomechanics & Skin: ${deform}; Skin: ${skinSelect?.value || 'Warm'}`,
           `• IWGDF Stratification: ${category}`

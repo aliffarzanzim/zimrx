@@ -126,7 +126,7 @@ declare(strict_types=1);
                         <ol>
                             <li>Scan this QR code with your phone camera</li>
                             <li>Log in once with your doctor credentials</li>
-                            <li><strong>Tip:</strong> Bookmark it on your phone — no need to scan for every patient</li>
+                            <li><strong>Tip:</strong> Bookmark it on your phone - no need to scan for every patient</li>
                             <li>Photos uploaded on phone attach instantly to whichever patient is open on this computer</li>
                         </ol>
                     </div>

@@ -21,7 +21,9 @@ mkdir -p "application/userdata/uploads/header-logos"
 mkdir -p "application/userdata/uploads/full-body-headers"
 mkdir -p "application/userdata/uploads/seal-and-stamps"
 mkdir -p "application/userdata/uploads/background-images"
+mkdir -p "application/systemdata/database"
 mkdir -p "logs"
+
 
 # Clean up any stale PID file
 if [ -f "logs/frankenphp.pid" ]; then

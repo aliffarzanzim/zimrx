@@ -4,7 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/init.php';
 require_admin();
 
-$page_title = 'ZimRx — Admin Dashboard';
+$page_title = 'ZimRx - Admin Dashboard';
 $extra_css = ['assets/css/pages/admin.css'];
 
 $counts = [
@@ -170,7 +170,7 @@ include 'header.php';
             </div>
             <div class="adm-nav-body">
                 <div class="adm-nav-title">Audit & Compliance Logs</div>
-                <div class="adm-nav-desc">Immutable access log — who viewed what and when</div>
+                <div class="adm-nav-desc">Immutable access log - who viewed what and when</div>
             </div>
             <span class="adm-badge-soon">Soon</span>
         </a>

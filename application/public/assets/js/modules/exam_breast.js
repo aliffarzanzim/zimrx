@@ -204,7 +204,7 @@
           `Mobility: ${m.mob || 'Freely mobile'}`,
           m.notes
         ].filter(Boolean).join(', ');
-        lines.push(`• ${m.side} Breast: Lesion #${m.num} at ${m.hour} O'Clock (${m.zone}, ${m.fnCm} cm FN) — ${details}.`);
+        lines.push(`• ${m.side} Breast: Lesion #${m.num} at ${m.hour} O'Clock (${m.zone}, ${m.fnCm} cm FN) - ${details}.`);
       });
     }
 

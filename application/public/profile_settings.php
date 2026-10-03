@@ -65,6 +65,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if ($newPassword !== '') {
+                if (mb_strlen($newPassword) < 8) {
+                    throw new Exception('New password must contain at least 8 characters.');
+                }
                 $userSql .= ", password_hash = :password_hash";
                 $userParams['password_hash'] = zimrx_password_hash($newPassword);
             }
@@ -114,7 +117,7 @@ include 'header.php';
         </div>
     <?php endif; ?>
 
-    <section class="admin-layout" class="admin-layout admin-layout-single">
+    <section class="admin-layout admin-layout-single">
         <div class="admin-panel">
             <h2>Personal &amp; Professional Details</h2>
             <form class="admin-form" method="post" autocomplete="off">
@@ -165,7 +168,7 @@ include 'header.php';
                     </div>
                 </div>
 
-                <div class="btn btn-primary admin-mt-20">
+                <div class="admin-mt-20">
                     <button class="btn btn-primary" type="submit">Save Profile Changes</button>
                 </div>
             </form>

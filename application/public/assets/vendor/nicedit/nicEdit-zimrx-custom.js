@@ -212,7 +212,7 @@ const getSelectedElement = (defaultEl) => {
  * Resolve font size from queryCommandValue → DOM fallback → computed style.
  */
 const _zrxGetSize = (el) => {
-    // Try queryCommandValue first — works in idle state
+    // Try queryCommandValue first - works in idle state
     try {
         const qcv = document.queryCommandValue('fontSize');
         if (qcv && qcv !== '0' && _zrxSizeMap[qcv]) return qcv;
@@ -693,7 +693,7 @@ function zrxApplySpanStyle(ne, cssProp, cssValue, isBlock) {
     var endSpan   = findAncestorSpan(range.endContainer);
 
     if (startSpan && startSpan === endSpan) {
-        // Selection is entirely inside one existing span — modify it in-place
+        // Selection is entirely inside one existing span - modify it in-place
         if (isReset) {
             // Unwrap: lift children up to parent, remove empty span
             var first = startSpan.firstChild;
@@ -739,7 +739,7 @@ function zrxApplySpanStyle(ne, cssProp, cssValue, isBlock) {
         return;
     }
 
-    // --- Tier 2: fresh selection or multi-span — extract, flatten, re-wrap ---
+    // --- Tier 2: fresh selection or multi-span - extract, flatten, re-wrap ---
     var styleAttr = cssKebab + ':' + cssValue;
     if (cssProp === 'transform') {
         var sv2 = parseFloat(cssValue.replace(/[^0-9.]/g, ''));

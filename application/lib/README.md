@@ -39,8 +39,8 @@ $pdoSystem = DbConnections::systemDb();
 3. **Audit & Safety:** Enforces `PDO::ERRMODE_EXCEPTION` and `PDO::ATTR_DEFAULT_FETCH_MODE = PDO::FETCH_ASSOC` uniformly across all endpoints.
 
 ### Schema Migrations (`DbMigrator`)
-- Database migrations live in `migrations/` as numbered SQL files (`001_initial_schema.sql`, `002_add_appointments.sql`, etc.).
-- On application bootstrap, `DbMigrator::run($pdo)` checks the `zimrx_migrations` table and applies unapplied migrations inside an atomic transaction.
+- Database migrations live in `migrations/` as numbered PHP migration scripts (`001_core_identity_tables.php`, `002_patient_appointment_visit.php`, etc.).
+- On application bootstrap, `(new DbMigrator())->run($pdo)` checks the `schema_migrations` table and applies unapplied migrations inside an atomic transaction.
 - When performing CLI batch operations or test setups, define `ZIMRX_DB_LIGHTWEIGHT` to skip automatic runtime migration checks.
 
 ---

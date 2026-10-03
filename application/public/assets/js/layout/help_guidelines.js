@@ -241,7 +241,7 @@ function showHelpGuidelineModal(type) {
           <div class="zrx-addr-section-header">
             <div class="zrx-addr-section-title">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              ঠিকানা ডিরেক্টরি ও ম্যানেজমেন্ট (Address Directory — Top 100)
+              ঠিকানা ডিরেক্টরি ও ম্যানেজমেন্ট (Address Directory - Top 100)
             </div>
             <button type="button" id="zrx-btn-reset-addr" class="zrx-btn-outline" class="zrx-help-btn-sm-px10" title="Reset all address customizations to default">Reset to Default</button>
           </div>
@@ -625,7 +625,7 @@ function showHelpGuidelineModal(type) {
                   <div class="phrase-text" class="${isHidden ? 'zrx-help-row-hidden' : 'zrx-help-row-visible'}">${name}</div>
                 </td>
                 <td class="zrx-help-usage-val">
-                  ${isSystem ? '—' : Number(addr.usage_count || 0)}
+                  ${isSystem ? 'N/A' : Number(addr.usage_count || 0)}
                 </td>
               </tr>
             `;

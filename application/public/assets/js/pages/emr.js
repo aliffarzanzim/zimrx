@@ -361,7 +361,7 @@ function renderTrajectories() {
                     const diffFormatted = Math.abs(diff) >= 10 ? Math.round(Math.abs(diff)) : Math.abs(diff).toFixed(1);
                     deltaHtml = `<span class="emr-trend-delta ${isUp ? 'delta-up' : 'delta-down'}">${sign}${diffFormatted}</span>`;
                 } else {
-                    deltaHtml = `<span class="emr-trend-delta delta-stable">— Stable</span>`;
+                    deltaHtml = `<span class="emr-trend-delta delta-stable">- Stable</span>`;
                 }
             }
         }

@@ -194,11 +194,7 @@ try {
         $pdo = db();
         zimrx_assert_mobile_context_table($pdo);
 
-        if (DbConnections::driver() === 'sqlite') {
-            $pdo->exec('BEGIN IMMEDIATE');
-        } else {
-            $pdo->beginTransaction();
-        }
+        $pdo->beginTransaction();
 
         try {
             $stmt = $pdo->prepare(
@@ -497,11 +493,7 @@ try {
         $visitRecordId = (int)($_POST['visit_record_id'] ?? 0);
 
         $pdo = db();
-        if (DbConnections::driver() === 'sqlite') {
-            $pdo->exec('BEGIN IMMEDIATE');
-        } else {
-            $pdo->beginTransaction();
-        }
+        $pdo->beginTransaction();
 
         $whereClauses = ['doctor_id = :doctor_id', 'claimed_at IS NULL'];
         $params = ['doctor_id' => $doctorId];

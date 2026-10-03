@@ -90,9 +90,21 @@ declare(strict_types=1);
         </table>
     </div>
     
-    <div style="margin-top: 15px; display: flex; justify-content: flex-end;">
-        <button type="button" style="padding: 10px 24px; font-weight: 600; border-radius: 8px; border: none; background: var(--zrx-primary); color: var(--zrx-white); font-size: 0.9rem; cursor: pointer; box-shadow: var(--zrx-shadow-md); transition: background 0.2s;">
+    <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="font-size: 0.78rem; color: var(--zrx-slate-600);">
+            Global paper margins and headers are managed in <a href="print_setup.php" style="color: var(--zrx-primary); text-decoration: underline; font-weight: 500;">Print Setup</a>.
+        </span>
+        <button type="button" id="btn-apply-font-format" onclick="zimrxApplyFontFormat()" style="padding: 8px 20px; font-weight: 600; border-radius: 6px; border: none; background: var(--zrx-primary); color: #ffffff; font-size: 0.85rem; cursor: pointer; transition: background 0.2s;">
             Apply Formatting
         </button>
     </div>
 </div>
+<script>
+function zimrxApplyFontFormat() {
+    if (typeof showZrxAlert === 'function') {
+        showZrxAlert('Typography format preferences applied for current consultation.', { type: 'notification', title: 'Formatting Applied' });
+    } else {
+        alert('Formatting applied for current consultation.');
+    }
+}
+</script>

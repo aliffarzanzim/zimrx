@@ -32,7 +32,7 @@ $dietOptions = [
 ?>
 <div class="module-header history-card-header">
     <span>History</span>
-    <div class="history-header-actions" class="zrx-flex-ac-6">
+    <div class="history-header-actions zrx-flex-ac-6">
         <button type="button" class="history-toggle-all-btn" data-history-toggle-all title="Expand or Collapse All History Sections">
             <?= zrx_icon('chevron-down', 12) ?>
             <span class="history-toggle-all-text">Expand All</span>
@@ -77,11 +77,11 @@ $dietOptions = [
                                         <span><?= $label ?></span>
                                     </label>
                                     <?php if ($fieldType === 'textbox'): ?>
-                                        <div class="history-med-input-wrap" class="zrx-dn">
+                                        <div class="history-med-input-wrap zrx-dn">
                                             <textarea rows="1" class="history-med-value-input" placeholder="<?= $placeholder ?: 'e.g. Details...' ?>"></textarea>
                                         </div>
                                     <?php elseif ($fieldType === 'dropdown_text' || $fieldType === 'dropdown'): ?>
-                                        <div class="history-med-input-wrap" class="zrx-dn">
+                                        <div class="history-med-input-wrap zrx-dn">
                                             <textarea rows="1" class="history-med-value-input" placeholder="<?= $placeholder ?: ($fieldType === 'dropdown' ? 'Select...' : 'Select or type...') ?>" <?= $fieldType === 'dropdown' ? 'readonly' : '' ?>></textarea>
                                             <button type="button" class="history-med-dropdown-btn" title="Select option" tabindex="-1">
                                                 <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l4 4 4-4"/></svg>
@@ -115,7 +115,7 @@ $dietOptions = [
                 <span class="history-accordion-title">Treatment History</span>
             </div>
         </button>
-        <div class="history-accordion-content" class="zrx-dn">
+        <div class="history-accordion-content zrx-dn">
             <div class="pc-wrapper history-treatment-wrapper" id="history-treatment-wrapper">
                 <div class="pc-table-container">
                     <table class="pc-table history-treatment-table" id="history-treatment-table">
@@ -174,7 +174,7 @@ $dietOptions = [
                 <span class="history-accordion-title">Habits</span>
             </div>
         </button>
-        <div class="history-accordion-content" class="zrx-dn">
+        <div class="history-accordion-content zrx-dn">
             <div class="history-habits-grid">
                 <?php foreach ($habitOptions as $key => $habit): ?>
                     <div class="history-habit-item">
@@ -183,14 +183,14 @@ $dietOptions = [
                             <span><?= htmlspecialchars($habit['label'], ENT_QUOTES, 'UTF-8') ?></span>
                         </label>
                         <?php if (!empty($habit['unit']) || !empty($habit['placeholder'])): ?>
-                            <span class="history-habit-qty-wrap <?= empty($habit['unit']) ? 'history-habit-text-wrap' : '' ?>" class="zrx-dn">
+                            <span class="history-habit-qty-wrap <?= empty($habit['unit']) ? 'history-habit-text-wrap' : '' ?> zrx-dn">
                                 <input type="text" class="history-habit-qty-input <?= empty($habit['unit']) ? 'history-habit-text-input-field' : '' ?>" data-unit="<?= htmlspecialchars($habit['unit'], ENT_QUOTES, 'UTF-8') ?>" placeholder="<?= htmlspecialchars($habit['placeholder'], ENT_QUOTES, 'UTF-8') ?>">
                                 <?php if (!empty($habit['unit'])): ?>
                                     <span class="history-habit-qty-unit"><?= htmlspecialchars($habit['unit'], ENT_QUOTES, 'UTF-8') ?></span>
                                 <?php endif; ?>
                             </span>
                             <?php if ($key === 'Smoking'): ?>
-                                <button type="button" class="history-calc-btn" data-history-packyear-open title="Calculate Pack-Years" class="zrx-dn">
+                                <button type="button" class="history-calc-btn zrx-dn" data-history-packyear-open title="Calculate Pack-Years">
                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <rect x="4" y="2" width="16" height="20" rx="2"></rect>
                                         <line x1="8" y1="6" x2="16" y2="6"></line>
@@ -245,7 +245,7 @@ $dietOptions = [
                 <span class="history-accordion-title">Diet &amp; Hypersensitivity</span>
             </div>
         </button>
-        <div class="history-accordion-content" class="zrx-dn">
+        <div class="history-accordion-content zrx-dn">
             <label class="history-field-row">
                 <span class="history-control-label">Diet Type</span>
                 <select class="module-input history-select" data-history-field="diet-type">
@@ -281,7 +281,7 @@ $dietOptions = [
                 <span class="history-accordion-title">Drug History</span>
             </div>
         </button>
-        <div class="history-accordion-content" class="zrx-dn">
+        <div class="history-accordion-content zrx-dn">
             <div class="pc-wrapper history-dh-wrapper" id="dh-wrapper">
                 <div class="pc-table-container">
                     <table class="pc-table history-dh-table" id="dh-table">

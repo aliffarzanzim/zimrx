@@ -1,0 +1,34 @@
+name: Tests
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  test:
+    name: PHP ${{ matrix.php-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.2', '8.3']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP environment
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: pdo, pdo_sqlite, mbstring, curl, fileinfo, gd, intl, openssl
+          coverage: none
+
+      - name: Build system reference databases from SQL seeds
+        run: php application/systemdata/seeds/build_db.php
+
+
+      - name: Run ZimRx Test Suite
+        run: php application/tests/run_tests.php

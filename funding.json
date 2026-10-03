@@ -55,8 +55,8 @@
         "status": "active",
         "name": "Hardware, clinical trials & core software R&D",
         "description": "Physical testing hardware (thermal printers, scanners, display), local clinical trials with 15-20 doctors, and core software R&D.",
-        "amount": 20000,
-        "currency": "USD",
+        "amount": 18000,
+        "currency": "EUR",
         "frequency": "one-time",
         "channels": [
           "bank-wire",

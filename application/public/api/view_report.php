@@ -54,10 +54,10 @@ if (preg_match('/^report-(\d+)-/', $fileName, $matches)) {
     if ($ownerDoctorId !== $doctorId) {
         $hasPermission = false;
         try {
-            $pdo = db();
+            $pdo = DbConnections::userdata();
             $stmt = $pdo->prepare(
                 "SELECT 1 FROM zimrx_doctor_assistants
-                 WHERE doctor_id = :owner_doctor AND assistant_id = :user_id LIMIT 1"
+                 WHERE doctor_id = :owner_doctor AND assistant_user_id = :user_id AND is_active = 1 LIMIT 1"
             );
             $stmt->execute(['owner_doctor' => $ownerDoctorId, 'user_id' => current_user_id()]);
             if ($stmt->fetchColumn()) {

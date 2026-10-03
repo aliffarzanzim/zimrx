@@ -294,7 +294,7 @@ require_once __DIR__ . '/header.php';
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                 </div>
             </div>
-            <div class="dash-kpi-num" class="zrx-c-success"><?= $returnRate ?>%</div>
+            <div class="dash-kpi-num zrx-c-success"><?= $returnRate ?>%</div>
             <div class="dash-kpi-footer">
                 <span>Follow-up &amp; revisits share</span>
             </div>

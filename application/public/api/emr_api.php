@@ -369,7 +369,7 @@ switch ($action) {
 
         emr_require_patient($pdo, $patientId, $currentDoctorId);
 
-        $pdo->exec('BEGIN IMMEDIATE');
+        $pdo->beginTransaction();
         try {
             // Get next visit no atomically inside immediate transaction
             $stmtNext = $pdo->prepare(
@@ -752,11 +752,7 @@ switch ($action) {
             emr_json_response(['success' => false, 'message' => 'Metric value must be numeric.'], 422);
         }
 
-        if (DbConnections::driver() === 'sqlite') {
-            $pdo->exec('BEGIN IMMEDIATE');
-        } else {
-            $pdo->beginTransaction();
-        }
+        $pdo->beginTransaction();
 
         try {
             $stmtIns = $pdo->prepare(
@@ -824,11 +820,7 @@ switch ($action) {
         }
         emr_require_patient($pdo, $patientId, $currentDoctorId);
 
-        if (DbConnections::driver() === 'sqlite') {
-            $pdo->exec('BEGIN IMMEDIATE');
-        } else {
-            $pdo->beginTransaction();
-        }
+        $pdo->beginTransaction();
 
         try {
             // Fetch the row's current sync_id and revision to build the tombstone.

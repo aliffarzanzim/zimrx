@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-// support_modal.php — ZimRx Support and Doctor Appreciation modal (include once per page)
+// support_modal.php - ZimRx Support and Doctor Appreciation modal (include once per page)
 if (defined('ZIMRX_SUPPORT_MODAL_LOADED')) return;
 define('ZIMRX_SUPPORT_MODAL_LOADED', true);
 ?>

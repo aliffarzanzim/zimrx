@@ -52,9 +52,8 @@ function getLayoutConfig() {
   };
 }
 
-// Main UI dynamic module renderer
+// Layout lifecycle hook (server-side pre-rendered via PHP)
 async function renderMainUI() {
-  // Modules are fully prerendered on the server using PHP for instant, seamless load!
   return Promise.resolve();
 }
 

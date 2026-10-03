@@ -6,7 +6,7 @@ LABEL maintainer="Alif Farzan Zim <aliffarzanzim@gmail.com>"
 LABEL description="ZimRx: Open-source, local-first offline prescription & EMR engine"
 
 # Install recommended dependencies and sqlite driver
-RUN apk add --no-cache bash curl sqlite && \
+RUN apk add --no-cache bash curl && \
     install-php-extensions pdo_sqlite && \
     cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
@@ -16,14 +16,16 @@ WORKDIR /app
 COPY Caddyfile /app/Caddyfile
 COPY application /app/application
 
-# Create required persistent state directories
+# Create required persistent state directories and compile reference databases from SQL seeds
 RUN mkdir -p /app/application/userdata/database \
     /app/application/userdata/uploads/reports \
     /app/application/userdata/uploads/header-logos \
     /app/application/userdata/uploads/full-body-headers \
     /app/application/userdata/uploads/seal-and-stamps \
     /app/application/userdata/uploads/background-images \
-    /app/logs
+    /app/application/systemdata/database \
+    /app/logs && \
+    php /app/application/systemdata/seeds/build_db.php
 
 # Doctor EMR data volume
 VOLUME ["/app/application/userdata"]

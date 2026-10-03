@@ -648,7 +648,7 @@ function zrx_render_left_sections(array $clinical, array $options): string {
     ];
 
     $bullet = zrx_trim_text($options['bullet_text'] ?? '');
-    if ($bullet === '' || $bullet === 'â—‹') {
+    if ($bullet === '' || $bullet === "\xC3\xA2\xE2\x80\x94\xE2\x80\xB9") {
         $bullet = '○';
     }
 
@@ -905,7 +905,7 @@ $options['bgcolor'] = strtoupper(ltrim((string)($header['bg_color'] ?? 'FFFFFF')
 $options['header_logo_url'] = trim((string)($header['logo_path'] ?? ''));
 $options['footer_text'] = zimrx_print_footer_html($header);
 
-$options['bullet_text'] = zrx_trim_text($options['bullet_text'] ?? '') === 'â—‹' ? '○' : ($options['bullet_text'] ?? '○');
+$options['bullet_text'] = zrx_trim_text($options['bullet_text'] ?? '') === "\xC3\xA2\xE2\x80\x94\xE2\x80\xB9" ? '○' : ($options['bullet_text'] ?? '○');
 $options['drug_bullet'] = zrx_trim_text($options['drug_bullet'] ?? '') === 'â€¢' ? '•' : ($options['drug_bullet'] ?? '•');
 
 $availableFonts = [

@@ -79,7 +79,7 @@ include 'header.php';
                 <h1>Header, Footer &amp; Background Setup</h1>
                 <p>Customize your prescription header text/image, footer, background watermark, and stamp.</p>
             </div>
-            <div class="header-editor-heading-actions" class="hfb-flex-gap8">
+            <div class="header-editor-heading-actions hfb-flex-gap8">
                 <a href="prescription_preview.php" target="_blank" class="btn btn-outline">Full Preview</a>
                 <a href="page_setup.php" class="btn btn-outline">Page Setup</a>
                 <a href="print_setup.php" class="btn btn-outline">Print Setup</a>
@@ -122,7 +122,7 @@ include 'header.php';
                     <div class="header-editor-panel panel-middle" id="header-logo-wrap">
                         <h2>Logo</h2>
                         <div class="panel-content logo-settings-panel">
-                            <div class="logo-preview-box <?= $displayLogo === 'yes' ? '' : 'logo-hidden' ?>" class="hfb-pos-rel">
+                            <div class="logo-preview-box <?= $displayLogo === 'yes' ? '' : 'logo-hidden' ?> hfb-pos-rel">
                                 <img id="header-logo-preview" src="<?= preview_escape($logoPath) ?>" alt="Logo" class="<?= $logoPath ? '' : 'is-hidden' ?>">
                                 <span id="header-logo-placeholder" class="zrx-logo-placeholder <?= $logoPath ? 'is-hidden' : '' ?>">Logo</span>
                                 <button type="button" id="logo-remove-btn" class="zrx-bgimg-remove <?= $logoPath ? '' : 'is-hidden' ?>" title="Remove logo">&#x2715;</button>
@@ -132,7 +132,7 @@ include 'header.php';
                                 <input type="hidden" name="logo_path" id="logo_path" value="<?= preview_escape($logoPath) ?>">
                                 <input type="file" id="header-logo-file" accept="image/*" hidden>
                                 <div class="zrx-logo-select-row">
-                                    <button type="button" id="logo-open-gallery" class="btn btn-outline" class="zrx-w100">Select Logo</button>
+                                    <button type="button" id="logo-open-gallery" class="btn btn-outline zrx-w100">Select Logo</button>
                                     <button type="button" id="upload-logo-trigger" class="btn btn-outline" title="Upload a new logo from your computer">&#8679; Upload</button>
                                 </div>
                                 <span id="logo-upload-status" class="upload-logo-status"></span>
@@ -211,7 +211,7 @@ include 'header.php';
 
                 <!-- Header Customization Card -->
                 <section class="header-editor-card zrx-bgimg-card <?= $headerType === 'text' ? '' : 'is-disabled' ?>" id="header-customization-card" style="width:<?= $footerWidth ?>cm; margin-bottom: 1.5rem;">
-                    <div class="zrx-bgimg-card-topbar" class="hfb-footer-header-row">
+                    <div class="zrx-bgimg-card-topbar hfb-footer-header-row">
                         <h2>Header Customization</h2>
                         <button type="button" id="btn-reset-header-customization" class="zrx-reset-icon-btn" title="Reset Header Customization to Defaults" <?= $headerType === 'text' ? '' : 'disabled' ?>>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -224,22 +224,22 @@ include 'header.php';
                         <?php endif; ?>
                     </div>
 
-                    <div class="control-row" class="hfb-mb-20">
+                    <div class="control-row hfb-mb-20">
                         <div class="hfb-flex-1">
-                            <label class="form-label" class="hfb-label-bold">Column Widths (%)</label>
+                            <label class="form-label hfb-label-bold">Column Widths (%)</label>
                             <span class="hfb-label-muted-desc">Note: Column widths must combine to exactly 100% if you edit them.</span>
                             <div class="hfb-field-group-row" id="header-widths-container">
-                                <div class="hfb-flex-1" class="width-ctrl-left">
+                                <div class="hfb-flex-1 width-ctrl-left">
                                     <span class="hfb-field-label">Left Column Width:</span>
-                                    <input type="number" name="header_left_width" id="header_left_width" min="10" max="80" step="1" class="zps-size-input" class="hfb-full-input" value="<?= preview_escape($options['header_left_width'] ?? ($displayLogo === 'yes' ? '40' : '49')) ?>">
+                                    <input type="number" name="header_left_width" id="header_left_width" min="10" max="80" step="1" class="zps-size-input hfb-full-input" value="<?= preview_escape($options['header_left_width'] ?? ($displayLogo === 'yes' ? '40' : '49')) ?>">
                                 </div>
-                                <div class="hfb-flex-1" class="width-ctrl-logo">
+                                <div class="hfb-flex-1 width-ctrl-logo">
                                     <span class="hfb-field-label">Logo Column Width:</span>
-                                    <input type="number" name="header_logo_width" id="header_logo_width" min="5" max="50" step="1" class="zps-size-input" class="hfb-full-input" value="<?= preview_escape($options['header_logo_width'] ?? '18') ?>">
+                                    <input type="number" name="header_logo_width" id="header_logo_width" min="5" max="50" step="1" class="zps-size-input hfb-full-input" value="<?= preview_escape($options['header_logo_width'] ?? '18') ?>">
                                 </div>
-                                <div class="hfb-flex-1" class="width-ctrl-right">
+                                <div class="hfb-flex-1 width-ctrl-right">
                                     <span class="hfb-field-label">Right Column Width:</span>
-                                    <input type="number" name="header_right_width" id="header_right_width" min="10" max="80" step="1" class="zps-size-input" class="hfb-full-input" value="<?= preview_escape($options['header_right_width'] ?? ($displayLogo === 'yes' ? '40' : '49')) ?>">
+                                    <input type="number" name="header_right_width" id="header_right_width" min="10" max="80" step="1" class="zps-size-input hfb-full-input" value="<?= preview_escape($options['header_right_width'] ?? ($displayLogo === 'yes' ? '40' : '49')) ?>">
                                 </div>
                             </div>
                         </div>
@@ -247,7 +247,7 @@ include 'header.php';
 
                     <!-- Logo Transformation Panel -->
                     <div id="logo-customization-controls" class="<?= $displayLogo === 'yes' ? '' : 'is-hidden' ?>">
-                        <label class="form-label" class="hfb-section-header-bordered">Logo Placement &amp; Transformation</label>
+                        <label class="form-label hfb-section-header-bordered">Logo Placement &amp; Transformation</label>
                         
                         <div class="hfb-grid-2col-responsive">
                             <!-- Scale Slider -->
@@ -420,7 +420,7 @@ include 'header.php';
                                 <span class="hfb-drawer-label">Stamp Color</span>
                                 <div class="zrx-flex-ac-5">
                                     <input type="color" id="stamp-color-picker" value="<?= preview_escape($stampColor) ?>" class="hfb-color-palette-btn">
-                                    <div class="hex-input-label" class="hfb-color-hex-wrapper">
+                                    <div class="hex-input-label hfb-color-hex-wrapper">
                                         <span class="hfb-color-hash">#</span>
                                         <input type="text" id="stamp-color-hex" value="<?= ltrim($stampColor, '#') ?>" class="hfb-color-hex-field">
                                     </div>
@@ -475,7 +475,7 @@ include 'header.php';
                     <option value="">All Categories</option>
                 </select>
             </div>
-            <div id="bg-gallery-upload-status" class="zrx-logo-gallery-status" class="hfb-mb-sm"></div>
+            <div id="bg-gallery-upload-status" class="zrx-logo-gallery-status hfb-mb-sm"></div>
             <div class="zrx-gallery-grid" id="zrx-gallery-grid">
                 <div class="zrx-gallery-loading">Loading&hellip;</div>
             </div>

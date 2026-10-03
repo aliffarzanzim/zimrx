@@ -271,7 +271,7 @@ function renderDxSection(items, title) {
     let dxBullet = cleanText(previewOptions.dx_bullet || '');
     if (!dxBullet) {
         let bullet = cleanText(previewOptions.bullet_text || '');
-        if (!bullet || bullet === 'â—‹') bullet = '○';
+        if (!bullet || bullet === '\u00e2\u2014\u2039') bullet = '○';
         dxBullet = bullet;
     }
 
@@ -454,7 +454,7 @@ function renderLeftSections(clinical) {
     };
 
     let bullet = cleanText(previewOptions.bullet_text || '');
-    if (!bullet || bullet === 'â—‹') bullet = '○';
+    if (!bullet || bullet === '\u00e2\u2014\u2039') bullet = '○';
 
     let html = '';
     let historyRendered = false;

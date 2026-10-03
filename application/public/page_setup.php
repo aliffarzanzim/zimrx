@@ -253,42 +253,42 @@ include 'header.php';
 </div>
 
 <div id="page-setup-confirm-modal" class="print-setup-toast" hidden>
-    <div class="print-setup-toast-panel" role="dialog" aria-modal="true" class="print-setup-toast-panel zps-confirm-panel">
-        <span class="print-setup-toast-icon" class="print-setup-toast-icon zps-confirm-icon" aria-hidden="true">&#9888;</span>
+    <div class="print-setup-toast-panel zps-confirm-panel" role="dialog" aria-modal="true">
+        <span class="print-setup-toast-icon zps-confirm-icon" aria-hidden="true">&#9888;</span>
         <strong class="zps-confirm-title">Reset to Defaults?</strong>
         <p class="zps-confirm-text">Are you sure you want to restore the sizes to default settings? This cannot be undone.</p>
         <div class="zps-confirm-actions">
-            <button type="button" id="confirm-page-reset-cancel" class="btn btn-outline" class="btn btn-outline zps-confirm-btn">Cancel</button>
-            <button type="button" id="confirm-page-reset-yes" class="btn btn-primary" class="btn btn-primary zps-confirm-btn-danger">Yes, Reset</button>
+            <button type="button" id="confirm-page-reset-cancel" class="btn btn-outline zps-confirm-btn">Cancel</button>
+            <button type="button" id="confirm-page-reset-yes" class="btn btn-primary zps-confirm-btn-danger">Yes, Reset</button>
         </div>
     </div>
 </div>
 
 <div id="page-sizes-modal" class="print-setup-toast" hidden>
-    <div class="print-setup-toast-panel" class="print-setup-toast-panel zps-preset-modal-panel">
+    <div class="print-setup-toast-panel zps-preset-modal-panel">
         <div class="zps-preset-modal-header">
             <strong class="zps-preset-modal-title">Common Page Sizes</strong>
             <button type="button" id="page-sizes-close-x" class="zps-preset-modal-close">&times;</button>
         </div>
         <p class="zps-preset-modal-desc">Click a preset to apply it as your complete prescription dimensions:</p>
         <div class="zps-preset-list">
-            <button type="button" class="btn btn-outline page-size-opt-btn" data-width="21.0" data-height="29.7" class="btn btn-outline zps-preset-btn">
+            <button type="button" class="btn btn-outline page-size-opt-btn zps-preset-btn" data-width="21.0" data-height="29.7">
                 <strong>A4 Size</strong>
                 <span class="zps-preset-dims">21.0 x 29.7 cm</span>
             </button>
-            <button type="button" class="btn btn-outline page-size-opt-btn" data-width="14.8" data-height="21.0" class="btn btn-outline zps-preset-btn">
+            <button type="button" class="btn btn-outline page-size-opt-btn zps-preset-btn" data-width="14.8" data-height="21.0">
                 <strong>A5 Size</strong>
                 <span class="zps-preset-dims">14.8 x 21.0 cm</span>
             </button>
-            <button type="button" class="btn btn-outline page-size-opt-btn" data-width="21.6" data-height="27.9" class="btn btn-outline zps-preset-btn">
+            <button type="button" class="btn btn-outline page-size-opt-btn zps-preset-btn" data-width="21.6" data-height="27.9">
                 <strong>Letter Size</strong>
                 <span class="zps-preset-dims">21.6 x 27.9 cm</span>
             </button>
-            <button type="button" class="btn btn-outline page-size-opt-btn" data-width="21.6" data-height="35.6" class="btn btn-outline zps-preset-btn">
+            <button type="button" class="btn btn-outline page-size-opt-btn zps-preset-btn" data-width="21.6" data-height="35.6">
                 <strong>Legal Size</strong>
                 <span class="zps-preset-dims">21.6 x 35.6 cm</span>
             </button>
-            <button type="button" class="btn btn-outline page-size-opt-btn" data-width="17.6" data-height="25.0" class="btn btn-outline zps-preset-btn">
+            <button type="button" class="btn btn-outline page-size-opt-btn zps-preset-btn" data-width="17.6" data-height="25.0">
                 <strong>B5 Size</strong>
                 <span class="zps-preset-dims">17.6 x 25.0 cm</span>
             </button>
