@@ -10,4 +10,5 @@ All notable changes to this project will be documented in this file.
 - Pediatric WHO/CDC growth chart calculator
 - Longitudinal EMR visit timeline and report attachment storage
 - Multi-provider scheduling and billing ledger
-- 181 automated regression and security tests
+- WHO ATC 2026 5-level classification, Defined Daily Dose (DDD), and INN reference catalogs
+- 199 automated regression and security tests

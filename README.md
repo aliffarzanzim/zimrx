@@ -36,6 +36,7 @@
 * **Open Data Portability & Sovereignty**: Export complete patient clinical histories, visit notes, and records into standardized open formats (JSON / CSV) at any time with zero vendor lock-in.
 * **Ultra-Fast Grid UI**: Custom-engineered, lightweight Prescription Grid UI built with pure Vanilla JS and CSS tokens. Entirely keyboard-driven (Tab & Arrow keys) to eliminate mouse fatigue, allowing doctors to compose an error-free prescription in under 20-30 seconds.
 * **Sub-Millisecond Pharmaceutical Search**: Instant full-text search across 30,000+ national commercial drug brands, formulations, strengths, and generic equivalents powered by SQLite FTS5.
+* **WHO ATC, DDD & INN International Standards**: Integrated 5-level WHO Anatomical Therapeutic Chemical classification (7,000 nodes across all 14 anatomical groups A through V), official WHO Defined Daily Doses (2,700+ DDD records), and WCO/WHO International Nonproprietary Names (7,200+ INNs with CAS numbers and HS customs codes) for cross-border generic mapping and international interoperability.
 * **Clinical Decision Support (CDS)**: Built-in safety checks for drug-drug interactions, pregnancy & lactation contraindications, renal/hepatic adjustments, and pediatric dosage calculators.
 * **Rapid Consultation Workflow**: Streamlined interface for presenting complaints, vitals, medical history, physical examinations, diagnostic investigations, and individualized patient advice templates.
 * **Pixel-Perfect Print Formatting**: Highly customizable prescription pad layout engine supporting custom doctor headers, clinic logos, multi-column formatters, and watermark overlays for standard A4/A5 or thermal printers.
@@ -62,8 +63,9 @@ Patient health records should **never** be monetized, tracked, or leaked to cent
                                ▼
 ┌──────────────────┬───────────────────────┬──────────────────┐
 │   zimrx_drugs    │     zimrx_static      │  zimrx_userdata  │
-│  (30k+ Catalog   │  (Standard DX / IX /  │  (Doctor EMR &   │
-│  & Interactions) │    Examinations)      │  Patient Visits) │
+│  (30k+ Brands,   │  (Standard DX / IX /  │  (Doctor EMR &   │
+│   Interactions,  │    Examinations)      │  Patient Visits) │
+│  WHO ATC/DDD/INN)│                       │                  │
 └──────────────────┴───────────────────────┴──────────────────┘
 ```
 
@@ -96,6 +98,13 @@ ZimRx implements a hardened **public webroot boundary** (`application/public/`) 
 * **Humanitarian Aid & Crisis Relief Ready**: Released under the copyleft **GNU AGPLv3** license, ZimRx provides medical teams and humanitarian organizations (such as *Médecins Sans Frontières*) with a zero-cost, resilient clinical prescribing engine that operates reliably in disaster response zones, refugee health posts, and rural clinics during complete telecommunication or power blackouts.
 * **Privacy by Design & Data Sovereignty**: Operates on a strict local-first, zero-telemetry model aligned with global privacy standards (GDPR, medical confidentiality). Sensitive patient health records remain strictly on local clinic hardware, entirely eliminating exposure to commercial cloud providers, telemetry backdoors, and recurring subscription lock-in.
 * **Modern Edge Infrastructure**: Powered by **[FrankenPHP](https://frankenphp.dev/)** and Caddy core, delivering a self-contained, single-binary execution environment that runs natively on budget laptops and clinic edge hardware without external database or web server configuration.
+
+### European Dimension & Humanitarian Collaboration
+
+While designed for low-resource environments globally, ZimRx incorporates European healthcare and open data dimensions:
+* **Standardized WHO ATC 2026 & INN Ontologies**: Clinical substances in `zimrx_drugs.db` map natively to the 5-level WHO Anatomical Therapeutic Chemical classification and International Nonproprietary Names (INN). European medical professionals can prescribe immediately using international substance standards, or integrate European national drug catalogs (such as BNF, Vidal, or Rote Liste equivalents) without touching application logic.
+* **European Humanitarian & Field Mission Utility**: Provides European humanitarian NGOs (such as *Médecins Sans Frontières*, ICRC, and emergency medical teams) with an offline, auditable clinical tool for crisis deployments where commercial cloud infrastructure is inaccessible or illegal under strict data protection mandates.
+* **Open European Co-Maintainership**: We actively invite European free software health informatics contributors, clinical pilot sites, and independent European security auditing firms (such as Radically Open Security) to pair for collaborative milestone delivery, security audits, and multi-language European localizations.
 
 ---
 
@@ -238,5 +247,8 @@ The standalone reference databases bundled in `application/systemdata/database/`
 * **Presenting Complaints (`zimrx_static_pc`)**: 
   The medical terminology catalogs represent standard, public clinical vocabulary curated from standard medical literature & textbooks, clinical practitioner notes, and the **SNOMED CT Global Patient Set (GPS)** for workflow efficiency and rapid autocomplete. They do not incorporate proprietary code systems or relational ontologies. Applicable SNOMED descriptions are used under the SNOMED International GPS Open License:
   > *"This material includes SNOMED Clinical Terms ® (SNOMED CT ®) which is used by permission of SNOMED International. All rights reserved. SNOMED CT ® was originally created by the College of American Pathologists."*
-* **Pharmaceutical Catalog**: Curated from public national pharmacopoeias, clinical formularies, open drug registries, and standard medical & pharmacology reference and textbooks.
+* **Pharmaceutical & Chemical Standardization (`zimrx_drugs`)**:
+  * **Commercial Brands & National Formularies**: Curated from public national pharmacopoeias, clinical formularies, open drug registries, and standard pharmacology reference texts.
+  * **WHO Anatomical Therapeutic Chemical (ATC) Classification & Defined Daily Dose (DDD)**: Derived from the official **WHO Collaborating Centre for Drug Statistics Methodology (2026)** reference datasets. Provides a normalized 5-level hierarchical taxonomy (7,000 nodes across all 14 anatomical groups A through V) and adult maintenance doses (2,768 records) for cross-border generic equivalence, clinical decision support, and epidemiological interoperability.
+  * **International Nonproprietary Names (INN)**: Standardized pharmaceutical nomenclature from the **World Health Organization (WHO)** and **World Customs Organization (WCO)** Harmonized System table (7,268 records), mapping generic substances to chemical CAS registry numbers and international tariff classifications.
 

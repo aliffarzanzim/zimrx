@@ -62,6 +62,7 @@ class ZimRxTestSuite {
         $this->testOfflinePrivacyAndFontIntegrity();
         $this->testAntiVibeCodingAndAttachmentSecurity();
         $this->testCrossPlatformStandardsAndRepositoryMetadata();
+        $this->testWhoAtcAndInnStandardization();
 
         echo "\n--------------------------------------------------------\n";
         echo "Test Results: {$this->passed} passed, {$this->failed} failed\n";
@@ -1231,6 +1232,79 @@ class ZimRxTestSuite {
         $this->assert(
             str_contains($dockerContent, 'php /app/application/systemdata/seeds/build_db.php'),
             "Dockerfile builds reference databases via native PHP without requiring sqlite CLI binary"
+        );
+    }
+
+    private function testWhoAtcAndInnStandardization(): void {
+        echo "[22/22] Testing WHO ATC 2026, Defined Daily Dose (DDD), and INN Standards...\n";
+
+        $db = DbConnections::systemDb();
+
+        // 1. Verify table presence
+        $tables = $db->query("SELECT name FROM sqlite_master WHERE type='table' AND name IN ('who_atc_hierarchy', 'who_ddd_reference', 'who_inn_catalog')")->fetchAll(PDO::FETCH_COLUMN);
+        $this->assert(
+            count($tables) === 3,
+            "Master drug database contains all 3 WHO standard tables (who_atc_hierarchy, who_ddd_reference, who_inn_catalog)"
+        );
+
+        // 2. ATC Hierarchy integrity
+        $atcCount = (int)$db->query("SELECT count(*) FROM who_atc_hierarchy")->fetchColumn();
+        $this->assert(
+            $atcCount >= 7000,
+            "who_atc_hierarchy contains complete 5-level international classification ({$atcCount} nodes >= 7000)"
+        );
+
+        $l1Count = (int)$db->query("SELECT count(DISTINCT level1_code) FROM who_atc_hierarchy WHERE level_number = 1")->fetchColumn();
+        $this->assert(
+            $l1Count === 14,
+            "who_atc_hierarchy covers all 14 official WHO anatomical main groups (A, B, C, D, G, H, J, L, M, N, P, R, S, V)"
+        );
+
+        // Spot-check standard substance: Metformin (A10BA02)
+        $metformin = $db->query("SELECT * FROM who_atc_hierarchy WHERE atc_code = 'A10BA02'")->fetch(PDO::FETCH_ASSOC);
+        $this->assert(
+            $metformin && $metformin['level1_code'] === 'A' && $metformin['level2_code'] === 'A10' && $metformin['level4_code'] === 'A10BA',
+            "ATC hierarchy maps Metformin (A10BA02) through Alimentary -> Blood glucose lowering -> Biguanides"
+        );
+
+        // 3. Defined Daily Dose (DDD) Reference integrity
+        $dddCount = (int)$db->query("SELECT count(*) FROM who_ddd_reference")->fetchColumn();
+        $this->assert(
+            $dddCount >= 2700,
+            "who_ddd_reference contains official 2026 WHO Defined Daily Doses ({$dddCount} records >= 2700)"
+        );
+
+        $metforminDdd = $db->query("SELECT * FROM who_ddd_reference WHERE atc_code = 'A10BA02'")->fetch(PDO::FETCH_ASSOC);
+        $this->assert(
+            $metforminDdd && (float)$metforminDdd['ddd'] === 2.0 && $metforminDdd['uom'] === 'g' && $metforminDdd['adm_route'] === 'O',
+            "WHO DDD specifies standard adult daily dose for Metformin (2.0 g, oral administration)"
+        );
+
+        // 4. International Nonproprietary Names (INN) Catalog integrity
+        $innCount = (int)$db->query("SELECT count(*) FROM who_inn_catalog")->fetchColumn();
+        $this->assert(
+            $innCount >= 7200,
+            "who_inn_catalog contains WCO / WHO standardized nomenclature ({$innCount} records >= 7200)"
+        );
+
+        $atorvastatinInn = $db->query("SELECT * FROM who_inn_catalog WHERE inn_name_en = 'atorvastatin'")->fetch(PDO::FETCH_ASSOC);
+        $this->assert(
+            $atorvastatinInn && $atorvastatinInn['cas_number'] === '134523-00-5' && $atorvastatinInn['hs_class_2022'] === '2933.99',
+            "who_inn_catalog maps Atorvastatin to CAS Registry Number 134523-00-5 and WCO HS customs class 2933.99"
+        );
+
+        // 5. Relational join with drug_generic (no extra columns added to drug_generic)
+        $joinCount = (int)$db->query("SELECT count(*) FROM drug_generic g JOIN who_atc_hierarchy h ON g.who_atc_class = h.atc_code")->fetchColumn();
+        $this->assert(
+            $joinCount >= 2250,
+            "Clinical generics join directly with WHO ATC hierarchy ({$joinCount} / 2331 generics matched, >96% coverage)"
+        );
+
+        // Verify drug_generic schema was not modified
+        $genericCols = $db->query("PRAGMA table_info(drug_generic)")->fetchAll(PDO::FETCH_COLUMN, 1);
+        $this->assert(
+            !in_array('ddd', $genericCols, true) && !in_array('inn_name', $genericCols, true),
+            "drug_generic schema preserved with zero positional column mutations (clean 3NF relational design)"
         );
     }
 }

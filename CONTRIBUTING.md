@@ -70,6 +70,17 @@ Patient safety comes first. While AI tools can be used to accelerate development
 
 ---
 
+## International & Humanitarian Collaboration
+
+ZimRx is actively open to international healthcare practitioners, humanitarian relief organizations, and medical software contributors. If you are interested in:
+* Maintaining or compiling national drug formulary packages based on WHO ATC and INN standards.
+* Piloting ZimRx in European clinics or emergency humanitarian field deployments.
+* Conducting independent clinical safety or security audits.
+
+Please reach out via GitHub Discussions, Issues, or contact `aliffarzanzim@gmail.com`.
+
+---
+
 ## License
 
 By contributing to ZimRx, you agree that your contributions will be licensed under the [GNU Affero General Public License v3.0 (AGPL-3.0)](LICENSE).
