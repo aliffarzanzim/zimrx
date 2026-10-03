@@ -29,6 +29,7 @@ function rx_interaction_ids_from_request(): array {
 
 function rx_has_interaction_generic_columns(PDO $pdo): bool {
     $columns = [];
+    // Static schema inspection on read-only drug catalog (zero parameters)
     foreach ($pdo->query('PRAGMA table_info(drug_interaction)') as $row) {
         $columns[$row['name'] ?? $row[1] ?? ''] = true;
     }
@@ -63,6 +64,7 @@ function rx_split_component_names($value): array {
 function rx_build_generic_lookup(PDO $pdo): array {
     $keys = [];
     $ambiguous = [];
+    // Static generic lookup on read-only drug catalog (zero parameters)
     foreach ($pdo->query('SELECT generic_id, generic_name, us_generic_name FROM drug_generic') as $row) {
         $genericId = rx_norm_space($row['generic_id'] ?? '');
         foreach ([$row['generic_name'] ?? '', $row['us_generic_name'] ?? ''] as $name) {
