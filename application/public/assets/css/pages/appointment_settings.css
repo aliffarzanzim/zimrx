@@ -1,0 +1,295 @@
+/* Appointment settings layout, schedule rules, and token configuration */
+
+.apt-settings-form-body {
+    margin-top: 1.25rem;
+}
+
+.apt-layout-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    align-items: start;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 960px) {
+    .apt-layout-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.apt-section-card {
+    background: var(--print-surface, var(--zrx-white));
+    border: 1px solid var(--print-border-soft, var(--zrx-border-subtle));
+    border-radius: var(--zrx-border-radius);
+    box-shadow: var(--zrx-shadow-card);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.apt-section-card-full {
+    grid-column: 1 / -1;
+}
+
+.apt-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.15rem;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid var(--zrx-slate-100);
+}
+
+.apt-card-head h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--zrx-text-main);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.apt-card-head svg {
+    color: var(--print-accent, var(--zrx-primary));
+}
+
+.apt-form-group {
+    margin-bottom: 1.15rem;
+}
+
+.apt-form-group:last-child {
+    margin-bottom: 0;
+}
+
+.apt-label-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.35rem;
+}
+
+.apt-label-wrap label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--zrx-slate-800);
+}
+
+.apt-unit-input {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--print-border, var(--zrx-border));
+    border-radius: 6px;
+    background: var(--zrx-bg-card);
+    overflow: hidden;
+    transition: all 0.15s ease;
+}
+
+.apt-unit-input:focus-within {
+    border-color: var(--zrx-primary);
+    box-shadow: var(--zrx-shadow-focus);
+}
+
+.apt-unit-input input {
+    flex: 1;
+    height: 38px;
+    padding: 0 0.75rem;
+    border: none;
+    outline: none;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--zrx-text-main);
+    background: transparent;
+}
+
+.apt-unit-input .apt-unit-badge {
+    background: var(--zrx-bg-subtle);
+    border-left: 1px solid var(--print-border, var(--zrx-border));
+    padding: 0 0.85rem;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--zrx-text-muted);
+    white-space: nowrap;
+}
+
+.apt-explanation-card {
+    background: var(--zrx-bg-subtle);
+    border: 1px solid var(--zrx-border-subtle);
+    border-left: 4px solid var(--zrx-primary);
+    border-radius: 6px;
+    padding: 0.9rem 1.1rem;
+    font-size: 0.83rem;
+    color: var(--zrx-slate-600);
+    line-height: 1.5;
+    margin-top: 1rem;
+}
+
+.apt-explanation-card strong {
+    color: var(--zrx-text-main);
+    font-size: 0.85rem;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+/* Weekly chamber schedule grid */
+
+.weekday-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0.75rem;
+}
+
+.weekday-item-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.65rem 0.85rem;
+    border: 1px solid var(--zrx-border-subtle);
+    border-radius: 6px;
+    background: var(--zrx-bg-subtle);
+}
+
+.weekday-item-box strong {
+    font-size: 0.88rem;
+    color: var(--zrx-text-main);
+    min-width: 80px;
+}
+
+.weekday-item-box label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--zrx-slate-600);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: pointer;
+}
+
+.weekday-item-box input[type="time"] {
+    border: 1px solid var(--zrx-border);
+    border-radius: 4px;
+    padding: 0.25rem 0.45rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+/* Token print field toggles */
+
+.token-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0.65rem;
+}
+
+.token-checkbox-card {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 0.75rem;
+    background: var(--zrx-bg-subtle);
+    border: 1px solid var(--zrx-border-subtle);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--zrx-slate-700);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.token-checkbox-card:hover {
+    background: var(--zrx-blue-50);
+    border-color: var(--zrx-blue-200);
+}
+
+.token-checkbox-card input[type="checkbox"] {
+    accent-color: var(--zrx-primary);
+}
+
+.doctor-select-heading {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    border-radius: 6px;
+    border: 1px solid var(--zrx-border);
+    background: var(--zrx-bg-card);
+    color: var(--zrx-text-main);
+    outline: none;
+}
+
+/* Status and notification banners */
+
+.apt-flash-msg-error {
+    background: var(--zrx-red-50);
+    color: var(--zrx-red-700);
+    border: 1px solid var(--zrx-red-200);
+    margin-top: 1rem;
+    margin-bottom: 0;
+}
+
+.apt-flash-msg-success {
+    background: var(--zrx-emerald-50);
+    color: var(--zrx-emerald-700);
+    border: 1px solid var(--zrx-emerald-200);
+    margin-top: 1rem;
+    margin-bottom: 0;
+}
+
+/* Confirmation dialog modal */
+
+.apt-modal-panel {
+    width: min(100%, 400px);
+    text-align: center;
+    gap: 1.25rem;
+    background: var(--zrx-bg-card);
+    padding: 1.75rem;
+    border-radius: 12px;
+    box-shadow: var(--zrx-shadow-modal);
+    border: 1px solid var(--zrx-border);
+}
+
+.apt-modal-icon {
+    font-size: 2.25rem;
+    line-height: 1;
+}
+
+.apt-modal-title {
+    font-size: 1.15rem;
+    color: var(--zrx-slate-800);
+    display: block;
+}
+
+.apt-modal-desc {
+    font-size: 0.875rem;
+    color: var(--zrx-text-muted);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.apt-modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.5rem;
+}
+
+.apt-modal-btn {
+    flex: 1;
+    padding: 0.5rem 1rem;
+}
+
+.apt-modal-btn-danger {
+    background: var(--zrx-red-600);
+    border-color: var(--zrx-red-600);
+}
+
+.apt-section-desc {
+    font-size: 0.85rem;
+    color: var(--zrx-text-muted);
+    margin-top: -0.5rem;
+    margin-bottom: 1rem;
+}

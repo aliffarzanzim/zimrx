@@ -1,0 +1,184 @@
+{
+  "pres-reg": {
+    "title": "Registration Number (Reg No) Guide",
+    "badge": "Prescription Page",
+    "steps": [
+      {
+        "icon": "1",
+        "text": "For <strong>existing registered patients</strong>, search by typing their Reg No, scanning their barcode, or searching directly from the phone number field."
+      },
+      {
+        "icon": "2",
+        "text": "For <strong>new patients</strong>, leave this field blank and enter patient particulars or write the prescription. A unique Reg No is automatically assigned when you click <strong>Save & Print</strong> or <strong>Save Only</strong>."
+      }
+    ]
+  },
+  "appt-reg": {
+    "title": "Registration Number (Reg No) Guide",
+    "badge": "Appointments Page",
+    "steps": [
+      {
+        "icon": "1",
+        "text": "For <strong>existing registered patients</strong>, search by entering their Reg No, scanning barcode, or searching via the mobile number field."
+      },
+      {
+        "icon": "2",
+        "text": "For <strong>new patients</strong>, leave blank and complete patient particulars. A unique Reg No is automatically assigned when you click <strong>Save Appointment</strong>."
+      }
+    ]
+  },
+  "mobile": {
+    "title": "Phone Number (Mobile) Guide",
+    "badge": "Search & Registration",
+    "steps": [
+      {
+        "icon": "1",
+        "text": "For <strong>existing patients</strong>, search by typing the phone number. You can also search by Reg No or scan barcode."
+      },
+      {
+        "icon": "2",
+        "text": "For <strong>new patients</strong>, enter the phone number. If another patient is already registered under this number, select <strong>It's a new patient</strong> from the dropdown: both patients share the contact number with separate Reg Nos and records."
+      }
+    ]
+  },
+  "col-resize": {
+    "title": "Table Layout Guide",
+    "badge": "Column Resize & Layout",
+    "steps": [
+      {
+        "icon": "1",
+        "text": "Drag column dividers to resize. Click <strong>Save layout</strong> to persist your custom widths, or click <strong>Reset</strong> to restore default dimensions."
+      }
+    ]
+  },
+  "dob": {
+    "title": "Date of Birth & Age (DOB & Age) Guide",
+    "badge": "Patient Particulars & Calculation",
+    "wide": true,
+    "steps": [
+      {
+        "icon": "★",
+        "text": "<strong>Entering either Age or DOB is sufficient.</strong> Providing one will automatically calculate and set the other."
+      },
+      {
+        "icon": "1",
+        "text": "<strong>Entering DOB auto-calculates Age and Unit:</strong><br>Selecting Date of Birth will automatically calculate the exact age and select the appropriate clinical unit:<ul class=\"zrx-help-list\"><li><strong>&ge; 1 Year:</strong> Age shown in completed years (<code>Unit = \"Years\"</code>).</li><li><strong>&lt; 1 Year but &ge; 1 Month:</strong> Age shown in months (<code>Unit = \"Months\"</code>).</li><li><strong>&lt; 1 Month but &ge; 7 Days:</strong> Age shown in weeks (<code>Unit = \"Weeks\"</code>).</li><li><strong>&lt; 7 Days (Neonate):</strong> Age shown in exact days (<code>Unit = \"Days\"</code>).</li></ul>"
+      },
+      {
+        "icon": "2",
+        "text": "<strong>Entering Age auto-estimates DOB:</strong><br>Typing an age and choosing a unit constructs an estimated backend DOB:<ul class=\"zrx-help-list\"><li><strong>Years (e.g. 25 Years):</strong> Sets estimated DOB to Jan 1st of that birth year.</li><li><strong>Months (e.g. 6 Months):</strong> Sets estimated DOB to the 1st of the calculated birth month.</li><li><strong>Weeks (e.g. 3 Weeks):</strong> Subtracts 21 days (3 &times; 7) from today's date.</li><li><strong>Days (e.g. 5 Days):</strong> Subtracts the exact number of days from today.</li></ul>"
+      },
+      {
+        "icon": "3",
+        "text": "<strong>Longitudinal Tracking & Pediatric Care:</strong> Dynamic age calculation ensures accurate growth chart plotting (WHO/CDC percentiles) and pediatric vaccine schedule timing on future visits."
+      }
+    ]
+  },
+  "visit-id": {
+    "title": "Visit ID Guide",
+    "badge": "Prescription & EMR Records",
+    "steps": [
+      {
+        "icon": "1",
+        "text": "<strong>Prescription Tracking & History:</strong> The Visit ID is tied directly to the clinical encounter. Each prescription has a unique Visit ID allowing precise lookup of the exact consultation notes and Rx state."
+      },
+      {
+        "icon": "2",
+        "text": "<strong>Automated Unique Identifier:</strong> The system automatically generates and assigns this ID when saving the prescription. No manual entry or modification is required."
+      }
+    ]
+  },
+  "occupation": {
+    "title": "Occupation Guide & Directory Management",
+    "badge": "Patient Particulars & EMR",
+    "wide": true,
+    "steps": [
+      {
+        "icon": "1",
+        "text": "Capturing occupational history helps assess socioeconomic status and evaluate occupational health hazards related to presenting complaints."
+      },
+      {
+        "icon": "2",
+        "text": "Common occupations are pre-populated in the dropdown. You can also type custom occupations, which are automatically saved to your practice directory for future prescriptions."
+      },
+      {
+        "icon": "3",
+        "text": "Dropdown suggestions are dynamically ranked by usage frequency. Use the directory management table below to pin frequent occupations, add custom entries, edit, or reset to defaults."
+      }
+    ],
+    "ui": {
+      "placeholder_input": "Type new occupation...",
+      "btn_add": "+ Add",
+      "btn_reset": "Reset to Default",
+      "th_move": "Move",
+      "th_actions": "Actions",
+      "th_type": "Type",
+      "th_name": "Occupation Name",
+      "th_usage": "Usage",
+      "loading": "Loading occupations...",
+      "empty": "No occupations found.",
+      "btn_pin": "Pin",
+      "btn_unpin": "Unpin",
+      "btn_edit": "Edit",
+      "btn_remove": "Remove",
+      "btn_restore": "Restore",
+      "btn_delete": "Delete",
+      "tag_system": "System",
+      "tag_custom": "Custom",
+      "tag_hidden": "Hidden",
+      "confirm_reset": "Reset all occupation customizations to default? This will unpin, unhide, and restore all system occupations.",
+      "prompt_edit": "Edit occupation name:"
+    }
+  },
+  "address": {
+    "title": "Address Guide & Directory Management",
+    "badge": "Patient Particulars & Geography",
+    "wide": true,
+    "steps": [
+      {
+        "icon": "1",
+        "text": "<strong>Smart Comma (,) Hierarchy:</strong> Typing an area name followed by a comma (<code>,</code>) automatically anticipates and suggests parent jurisdictions (e.g., typing <code>Savar,</code> suggests <code>Dhaka</code>)."
+      },
+      {
+        "icon": "2",
+        "text": "<strong>National Directory & Custom Entries:</strong> Autocomplete searches across comprehensive national administrative subdivisions as well as your saved custom addresses."
+      },
+      {
+        "icon": "3",
+        "text": "<strong>Frequency-Ranked Predictions:</strong> Frequently entered addresses and exact matches are automatically elevated to the top of suggestion lists."
+      },
+      {
+        "icon": "4",
+        "text": "<strong>Practice Region Filtering:</strong> Select your practice districts below to narrow suggestions to your local catchment area. You can also pin, edit, delete, or add custom addresses."
+      }
+    ],
+    "ui": {
+      "section_districts_title": "Practice Districts Filter",
+      "btn_dist_all": "All Districts",
+      "btn_dist_save": "Save Districts",
+      "btn_dist_saved": "Saved ✓",
+      "district_search_placeholder": "Search District...",
+      "districts_loading": "Loading districts...",
+      "section_addr_title": "Address Directory & Management (Top 100)",
+      "btn_reset_addr": "Reset to Default",
+      "addr_search_placeholder": "Search locality, thana, upazila, district...",
+      "tab_all": "All (Top 100)",
+      "tab_custom": "Custom Only",
+      "tab_system": "System (National)",
+      "tab_pinned": "Pinned",
+      "new_addr_placeholder": "Type new custom address/area...",
+      "btn_add_addr": "+ Add",
+      "th_actions": "Actions",
+      "th_type": "Type",
+      "th_address": "Address / Combination",
+      "th_usage": "Usage",
+      "addr_loading": "Loading addresses...",
+      "addr_empty": "No addresses found.",
+      "confirm_reset_addr": "Reset all address customizations and district preferences to default?",
+      "prompt_edit_addr": "Edit address name:"
+    }
+  },
+  "modal_ui": {
+    "btn_ok": "Got it"
+  }
+}

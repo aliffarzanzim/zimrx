@@ -1,10 +1,11 @@
 <?php
-/**
- * Migration 006  -  User drug instructions table
- */
+declare(strict_types=1);
+
+// Doctor medication administration instructions (bilingual) with usage ranking and static linking.
 class Migration006InstructionUsageStaticFirst {
 
     public function up(PDO $pdo): void {
+        // Custom instruction overrides, dosage form bindings, and frequency tracking
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_drug_instructions (
                 id " . DbSql::autoIncrement() . ",
@@ -29,3 +30,4 @@ class Migration006InstructionUsageStaticFirst {
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_rx_instruction_doctor_usage ON zimrx_user_drug_instructions(doctor_id, usage_count DESC, sort_order ASC, id ASC)");
     }
 }
+

@@ -1,0 +1,1203 @@
+{
+    "categories": {
+        "1": {
+            "text": "General Advice",
+            "alias": "general, common, shadharon, advice, prescription rules, নিয়মাবলী"
+        },
+        "2": {
+            "text": "Hypertension",
+            "alias": "htn, high blood pressure, bp, pressure, উচ্চ রক্তচাপ, প্রেশার"
+        },
+        "3": {
+            "text": "Diabetes Mellitus",
+            "alias": "dm, diabetes, sugar, suga, ডায়াবেটিস, সুগার, বহুমূত্র"
+        },
+        "4": {
+            "text": "Hypoglycemia",
+            "alias": "hypoglycemia, low sugar, low blood glucose, শর্করা স্বল্পতা"
+        },
+        "5": {
+            "text": "Hyperglycemia / DKA",
+            "alias": "hyperglycemia, dka, diabetic coma, হাইপারগ্লাইসেমিয়া, কোমা"
+        },
+        "6": {
+            "text": "Dyslipidemia / Hyperlipidemia",
+            "alias": "lipid, cholesterol, dyslipidemia, চর্বি, কোলেস্টেরল"
+        },
+        "7": {
+            "text": "Obesity / Weight Gain",
+            "alias": "obesity, weight gain, fat, overweight, অতিরিক্ত ওজন, স্থূলতা"
+        },
+        "8": {
+            "text": "Ischemic Heart Disease / MI",
+            "alias": "mi, myocardial infarction, heart attack, acs, ihd, angina, হার্ট অ্যাটাক, হৃদরোগ"
+        },
+        "9": {
+            "text": "Heart Failure",
+            "alias": "heart failure, chf, hf, হার্ট ফেইলিওর"
+        },
+        "10": {
+            "text": "Vasovagal Attack / Syncope",
+            "alias": "syncope, fainting, vasovagal, অজ্ঞান হওয়া"
+        },
+        "11": {
+            "text": "Stroke",
+            "alias": "stroke, cva, paralysis, স্ট্রোক, প্যারালাইসিস"
+        },
+        "12": {
+            "text": "Epilepsy / Convulsion",
+            "alias": "epilepsy, convulsion, seizure, মৃগীরোগ, খিঁচুনি"
+        },
+        "13": {
+            "text": "Migraine / Tension Headache",
+            "alias": "migraine, headache, tension headache, মাইগ্রেন, মাথা ব্যথা"
+        },
+        "14": {
+            "text": "Bell's Palsy",
+            "alias": "bells palsy, facial palsy, মুখের পক্ষাঘাত, মুখ বাঁকা"
+        },
+        "15": {
+            "text": "Meningitis / Encephalitis",
+            "alias": "meningitis, encephalitis, tbm, ব্রেইন ইনফেকশন, মেনিনজাইটিস"
+        },
+        "16": {
+            "text": "Vertigo / BPPV",
+            "alias": "vertigo, bppv, dizziness, মাথা ঘোরা"
+        },
+        "17": {
+            "text": "Restless Legs Syndrome",
+            "alias": "rls, restless leg, পায়ে অস্বস্তি, পা কামড়ানো"
+        },
+        "18": {
+            "text": "Asthma / COPD",
+            "alias": "asthma, copd, shortness of breath, হাঁপানি, শ্বাসকষ্ট"
+        },
+        "19": {
+            "text": "Tuberculosis (TB)",
+            "alias": "tb, tuberculosis, যক্ষ্মা, টিবি"
+        },
+        "20": {
+            "text": "Pneumonia",
+            "alias": "pneumonia, chest infection, cap, hap, নিউমোনিয়া"
+        },
+        "21": {
+            "text": "Common Cold / Flu / Fever",
+            "alias": "cold, flu, viral fever, pyrexia, সর্দি, জ্বর, ইনফ্লুয়েঞ্জা"
+        },
+        "22": {
+            "text": "GERD / Peptic Ulcer Disease",
+            "alias": "gerd, pud, gastric, acidity, ulcer, গ্যাস্ট্রিক, আলসার, বুক জ্বালা"
+        },
+        "23": {
+            "text": "Diarrhoea / AWD",
+            "alias": "diarrhoea, loose motion, awd, ডায়রিয়া, পাতলা পায়খানা"
+        },
+        "24": {
+            "text": "Constipation",
+            "alias": "constipation, bowel, কোষ্ঠকাঠিন্য, কষা পায়খানা"
+        },
+        "25": {
+            "text": "Irritable Bowel Syndrome (IBS)",
+            "alias": "ibs, irritable bowel, আইবিএস"
+        },
+        "26": {
+            "text": "Jaundice / Acute Viral Hepatitis",
+            "alias": "jaundice, liver, hepatitis, জন্ডিস, হেপাটাইটিস"
+        },
+        "27": {
+            "text": "Fatty Liver (NAFLD)",
+            "alias": "fatty liver, nafld, nash, ফ্যাটি লিভার, লিভারে চর্বি"
+        },
+        "28": {
+            "text": "Chronic Liver Disease (CLD)",
+            "alias": "cld, liver cirrhosis, লিভার সিরোসিস, লিভার রোগ"
+        },
+        "29": {
+            "text": "Pancreatitis (Acute/Chronic)",
+            "alias": "pancreatitis, pancreas, অগ্ন্যাশয়, প্যানক্রিয়াটাইটিস"
+        },
+        "30": {
+            "text": "Ulcerative Colitis / Crohn's Disease",
+            "alias": "ibd, ulcerative colitis, crohns, আইবিডি, কোলাইটিস"
+        },
+        "31": {
+            "text": "Urinary Tract Infection (UTI) / Pyelonephritis",
+            "alias": "uti, urine infection, dysuria, pyelonephritis, প্রস্রাবে ইনফেকশন, প্রস্রাবে জ্বালাপোড়া"
+        },
+        "32": {
+            "text": "Chronic Kidney Disease (CKD)",
+            "alias": "ckd, kidney, renal failure, কিডনি রোগ"
+        },
+        "33": {
+            "text": "Renal & Ureteric Stone",
+            "alias": "renal stone, ureteric stone, kidney stone, কিডনিতে পাথর"
+        },
+        "34": {
+            "text": "Nephrotic Syndrome",
+            "alias": "nephrotic syndrome, proteinuria, নেফ্রোটিক সিনড্রোম"
+        },
+        "35": {
+            "text": "Acute Glomerulonephritis (AGN)",
+            "alias": "agn, kidney infection, গ্লোমেরুলোনেফ্রাইটিস"
+        },
+        "36": {
+            "text": "Benign Enlargement of Prostate (BEP)",
+            "alias": "bep, bph, prostate, প্রোস্টেট"
+        },
+        "37": {
+            "text": "A-V Fistula Care",
+            "alias": "av fistula, dialysis, ফিস্টুলা, ডায়ালাইসিস"
+        },
+        "38": {
+            "text": "Lumbar Spondylosis / LBP / PLID",
+            "alias": "lbp, back pain, plid, spondylosis, কোমর ব্যথা, মাজা ব্যথা"
+        },
+        "39": {
+            "text": "Osteoarthritis (Knee)",
+            "alias": "oa, knee pain, arthritis, joint pain, হাঁটু ব্যথা, বাত"
+        },
+        "40": {
+            "text": "Ankylosing Spondylitis",
+            "alias": "ankylosing spondylitis, as, spine arthritis, মেরুদণ্ডের বাত"
+        },
+        "41": {
+            "text": "Gout",
+            "alias": "gout, uric acid, joint pain, গেঁটে বাত, ইউরিক এসিড"
+        },
+        "42": {
+            "text": "Rheumatoid Arthritis / SLE",
+            "alias": "ra, sle, rheumatoid, lupus, বাত, রিউমাটয়েড, লুপাস"
+        },
+        "43": {
+            "text": "Osteoporosis",
+            "alias": "osteoporosis, bone loss, হাড় ক্ষয়"
+        },
+        "44": {
+            "text": "Carpal Tunnel Syndrome",
+            "alias": "cts, carpal tunnel, wrist pain, হাতের কব্জি, স্নায়ুরোগ"
+        },
+        "45": {
+            "text": "Plantar Fasciitis / Calcaneal Spur",
+            "alias": "plantar fasciitis, heel pain, calcaneal spur, গোড়ালি ব্যথা"
+        },
+        "46": {
+            "text": "Neck Pain / Cervical Spondylosis",
+            "alias": "neck pain, cervical spondylosis, ঘাড় ব্যথা, স্পন্ডাইলোসিস"
+        },
+        "47": {
+            "text": "Frozen Shoulder",
+            "alias": "frozen shoulder, shoulder pain, কাঁধ ব্যথা, ফ্রোজেন শোল্ডার"
+        },
+        "48": {
+            "text": "Systemic Sclerosis",
+            "alias": "systemic sclerosis, scleroderma, স্ক্লেরোডার্মা"
+        },
+        "49": {
+            "text": "Acne Vulgaris",
+            "alias": "acne, pimples, ব্রন, মেছতা"
+        },
+        "50": {
+            "text": "Fungal Infection / Ringworm",
+            "alias": "tinea, fungal, ringworm, candidiasis, দাদ, ছত্রাক, চুলকানি"
+        },
+        "51": {
+            "text": "Scabies",
+            "alias": "scabies, itching, খোস পাঁচড়া, চুলকানি"
+        },
+        "52": {
+            "text": "Eczema / Atopic Dermatitis",
+            "alias": "eczema, atopic dermatitis, allergy, একজিমা, অ্যালার্জি"
+        },
+        "53": {
+            "text": "Psoriasis",
+            "alias": "psoriasis, skin disease, সোরিয়াসিস"
+        },
+        "54": {
+            "text": "Lice Infestation (Pediculosis)",
+            "alias": "lice, pediculosis, উকুন"
+        },
+        "55": {
+            "text": "Vitiligo",
+            "alias": "vitiligo, leukoderma, শ্বেতী, সাদা দাগ"
+        },
+        "56": {
+            "text": "Boils / Carbuncle / Abscess",
+            "alias": "boil, abscess, carbuncle, furuncle, ফোঁড়া, ঘা, পুঁজ"
+        },
+        "57": {
+            "text": "Melasma / Freckles",
+            "alias": "melasma, freckles, age spots, মেছতা, কালো দাগ"
+        },
+        "58": {
+            "text": "Corn / Callosities / Cracked Heels",
+            "alias": "corn, cracked heels, callosities, গোড়ালি ফাটা, কড়া পড়া"
+        },
+        "59": {
+            "text": "Miliaria / Hyperhidrosis",
+            "alias": "miliaria, hyperhidrosis, sweating, ঘাম, ঘামাচি"
+        },
+        "60": {
+            "text": "Hypothyroidism",
+            "alias": "thyroid, hypothyroidism, থাইরয়েড"
+        },
+        "61": {
+            "text": "Hyperthyroidism / Thyrotoxicosis",
+            "alias": "hyperthyroidism, thyrotoxicosis, থাইরয়েড বৃদ্ধি"
+        },
+        "62": {
+            "text": "Addison's Disease",
+            "alias": "addisons disease, adrenal insufficiency, অ্যাডিসনস ডিজিজ"
+        },
+        "63": {
+            "text": "Pregnancy / Antenatal Care",
+            "alias": "anc, pregnancy, pregnant, maternity, গর্ভাবস্থা, প্রেগন্যান্সি, গর্ভবতী"
+        },
+        "64": {
+            "text": "Post Natal Care (NVD/CS)",
+            "alias": "pnc, post natal, post partum, delivery, c-section, ডেলিভারি, প্রসব, সিজার"
+        },
+        "65": {
+            "text": "PCOS (Polycystic Ovary Syndrome)",
+            "alias": "pcos, pcod, polycystic, পলিসিস্টিক ওভারি"
+        },
+        "66": {
+            "text": "Dysmenorrhoea",
+            "alias": "dysmenorrhea, period pain, menstrual pain, মাসিক, ঋতুস্রাব, ব্যথা"
+        },
+        "67": {
+            "text": "Infertility",
+            "alias": "infertility, childless, বন্ধ্যাত্ব, সন্তানহীনতা"
+        },
+        "68": {
+            "text": "Abortion (Missed/Incomplete/Septic)",
+            "alias": "abortion, missed abortion, গর্ভপাত, অ্যাবরশন"
+        },
+        "69": {
+            "text": "Leukorrhea / Vaginal Discharge",
+            "alias": "leukorrhea, vaginal discharge, সাদাস্রাব"
+        },
+        "70": {
+            "text": "Premenstrual Syndrome (PMS)",
+            "alias": "pms, premenstrual, মাসিক পূর্ববর্তী সমস্যা"
+        },
+        "71": {
+            "text": "Menopause",
+            "alias": "menopause, মেনোপজ, মাসিক বন্ধ"
+        },
+        "72": {
+            "text": "Neonatal Care",
+            "alias": "neonate, newborn, baby, নবজাতক, শিশু"
+        },
+        "73": {
+            "text": "Febrile Convulsion",
+            "alias": "febrile convulsion, seizure, জ্বরের খিঁচুনি, শিশু"
+        },
+        "74": {
+            "text": "Thalassemia",
+            "alias": "thalassemia, blood disorder, থ্যালাসেমিয়া, রক্তশূন্যতা"
+        },
+        "75": {
+            "text": "Dengue Fever",
+            "alias": "dengue, viral fever, ডেঙ্গু জ্বর"
+        },
+        "76": {
+            "text": "COVID-19",
+            "alias": "covid, corona, sars, করোনা, কোভিড"
+        },
+        "77": {
+            "text": "Chicken Pox & Mumps",
+            "alias": "chicken pox, mumps, varicella, জলবসন্ত, মাম্পস"
+        },
+        "78": {
+            "text": "Psychiatry (Depression / Anxiety)",
+            "alias": "depression, anxiety, panic disorder, ocd, বিষণ্ণতা, দুশ্চিন্তা, মানসিক রোগ"
+        },
+        "79": {
+            "text": "Insomnia",
+            "alias": "insomnia, sleep disorder, অনিদ্রা, ঘুম না হওয়া"
+        },
+        "80": {
+            "text": "Erectile Dysfunction / Sexual Issues",
+            "alias": "ed, erectile dysfunction, pe, যৌন সমস্যা, দ্রুত বীর্যপাত"
+        },
+        "81": {
+            "text": "Anal Fissure / Hemorrhoids",
+            "alias": "piles, hemorrhoids, fissure, পাইলস, ফিশার, অর্শ"
+        },
+        "82": {
+            "text": "Post-op: Appendicitis / Cholecystitis",
+            "alias": "surgery, appendicitis, cholecystitis, সার্জারি, অপারেশন, অ্যাপেন্ডিক্স"
+        },
+        "83": {
+            "text": "Cellulitis / Diabetic Foot",
+            "alias": "cellulitis, diabetic foot, infection, পায়ে ঘা, ইনফেকশন"
+        },
+        "84": {
+            "text": "Head Injury / Spinal Injury",
+            "alias": "head injury, trauma, rta, মাথায় আঘাত, দুর্ঘটনা"
+        },
+        "85": {
+            "text": "Burn",
+            "alias": "burn, পোড়া ঘা"
+        },
+        "86": {
+            "text": "Poisoning (General)",
+            "alias": "poisoning, opc, intoxication, বিষপান, বিষক্রিয়া"
+        },
+        "87": {
+            "text": "Snake Bite",
+            "alias": "snake bite, সাপে কাটা"
+        },
+        "88": {
+            "text": "Rabies / Animal Bite",
+            "alias": "rabies, animal bite, dog bite, জলাতঙ্ক, কুকুর কামড়"
+        },
+        "89": {
+            "text": "Ear Infection (Otitis Media)",
+            "alias": "csom, asom, ear infection, কানের ইনফেকশন, কান পাকা"
+        },
+        "90": {
+            "text": "Tonsillitis / Pharyngitis",
+            "alias": "tonsillitis, sore throat, টনসিল, গলা ব্যথা"
+        },
+        "91": {
+            "text": "Epistaxis",
+            "alias": "epistaxis, nose bleeding, নাক দিয়ে রক্ত পড়া"
+        },
+        "92": {
+            "text": "Conjunctivitis / Corneal Ulcer",
+            "alias": "conjunctivitis, eye infection, corneal ulcer, চোখ ওঠা"
+        },
+        "93": {
+            "text": "Cataract Surgery",
+            "alias": "cataract, eye surgery, ছানি, চোখ অপারেশন"
+        },
+        "94": {
+            "text": "Tooth Extraction",
+            "alias": "tooth extraction, dental, দাঁত তোলা"
+        },
+        "95": {
+            "text": "NG Tube Feeding",
+            "alias": "ng tube, feeding tube, নাকের নল, রাইলস টিউব"
+        },
+        "96": {
+            "text": "Tracheostomy Care",
+            "alias": "tracheostomy, breathing tube, শ্বাসনালীর ছিদ্র, ট্র্যাকিওস্টোমি"
+        },
+        "97": {
+            "text": "Breast Mastitis / Abscess",
+            "alias": "mastitis, breast abscess, স্তনে ফোঁড়া, ইনফেকশন"
+        },
+        "98": {
+            "text": "Infantile Colic / Crying Baby",
+            "alias": "colic, crying baby, বাচ্চাদের কান্না, পেট ব্যথা"
+        },
+        "99": {
+            "text": "Nocturnal Enuresis (Bedwetting)",
+            "alias": "enuresis, bedwetting, বিছানায় প্রস্রাব"
+        },
+        "100": {
+            "text": "Bone Fracture",
+            "alias": "fracture, broken bone, হাড় ভাঙা, ফ্র্যাকচার"
+        },
+        "101": {
+            "text": "Autism / Cerebral Palsy",
+            "alias": "autism, cp, cerebral palsy, অটিজম"
+        },
+        "102": {
+            "text": "Peripheral Arterial Disease (PAD)",
+            "alias": "pad, block, ischemia, রক্তনালীর ব্লক"
+        },
+        "103": {
+            "text": "Hemophilia / ITP",
+            "alias": "hemophilia, itp, bleeding disorder, রক্তপাত, হিমোফিলিয়া"
+        },
+        "104": {
+            "text": "Dental Caries / Oral Hygiene",
+            "alias": "dental caries, oral hygiene, দাঁতের ক্ষয়, দাঁতের যত্ন"
+        },
+        "105": {
+            "text": "Chalazion / Black Eye",
+            "alias": "chalazion, black eye, stye, আঞ্জনি, চোখ ফোলা"
+        },
+        "106": {
+            "text": "Growing Pains",
+            "alias": "growing pain, leg pain child, শিশুর পা ব্যথা"
+        },
+        "107": {
+            "text": "Avulsed Tooth",
+            "alias": "avulsed tooth, broken tooth, দাঁত পড়া, আঘাত"
+        },
+        "108": {
+            "text": "Molar Pregnancy",
+            "alias": "molar pregnancy, মোলার প্রেগন্যান্সি"
+        }
+    },
+    "items": {
+        "1": {
+            "text": "Take your medicines regularly as prescribed."
+        },
+        "2": {
+            "text": "Do not stop or change any medicine without consulting the doctor."
+        },
+        "3": {
+            "text": "Never stop medicines marked as 'Continue' without the doctor's permission."
+        },
+        "4": {
+            "text": "Drink at least 8 glasses of water daily."
+        },
+        "5": {
+            "text": "Please bring this prescription and all previous medical records during your next visit."
+        },
+        "6": {
+            "text": "Take blood pressure medications regularly. Never stop them suddenly."
+        },
+        "7": {
+            "text": "Strictly avoid adding extra salt to your meals."
+        },
+        "8": {
+            "text": "Walk briskly for at least 30 minutes every day."
+        },
+        "9": {
+            "text": "Check your blood pressure regularly."
+        },
+        "10": {
+            "text": "Avoid all types of sweets, sugary fruits, and added sugar."
+        },
+        "11": {
+            "text": "Walk briskly for at least 30 minutes every day."
+        },
+        "12": {
+            "text": "Eat your meals immediately after taking insulin or oral diabetes medicine."
+        },
+        "13": {
+            "text": "Monitor your blood sugar regularly with a glucometer and keep a record."
+        },
+        "14": {
+            "text": "If you experience dizziness, sweating, or palpitations, immediately eat something sweet."
+        },
+        "15": {
+            "text": "If the patient becomes unconscious, place sugar/molasses under their tongue and rush to the hospital."
+        },
+        "16": {
+            "text": "If symptoms like excessive thirst, urination, or vomiting occur, seek immediate medical help."
+        },
+        "17": {
+            "text": "Drink plenty of saline water to prevent dehydration."
+        },
+        "18": {
+            "text": "Avoid fried foods, red meat (beef/mutton), egg yolks, butter, and fatty foods."
+        },
+        "19": {
+            "text": "Eat plenty of fresh vegetables, fruits, and sea fish."
+        },
+        "20": {
+            "text": "Avoid fast food, sweets, and soft drinks."
+        },
+        "21": {
+            "text": "Exercise or walk briskly for at least 30 minutes daily to break a sweat."
+        },
+        "22": {
+            "text": "Take complete rest for 30 to 45 days after returning from the hospital."
+        },
+        "23": {
+            "text": "Heavy lifting and sexual intercourse are prohibited for 1 month."
+        },
+        "24": {
+            "text": "Avoid mental stress, excitement, and anxiety."
+        },
+        "25": {
+            "text": "Strictly follow the fluid and salt restriction as prescribed by the doctor."
+        },
+        "26": {
+            "text": "Keep your weight under control and weigh yourself daily."
+        },
+        "27": {
+            "text": "Avoid prolonged standing and dehydration."
+        },
+        "28": {
+            "text": "Drink oral rehydration salts (ORS) and avoid missing meals."
+        },
+        "29": {
+            "text": "Keep blood pressure and diabetes strictly under control."
+        },
+        "30": {
+            "text": "Perform regular physiotherapy for the paralyzed limbs."
+        },
+        "31": {
+            "text": "Change the bedridden patient's position every 2 hours to prevent bedsores."
+        },
+        "32": {
+            "text": "Stay away from water, fire, and sharp objects at all times."
+        },
+        "33": {
+            "text": "Do not swim alone, work at heights, or drive."
+        },
+        "34": {
+            "text": "During a seizure, do not force objects into the patient's mouth."
+        },
+        "35": {
+            "text": "Avoid triggers such as chocolate, cheese, coffee, loud noises, and strong sunlight."
+        },
+        "36": {
+            "text": "Manage mental stress and ensure adequate sleep."
+        },
+        "37": {
+            "text": "Wear sunglasses when going outside during the day."
+        },
+        "38": {
+            "text": "Tape the affected eyelid shut or use an eye pad at night to protect the eye."
+        },
+        "39": {
+            "text": "Take your medicines regularly. TB medicines may cause orange urine, do not panic."
+        },
+        "40": {
+            "text": "If your eyes turn yellow or you experience vomiting, see a doctor immediately."
+        },
+        "41": {
+            "text": "Move slowly and carefully to avoid triggering dizziness."
+        },
+        "42": {
+            "text": "This condition often resolves on its own within a few weeks."
+        },
+        "43": {
+            "text": "Reduce caffeine intake (tea/coffee)."
+        },
+        "44": {
+            "text": "Light massage and regular exercise may help."
+        },
+        "45": {
+            "text": "Use your inhaler with a spacer and always gargle after use."
+        },
+        "46": {
+            "text": "Avoid dust, smoke, pets, and cold environments."
+        },
+        "47": {
+            "text": "Smoking is completely prohibited. Do not use mosquito coils indoors."
+        },
+        "48": {
+            "text": "Complete the full course of medicine without missing a single day."
+        },
+        "49": {
+            "text": "Urine and tears may turn orange due to the medicine; do not panic."
+        },
+        "50": {
+            "text": "Use a 3-ball incentive spirometer for lung exercises."
+        },
+        "51": {
+            "text": "Avoid smoke, dust, and cold environments."
+        },
+        "52": {
+            "text": "If breathing difficulty increases, seek immediate hospital admission."
+        },
+        "53": {
+            "text": "Drink plenty of warm fluids and water."
+        },
+        "54": {
+            "text": "If temperature exceeds 102┬░F, use 1 Paracetamol suppository rectally."
+        },
+        "55": {
+            "text": "Inhale steam if your nose is blocked."
+        },
+        "56": {
+            "text": "Eat meals on time. Do not keep your stomach empty for long periods."
+        },
+        "57": {
+            "text": "Avoid extra spicy, fried foods, fast food, tea, and coffee."
+        },
+        "58": {
+            "text": "Do not lie down immediately after eating; wait at least 2 hours before sleeping."
+        },
+        "59": {
+            "text": "Mix one full packet of ORS in half a liter of water and drink after each loose motion."
+        },
+        "60": {
+            "text": "Never mix ORS in hot water or alter the water-to-powder ratio."
+        },
+        "61": {
+            "text": "Do not stop normal food. Continue breast milk for infants."
+        },
+        "62": {
+            "text": "Drink at least 2 to 2.5 liters of water daily."
+        },
+        "63": {
+            "text": "Eat high-fiber foods like vegetables, fruits, and ispaghula husk."
+        },
+        "64": {
+            "text": "Engage in regular physical activity or brisk walking."
+        },
+        "65": {
+            "text": "IBS is a manageable condition. Maintain a stress-free lifestyle."
+        },
+        "66": {
+            "text": "Identify and avoid foods that trigger your symptoms."
+        },
+        "67": {
+            "text": "Take complete bed rest. It heals in 3 to 6 weeks naturally."
+        },
+        "68": {
+            "text": "Do not take paracetamol or any painkiller without a doctor's advice."
+        },
+        "69": {
+            "text": "Strictly avoid alcohol, smoking, and herbal/unregistered medicines."
+        },
+        "70": {
+            "text": "Walk briskly for 30 to 60 minutes every day and reduce excess body weight."
+        },
+        "71": {
+            "text": "Avoid fast food, sugary items, deep-fried foods, and red meat."
+        },
+        "72": {
+            "text": "Do not take any NSAIDs, sedatives, or painkillers without permission."
+        },
+        "73": {
+            "text": "Ensure regular bowel movements; avoid constipation at all costs."
+        },
+        "74": {
+            "text": "Restrict daily salt and water intake as advised by the doctor."
+        },
+        "75": {
+            "text": "Strictly avoid alcohol and smoking."
+        },
+        "76": {
+            "text": "Take your medicines regularly and report to the hospital if pain worsens."
+        },
+        "77": {
+            "text": "This is a chronic but manageable disease. Do not panic."
+        },
+        "78": {
+            "text": "If your stomach swells, eyes turn red, or oral ulcers appear, contact the hospital."
+        },
+        "79": {
+            "text": "Drink plenty of water (at least 2 to 2.5 liters daily)."
+        },
+        "80": {
+            "text": "Do not hold your urine for long periods."
+        },
+        "81": {
+            "text": "Empty your bladder before and after intercourse. Maintain local hygiene."
+        },
+        "82": {
+            "text": "Drink water exactly as prescribed (usually previous day's urine output + 500 ml)."
+        },
+        "83": {
+            "text": "Avoid extra table salt and high-potassium fruits (e.g., banana, coconut water)."
+        },
+        "84": {
+            "text": "Consume measured amounts of protein based on your weight."
+        },
+        "85": {
+            "text": "Drink 2.5 to 3 liters of water daily so that urine output remains high."
+        },
+        "86": {
+            "text": "Avoid extra salt, red meat, and spinach."
+        },
+        "87": {
+            "text": "Heat a small amount of urine daily; if it turns cloudy continuously, contact the hospital."
+        },
+        "88": {
+            "text": "Feed the patient 3 to 4 egg whites daily as a source of protein."
+        },
+        "89": {
+            "text": "Strictly restrict fruits and salt intake."
+        },
+        "90": {
+            "text": "Take medicines regularly and limit salt and fluid intake as advised."
+        },
+        "91": {
+            "text": "Follow up after 6 weeks with a Urine R/E report."
+        },
+        "92": {
+            "text": "Reduce fluid intake in the evening and before bedtime."
+        },
+        "93": {
+            "text": "Avoid constipation and reduce caffeine intake."
+        },
+        "94": {
+            "text": "Do not wear tight clothes, watches, or bracelets on the fistula arm."
+        },
+        "95": {
+            "text": "No injections, blood draws, or BP measurements should be done on that arm."
+        },
+        "96": {
+            "text": "Squeeze a soft ball regularly to exercise the fistula arm."
+        },
+        "97": {
+            "text": "Do not bend forward to work or lift heavy objects."
+        },
+        "98": {
+            "text": "Use a firm, flat bed. Avoid soft foam beds."
+        },
+        "99": {
+            "text": "Use a high commode in the toilet and perform back strengthening exercises."
+        },
+        "100": {
+            "text": "Avoid folding your knees, squatting, or sitting on the floor."
+        },
+        "101": {
+            "text": "Do not use stairs frequently. Use a high commode in the toilet."
+        },
+        "102": {
+            "text": "Reduce body weight and wear a knee cap during the day."
+        },
+        "103": {
+            "text": "Perform regular physical exercise like swimming and back extension exercises."
+        },
+        "104": {
+            "text": "Do not sleep on soft beds. Maintain good posture."
+        },
+        "105": {
+            "text": "Avoid red meat, organ meat, sea fish, lentils, and alcohol."
+        },
+        "106": {
+            "text": "Drink plenty of water and reduce excess body weight."
+        },
+        "107": {
+            "text": "Take your immunosuppressive medicines regularly."
+        },
+        "108": {
+            "text": "For SLE, avoid direct sunlight and use sunscreen generously."
+        },
+        "109": {
+            "text": "Follow up regularly with CBC, SGPT, and Creatinine reports as advised."
+        },
+        "110": {
+            "text": "Stop smoking and moderate alcohol intake."
+        },
+        "111": {
+            "text": "Take adequate dietary calcium and perform regular exercise."
+        },
+        "112": {
+            "text": "Take frequent breaks from repetitive activities involving the hands."
+        },
+        "113": {
+            "text": "Wear a snug wrist splint at night and do not sleep on your hands."
+        },
+        "114": {
+            "text": "Always wear soft-soled shoes or foam sandals, even indoors."
+        },
+        "115": {
+            "text": "Roll a bottle or ball under the arch of your foot for 5 minutes daily."
+        },
+        "116": {
+            "text": "Avoid keeping your neck bent for long periods (e.g., while using a phone or reading)."
+        },
+        "117": {
+            "text": "Perform neck muscle strengthening exercises as advised."
+        },
+        "118": {
+            "text": "Encourage gentle shoulder movements; avoid prolonged rest."
+        },
+        "119": {
+            "text": "Avoid sleeping on the affected side."
+        },
+        "120": {
+            "text": "Avoid exposure to cold. Wear socks and gloves in winter."
+        },
+        "121": {
+            "text": "Apply olive oil or vaseline on the skin to keep it moist."
+        },
+        "122": {
+            "text": "Wash your face twice a day with soap or face wash to remove excess oil."
+        },
+        "123": {
+            "text": "Do not pick or squeeze the pimples to avoid scarring."
+        },
+        "124": {
+            "text": "Avoid using excess cosmetics on the face and drink plenty of water."
+        },
+        "125": {
+            "text": "Keep the affected area clean and dry. Do not share towels or clothes."
+        },
+        "126": {
+            "text": "Apply the ointment slightly beyond the border of the affected skin."
+        },
+        "127": {
+            "text": "Continue the medication for at least 2 weeks after the spots disappear."
+        },
+        "128": {
+            "text": "All family members and close contacts must be treated simultaneously."
+        },
+        "129": {
+            "text": "Apply lotion all over the body after a bath and wash it off after the prescribed time."
+        },
+        "130": {
+            "text": "Wash all used clothes, bedding, and towels in hot water and dry them in sunlight."
+        },
+        "131": {
+            "text": "Do not let the skin dry out; use moisturizers frequently, especially after bathing."
+        },
+        "132": {
+            "text": "Avoid harsh soaps, hot water, and woolen clothing."
+        },
+        "133": {
+            "text": "This condition is controllable but requires patience for long-term treatment."
+        },
+        "134": {
+            "text": "Avoid triggers like stress, cold weather, smoking, and skin trauma."
+        },
+        "135": {
+            "text": "Comb hair with a fine-tooth comb after applying the prescribed lice treatment."
+        },
+        "136": {
+            "text": "Wash all bedding and clothes in hot water and dry in sunlight."
+        },
+        "137": {
+            "text": "This is not contagious. Provide psychological support to the patient."
+        },
+        "138": {
+            "text": "Use sunscreen generously on affected areas when outdoors."
+        },
+        "139": {
+            "text": "Do not squeeze or attempt to pop the boil yourself."
+        },
+        "140": {
+            "text": "Apply warm compresses 3-4 times daily to help it drain naturally."
+        },
+        "141": {
+            "text": "Protect from sunlight and avoid the sun between 10 AM and 2 PM."
+        },
+        "142": {
+            "text": "Use sunscreen (SPF 50+) generously 30 minutes before going outdoors or cooking."
+        },
+        "143": {
+            "text": "Soak feet in warm soapy water, then rub with a pumice stone."
+        },
+        "144": {
+            "text": "Apply Vaseline or moisturizer 4-6 times daily and wear comfortable socks/shoes."
+        },
+        "145": {
+            "text": "Wear loose, light-colored cotton clothing."
+        },
+        "146": {
+            "text": "Avoid excessive heat and keep the environment cool and aerated."
+        },
+        "147": {
+            "text": "This is a lifelong treatment. Take the medicine at the same time every day (usually empty stomach)."
+        },
+        "148": {
+            "text": "Do not change the dose or stop the medicine without consulting your doctor."
+        },
+        "149": {
+            "text": "If sore throat or fever develops, stop the drug and contact the physician immediately."
+        },
+        "150": {
+            "text": "If eyes are protruding, stop smoking and use lubricating eye drops."
+        },
+        "151": {
+            "text": "Double the dose of your steroid medication during a fever or illness."
+        },
+        "152": {
+            "text": "Always carry a steroid card or bracelet stating your condition."
+        },
+        "153": {
+            "text": "Ensure at least 4 antenatal checkups with your doctor during pregnancy."
+        },
+        "154": {
+            "text": "Eat nutritious food, vegetables, fruits, and drink plenty of water."
+        },
+        "155": {
+            "text": "Go to the hospital immediately in case of bleeding, convulsion, severe headache, or water breaking."
+        },
+        "156": {
+            "text": "Avoid heavy lifting for 1.5 to 3 months after delivery/c-section."
+        },
+        "157": {
+            "text": "Refrain from sexual intercourse for 4 to 6 weeks and adopt birth control measures afterward."
+        },
+        "158": {
+            "text": "Maintain a gap of at least 3 years before planning the next pregnancy."
+        },
+        "159": {
+            "text": "Weight reduction and regular exercise are the primary treatments."
+        },
+        "160": {
+            "text": "Avoid oily, fatty foods, fast foods, and excess carbohydrates."
+        },
+        "161": {
+            "text": "Apply hot compression to the lower abdomen and drink plenty of water."
+        },
+        "162": {
+            "text": "Maintain a menstrual calendar to track your symptoms."
+        },
+        "163": {
+            "text": "Both husband and wife need to undergo checkups. Male testing is essential."
+        },
+        "164": {
+            "text": "Physical intimacy on alternate days between the 10th and 20th day of the cycle is effective for conception."
+        },
+        "165": {
+            "text": "Take complete rest for 14 days and avoid heavy work."
+        },
+        "166": {
+            "text": "Abstain from sexual intercourse for 14 days."
+        },
+        "167": {
+            "text": "Follow up with an ultrasound (USG) report after 14 days."
+        },
+        "168": {
+            "text": "Wash private parts with lukewarm water and maintain personal hygiene."
+        },
+        "169": {
+            "text": "Use clean, loose cotton undergarments."
+        },
+        "170": {
+            "text": "Ensure adequate sleep, take regular exercise, and seek emotional support."
+        },
+        "171": {
+            "text": "Avoid excessive sweets and decrease fluid intake if you feel bloated."
+        },
+        "172": {
+            "text": "Engage in low-intensity exercise like yoga and deep breathing."
+        },
+        "173": {
+            "text": "Consume a diet rich in calcium, dairy products, fruits, and vegetables."
+        },
+        "174": {
+            "text": "Exclusively breastfeed the baby up to 6 months of age. Do not give even a drop of water."
+        },
+        "175": {
+            "text": "Do not give honey, sugar water, or anything else except colostrum (first milk) after birth."
+        },
+        "176": {
+            "text": "Ensure EPI vaccinations are given on time starting from 42 days."
+        },
+        "177": {
+            "text": "Convulsions may occur with fever until 6 years of age; do not panic."
+        },
+        "178": {
+            "text": "Give paracetamol/diazepam immediately when fever starts."
+        },
+        "179": {
+            "text": "During a seizure, lay the child on their side and do not force anything into their mouth."
+        },
+        "180": {
+            "text": "Avoid iron-rich foods like beef, liver, and spinach."
+        },
+        "181": {
+            "text": "Screen partners for thalassemia trait before marriage."
+        },
+        "182": {
+            "text": "Take complete rest and drink plenty of fluids (ORS, coconut water, fruit juice)."
+        },
+        "183": {
+            "text": "Do not take painkillers like aspirin or ibuprofen for fever; only take paracetamol."
+        },
+        "184": {
+            "text": "Go to the hospital if there is vomiting, severe abdominal pain, bleeding, or no urine output."
+        },
+        "185": {
+            "text": "Stay in complete home isolation for 14-21 days and wear a mask."
+        },
+        "186": {
+            "text": "Monitor SpO2 with a pulse oximeter. Go to the hospital if it falls below 94%."
+        },
+        "187": {
+            "text": "Keep the patient isolated. Cut nails short to prevent scratching and scarring."
+        },
+        "188": {
+            "text": "Do not give aspirin to children. For Mumps, contact the doctor if testicular pain occurs."
+        },
+        "189": {
+            "text": "This is a treatable illness. Do not feel ashamed; seek family support."
+        },
+        "190": {
+            "text": "Establish a regular routine, exercise daily, and try relaxation techniques/yoga."
+        },
+        "191": {
+            "text": "Maintain a strict sleep schedule. Go to bed and wake up at the same time."
+        },
+        "192": {
+            "text": "Do not use mobiles or watch TV in bed. Avoid tea/coffee after evening."
+        },
+        "193": {
+            "text": "Stop smoking and alcohol. Reduce excess body weight."
+        },
+        "194": {
+            "text": "Avoid mental stress and performance anxiety, which are major causes."
+        },
+        "195": {
+            "text": "Sit in warm water mixed with salt/povisep for 15 minutes after defecation (Hip Bath)."
+        },
+        "196": {
+            "text": "Keep stools soft by drinking plenty of water and eating high-fiber foods."
+        },
+        "197": {
+            "text": "Take medicines regularly and remove stitches after the advised duration."
+        },
+        "198": {
+            "text": "For gallbladder stones, prepare for surgery after 6 weeks if advised."
+        },
+        "199": {
+            "text": "Elevate the affected leg using a pillow."
+        },
+        "200": {
+            "text": "Bathe the foot in lukewarm water with povisep and change dressings regularly."
+        },
+        "201": {
+            "text": "Keep diabetes strictly under control."
+        },
+        "202": {
+            "text": "If you experience severe vomiting, dizziness, or abnormal behavior, contact the hospital immediately."
+        },
+        "203": {
+            "text": "Take medicines properly and rest. Wear a cervical collar if prescribed."
+        },
+        "204": {
+            "text": "Take prescribed medicines and keep the wound clean."
+        },
+        "205": {
+            "text": "Follow up with the burn or surgery department for further management."
+        },
+        "206": {
+            "text": "Do not induce vomiting if kerosene, acid, or corrosive substances are ingested."
+        },
+        "207": {
+            "text": "Never give anything by mouth to an unconscious patient."
+        },
+        "208": {
+            "text": "Consult a psychiatrist later for suicidal tendencies."
+        },
+        "209": {
+            "text": "Keep the patient calm and immobilize the bitten limb. Movement spreads the venom faster."
+        },
+        "210": {
+            "text": "Do not cut the wound or try to suck out the venom."
+        },
+        "211": {
+            "text": "Transport the patient rapidly to a hospital. Avoid traditional healers."
+        },
+        "212": {
+            "text": "Wash the wound immediately with running water and soap for 15 minutes."
+        },
+        "213": {
+            "text": "Do not apply any bandage or stitches to the wound."
+        },
+        "214": {
+            "text": "Get the Rabies vaccine from a hospital immediately. Avoid traditional treatments."
+        },
+        "215": {
+            "text": "Do not let water enter the ear. Use oil-soaked cotton while bathing."
+        },
+        "216": {
+            "text": "Do not prick or clean the ear with cotton buds or sticks."
+        },
+        "217": {
+            "text": "Keep your mouth open while sneezing or coughing."
+        },
+        "218": {
+            "text": "Gargle with lukewarm saline water daily."
+        },
+        "219": {
+            "text": "Avoid spicy, hard, and bony foods. Do not consume cold food/drinks."
+        },
+        "220": {
+            "text": "Pinch the nose with your thumb and index finger for 5 minutes."
+        },
+        "221": {
+            "text": "Apply cold compression or ice wrapped in cloth to the nose/forehead."
+        },
+        "222": {
+            "text": "Do not let water enter the eye. Wear sunglasses when outdoors."
+        },
+        "223": {
+            "text": "Do not rub the eyes. Wash your hands frequently."
+        },
+        "224": {
+            "text": "Avoid applying water to the operated eye for 14-15 days."
+        },
+        "225": {
+            "text": "Wear dark sunglasses regularly for 1 month."
+        },
+        "226": {
+            "text": "Bite firmly on the cotton/gauze for 30 minutes to 1 hour after extraction."
+        },
+        "227": {
+            "text": "Eat only soft, cold foods for 24 hours. Avoid hot and hard foods."
+        },
+        "228": {
+            "text": "Do not gargle forcefully or spit repeatedly."
+        },
+        "229": {
+            "text": "Bring the patient to a sitting or propped-up position before feeding."
+        },
+        "230": {
+            "text": "Keep the patient in the same position for 15 minutes after feeding to prevent aspiration."
+        },
+        "231": {
+            "text": "Keep the tracheostomy tube opening covered with a piece of wet gauze."
+        },
+        "232": {
+            "text": "Use a suction machine to clear mucus if breathing becomes difficult."
+        },
+        "233": {
+            "text": "Support the breasts with a binder or tight brassiere."
+        },
+        "234": {
+            "text": "Do not stop breastfeeding; continue feeding from both breasts."
+        },
+        "235": {
+            "text": "Babies may cry due to gas; ensure you burp the baby after every feed."
+        },
+        "236": {
+            "text": "The breastfeeding mother should avoid allergenic foods or cow's milk."
+        },
+        "237": {
+            "text": "Restrict fluid intake after 6 PM and ensure the child voids before sleeping."
+        },
+        "238": {
+            "text": "Do not scold or shame the child for bedwetting. Reward them for dry nights."
+        },
+        "239": {
+            "text": "Keep the fractured limb elevated and move your fingers/toes regularly."
+        },
+        "240": {
+            "text": "Do not let the plaster get wet. Contact the orthopedics department if pain worsens."
+        },
+        "241": {
+            "text": "Spend quality time with the child and consider developmental therapy."
+        },
+        "242": {
+            "text": "Enroll the child in a special education school if required."
+        },
+        "243": {
+            "text": "Smoking and use of any tobacco products are strictly prohibited."
+        },
+        "244": {
+            "text": "Continue your blood pressure and diabetes medications as before."
+        },
+        "245": {
+            "text": "Avoid NSAIDs (painkillers) and intramuscular (IM) injections completely."
+        },
+        "246": {
+            "text": "Rest the bleeding site using a splint and take prescribed medications regularly."
+        },
+        "247": {
+            "text": "Brush your teeth twice a day (morning and night) using a soft toothbrush."
+        },
+        "248": {
+            "text": "Rinse your mouth well after every meal and reduce intake of sweet/acidic foods."
+        },
+        "249": {
+            "text": "Apply warm compression to the affected eyelid 3-4 times a day (for Chalazion)."
+        },
+        "250": {
+            "text": "For a black eye, apply a cold pack (ice wrapped in cloth) and sleep with head elevated."
+        },
+        "251": {
+            "text": "Ensure a calcium and nutrient-enriched diet for the child."
+        },
+        "252": {
+            "text": "Do not massage the legs hard; apply only light massage for comfort."
+        },
+        "253": {
+            "text": "Place the tooth back in its socket immediately or preserve it in saliva, milk, or saline."
+        },
+        "254": {
+            "text": "Strictly use barrier or hormonal contraceptives for at least 1 year."
+        },
+        "255": {
+            "text": "Follow up regularly with Serum Beta HCG reports for 1 year."
+        }
+    }
+}

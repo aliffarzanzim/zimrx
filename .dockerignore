@@ -1,0 +1,15 @@
+.git
+tools
+logs
+runtime
+preview
+*.bat
+*.sh
+application/userdata/*
+!application/userdata/**/.htaccess
+!application/userdata/**/.gitkeep
+**/*.db
+**/*.sqlite
+**/*.sqlite3
+**/*.db-wal
+**/*.db-shm

@@ -12,6 +12,10 @@ class ComposerStaticInitd2e0a434cf90d089e32b1786328d6b50
             'chillerlan\\Settings\\' => 20,
             'chillerlan\\QRCode\\' => 18,
         ),
+        'Z' =>
+        array (
+            'ZimRx\\Services\\' => 15,
+        ),
         'P' =>
         array (
             'Psr\\Log\\' => 8,
@@ -32,6 +36,10 @@ class ComposerStaticInitd2e0a434cf90d089e32b1786328d6b50
         'chillerlan\\QRCode\\' =>
         array (
             0 => __DIR__ . '/..' . '/chillerlan/php-qrcode/src',
+        ),
+        'ZimRx\\Services\\' =>
+        array (
+            0 => __DIR__ . '/../..' . '/lib/Services',
         ),
         'Psr\\Log\\' =>
         array (

@@ -1,0 +1,265 @@
+/* Breast examination interactive SVG diagram, lesion markers, and staging controls */
+
+.zrx-breast-diagram-section {
+    background: var(--zrx-bg-subtle);
+    border: 1px solid var(--zrx-border-subtle);
+    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+.zrx-breast-diagram-header {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.zrx-diagram-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--zrx-slate-800);
+}
+.zrx-diagram-subtitle {
+    font-size: 0.70rem;
+    color: var(--zrx-text-muted);
+}
+.zrx-breast-diagrams-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+}
+@media (max-width: 680px) {
+    .zrx-breast-diagrams-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.zrx-breast-diagram-card {
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
+    border-radius: 6px;
+    padding: 0.45rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    box-shadow: var(--zrx-shadow-sm);
+}
+.zrx-diagram-card-top {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid var(--zrx-slate-100);
+}
+.zrx-diagram-name {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--zrx-slate-700);
+}
+.zrx-diagram-btn-clear {
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
+    border-radius: 3px;
+    font-size: 0.66rem;
+    font-weight: 600;
+    color: var(--zrx-text-muted);
+    padding: 1px 6px;
+    cursor: pointer;
+    transition: all 0.12s;
+}
+.zrx-diagram-btn-clear:hover {
+    background: var(--zrx-red-100);
+    border-color: var(--zrx-red-400);
+    color: var(--zrx-red-600);
+}
+.zrx-svg-canvas-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+}
+.zrx-breast-svg {
+    cursor: crosshair;
+    user-select: none;
+    display: block;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.04));
+}
+.zrx-svg-breast-outer {
+    transition: stroke 0.15s;
+}
+.zrx-breast-svg:hover .zrx-svg-breast-outer {
+    stroke: var(--zrx-primary);
+}
+.zrx-svg-hour {
+    font-size: 8px;
+    font-weight: 700;
+    fill: var(--zrx-text-muted);
+    pointer-events: none;
+}
+.zrx-svg-label-tail {
+    font-size: 7.5px;
+    font-weight: 700;
+    fill: var(--zrx-text-muted);
+    pointer-events: none;
+}
+.zrx-svg-pin {
+    cursor: pointer;
+    transition: transform 0.12s;
+}
+.zrx-svg-pin:hover {
+    transform: scale(1.18);
+}
+.zrx-diagram-lesions-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin-top: 0.2rem;
+}
+.zrx-diagram-empty-hint {
+    font-size: 0.72rem;
+    color: var(--zrx-text-muted);
+    font-style: italic;
+    text-align: center;
+    padding: 0.45rem 0.6rem;
+    background: var(--zrx-bg-card);
+    border: 1px dashed var(--zrx-border);
+    border-radius: 4px;
+}
+.zrx-lesion-card {
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
+    border-left: 3px solid var(--zrx-red-500);
+    border-radius: 5px;
+    padding: 0.45rem 0.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    box-shadow: var(--zrx-shadow-sm);
+}
+.zrx-lesion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.zrx-lesion-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.zrx-lesion-badge {
+    background: var(--zrx-red-100);
+    color: var(--zrx-red-700);
+    font-size: 0.66rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    letter-spacing: 0.3px;
+}
+.zrx-lesion-title {
+    font-size: 0.74rem;
+    color: var(--zrx-slate-800);
+    font-weight: 500;
+}
+.zrx-lesion-del-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.15rem;
+    line-height: 1;
+    color: var(--zrx-border-divider);
+    cursor: pointer;
+    padding: 0 4px;
+    border-radius: 3px;
+    transition: all 0.12s;
+}
+.zrx-lesion-del-btn:hover {
+    color: var(--zrx-red-600);
+    background: var(--zrx-red-100);
+}
+.zrx-lesion-body {
+    display: grid;
+    grid-template-columns: 110px 145px 135px 1fr;
+    gap: 0.45rem;
+    align-items: center;
+}
+@media (max-width: 900px) {
+    .zrx-lesion-body {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+.zrx-lesion-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+.zrx-lesion-field label {
+    font-size: 0.66rem;
+    font-weight: 600;
+    color: var(--zrx-text-muted);
+}
+
+/* Clinical category score selector (E1 - E5) */
+
+.zrx-exam-e-score-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: var(--zrx-bg-subtle);
+    border: 1px solid var(--zrx-border-subtle);
+    border-radius: 6px;
+    padding: 0.4rem 0.65rem;
+    flex-wrap: wrap;
+}
+.zrx-exam-e-score-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--zrx-slate-700);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.zrx-exam-e-score-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+.zrx-e-btn {
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--zrx-slate-600);
+    cursor: pointer;
+    transition: all 0.14s ease-in-out;
+}
+.zrx-e-btn:hover {
+    background: var(--zrx-slate-100);
+    border-color: var(--zrx-border-divider);
+}
+.zrx-e-btn.active[data-escore="E1"] {
+    background: var(--zrx-emerald-500);
+    color: var(--zrx-white);
+    border-color: var(--zrx-emerald-600);
+}
+.zrx-e-btn.active[data-escore="E2"] {
+    background: var(--zrx-blue-600);
+    color: var(--zrx-white);
+    border-color: var(--zrx-blue-700);
+}
+.zrx-e-btn.active[data-escore="E3"] {
+    background: var(--zrx-amber-500);
+    color: var(--zrx-white);
+    border-color: var(--zrx-amber-600);
+}
+.zrx-e-btn.active[data-escore="E4"] {
+    background: var(--zrx-orange-700);
+    color: var(--zrx-white);
+    border-color: var(--zrx-orange-700);
+}
+.zrx-e-btn.active[data-escore="E5"] {
+    background: var(--zrx-red-600);
+    color: var(--zrx-white);
+    border-color: var(--zrx-red-700);
+}
+

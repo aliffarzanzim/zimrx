@@ -1,0 +1,22 @@
+{
+    "scope": "bd",
+    "name": "Bangladesh Commercial Drug Formulary",
+    "version": "1.0.0",
+    "author": "Alif Farzan Zim",
+    "contributors": [
+        "Alif Farzan Zim"
+    ],
+    "license": "Proprietary Clinical / Open Medical Reference",
+    "attribution": "Directorate General of Drug Administration (DGDA) Bangladesh Reference",
+    "release_notes": "Commercial trade brand names, dosage variants, strengths, and licensed manufacturers for Bangladesh.",
+    "release_date": "2026-10-08",
+    "last_updated": "2026-10-08 15:33:05",
+    "country_code": "BD",
+    "dump_filename": "zimrx_drugs_bd.sql",
+    "sha256": "e48c3b36e9294b528f6a814a1764fccb84e92ad5ebfa875dccba8cd2200c825c",
+    "file_size_bytes": 9387789,
+    "table_counts": {
+        "drug_manufacturer_bd": 751,
+        "drug_brand_bd": 37260
+    }
+}

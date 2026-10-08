@@ -1,0 +1,38 @@
+# Auto-detect text files and normalize line endings
+* text=auto
+
+# Scripts: Ensure Linux/macOS shell scripts always retain LF line endings
+*.sh text eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Source Code: Enforce LF line endings
+*.php text eol=lf
+*.js text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.sql text eol=lf
+application/systemdata/seeds/*.sql -text
+*.yml text eol=lf
+*.yaml text eol=lf
+*.cff text eol=lf
+
+# Binaries: Prevent Git from modifying binary files
+*.db binary
+*.db3 binary
+*.sqlite binary
+*.sqlite3 binary
+*.mp4 binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.eot binary

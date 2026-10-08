@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use or reference this software, please cite it as below."
+title: "ZimRx: Open-Source, Privacy-First, Local-First Medical & Healthcare Suite"
+authors:
+  - family-names: "Zim"
+    given-names: "Alif Farzan"
+    affiliation: "Dhaka Medical College"
+    email: "aliffarzanzim@gmail.com"
+license: "AGPL-3.0-or-later"
+repository-code: "https://github.com/aliffarzanzim/zimrx"
+keywords:
+  - "electronic medical records"
+  - "digital prescription"
+  - "offline-first"
+  - "local-first"
+  - "healthcare informatics"
+  - "clinical decision support"
+  - "php"
+  - "sqlite"
+abstract: "ZimRx is an open-source, privacy-first, local-first medical and healthcare suite designed for solo practitioners and clinics in low-resource and bandwidth-constrained regions."

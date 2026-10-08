@@ -1,0 +1,32 @@
+{
+    "scope": "core",
+    "name": "ZimRx Universal Clinical Drug Core",
+    "version": "1.0.0",
+    "author": "Alif Farzan Zim",
+    "contributors": [
+        "Alif Farzan Zim"
+    ],
+    "license": "GPL-3.0-or-later",
+    "attribution": "ZimRx Clinical Knowledge Base",
+    "release_notes": "Canonical generic clinical catalog, WHO ATC classification, dosing, and safety rules.",
+    "release_date": "2026-10-08",
+    "last_updated": "2026-10-08 16:02:12",
+    "dump_filename": "zimrx_drugs.sql",
+    "sha256": "90c100dc1b9e35c7b00a706d870cb996a17a7d8a4746e0770d2f73e1ca0882f1",
+    "file_size_bytes": 47481328,
+    "table_counts": {
+        "zimrx_drug_db_version": 1,
+        "zimrx_drug_patches": 0,
+        "drug_dosage_form": 129,
+        "drug_generic": 2331,
+        "drug_generic_product": 6017,
+        "drug_pregnancy_category": 25,
+        "drug_therapeutic_class": 520,
+        "drug_indication": 2863,
+        "drug_interaction": 60418,
+        "drug_template": 12128,
+        "who_atc_hierarchy": 7000,
+        "who_ddd_reference": 2768,
+        "who_inn_catalog": 7268
+    }
+}

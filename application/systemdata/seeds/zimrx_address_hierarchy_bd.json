@@ -1,0 +1,21 @@
+{
+    "country_code": "BD",
+    "seed_file": "zimrx_address_hierarchy_bd.sql",
+    "places_count": 5528,
+    "levels": 4,
+    "level_names": [
+        "division",
+        "district",
+        "upazila",
+        "union"
+    ],
+    "version": "1.0.0",
+    "release_date": "2026-10-07",
+    "last_updated": "2026-10-07",
+    "author": "Wikidata (Wikimedia Community)",
+    "license": "CC0-1.0",
+    "contributors": [
+        "Wikimedia Contributors",
+        "Alif Farzan Zim"
+    ]
+}

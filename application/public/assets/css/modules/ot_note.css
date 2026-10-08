@@ -1,0 +1,329 @@
+/* OT notes module wrapper, print option badges, tabs, and tables */
+.ot-wrapper {
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    box-shadow: none;
+    font-family: var(--font-family);
+    margin: -2px;
+    width: calc(100% + 4px);
+}
+
+.ot-header {
+    background: var(--zrx-border);
+    color: var(--zrx-text-main);
+    height: 32px;
+    box-sizing: border-box;
+    padding: 0 0.85rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid var(--zrx-border-divider);
+    text-align: center;
+}
+
+.ot-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.ot-print-options {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    column-gap: 48px;
+    row-gap: 8px;
+    min-width: 0;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 8px 12px;
+    background: var(--zrx-border-subtle);
+    border-top: 1px solid var(--zrx-slate-300);
+    border-bottom: 1px solid var(--zrx-slate-400);
+}
+
+.ot-print-options label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    padding: 0 0.75rem;
+    border: 1px solid var(--zrx-slate-500);
+    border-radius: 6px;
+    background: var(--zrx-bg-subtle);
+    color: var(--zrx-text-main);
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: var(--zrx-shadow-sm);
+}
+
+.ot-print-options label:has(input:checked) {
+    border-color: var(--zrx-primary);
+    background: var(--zrx-blue-50);
+    color: var(--zrx-blue-800);
+    box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.28), var(--zrx-shadow-sm);
+}
+
+.ot-print-options input[type="radio"],
+.ot-print-options input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.ot-print-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+}
+
+.ot-print-group-title {
+    color: var(--zrx-slate-800);
+    font-size: 0.76rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.ot-tabs-container {
+    background: var(--zrx-border-subtle);
+    padding: 10px 16px 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.ot-tab-list {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.ot-tab {
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
+    border-bottom: none;
+    padding: 8px 20px;
+    border-radius: 7px 7px 0 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--zrx-text-main);
+    cursor: pointer;
+    box-shadow: var(--zrx-shadow-tab);
+    transition: all 0.15s ease;
+    margin-bottom: -1px;
+}
+
+.ot-tab:hover {
+    background: var(--zrx-slate-100);
+}
+
+.ot-tab.active {
+    background: var(--zrx-bg-card);
+    color: var(--zrx-primary);
+    border-color: var(--zrx-border-divider);
+    z-index: 3;
+    position: relative;
+    box-shadow: var(--zrx-shadow-tab-active);
+}
+
+@media (max-width: 760px) {
+    .ot-print-options {
+        align-items: stretch;
+    }
+    .ot-print-group {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+}
+
+.ot-panes {
+    background: var(--zrx-bg-card);
+    min-height: 250px;
+}
+
+.ot-pane {
+    display: none;
+    flex-direction: column;
+}
+
+.ot-pane.active {
+    display: flex;
+}
+
+/* Operation theater procedure and findings table */
+.ot-table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.ot-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.ot-table th {
+    background: var(--zrx-border);
+    color: var(--zrx-text-main);
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.5rem;
+    border: none;
+    border-right: var(--zrx-table-border-width, 2px) solid var(--zrx-border-divider);
+    border-bottom: var(--zrx-table-border-width, 2px) solid var(--zrx-border-divider);
+    text-align: left;
+}
+
+.ot-table td {
+    border: none;
+    border-right: var(--zrx-table-border-width, 2px) solid var(--zrx-table-border, var(--zrx-table-border));
+    border-bottom: var(--zrx-table-border-width, 2px) solid var(--zrx-table-border, var(--zrx-table-border));
+    padding: 0;
+    vertical-align: middle;
+    background: var(--zrx-bg-card);
+}
+
+.ot-table thead th { border-top: none; }
+.ot-table thead th:first-child { border-left: none; }
+.ot-table thead th:last-child { border-right: none; }
+
+.ot-table td.ot-action, .ot-action {
+    text-align: center;
+    background: var(--zrx-bg-canvas);
+    vertical-align: middle;
+    padding: 0;
+}
+
+.ot-table td.ot-del, .ot-del { padding: 0; }
+.ot-del button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+    padding: 0;
+    margin: 0 auto;
+    box-sizing: border-box;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border-divider);
+    border-radius: 3px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--zrx-text-body);
+    cursor: pointer;
+    box-shadow: var(--zrx-shadow-sm);
+    line-height: 1;
+}
+.ot-del button:hover { background: var(--zrx-red-100); border-color: var(--zrx-red-500); color: var(--zrx-red-600); }
+
+.ot-table td.ot-drag, .ot-drag { color: var(--zrx-text-muted); padding: 0; }
+.ot-row-move-btn {
+    width: 100%;
+    height: 30px;
+    border: none;
+    background: transparent;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    padding: 0;
+}
+.ot-row-move-btn:hover { background: var(--zrx-border-subtle); color: var(--zrx-slate-700); }
+.ot-row-move-btn:active { cursor: grabbing; }
+.ot-row-move-btn svg { pointer-events: none; }
+
+.ot-input {
+    width: 100%;
+    min-height: 38px;
+    border: none;
+    padding: 8px 0.6rem;
+    font-size: 15px;
+    background: transparent;
+    outline: none;
+    font-family: var(--font-family);
+    color: var(--zrx-text-main);
+    display: block;
+    resize: none;
+    overflow: hidden;
+}
+
+.ot-input:focus {
+    background: var(--zrx-blue-50);
+    box-shadow: var(--zrx-shadow-cell-focus);
+}
+
+.ot-input[readonly] {
+    color: var(--zrx-text-main);
+    background: var(--zrx-bg-subtle);
+    font-weight: 600;
+}
+
+.ot-footer {
+    display: flex;
+    justify-content: center;
+    border-top: var(--zrx-table-border-width, 2px) solid var(--zrx-table-border, var(--zrx-table-border));
+    background: var(--zrx-bg-subtle);
+    padding: 0.45rem 0;
+}
+
+.ot-add-row-btn {
+    min-width: 110px;
+    height: 30px;
+    border: 1px solid var(--zrx-border-divider);
+    border-radius: 8px;
+    background: var(--zrx-bg-card);
+    color: var(--zrx-text-main);
+    font: inherit;
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--zrx-shadow-sm);
+}
+
+.ot-add-row-btn:hover {
+    background: var(--zrx-blue-50);
+    border-color: var(--zrx-primary);
+    color: var(--zrx-primary);
+}
+
+/* Rich text editor responsive layout overrides */
+.ot-nicedit-container .nicEdit-panelContain {
+    border: none !important;
+    border-bottom: 1px solid var(--zrx-border) !important;
+    background: var(--zrx-slate-100) !important;
+    width: 100% !important;
+    border-radius: 0;
+}
+
+.ot-nicedit-container .nicEdit-main {
+    width: 100% !important;
+    box-sizing: border-box;
+    padding: 12px 16px;
+    min-height: 250px !important;
+    outline: none;
+    font-family: var(--font-family);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--zrx-text-main);
+}
+
+.ot-nicedit-container .nicEdit-main:focus {
+    background: var(--zrx-bg-subtle);
+}

@@ -1,0 +1,29 @@
+/* Master prescription module styles bundle */
+@import "../modules/paediatric.css";
+
+/* Core clinical modules */
+@import "../modules/pres_particulars.css";
+@import "../modules/pc.css";
+@import "../modules/history.css";
+@import "../modules/oh.css";
+@import "../modules/rx.css";
+@import "../modules/reports.css";
+@import "../modules/table_resizer.css";
+@import "../modules/modals_dialogs.css";
+@import "../modules/ai_analyzer.css";
+@import "../modules/calculators.css";
+@import "../modules/ot_note.css";
+@import "../modules/text_pad.css";
+@import "../modules/font_format.css";
+
+/* Specialized clinical examination modules */
+@import "../modules/exam_ophthalmology.css";
+@import "../modules/exam_breast.css";
+@import "../modules/exam_abdominal.css";
+@import "../modules/exam_pelvic.css";
+@import "../modules/exam_burn.css";
+@import "../modules/exam_ent.css";
+@import "../modules/exam_dental.css";
+@import "../modules/exam_diabetic_foot.css";
+@import "../modules/exam_dermatology.css";
+@import "../modules/exam_specialties.css";
