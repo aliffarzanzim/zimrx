@@ -1,0 +1,126 @@
+{
+    "1": {
+        "text": "Before meal",
+        "alias": "khabar, age, before"
+    },
+    "2": {
+        "text": "After meal",
+        "alias": "khabar, pore, after"
+    },
+    "3": {
+        "text": "Before meal",
+        "alias": "ahar, age, before"
+    },
+    "4": {
+        "text": "After meal",
+        "alias": "ahar, pore, after"
+    },
+    "5": {
+        "text": "30 minutes before breakfast",
+        "alias": "nasta, age, before, 30"
+    },
+    "6": {
+        "text": "On full stomach",
+        "alias": "bhora, full"
+    },
+    "7": {
+        "text": "On empty stomach",
+        "alias": "khali, empty"
+    },
+    "8": {
+        "text": "With food",
+        "alias": "khabar, sathe, with"
+    },
+    "9": {
+        "text": "30 minutes before meal",
+        "alias": "khabar, age, before, 30"
+    },
+    "10": {
+        "text": "1 hour before meal",
+        "alias": "khabar, age, before, 1, hour, 1 hour"
+    },
+    "11": {
+        "text": "2 hours after meal",
+        "alias": "khabar, pore, after, 2, hour, 2 hours"
+    },
+    "12": {
+        "text": "Regardless of meals",
+        "alias": "khabar, age, pore, age pore, anytime"
+    },
+    "13": {
+        "text": "With the first bite of meal",
+        "alias": "first, prothom, khabar, age, before"
+    },
+    "14": {
+        "text": "Immediately before meal",
+        "alias": "khabar, age, before"
+    },
+    "15": {
+        "text": "Immediately after meal",
+        "alias": "khabar, pore, after"
+    },
+    "16": {
+        "text": "In the middle of the meal",
+        "alias": "khabar, majhkhane, middle"
+    },
+    "17": {
+        "text": "After breakfast",
+        "alias": "nasta, pore, after"
+    },
+    "18": {
+        "text": "At bedtime",
+        "alias": "rate, bedtime, shobar, age, before"
+    },
+    "19": {
+        "text": "Before journey",
+        "alias": "journey, travel, tour, age, before"
+    },
+    "20": {
+        "text": "Before intercourse",
+        "alias": "intercourse, sex, coitus, age, before, sohobaser age, sohobas"
+    },
+    "21": {
+        "text": "Shake well before use",
+        "alias": "shake, jhakie, bebohar"
+    },
+    "22": {
+        "text": "Chew well",
+        "alias": "chew, chibie"
+    },
+    "23": {
+        "text": "Dissolve in a glass of water",
+        "alias": "dissolve, glass, guliye"
+    },
+    "24": {
+        "text": "Keep under the tongue",
+        "alias": "sublingual, jihba, tongue"
+    },
+    "25": {
+        "text": "Apply on the affected area",
+        "alias": "apply, lagaben, affected, area"
+    },
+    "26": {
+        "text": "Insert into the rectum",
+        "alias": "rectum, moldare, payupothe"
+    },
+    "27": {
+        "text": "Insert into the vagina",
+        "alias": "vagina, joni, jonipoth"
+    },
+    "28": {
+        "text": "Use with Nebulizer machine",
+        "alias": "nebulizer, nebuliser, nebulizer machine, nebuliser machine"
+    },
+    "29": {
+        "text": "Inject under the skin",
+        "alias": "subcutaneous, sc, chamra, skin"
+    },
+    "30": {
+        "text": "Rinse mouth after use",
+        "alias": "rinse mouth, kuli, mouth"
+    },
+    "31": {
+        "text": "Apply on the skin",
+        "alias": "patch, lagaben, chamra, skin"
+    }
+}

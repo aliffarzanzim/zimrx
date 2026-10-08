@@ -1,0 +1,19 @@
+{
+  "country_code": "BD",
+  "default_mode": "dual",
+  "seed_file": "zimrx_drugs_bd.sql",
+  "brand_table": "drug_brand_bd",
+  "manufacturer_table": "drug_manufacturer_bd",
+  "template_table": "drug_template",
+  "brands_count": 37260,
+  "manufacturers_count": 751,
+  "templates_count": 12128,
+  "currency": "BDT",
+  "version": "2026.1.0",
+  "release_date": "2026-10-06",
+  "last_updated": "2026-10-06",
+  "author": "ZimRx Pharmacology Team",
+  "contributors": [
+    "Alif Farzan Zim"
+  ]
+}

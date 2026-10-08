@@ -28,7 +28,10 @@ if not exist "runtime\frankenphp\frankenphp.exe" (
 
 if not exist "application\userdata\database" mkdir application\userdata\database
 if not exist "application\userdata\uploads" mkdir application\userdata\uploads
+if not exist "application\systemdata\database" mkdir application\systemdata\database
 if not exist "logs" mkdir logs
+
+
 
 :: Kill any leftover frankenphp instances before starting
 taskkill /f /im frankenphp.exe >nul 2>&1
@@ -37,7 +40,7 @@ if exist "logs\frankenphp.pid" del /q "logs\frankenphp.pid" >nul 2>&1
 set "ZIMRX_HTTP_PORT=8080"
 
 echo [1/2] Launching FrankenPHP web server on port %ZIMRX_HTTP_PORT%...
-start "" /min runtime\frankenphp\frankenphp.exe run --config Caddyfile --adapter caddyfile
+start "" /b cmd /c "runtime\frankenphp\frankenphp.exe run --config Caddyfile --adapter caddyfile >> logs\frankenphp.log 2>&1"
 
 echo [2/2] Initializing application environment...
 timeout /t 2 /nobreak >nul

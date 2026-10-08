@@ -1,0 +1,268 @@
+/* Ophthalmology examination module, bilateral eye grids, refraction, and findings */
+.zrx-exam-wrapper {
+    display: flex;
+    flex-direction: column;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+    margin: -2px;
+    width: calc(100% + 4px);
+}
+.zrx-exam-header {
+    height: 32px;
+    box-sizing: border-box;
+    background: var(--zrx-border);
+    border-bottom: 1px solid var(--zrx-border-divider);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 0.75rem;
+    margin: -2px -2px 0 -2px;
+    width: calc(100% + 4px);
+}
+.zrx-exam-title-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: var(--zrx-text-main);
+}
+.zrx-exam-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.zrx-exam-btn {
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--zrx-border-divider);
+    background: var(--zrx-slate-100);
+    color: var(--zrx-slate-700);
+    transition: all 0.12s ease-in-out;
+}
+.zrx-exam-btn-normal:hover {
+    background: var(--zrx-blue-100);
+    color: var(--zrx-blue-600);
+    border-color: var(--zrx-sky-400);
+}
+.zrx-exam-btn-clear:hover {
+    background: var(--zrx-red-100);
+    color: var(--zrx-red-600);
+    border-color: var(--zrx-red-400);
+}
+.zrx-exam-body {
+    padding: 0.75rem;
+    background: var(--zrx-bg-card);
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    box-sizing: border-box;
+}
+.zrx-exam-dual-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+}
+@media (max-width: 768px) {
+    .zrx-exam-dual-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.zrx-exam-col {
+    background: var(--zrx-bg-subtle);
+    border: 1px solid var(--zrx-border-subtle);
+    border-radius: 6px;
+    padding: 0.5rem 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+.zrx-exam-col-header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 700;
+    font-size: 0.78rem;
+    color: var(--zrx-slate-800);
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--zrx-border-subtle);
+}
+.zrx-exam-col-badge {
+    background: var(--zrx-border-subtle);
+    color: var(--zrx-slate-600);
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+}
+.zrx-exam-section-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--zrx-text-muted);
+    margin-top: 0.2rem;
+}
+.zrx-exam-form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+.zrx-exam-lbl {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--zrx-slate-600);
+}
+.zrx-exam-select,
+.zrx-exam-input {
+    height: 28px;
+    border: 1px solid var(--zrx-border);
+    border-radius: 4px;
+    padding: 0 6px;
+    font-size: 0.76rem;
+    color: var(--zrx-text-main);
+    background: var(--zrx-bg-card);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+.zrx-exam-select:focus,
+.zrx-exam-input:focus,
+.zrx-exam-textarea:focus {
+    border-color: var(--zrx-primary, var(--zrx-primary));
+    box-shadow: var(--zrx-shadow-focus);
+}
+.zrx-exam-flex-pair {
+    display: flex;
+    gap: 0.35rem;
+    align-items: center;
+}
+.zrx-exam-flex-pair .zrx-exam-input,
+.zrx-exam-flex-pair .zrx-exam-select {
+    flex: 1;
+}
+.zrx-exam-input-unit {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--zrx-text-muted);
+    white-space: nowrap;
+}
+.zrx-exam-top-row,
+.zrx-exam-nodes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.5rem;
+    background: var(--zrx-bg-subtle);
+    border: 1px solid var(--zrx-border-subtle);
+    border-radius: 6px;
+    padding: 0.5rem 0.65rem;
+}
+.zrx-exam-top-cell,
+.zrx-exam-node-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+.zrx-exam-chips-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+    background: var(--zrx-bg-subtle);
+    border: 1px solid var(--zrx-border-subtle);
+    border-radius: 6px;
+    padding: 0.45rem 0.6rem;
+}
+.zrx-exam-chips-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--zrx-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 0.2rem;
+}
+.zrx-exam-chip {
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--zrx-slate-700);
+    cursor: pointer;
+    transition: all 0.12s ease-in-out;
+    white-space: nowrap;
+}
+.zrx-exam-chip:hover {
+    background: var(--zrx-blue-50);
+    border-color: var(--zrx-blue-300);
+    color: var(--zrx-primary-hover);
+}
+.zrx-exam-findings-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+.zrx-exam-textarea {
+    width: 100%;
+    border: 1px solid var(--zrx-border);
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: var(--zrx-text-main);
+    background: var(--zrx-bg-card);
+    resize: vertical;
+    box-sizing: border-box;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.zrx-exam-refraction-box {
+    background: var(--zrx-bg-subtle);
+    border: 1px solid var(--zrx-border-subtle);
+    border-radius: 6px;
+    padding: 0.5rem 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+.zrx-exam-refraction-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--zrx-slate-700);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.zrx-exam-refraction-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+.zrx-exam-ref-row {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.zrx-exam-ref-eye {
+    font-weight: 700;
+    font-size: 0.75rem;
+    width: 28px;
+    color: var(--zrx-slate-800);
+    flex-shrink: 0;
+}
+.zrx-exam-ref-row .zrx-exam-input {
+    flex: 1;
+    text-align: center;
+}
+

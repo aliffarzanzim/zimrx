@@ -1,11 +1,11 @@
 <?php
-/**
- * Migration 007  -  Drug instruction settings tables
- */
+declare(strict_types=1);
+
+// Doctor medication instruction preferences and template visibility toggles.
 class Migration007InstructionTemplateSettings {
 
     public function up(PDO $pdo): void {
-        // ---- zimrx_user_drug_instructions_settings ----
+        // Per-instruction configuration (timing defaults, language preferences, meal relation)
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_drug_instructions_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -18,7 +18,7 @@ class Migration007InstructionTemplateSettings {
             )"
         );
 
-        // ---- zimrx_user_drug_instructionss_settings ----
+        // Retained fallback table to support legacy queries referencing the alternate spelling
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_drug_instructionss_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -32,3 +32,4 @@ class Migration007InstructionTemplateSettings {
         );
     }
 }
+

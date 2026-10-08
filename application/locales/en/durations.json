@@ -1,0 +1,130 @@
+{
+    "1": {
+        "text": "1 day",
+        "alias": "1 day, 1 din, ek din"
+    },
+    "2": {
+        "text": "2 days",
+        "alias": "2 days, 2 din, dui din"
+    },
+    "3": {
+        "text": "3 days",
+        "alias": "3 days, 3 din, tin din"
+    },
+    "4": {
+        "text": "4 days",
+        "alias": "4 days, 4 din, char din"
+    },
+    "5": {
+        "text": "5 days",
+        "alias": "5 days, 5 din, pach din"
+    },
+    "6": {
+        "text": "6 days",
+        "alias": "6 days, 6 din, choy din"
+    },
+    "7": {
+        "text": "7 days",
+        "alias": "7 days, 7 din, shat din"
+    },
+    "8": {
+        "text": "10 days",
+        "alias": "10 days, 10 din, dosh din"
+    },
+    "9": {
+        "text": "14 days",
+        "alias": "14 days, 14 din, chouddo din"
+    },
+    "10": {
+        "text": "15 days",
+        "alias": "15 days, 15 din, ponero din"
+    },
+    "11": {
+        "text": "21 days",
+        "alias": "21 days, 21 din, ekush din"
+    },
+    "12": {
+        "text": "28 days",
+        "alias": "28 days, 28 din, aatash din"
+    },
+    "13": {
+        "text": "1 week",
+        "alias": "1 week, 1 shoptaho, ek shoptaho"
+    },
+    "14": {
+        "text": "2 weeks",
+        "alias": "2 weeks, 2 shoptaho, dui shoptaho"
+    },
+    "15": {
+        "text": "3 weeks",
+        "alias": "3 weeks, 3 shoptaho, tin shoptaho"
+    },
+    "16": {
+        "text": "4 weeks",
+        "alias": "4 weeks, 4 shoptaho, char shoptaho"
+    },
+    "17": {
+        "text": "6 weeks",
+        "alias": "6 weeks, 6 shoptaho, choy shoptaho"
+    },
+    "18": {
+        "text": "1 month",
+        "alias": "1 month, 1 mash, ek mash"
+    },
+    "19": {
+        "text": "2 months",
+        "alias": "2 months, 2 mash, dui mash"
+    },
+    "20": {
+        "text": "3 months",
+        "alias": "3 months, 3 mash, tin mash"
+    },
+    "21": {
+        "text": "4 months",
+        "alias": "4 months, 4 mash, char mash"
+    },
+    "22": {
+        "text": "6 months",
+        "alias": "6 months, 6 mash, choy mash"
+    },
+    "23": {
+        "text": "1 year",
+        "alias": "1 year, 1 bochor, ek bochor"
+    },
+    "24": {
+        "text": "Continue",
+        "alias": "continue, cholbe"
+    },
+    "25": {
+        "text": "Continue until next visit",
+        "alias": "until next visit, poroborti poramorsho porjonto cholbe"
+    },
+    "26": {
+        "text": "If fever occurs",
+        "alias": "if fever, jor hole, jwar hole"
+    },
+    "27": {
+        "text": "If pain occurs",
+        "alias": "if pain, byatha hole, betha hole"
+    },
+    "28": {
+        "text": "If fever or pain occurs",
+        "alias": "if fever or pain, jor ba betha hole, jwar ba byatha hole"
+    },
+    "29": {
+        "text": "If chest pain occurs",
+        "alias": "if chest pain, buke betha hole, buke byatha hole"
+    },
+    "30": {
+        "text": "If shortness of breath occurs",
+        "alias": "if shortness of breath, nishash nite koshto hole, shashkoshtho hole"
+    },
+    "31": {
+        "text": "If nausea or vomiting occurs",
+        "alias": "if nausea or vomiting, bomi bomi bhab ba bomi hole"
+    },
+    "32": {
+        "text": "If loose motion occurs",
+        "alias": "if loose motion, patla paykhana hole, diarrhea hole"
+    }
+}

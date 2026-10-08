@@ -1,0 +1,191 @@
+/* Burn assessment diagram, Lund-Browder segment selection, and Parkland fluid calculations */
+.zrx-burn-metrics-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.55rem;
+    margin-bottom: 0.65rem;
+}
+@media (max-width: 768px) {
+    .zrx-burn-metrics-bar {
+        grid-template-columns: 1fr;
+    }
+}
+.zrx-burn-metric-chip {
+    background: var(--zrx-bg-subtle);
+    border: 1px solid var(--zrx-border);
+    border-radius: 6px;
+    padding: 0.45rem 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+.zrx-burn-metric-lbl {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--zrx-text-muted);
+}
+.zrx-burn-metric-val {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--zrx-text-main);
+    line-height: 1.2;
+}
+.zrx-burn-metric-status {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--zrx-emerald-500);
+}
+.zrx-burn-metric-status.moderate { color: var(--zrx-amber-500); }
+.zrx-burn-metric-status.major { color: var(--zrx-red-600); }
+
+.zrx-burn-diagram-section {
+    background: var(--zrx-bg-subtle);
+    border: 1px solid var(--zrx-border);
+    border-radius: 6px;
+    padding: 0.65rem;
+    margin-bottom: 0.65rem;
+}
+.zrx-burn-diagrams-grid {
+    display: grid;
+    grid-template-columns: 180px 180px 1fr;
+    gap: 0.75rem;
+    align-items: start;
+}
+@media (max-width: 950px) {
+    .zrx-burn-diagrams-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+@media (max-width: 650px) {
+    .zrx-burn-diagrams-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.zrx-burn-diagram-card {
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
+    border-radius: 6px;
+    padding: 0.45rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.zrx-burn-card-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--zrx-slate-700);
+    margin-bottom: 0.3rem;
+}
+.zrx-burn-svg-wrap {
+    width: 160px;
+    height: 250px;
+}
+.zrx-burn-svg {
+    width: 100%;
+    height: 100%;
+    user-select: none;
+}
+.zrx-burn-segment {
+    fill: var(--zrx-white);
+    stroke: var(--zrx-border-divider);
+    stroke-width: 1.5;
+    cursor: pointer;
+    transition: fill 0.12s, stroke 0.12s;
+}
+.zrx-burn-segment:hover {
+    fill: var(--zrx-red-100);
+    stroke: var(--zrx-red-500);
+}
+.zrx-burn-segment.active {
+    fill: var(--zrx-red-600);
+    stroke: var(--zrx-red-700);
+    stroke-width: 2;
+}
+.zrx-burn-label {
+    font-size: 8px;
+    font-weight: 700;
+    fill: var(--zrx-slate-600);
+    pointer-events: none;
+    text-anchor: middle;
+}
+.zrx-burn-segment.active + .zrx-burn-label,
+.zrx-burn-segment.active ~ .zrx-burn-label {
+    fill: var(--zrx-white);
+}
+
+.zrx-burn-calc-card {
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
+    border-radius: 6px;
+    padding: 0.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.zrx-burn-calc-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--zrx-border-subtle);
+}
+.zrx-burn-calc-badge {
+    background: var(--zrx-red-100);
+    color: var(--zrx-red-700);
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 4px;
+}
+.zrx-burn-calc-formula {
+    font-size: 0.72rem;
+    color: var(--zrx-text-muted);
+    font-family: monospace;
+    font-weight: 600;
+}
+.zrx-burn-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+.zrx-burn-infusion-card {
+    background: var(--zrx-blue-50);
+    border: 1px solid var(--zrx-blue-200);
+    border-radius: 6px;
+    padding: 0.5rem 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+.zrx-burn-infusion-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.76rem;
+}
+.zrx-burn-infusion-period {
+    color: var(--zrx-blue-800);
+    font-weight: 600;
+}
+.zrx-burn-infusion-val {
+    color: var(--zrx-text-main);
+    font-weight: 800;
+}
+.zrx-burn-infusion-rate {
+    color: var(--zrx-primary);
+    font-weight: 600;
+}
+.zrx-burn-infusion-target {
+    border-top: 1px dashed var(--zrx-blue-200);
+    padding-top: 0.3rem;
+    font-size: 0.7rem;
+    color: var(--zrx-blue-900);
+}
+.zrx-burn-risk-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35rem;
+}
+

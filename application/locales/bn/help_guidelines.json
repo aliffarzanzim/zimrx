@@ -1,0 +1,184 @@
+{
+  "pres-reg": {
+    "title": "রেজিস্ট্রেশন নম্বর (Reg No) নির্দেশিকা",
+    "badge": "প্রেসক্রিপশন পেজ",
+    "steps": [
+      {
+        "icon": "১",
+        "text": "যদি <strong>অলরেডি রেজিস্টার্ড পেশেন্ট</strong> হয় তাহলে রেজিস্ট্রেশন নম্বর লিখে সার্চ করুন বা বারকোড স্ক্যান করুন বা রেজিস্ট্রেশন নম্বর কাছে না পেলে, ফোন নম্বরের ফিল্ড থেকেও সার্চ করতে পারেন।"
+      },
+      {
+        "icon": "২",
+        "text": "আর যদি <strong>নতুন পেশেন্ট</strong> হয় তাহলে ব্লাঙ্ক রাখুন এবং অন্যান্য particulars পূরণ করুন বা পুরো প্রেসক্রিপশনটাই লিখে ফেলুন। <strong>Save & Print</strong> বা <strong>Save Only</strong> করার পরে অটোমেটিক রেজিস্ট্রেশন নাম্বার assign হবে।"
+      }
+    ]
+  },
+  "appt-reg": {
+    "title": "রেজিস্ট্রেশন নম্বর (Reg No) নির্দেশিকা",
+    "badge": "অ্যাপয়েন্টমেন্ট পেজ",
+    "steps": [
+      {
+        "icon": "১",
+        "text": "যদি <strong>অলরেডি রেজিস্টার্ড পেশেন্ট</strong> হয় তাহলে রেজিস্ট্রেশন নম্বর লিখে সার্চ করুন বা বারকোড স্ক্যান করুন বা রেজিস্ট্রেশন নম্বর কাছে না পেলে, ফোন নম্বরের ফিল্ড থেকেও সার্চ করতে পারেন।"
+      },
+      {
+        "icon": "২",
+        "text": "আর যদি <strong>নতুন পেশেন্ট</strong> হয় তাহলে ব্লাঙ্ক রাখুন এবং অন্যান্য particulars পূরণ করুন। <strong>Save Appointment</strong> করার পরে অটোমেটিক রেজিস্ট্রেশন নাম্বার assign হবে।"
+      }
+    ]
+  },
+  "mobile": {
+    "title": "ফোন নম্বর (Mobile) নির্দেশিকা",
+    "badge": "সার্চ ও রেজিস্ট্রেশন",
+    "steps": [
+      {
+        "icon": "১",
+        "text": "যদি <strong>অলরেডি রেজিস্টার্ড পেশেন্ট</strong> হয় তাহলে ফোন নম্বর লিখে সার্চ করুন, রেজিস্ট্রেশন নম্বর থাকলে তা দিয়েও সার্চ করতে পারেন বা বারকোড স্ক্যান করুন।"
+      },
+      {
+        "icon": "২",
+        "text": "আর যদি <strong>নতুন পেশেন্ট</strong> হয় তাহলে নতুন ফোন নম্বর লিখে ফেলুন, একই নম্বরে অলরেডি আরেকজনের রেজিস্ট্রেশন থেকে থাকলে ড্রপডাউন থেকে <strong>It's a new patient</strong> এ ক্লিক করুন, তাহলে একই নাম্বারে দুই পেশেন্টই রেজিস্ট্রার্ড থাকবে, তবে রেজিস্ট্রেশন নম্বর আলাদা হবে।"
+      }
+    ]
+  },
+  "col-resize": {
+    "title": "টেবিল লেআউট নির্দেশিকা",
+    "badge": "কলাম রিসাইজ ও লেআউট",
+    "steps": [
+      {
+        "icon": "১",
+        "text": "Resize করা এই লেআউটটি সেইভ করতে <strong>Save layout</strong> করুন। এবং Default Layout এ যেতে <strong>Reset</strong> করুন।"
+      }
+    ]
+  },
+  "dob": {
+    "title": "জন্মতারিখ ও বয়স (DOB & Age) নির্দেশিকা",
+    "badge": "পেশেন্ট পার্টিকুলার্স ও ক্যালকুলেশন",
+    "wide": true,
+    "steps": [
+      {
+        "icon": "★",
+        "text": "<strong>Age বা DOB যেকোনো একটি ইনপুট দিলেই হবে।</strong> যেকোনো একটি ইনপুট দিলে অন্যটি স্বয়ংক্রিয়ভাবে সেট হয়ে যাবে।"
+      },
+      {
+        "icon": "১",
+        "text": "<strong>DOB এন্ট্রি করলে Age ও Unit অটো-ক্যালকুলেট হবে:</strong><br>ক্যালেন্ডার থেকে Date of Birth সিলেক্ট করলে, সিস্টেম নিজে থেকেই রোগীর বয়স এবং সঠিক Unit নির্ধারণ করে নিবে:<ul class=\"zrx-help-list\"><li><strong>১ বছর বা তার বেশি (&ge; 1 Year):</strong> Age দেখাবে পূর্ণ বছরে এবং <code>Unit = \"Years\"</code> সিলেক্ট হবে।</li><li><strong>১ বছরের কম, কিন্তু ১ মাসের বেশি:</strong> Age দেখাবে মাসে এবং <code>Unit = \"Months\"</code> সিলেক্ট হবে।</li><li><strong>১ মাসের কম, কিন্তু ৭ দিনের বেশি:</strong> Age দেখাবে সপ্তাহে এবং <code>Unit = \"Weeks\"</code> সিলেক্ট হবে।</li><li><strong>৭ দিনের কম (নবজাতক):</strong> Age দেখাবে এক্স্যাক্ট দিনে এবং <code>Unit = \"Days\"</code> সিলেক্ট হবে।</li></ul>"
+      },
+      {
+        "icon": "২",
+        "text": "<strong>Age এন্ট্রি করলে আনুমানিক DOB সেট হবে:</strong><br>আপনি যদি শুধু বয়স টাইপ করে Unit সিলেক্ট করেন, তবে সিস্টেম ব্যাকএন্ডে একটি আনুমানিক (Estimated) DOB তৈরি করে নিবে:<ul class=\"zrx-help-list\"><li><strong>Years (যেমন: 25 Years):</strong> ওই হিসাবকৃত বছরের শুরুর তারিখটিকে (যেমন: ০১/০১/XXXX) DOB হিসেবে সেট করবে।</li><li><strong>Months (যেমন: 6 Months):</strong> ৬ মাস আগের মাসের ১ তারিখকে DOB হিসেবে ধরবে।</li><li><strong>Weeks (যেমন: 3 Weeks):</strong> বর্তমান তারিখ থেকে ২১ দিন (৩ &times; ৭) মাইনাস করে DOB সেট করবে।</li><li><strong>Days (যেমন: 5 Days):</strong> বর্তমান তারিখ থেকে ৫ দিন মাইনাস করে DOB সেট করবে।</li></ul>"
+      },
+      {
+        "icon": "৩",
+        "text": "<strong>ভবিষ্যৎ ভিজিট ও পিডিয়াট্রিক সুবিধা:</strong> পরবর্তীতে এই সেইম রোগীই আসলে ডায়নামিক ভাবে বয়স হিসাব করে প্রেস্ক্রিপশনে বসিয়ে দিবে অটোমেটিক। এছাড়া বাচ্চাদের গ্রোথ চার্ট (Growth chart) এবং ভ্যাকসিনেশনের (Vaccination) সিডিউল তৈরিতেও হেল্প করবে।"
+      }
+    ]
+  },
+  "visit-id": {
+    "title": "ভিজিট আইডি (Visit ID) নির্দেশিকা",
+    "badge": "প্রেসক্রিপশন ও EMR রেকর্ড",
+    "steps": [
+      {
+        "icon": "১",
+        "text": "<strong>প্রেসক্রিপশন ট্র্যাকিং ও হিস্ট্রি:</strong> ভিজিট আইডিটি প্রেসক্রিপশনের সাথে জড়িত। আপনার লেখা প্রতিটি প্রেসক্রিপশনের একটি ইউনিক ভিজিট আইডি আছে যা দিয়ে এক্সাক্টলি ঐ কনসালটেশনের সময় কি প্রেসক্রিপশন করেছিলেন তা দেখতে পাবেন।"
+      },
+      {
+        "icon": "২",
+        "text": "<strong>স্বয়ংক্রিয় ইউনিক কোড:</strong> প্রেসক্রিপশন সংরক্ষণ (Save) করার সময় সিস্টেম নিজে থেকেই এই ইউনিক কোড তৈরি করে নেয়। এটি সম্পূর্ণরূপে স্বয়ংক্রিয় হওয়ায় এটি ম্যানুয়ালি এন্ট্রি বা পরিবর্তন করার প্রয়োজন নেই।"
+      }
+    ]
+  },
+  "occupation": {
+    "title": "পেশা (Occupation) নির্দেশিকা ও ম্যানেজমেন্ট",
+    "badge": "পেশেন্ট পার্টিকুলার্স ও EMR",
+    "wide": true,
+    "steps": [
+      {
+        "icon": "১",
+        "text": "রেগুলার প্র্যাক্টিসের সময় সাধারণত Occupational History রেকর্ড করে না, ভার্বালি জেনে নেয়া হয়, অন্যান্য প্রেসক্রিপশন সফটওয়্যারেও এই ফিচারটি নেই। তবে একটি Comprehensive EMR-এর জন্য ZimRx-এ এটি অ্যাড করা হয়েছে। এর মাধ্যমে পেশেন্টের Socioeconomic অবস্থার পাশাপাশি, তার Presenting Complaints-এর সাথে কোনো Occupational Relation আছে কি না, তা সহজেই অ্যাসেস করা যাবে।"
+      },
+      {
+        "icon": "২",
+        "text": "আপনার সুবিধার্থে ড্রপ-ডাউন মেনুতে কিছু কমন Occupation দেওয়া আছে। চাইলে ম্যানুয়ালি টাইপ করেও নতুন Occupation এন্ট্রি করতে পারবেন। একবার এন্ট্রি করলে এটি অটো-সেইভ হয়ে থাকবে এবং পরবর্তীতে আপনার ভবিষ্যতের অন্যান্য সকল প্রেসক্রিপশনে তা Show করবে।"
+      },
+      {
+        "icon": "৩",
+        "text": "ড্রপ-ডাউন মেনুর sorting মেইনলি Usage এর উপর নির্ভর করবে, যেটা যত বেশি বার ইউস হয়েছে তা তত উপরে শো করবে। Usage দেখার জন্য নিচের টেবিলটি দেখুন, এখান থেকে Reset to default করতে পারবেন, ডিলিট করতে পারবেন, নতুন এন্ট্রি সরাসরি এখান থেকেই যোগ করতে পারবেন, বা কোনোটা সবসময় প্রথমে দেখাতে চাইলে pin করে রাখতে পারবেন।"
+      }
+    ],
+    "ui": {
+      "placeholder_input": "নতুন পেশা (New Occupation) লিখুন...",
+      "btn_add": "+ Add",
+      "btn_reset": "Reset to Default",
+      "th_move": "Move",
+      "th_actions": "Actions",
+      "th_type": "Type",
+      "th_name": "Occupation Name",
+      "th_usage": "Usage",
+      "loading": "Loading occupations...",
+      "empty": "No occupations found.",
+      "btn_pin": "Pin",
+      "btn_unpin": "Unpin",
+      "btn_edit": "Edit",
+      "btn_remove": "Remove",
+      "btn_restore": "Restore",
+      "btn_delete": "Delete",
+      "tag_system": "System",
+      "tag_custom": "Custom",
+      "tag_hidden": "Hidden",
+      "confirm_reset": "Reset all occupation customizations to default? This will unpin, unhide, and restore all system occupations.",
+      "prompt_edit": "Edit occupation name:"
+    }
+  },
+  "address": {
+    "title": "ঠিকানা (Address) নির্দেশিকা ও ম্যানেজমেন্ট",
+    "badge": "পেশেন্ট পার্টিকুলার্স ও জিওগ্রাফি",
+    "wide": true,
+    "steps": [
+      {
+        "icon": "১",
+        "text": "<strong>কমা (,) ম্যাজিক ও Smart Prediction:</strong> আপনি জায়গার নাম লিখে কমা (<code>,</code>) দিলে সিস্টেম অটোমেটিক্যালি এর পরের প্যারেন্ট লোকেশনটি বুঝে যায়। যেমন, আপনি <code>Savar</code> টাইপ করার সাথে সাথেই সিস্টেম নিজে থেকে <code>Dhaka</code> সাজেস্ট করবে।"
+      },
+      {
+        "icon": "২",
+        "text": "<strong>জাতীয় ডাটাবেস ও কাস্টম এড্রেস:</strong> সাজেশন লিস্টটি একসাথে দুটি জায়গা থেকে ডাটা দেখায়:<ul class=\"zrx-help-list-compact\"><li>বাংলাদেশের সমস্ত জেলা, উপজেলা, থানা, ইউনিয়ন ও পোস্ট কোড (English &amp; বাংলা)।</li><li>আপনার নিজের সেইভ করা বা বেশি ব্যবহৃত কাস্টম ঠিকানাগুলো।</li></ul>"
+      },
+      {
+        "icon": "৩",
+        "text": "<strong>ব্যবহার অনুযায়ী স্মার্ট র‍্যাংকিং:</strong> আপনি যে ঠিকানাগুলো সবচেয়ে বেশি ব্যবহার করেন (Usage frequency) বা যেগুলো হুবহু মিলে যায় (Exact match), সেগুলো স্বয়ংক্রিয়ভাবে সাজেশনের একেবারে উপরে (Top) শো করবে।"
+      },
+      {
+        "icon": "৪",
+        "text": "<strong>প্র্যাক্টিস জেলা ফিল্টারিং ও ম্যানেজমেন্ট:</strong> এছাড়া আপনি জাস্ট নির্দিষ্ট একটা জেলাতে প্র্যাক্টিস করতে চাইলে জাস্ট ঐ জেলা বা আশে-পাশের জেলাগুলোও সিলেক্ট করে রাখতে পারেন, তাহলে অন্যান্য জেলা আর দেখাবে না। নিচের টেবিল থেকে আপনি যায়গার নাম ডিলিট, এডিট, রিসেট, পিন এবং কাস্টম এড্রেসও যুক্ত করতে পারেন।"
+      }
+    ],
+    "ui": {
+      "section_districts_title": "প্র্যাক্টিস জেলা ফিল্টার (Practice Districts Filter)",
+      "btn_dist_all": "All (সমগ্র বাংলাদেশ)",
+      "btn_dist_save": "Save Districts",
+      "btn_dist_saved": "Saved ✓",
+      "district_search_placeholder": "জেলা সার্চ করুন (Search District)...",
+      "districts_loading": "Loading districts...",
+      "section_addr_title": "ঠিকানা ডিরেক্টরি ও ম্যানেজমেন্ট (Address Directory - Top 100)",
+      "btn_reset_addr": "Reset to Default",
+      "addr_search_placeholder": "ঠিকানা সার্চ করুন (Search locality, thana, upazila, district)...",
+      "tab_all": "All (Top 100)",
+      "tab_custom": "Custom Only",
+      "tab_system": "System (National)",
+      "tab_pinned": "Pinned",
+      "new_addr_placeholder": "নতুন কাস্টম ঠিকানা (New Address/Area) লিখুন...",
+      "btn_add_addr": "+ Add",
+      "th_actions": "Actions",
+      "th_type": "Type",
+      "th_address": "Address / Combination",
+      "th_usage": "Usage",
+      "addr_loading": "Loading addresses...",
+      "addr_empty": "No addresses found.",
+      "confirm_reset_addr": "Reset all address customizations and district preferences to default?",
+      "prompt_edit_addr": "Edit address name:"
+    }
+  },
+  "modal_ui": {
+    "btn_ok": "বুঝেছি"
+  }
+}

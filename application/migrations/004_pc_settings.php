@@ -1,7 +1,7 @@
 <?php
-/**
- * Migration 004  -  Presenting complaints (PC/CC) and autocomplete settings tables
- */
+declare(strict_types=1);
+
+// Chief complaints (PC/CC) storage, frequency tracking, and suggestion priority order.
 class Migration004PcSettings {
 
     private array $defaultPriorities = [
@@ -11,7 +11,7 @@ class Migration004PcSettings {
     ];
 
     public function up(PDO $pdo): void {
-        // ---- zimrx_user_pc ----
+        // Doctor vocabulary for chief complaints with usage counters and pinned items
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_pc (
                 id " . DbSql::autoIncrement() . ",
@@ -32,7 +32,7 @@ class Migration004PcSettings {
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_zimrx_user_pc_doctor_category_usage ON zimrx_user_pc(doctor_id, category, usage_count)");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_zimrx_user_pc_doctor_category_recent ON zimrx_user_pc(doctor_id, category, updated_at)");
 
-        // ---- zimrx_user_pc_settings ----
+        // Autocomplete search source priorities and toggle settings
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_pc_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -50,12 +50,13 @@ class Migration004PcSettings {
         );
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_zimrx_user_pc_settings_doctor_key ON zimrx_user_pc_settings(doctor_id, setting_key, source, term)");
 
-        // Migrate any legacy 'snomed' source references to 'static_pc' and remove 'icd'
+        // Normalize legacy source names (snomed -> static_pc, drop retired icd entries)
         try {
             $pdo->exec("UPDATE zimrx_user_pc_settings SET source = 'static_pc' WHERE source = 'snomed'");
             $pdo->exec("DELETE FROM zimrx_user_pc_settings WHERE setting_key = 'source_priority' AND source = 'icd'");
         } catch (Throwable $_) {}
 
+        // Seed initial complaint search priority order for doctor 1
         $stmt = $pdo->prepare(
             DbSql::insertIgnore(
                 'zimrx_user_pc_settings',
@@ -75,3 +76,4 @@ class Migration004PcSettings {
         }
     }
 }
+

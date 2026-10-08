@@ -1,0 +1,42 @@
+# ZimRx Container Runtime (FrankenPHP + Alpine)
+# Official FrankenPHP image (PHP 8.3; compatible with PHP >=8.2)
+FROM dunglas/frankenphp:1-php8.3-alpine
+
+LABEL maintainer="Alif Farzan Zim <aliffarzanzim@gmail.com>"
+LABEL description="ZimRx: Open-source, local-first offline prescription & EMR engine"
+
+# Install recommended dependencies and sqlite driver
+RUN apk add --no-cache bash curl && \
+    install-php-extensions pdo_sqlite && \
+    cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+
+WORKDIR /app
+
+# Copy web server configuration, application source, and repository manifests
+COPY Caddyfile /app/Caddyfile
+COPY application /app/application
+COPY .editorconfig .gitattributes funding.json Dockerfile /app/
+COPY .github /app/.github
+
+# Create required persistent state directories and compile reference databases from SQL seeds
+RUN mkdir -p /app/application/userdata/database \
+    /app/application/userdata/uploads/reports \
+    /app/application/userdata/uploads/header-logos \
+    /app/application/userdata/uploads/full-body-headers \
+    /app/application/userdata/uploads/seal-and-stamps \
+    /app/application/userdata/uploads/background-images \
+    /app/application/systemdata/database \
+    /app/logs && \
+    php /app/application/systemdata/seeds/build_db.php
+
+# Doctor EMR data volume
+VOLUME ["/app/application/userdata"]
+
+ENV ZIMRX_HTTP_PORT=8080 \
+    ZIMRX_IN_DOCKER=1
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/ || exit 1
+
+CMD ["frankenphp", "run", "--config", "/app/Caddyfile", "--adapter", "caddyfile"]

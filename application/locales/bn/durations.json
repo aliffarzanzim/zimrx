@@ -1,0 +1,130 @@
+{
+    "1": {
+        "text": "০১ দিন",
+        "alias": "1 day, 1 din, ek din"
+    },
+    "2": {
+        "text": "০২ দিন",
+        "alias": "2 days, 2 din, dui din"
+    },
+    "3": {
+        "text": "০৩ দিন",
+        "alias": "3 days, 3 din, tin din"
+    },
+    "4": {
+        "text": "০৪ দিন",
+        "alias": "4 days, 4 din, char din"
+    },
+    "5": {
+        "text": "০৫ দিন",
+        "alias": "5 days, 5 din, pach din"
+    },
+    "6": {
+        "text": "০৬ দিন",
+        "alias": "6 days, 6 din, choy din"
+    },
+    "7": {
+        "text": "০৭ দিন",
+        "alias": "7 days, 7 din, shat din"
+    },
+    "8": {
+        "text": "১০ দিন",
+        "alias": "10 days, 10 din, dosh din"
+    },
+    "9": {
+        "text": "১৪ দিন",
+        "alias": "14 days, 14 din, chouddo din"
+    },
+    "10": {
+        "text": "১৫ দিন",
+        "alias": "15 days, 15 din, ponero din"
+    },
+    "11": {
+        "text": "২১ দিন",
+        "alias": "21 days, 21 din, ekush din"
+    },
+    "12": {
+        "text": "২৮ দিন",
+        "alias": "28 days, 28 din, aatash din"
+    },
+    "13": {
+        "text": "১ সপ্তাহ",
+        "alias": "1 week, 1 shoptaho, ek shoptaho"
+    },
+    "14": {
+        "text": "২ সপ্তাহ",
+        "alias": "2 weeks, 2 shoptaho, dui shoptaho"
+    },
+    "15": {
+        "text": "৩ সপ্তাহ",
+        "alias": "3 weeks, 3 shoptaho, tin shoptaho"
+    },
+    "16": {
+        "text": "৪ সপ্তাহ",
+        "alias": "4 weeks, 4 shoptaho, char shoptaho"
+    },
+    "17": {
+        "text": "৬ সপ্তাহ",
+        "alias": "6 weeks, 6 shoptaho, choy shoptaho"
+    },
+    "18": {
+        "text": "১ মাস",
+        "alias": "1 month, 1 mash, ek mash"
+    },
+    "19": {
+        "text": "২ মাস",
+        "alias": "2 months, 2 mash, dui mash"
+    },
+    "20": {
+        "text": "৩ মাস",
+        "alias": "3 months, 3 mash, tin mash"
+    },
+    "21": {
+        "text": "৪ মাস",
+        "alias": "4 months, 4 mash, char mash"
+    },
+    "22": {
+        "text": "৬ মাস",
+        "alias": "6 months, 6 mash, choy mash"
+    },
+    "23": {
+        "text": "১ বছর",
+        "alias": "1 year, 1 bochor, ek bochor"
+    },
+    "24": {
+        "text": "চলবে",
+        "alias": "continue, cholbe"
+    },
+    "25": {
+        "text": "পরবর্তী পরামর্শ পর্যন্ত চলবে",
+        "alias": "until next visit, poroborti poramorsho porjonto cholbe"
+    },
+    "26": {
+        "text": "জ্বর হলে",
+        "alias": "if fever, jor hole, jwar hole"
+    },
+    "27": {
+        "text": "ব্যথা হলে",
+        "alias": "if pain, byatha hole, betha hole"
+    },
+    "28": {
+        "text": "জ্বর বা ব্যথা হলে",
+        "alias": "if fever or pain, jor ba betha hole, jwar ba byatha hole"
+    },
+    "29": {
+        "text": "বুকে ব্যথা হলে",
+        "alias": "if chest pain, buke betha hole, buke byatha hole"
+    },
+    "30": {
+        "text": "নিঃশ্বাস নিতে কষ্ট হলে",
+        "alias": "if shortness of breath, nishash nite koshto hole, shashkoshtho hole"
+    },
+    "31": {
+        "text": "বমি বমি ভাব বা বমি হলে",
+        "alias": "if nausea or vomiting, bomi bomi bhab ba bomi hole"
+    },
+    "32": {
+        "text": "পাতলা পায়খানা হলে",
+        "alias": "if loose motion, patla paykhana hole, diarrhea hole"
+    }
+}

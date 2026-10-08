@@ -1,0 +1,1283 @@
+{
+    "success": true,
+    "from_cache": false,
+    "timestamp": "2026-10-07 13:16:32",
+    "total_countries": 255,
+    "countries": [
+        {
+            "code": "AF",
+            "name": "Afghanistan",
+            "qid": "Q889"
+        },
+        {
+            "code": "AL",
+            "name": "Albania",
+            "qid": "Q222"
+        },
+        {
+            "code": "DZ",
+            "name": "Algeria",
+            "qid": "Q262"
+        },
+        {
+            "code": "AS",
+            "name": "American Samoa",
+            "qid": "Q16641"
+        },
+        {
+            "code": "AD",
+            "name": "Andorra",
+            "qid": "Q228"
+        },
+        {
+            "code": "AO",
+            "name": "Angola",
+            "qid": "Q916"
+        },
+        {
+            "code": "AI",
+            "name": "Anguilla",
+            "qid": "Q25228"
+        },
+        {
+            "code": "AQ",
+            "name": "Antarctic Treaty area",
+            "qid": "Q10372207"
+        },
+        {
+            "code": "AG",
+            "name": "Antigua and Barbuda",
+            "qid": "Q781"
+        },
+        {
+            "code": "AR",
+            "name": "Argentina",
+            "qid": "Q414"
+        },
+        {
+            "code": "AM",
+            "name": "Armenia",
+            "qid": "Q399"
+        },
+        {
+            "code": "AW",
+            "name": "Aruba",
+            "qid": "Q21203"
+        },
+        {
+            "code": "AC",
+            "name": "Ascension",
+            "qid": "Q31890709"
+        },
+        {
+            "code": "AU",
+            "name": "Australia",
+            "qid": "Q408"
+        },
+        {
+            "code": "AT",
+            "name": "Austria",
+            "qid": "Q40"
+        },
+        {
+            "code": "AZ",
+            "name": "Azerbaijan",
+            "qid": "Q227"
+        },
+        {
+            "code": "BH",
+            "name": "Bahrain",
+            "qid": "Q398"
+        },
+        {
+            "code": "BD",
+            "name": "Bangladesh",
+            "qid": "Q902"
+        },
+        {
+            "code": "BB",
+            "name": "Barbados",
+            "qid": "Q244"
+        },
+        {
+            "code": "BY",
+            "name": "Belarus",
+            "qid": "Q184"
+        },
+        {
+            "code": "BE",
+            "name": "Belgium",
+            "qid": "Q31"
+        },
+        {
+            "code": "BZ",
+            "name": "Belize",
+            "qid": "Q242"
+        },
+        {
+            "code": "BJ",
+            "name": "Benin",
+            "qid": "Q962"
+        },
+        {
+            "code": "BM",
+            "name": "Bermuda",
+            "qid": "Q23635"
+        },
+        {
+            "code": "BT",
+            "name": "Bhutan",
+            "qid": "Q917"
+        },
+        {
+            "code": "BO",
+            "name": "Bolivia",
+            "qid": "Q750"
+        },
+        {
+            "code": "BA",
+            "name": "Bosnia and Herzegovina",
+            "qid": "Q225"
+        },
+        {
+            "code": "BW",
+            "name": "Botswana",
+            "qid": "Q963"
+        },
+        {
+            "code": "BV",
+            "name": "Bouvet Island",
+            "qid": "Q23408"
+        },
+        {
+            "code": "BR",
+            "name": "Brazil",
+            "qid": "Q155"
+        },
+        {
+            "code": "IO",
+            "name": "British Indian Ocean Territory",
+            "qid": "Q43448"
+        },
+        {
+            "code": "VG",
+            "name": "British Virgin Islands",
+            "qid": "Q25305"
+        },
+        {
+            "code": "BN",
+            "name": "Brunei",
+            "qid": "Q921"
+        },
+        {
+            "code": "BG",
+            "name": "Bulgaria",
+            "qid": "Q219"
+        },
+        {
+            "code": "BF",
+            "name": "Burkina Faso",
+            "qid": "Q965"
+        },
+        {
+            "code": "BI",
+            "name": "Burundi",
+            "qid": "Q967"
+        },
+        {
+            "code": "KH",
+            "name": "Cambodia",
+            "qid": "Q424"
+        },
+        {
+            "code": "CM",
+            "name": "Cameroon",
+            "qid": "Q1009"
+        },
+        {
+            "code": "CA",
+            "name": "Canada",
+            "qid": "Q16"
+        },
+        {
+            "code": "CV",
+            "name": "Cape Verde",
+            "qid": "Q1011"
+        },
+        {
+            "code": "BQ",
+            "name": "Caribbean Netherlands",
+            "qid": "Q27561"
+        },
+        {
+            "code": "KY",
+            "name": "Cayman Islands",
+            "qid": "Q5785"
+        },
+        {
+            "code": "CF",
+            "name": "Central African Republic",
+            "qid": "Q929"
+        },
+        {
+            "code": "TD",
+            "name": "Chad",
+            "qid": "Q657"
+        },
+        {
+            "code": "CL",
+            "name": "Chile",
+            "qid": "Q298"
+        },
+        {
+            "code": "CX",
+            "name": "Christmas Island",
+            "qid": "Q31063"
+        },
+        {
+            "code": "CP",
+            "name": "Clipperton Island",
+            "qid": "Q161258"
+        },
+        {
+            "code": "CC",
+            "name": "Cocos (Keeling) Islands",
+            "qid": "Q36004"
+        },
+        {
+            "code": "CO",
+            "name": "Colombia",
+            "qid": "Q739"
+        },
+        {
+            "code": "KM",
+            "name": "Comoros",
+            "qid": "Q970"
+        },
+        {
+            "code": "CK",
+            "name": "Cook Islands",
+            "qid": "Q26988"
+        },
+        {
+            "code": "CR",
+            "name": "Costa Rica",
+            "qid": "Q800"
+        },
+        {
+            "code": "HR",
+            "name": "Croatia",
+            "qid": "Q224"
+        },
+        {
+            "code": "CU",
+            "name": "Cuba",
+            "qid": "Q241"
+        },
+        {
+            "code": "CW",
+            "name": "Curaçao",
+            "qid": "Q25279"
+        },
+        {
+            "code": "CY",
+            "name": "Cyprus",
+            "qid": "Q644636"
+        },
+        {
+            "code": "CZ",
+            "name": "Czech Republic",
+            "qid": "Q213"
+        },
+        {
+            "code": "CD",
+            "name": "Democratic Republic of the Congo",
+            "qid": "Q974"
+        },
+        {
+            "code": "DK",
+            "name": "Denmark",
+            "qid": "Q35"
+        },
+        {
+            "code": "DG",
+            "name": "Diego Garcia",
+            "qid": "Q184851"
+        },
+        {
+            "code": "DJ",
+            "name": "Djibouti",
+            "qid": "Q977"
+        },
+        {
+            "code": "DM",
+            "name": "Dominica",
+            "qid": "Q784"
+        },
+        {
+            "code": "DO",
+            "name": "Dominican Republic",
+            "qid": "Q786"
+        },
+        {
+            "code": "EC",
+            "name": "Ecuador",
+            "qid": "Q736"
+        },
+        {
+            "code": "EG",
+            "name": "Egypt",
+            "qid": "Q79"
+        },
+        {
+            "code": "SV",
+            "name": "El Salvador",
+            "qid": "Q792"
+        },
+        {
+            "code": "GQ",
+            "name": "Equatorial Guinea",
+            "qid": "Q983"
+        },
+        {
+            "code": "ER",
+            "name": "Eritrea",
+            "qid": "Q986"
+        },
+        {
+            "code": "EE",
+            "name": "Estonia",
+            "qid": "Q191"
+        },
+        {
+            "code": "SZ",
+            "name": "Eswatini",
+            "qid": "Q1050"
+        },
+        {
+            "code": "ET",
+            "name": "Ethiopia",
+            "qid": "Q115"
+        },
+        {
+            "code": "FK",
+            "name": "Falkland Islands",
+            "qid": "Q9648"
+        },
+        {
+            "code": "FO",
+            "name": "Faroe Islands",
+            "qid": "Q4628"
+        },
+        {
+            "code": "FM",
+            "name": "Federated States of Micronesia",
+            "qid": "Q702"
+        },
+        {
+            "code": "FJ",
+            "name": "Fiji",
+            "qid": "Q712"
+        },
+        {
+            "code": "FI",
+            "name": "Finland",
+            "qid": "Q33"
+        },
+        {
+            "code": "FR",
+            "name": "France",
+            "qid": "Q142"
+        },
+        {
+            "code": "GF",
+            "name": "French Guiana",
+            "qid": "Q3769"
+        },
+        {
+            "code": "PF",
+            "name": "French Polynesia",
+            "qid": "Q30971"
+        },
+        {
+            "code": "TF",
+            "name": "French Southern and Antarctic Lands",
+            "qid": "Q129003"
+        },
+        {
+            "code": "GA",
+            "name": "Gabon",
+            "qid": "Q1000"
+        },
+        {
+            "code": "GE",
+            "name": "Georgia",
+            "qid": "Q230"
+        },
+        {
+            "code": "DE",
+            "name": "Germany",
+            "qid": "Q183"
+        },
+        {
+            "code": "GH",
+            "name": "Ghana",
+            "qid": "Q117"
+        },
+        {
+            "code": "GI",
+            "name": "Gibraltar",
+            "qid": "Q1410"
+        },
+        {
+            "code": "GR",
+            "name": "Greece",
+            "qid": "Q41"
+        },
+        {
+            "code": "GL",
+            "name": "Greenland",
+            "qid": "Q223"
+        },
+        {
+            "code": "GD",
+            "name": "Grenada",
+            "qid": "Q769"
+        },
+        {
+            "code": "GP",
+            "name": "Guadeloupe",
+            "qid": "Q17012"
+        },
+        {
+            "code": "GU",
+            "name": "Guam",
+            "qid": "Q16635"
+        },
+        {
+            "code": "GT",
+            "name": "Guatemala",
+            "qid": "Q774"
+        },
+        {
+            "code": "GG",
+            "name": "Guernsey",
+            "qid": "Q25230"
+        },
+        {
+            "code": "GN",
+            "name": "Guinea",
+            "qid": "Q1006"
+        },
+        {
+            "code": "GW",
+            "name": "Guinea-Bissau",
+            "qid": "Q1007"
+        },
+        {
+            "code": "GY",
+            "name": "Guyana",
+            "qid": "Q734"
+        },
+        {
+            "code": "HT",
+            "name": "Haiti",
+            "qid": "Q790"
+        },
+        {
+            "code": "HM",
+            "name": "Heard Island and McDonald Islands",
+            "qid": "Q131198"
+        },
+        {
+            "code": "HN",
+            "name": "Honduras",
+            "qid": "Q783"
+        },
+        {
+            "code": "HK",
+            "name": "Hong Kong",
+            "qid": "Q8646"
+        },
+        {
+            "code": "HU",
+            "name": "Hungary",
+            "qid": "Q28"
+        },
+        {
+            "code": "IS",
+            "name": "Iceland",
+            "qid": "Q189"
+        },
+        {
+            "code": "IN",
+            "name": "India",
+            "qid": "Q668"
+        },
+        {
+            "code": "ID",
+            "name": "Indonesia",
+            "qid": "Q252"
+        },
+        {
+            "code": "IR",
+            "name": "Iran",
+            "qid": "Q794"
+        },
+        {
+            "code": "IQ",
+            "name": "Iraq",
+            "qid": "Q796"
+        },
+        {
+            "code": "IE",
+            "name": "Ireland",
+            "qid": "Q27"
+        },
+        {
+            "code": "IM",
+            "name": "Isle of Man",
+            "qid": "Q9676"
+        },
+        {
+            "code": "IL",
+            "name": "Israel",
+            "qid": "Q801"
+        },
+        {
+            "code": "IT",
+            "name": "Italy",
+            "qid": "Q38"
+        },
+        {
+            "code": "CI",
+            "name": "Ivory Coast",
+            "qid": "Q1008"
+        },
+        {
+            "code": "JM",
+            "name": "Jamaica",
+            "qid": "Q766"
+        },
+        {
+            "code": "JP",
+            "name": "Japan",
+            "qid": "Q17"
+        },
+        {
+            "code": "JE",
+            "name": "Jersey",
+            "qid": "Q785"
+        },
+        {
+            "code": "JO",
+            "name": "Jordan",
+            "qid": "Q810"
+        },
+        {
+            "code": "KZ",
+            "name": "Kazakhstan",
+            "qid": "Q232"
+        },
+        {
+            "code": "KE",
+            "name": "Kenya",
+            "qid": "Q114"
+        },
+        {
+            "code": "NL",
+            "name": "Kingdom of the Netherlands",
+            "qid": "Q29999"
+        },
+        {
+            "code": "KI",
+            "name": "Kiribati",
+            "qid": "Q710"
+        },
+        {
+            "code": "XK",
+            "name": "Kosovo",
+            "qid": "Q1246"
+        },
+        {
+            "code": "KW",
+            "name": "Kuwait",
+            "qid": "Q817"
+        },
+        {
+            "code": "KG",
+            "name": "Kyrgyzstan",
+            "qid": "Q813"
+        },
+        {
+            "code": "LA",
+            "name": "Laos",
+            "qid": "Q819"
+        },
+        {
+            "code": "LV",
+            "name": "Latvia",
+            "qid": "Q211"
+        },
+        {
+            "code": "LB",
+            "name": "Lebanon",
+            "qid": "Q822"
+        },
+        {
+            "code": "LS",
+            "name": "Lesotho",
+            "qid": "Q1013"
+        },
+        {
+            "code": "LR",
+            "name": "Liberia",
+            "qid": "Q1014"
+        },
+        {
+            "code": "LY",
+            "name": "Libya",
+            "qid": "Q1016"
+        },
+        {
+            "code": "LI",
+            "name": "Liechtenstein",
+            "qid": "Q347"
+        },
+        {
+            "code": "LT",
+            "name": "Lithuania",
+            "qid": "Q37"
+        },
+        {
+            "code": "LU",
+            "name": "Luxembourg",
+            "qid": "Q32"
+        },
+        {
+            "code": "MO",
+            "name": "Macau",
+            "qid": "Q14773"
+        },
+        {
+            "code": "MG",
+            "name": "Madagascar",
+            "qid": "Q1019"
+        },
+        {
+            "code": "MW",
+            "name": "Malawi",
+            "qid": "Q1020"
+        },
+        {
+            "code": "MY",
+            "name": "Malaysia",
+            "qid": "Q833"
+        },
+        {
+            "code": "MV",
+            "name": "Maldives",
+            "qid": "Q826"
+        },
+        {
+            "code": "ML",
+            "name": "Mali",
+            "qid": "Q912"
+        },
+        {
+            "code": "MT",
+            "name": "Malta",
+            "qid": "Q233"
+        },
+        {
+            "code": "MH",
+            "name": "Marshall Islands",
+            "qid": "Q709"
+        },
+        {
+            "code": "MQ",
+            "name": "Martinique",
+            "qid": "Q17054"
+        },
+        {
+            "code": "MR",
+            "name": "Mauritania",
+            "qid": "Q1025"
+        },
+        {
+            "code": "MU",
+            "name": "Mauritius",
+            "qid": "Q1027"
+        },
+        {
+            "code": "YT",
+            "name": "Mayotte",
+            "qid": "Q17063"
+        },
+        {
+            "code": "MX",
+            "name": "Mexico",
+            "qid": "Q96"
+        },
+        {
+            "code": "MD",
+            "name": "Moldova",
+            "qid": "Q217"
+        },
+        {
+            "code": "MC",
+            "name": "Monaco",
+            "qid": "Q235"
+        },
+        {
+            "code": "MN",
+            "name": "Mongolia",
+            "qid": "Q711"
+        },
+        {
+            "code": "ME",
+            "name": "Montenegro",
+            "qid": "Q236"
+        },
+        {
+            "code": "MS",
+            "name": "Montserrat",
+            "qid": "Q13353"
+        },
+        {
+            "code": "MA",
+            "name": "Morocco",
+            "qid": "Q1028"
+        },
+        {
+            "code": "MZ",
+            "name": "Mozambique",
+            "qid": "Q1029"
+        },
+        {
+            "code": "MM",
+            "name": "Myanmar",
+            "qid": "Q836"
+        },
+        {
+            "code": "NA",
+            "name": "Namibia",
+            "qid": "Q1030"
+        },
+        {
+            "code": "NR",
+            "name": "Nauru",
+            "qid": "Q697"
+        },
+        {
+            "code": "NP",
+            "name": "Nepal",
+            "qid": "Q837"
+        },
+        {
+            "code": "NC",
+            "name": "New Caledonia",
+            "qid": "Q33788"
+        },
+        {
+            "code": "NZ",
+            "name": "New Zealand",
+            "qid": "Q664"
+        },
+        {
+            "code": "NI",
+            "name": "Nicaragua",
+            "qid": "Q811"
+        },
+        {
+            "code": "NE",
+            "name": "Niger",
+            "qid": "Q1032"
+        },
+        {
+            "code": "NG",
+            "name": "Nigeria",
+            "qid": "Q1033"
+        },
+        {
+            "code": "NU",
+            "name": "Niue",
+            "qid": "Q34020"
+        },
+        {
+            "code": "NF",
+            "name": "Norfolk Island",
+            "qid": "Q31057"
+        },
+        {
+            "code": "KP",
+            "name": "North Korea",
+            "qid": "Q423"
+        },
+        {
+            "code": "MK",
+            "name": "North Macedonia",
+            "qid": "Q221"
+        },
+        {
+            "code": "MP",
+            "name": "Northern Mariana Islands",
+            "qid": "Q16644"
+        },
+        {
+            "code": "NO",
+            "name": "Norway",
+            "qid": "Q20"
+        },
+        {
+            "code": "OM",
+            "name": "Oman",
+            "qid": "Q842"
+        },
+        {
+            "code": "PK",
+            "name": "Pakistan",
+            "qid": "Q843"
+        },
+        {
+            "code": "PW",
+            "name": "Palau",
+            "qid": "Q695"
+        },
+        {
+            "code": "PS",
+            "name": "Palestine",
+            "qid": "Q219060"
+        },
+        {
+            "code": "PA",
+            "name": "Panama",
+            "qid": "Q804"
+        },
+        {
+            "code": "PG",
+            "name": "Papua New Guinea",
+            "qid": "Q691"
+        },
+        {
+            "code": "PY",
+            "name": "Paraguay",
+            "qid": "Q733"
+        },
+        {
+            "code": "CN",
+            "name": "People's Republic of China",
+            "qid": "Q148"
+        },
+        {
+            "code": "PE",
+            "name": "Peru",
+            "qid": "Q419"
+        },
+        {
+            "code": "PH",
+            "name": "Philippines",
+            "qid": "Q928"
+        },
+        {
+            "code": "PN",
+            "name": "Pitcairn Islands",
+            "qid": "Q35672"
+        },
+        {
+            "code": "PL",
+            "name": "Poland",
+            "qid": "Q36"
+        },
+        {
+            "code": "PT",
+            "name": "Portugal",
+            "qid": "Q45"
+        },
+        {
+            "code": "PR",
+            "name": "Puerto Rico",
+            "qid": "Q1183"
+        },
+        {
+            "code": "QA",
+            "name": "Qatar",
+            "qid": "Q846"
+        },
+        {
+            "code": "CG",
+            "name": "Republic of the Congo",
+            "qid": "Q971"
+        },
+        {
+            "code": "RO",
+            "name": "Romania",
+            "qid": "Q218"
+        },
+        {
+            "code": "RU",
+            "name": "Russia",
+            "qid": "Q159"
+        },
+        {
+            "code": "RW",
+            "name": "Rwanda",
+            "qid": "Q1037"
+        },
+        {
+            "code": "RE",
+            "name": "Réunion",
+            "qid": "Q17070"
+        },
+        {
+            "code": "BL",
+            "name": "Saint Barthélemy",
+            "qid": "Q25362"
+        },
+        {
+            "code": "SH",
+            "name": "Saint Helena, Ascension and Tristan da Cunha",
+            "qid": "Q192184"
+        },
+        {
+            "code": "KN",
+            "name": "Saint Kitts and Nevis",
+            "qid": "Q763"
+        },
+        {
+            "code": "LC",
+            "name": "Saint Lucia",
+            "qid": "Q760"
+        },
+        {
+            "code": "PM",
+            "name": "Saint Pierre and Miquelon",
+            "qid": "Q34617"
+        },
+        {
+            "code": "VC",
+            "name": "Saint Vincent and the Grenadines",
+            "qid": "Q757"
+        },
+        {
+            "code": "MF",
+            "name": "Saint-Martin",
+            "qid": "Q126125"
+        },
+        {
+            "code": "WS",
+            "name": "Samoa",
+            "qid": "Q683"
+        },
+        {
+            "code": "SM",
+            "name": "San Marino",
+            "qid": "Q238"
+        },
+        {
+            "code": "CQ",
+            "name": "Sark",
+            "qid": "Q3405693"
+        },
+        {
+            "code": "SA",
+            "name": "Saudi Arabia",
+            "qid": "Q851"
+        },
+        {
+            "code": "SN",
+            "name": "Senegal",
+            "qid": "Q1041"
+        },
+        {
+            "code": "RS",
+            "name": "Serbia",
+            "qid": "Q403"
+        },
+        {
+            "code": "SC",
+            "name": "Seychelles",
+            "qid": "Q1042"
+        },
+        {
+            "code": "SL",
+            "name": "Sierra Leone",
+            "qid": "Q1044"
+        },
+        {
+            "code": "SG",
+            "name": "Singapore",
+            "qid": "Q334"
+        },
+        {
+            "code": "SX",
+            "name": "Sint Maarten",
+            "qid": "Q26273"
+        },
+        {
+            "code": "SK",
+            "name": "Slovakia",
+            "qid": "Q214"
+        },
+        {
+            "code": "SI",
+            "name": "Slovenia",
+            "qid": "Q215"
+        },
+        {
+            "code": "SB",
+            "name": "Solomon Islands",
+            "qid": "Q685"
+        },
+        {
+            "code": "SO",
+            "name": "Somalia",
+            "qid": "Q1045"
+        },
+        {
+            "code": "ZA",
+            "name": "South Africa",
+            "qid": "Q258"
+        },
+        {
+            "code": "GS",
+            "name": "South Georgia and the South Sandwich Islands",
+            "qid": "Q35086"
+        },
+        {
+            "code": "KR",
+            "name": "South Korea",
+            "qid": "Q884"
+        },
+        {
+            "code": "SS",
+            "name": "South Sudan",
+            "qid": "Q958"
+        },
+        {
+            "code": "ES",
+            "name": "Spain",
+            "qid": "Q29"
+        },
+        {
+            "code": "LK",
+            "name": "Sri Lanka",
+            "qid": "Q854"
+        },
+        {
+            "code": "SD",
+            "name": "Sudan",
+            "qid": "Q1049"
+        },
+        {
+            "code": "SR",
+            "name": "Suriname",
+            "qid": "Q730"
+        },
+        {
+            "code": "SJ",
+            "name": "Svalbard and Jan Mayen",
+            "qid": "Q842829"
+        },
+        {
+            "code": "SE",
+            "name": "Sweden",
+            "qid": "Q34"
+        },
+        {
+            "code": "CH",
+            "name": "Switzerland",
+            "qid": "Q39"
+        },
+        {
+            "code": "SY",
+            "name": "Syria",
+            "qid": "Q858"
+        },
+        {
+            "code": "ST",
+            "name": "São Tomé and Príncipe",
+            "qid": "Q1039"
+        },
+        {
+            "code": "TW",
+            "name": "Taiwan",
+            "qid": "Q865"
+        },
+        {
+            "code": "TJ",
+            "name": "Tajikistan",
+            "qid": "Q863"
+        },
+        {
+            "code": "TZ",
+            "name": "Tanzania",
+            "qid": "Q924"
+        },
+        {
+            "code": "TH",
+            "name": "Thailand",
+            "qid": "Q869"
+        },
+        {
+            "code": "BS",
+            "name": "The Bahamas",
+            "qid": "Q778"
+        },
+        {
+            "code": "GM",
+            "name": "The Gambia",
+            "qid": "Q1005"
+        },
+        {
+            "code": "TL",
+            "name": "Timor-Leste",
+            "qid": "Q574"
+        },
+        {
+            "code": "TG",
+            "name": "Togo",
+            "qid": "Q945"
+        },
+        {
+            "code": "TK",
+            "name": "Tokelau",
+            "qid": "Q36823"
+        },
+        {
+            "code": "TO",
+            "name": "Tonga",
+            "qid": "Q678"
+        },
+        {
+            "code": "TT",
+            "name": "Trinidad and Tobago",
+            "qid": "Q754"
+        },
+        {
+            "code": "TA",
+            "name": "Tristan da Cunha",
+            "qid": "Q34625512"
+        },
+        {
+            "code": "TN",
+            "name": "Tunisia",
+            "qid": "Q948"
+        },
+        {
+            "code": "TR",
+            "name": "Turkey",
+            "qid": "Q43"
+        },
+        {
+            "code": "TM",
+            "name": "Turkmenistan",
+            "qid": "Q874"
+        },
+        {
+            "code": "TC",
+            "name": "Turks and Caicos Islands",
+            "qid": "Q18221"
+        },
+        {
+            "code": "TV",
+            "name": "Tuvalu",
+            "qid": "Q672"
+        },
+        {
+            "code": "UG",
+            "name": "Uganda",
+            "qid": "Q1036"
+        },
+        {
+            "code": "UA",
+            "name": "Ukraine",
+            "qid": "Q212"
+        },
+        {
+            "code": "AE",
+            "name": "United Arab Emirates",
+            "qid": "Q878"
+        },
+        {
+            "code": "GB",
+            "name": "United Kingdom",
+            "qid": "Q145"
+        },
+        {
+            "code": "US",
+            "name": "United States",
+            "qid": "Q30"
+        },
+        {
+            "code": "UM",
+            "name": "United States Minor Outlying Islands",
+            "qid": "Q16645"
+        },
+        {
+            "code": "VI",
+            "name": "United States Virgin Islands",
+            "qid": "Q11703"
+        },
+        {
+            "code": "UY",
+            "name": "Uruguay",
+            "qid": "Q77"
+        },
+        {
+            "code": "UZ",
+            "name": "Uzbekistan",
+            "qid": "Q265"
+        },
+        {
+            "code": "VU",
+            "name": "Vanuatu",
+            "qid": "Q686"
+        },
+        {
+            "code": "VA",
+            "name": "Vatican City",
+            "qid": "Q237"
+        },
+        {
+            "code": "VE",
+            "name": "Venezuela",
+            "qid": "Q717"
+        },
+        {
+            "code": "VN",
+            "name": "Vietnam",
+            "qid": "Q881"
+        },
+        {
+            "code": "WF",
+            "name": "Wallis and Futuna",
+            "qid": "Q35555"
+        },
+        {
+            "code": "EH",
+            "name": "Western Sahara",
+            "qid": "Q6250"
+        },
+        {
+            "code": "YE",
+            "name": "Yemen",
+            "qid": "Q805"
+        },
+        {
+            "code": "ZM",
+            "name": "Zambia",
+            "qid": "Q953"
+        },
+        {
+            "code": "ZW",
+            "name": "Zimbabwe",
+            "qid": "Q954"
+        },
+        {
+            "code": "AX",
+            "name": "Åland",
+            "qid": "Q5689"
+        }
+    ]
+}

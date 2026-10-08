@@ -4,39 +4,68 @@
 }
 
 :{$ZIMRX_HTTP_PORT:8080} {
-	root * ./application
+	root * ./application/public
 
 	handle /favicon.ico {
 		respond 204
 	}
 
-	# Allow uploads while protecting databases and private data
-	handle_path /userdata/uploads/* {
-		root * ./application/userdata/uploads
+	# 1. Public stationery media (clinic logos & print headers) needed for prescription preview.
+	# Safe to serve: filenames use random tokens, directory listing is off, and clinical reports stay blocked below.
+	handle_path /userdata/uploads/header-logos/* {
+		root * ./application/userdata/uploads/header-logos
+		file_server
+	}
+	handle_path /userdata/uploads/full-body-headers/* {
+		root * ./application/userdata/uploads/full-body-headers
+		file_server
+	}
+	handle_path /uploads/header-logos/* {
+		root * ./application/userdata/uploads/header-logos
+		file_server
+	}
+	handle_path /uploads/full-body-headers/* {
+		root * ./application/userdata/uploads/full-body-headers
 		file_server
 	}
 
-	# Never expose local data stores or old import dumps through the browser.
-	@privateData path /userdata/* /obsolete/*
+
+	# 2. Block direct HTTP access to confidential clinical reports.
+	# Patient medical records and imaging must be streamed via authenticated api/view_report.php
+	@clinicalReports path /userdata/uploads/reports/* /uploads/reports/*
+	respond @clinicalReports 404
+
+	# 3. Never expose local data stores, private uploads, or internal engine directories.
+	@privateData path /userdata/* /systemdata/* /uploads/* /obsolete/* /migrations/* /tests/* /lib/* /db/* /modules/* /views/*
 	respond @privateData 404
 
+	# 3b. Block direct HTTP invocation of internal framework scripts and manifests
+	@privateFiles path /config.php /auth.php /db.php /header.php /footer.php /composer.json /composer.lock
+	respond @privateFiles 404
+
+	# 4. Block sensitive database and configuration files
 	@databaseFiles path *.db *.db3 *.sqlite *.sqlite3 *.sql *.mdb *.accdb *.db-wal *.db-shm *.sqlite-wal *.sqlite-shm
 	respond @databaseFiles 404
 
-	# Composer dependencies live in application/vendor for portability.
-	# Only the manually bundled NicEdit browser asset should be public.
+	# 5. Composer dependencies live in application/vendor for portability.
+	# Only the manually bundled NicEdit browser asset is public.
 	@privateVendor {
 		path /vendor/*
 		not path /vendor/nicedit/*
+		not path /vendor/flatpickr/*
 	}
 	respond @privateVendor 404
 
+	# 6. Global security headers
+	header {
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		X-XSS-Protection "1; mode=block"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob:; connect-src 'self' http://127.0.0.1:* http://localhost:*; frame-ancestors 'self'; base-uri 'self'; form-action 'self';"
+	}
+
 	encode gzip
 	php_server
-
-	# Handle uploads directory
-	handle_path /uploads/* {
-		root * ./application/userdata/uploads
-		file_server
-	}
 }
+

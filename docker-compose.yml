@@ -1,0 +1,18 @@
+services:
+  zimrx:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: zimrx_app
+    ports:
+      - "8080:8080"
+    volumes:
+      - zimrx_userdata:/app/application/userdata
+    environment:
+      - ZIMRX_HTTP_PORT=8080
+      - ZIMRX_IN_DOCKER=1
+      - ZIMRX_ALLOW_HTTP=1
+    restart: unless-stopped
+
+volumes:
+  zimrx_userdata:

@@ -1,21 +1,31 @@
 <?php
-/**
- * Migration 003  -  Prescription print layout, header settings, OT note settings, and interface layout
- */
+declare(strict_types=1);
+
+// Print layout settings: margins, prescription header/footer blocks, OT notes, and UI preferences.
 class Migration003PrintLayoutSettings {
 
     public function up(PDO $pdo): void {
-        // ---- zimrx_prescription_print_layout_settings ----
+        $defaultsPath = dirname(__DIR__) . '/config/print_defaults.php';
+        $d = is_file($defaultsPath) ? require $defaultsPath : [];
+
+        $pageWidth    = (float)($d['page_width'] ?? 21.0);
+        $pageHeight   = (float)($d['page_height'] ?? 29.7);
+        $headerHeight = (float)($d['header_height'] ?? 5.3);
+        $ptInfoHeight = (float)($d['pt_info_height'] ?? 1.6);
+        $leftWidth    = (float)($d['left_width'] ?? 9.0);
+        $footerHeight = (float)($d['footer_height'] ?? 2.0);
+
+        // Physical page dimensions, margins, and typography metrics
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_prescription_print_layout_settings (
                 id " . DbSql::autoIncrement() . ",
                 doctor_id " . DbSql::intType() . " NOT NULL UNIQUE,
-                page_width_cm REAL DEFAULT 21,
-                page_height_cm REAL DEFAULT 29.7,
-                header_height_cm REAL DEFAULT 3,
-                patient_info_height_cm REAL DEFAULT 2,
-                left_width_cm REAL DEFAULT 4,
-                footer_height_cm REAL DEFAULT 1.5,
+                page_width_cm REAL DEFAULT {$pageWidth},
+                page_height_cm REAL DEFAULT {$pageHeight},
+                header_height_cm REAL DEFAULT {$headerHeight},
+                patient_info_height_cm REAL DEFAULT {$ptInfoHeight},
+                left_width_cm REAL DEFAULT {$leftWidth},
+                footer_height_cm REAL DEFAULT {$footerHeight},
                 body_font_size_pt REAL DEFAULT 10,
                 rx_font_size_pt REAL DEFAULT 12,
                 line_height_pt REAL DEFAULT 14,
@@ -26,12 +36,12 @@ class Migration003PrintLayoutSettings {
             )"
         );
 
-        // Seed default row for doctor 1
+        // Seed default A4 layout for primary doctor
         $pdo->exec(
             DbSql::insertIgnore('zimrx_prescription_print_layout_settings', 'doctor_id', '1')
         );
 
-        // ---- zimrx_prescription_header_settings ----
+        // Pad header styling: clinic name, doctor credentials, watermark logos, and block texts
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_prescription_header_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -84,7 +94,7 @@ class Migration003PrintLayoutSettings {
             )"
         );
 
-        // Seed default header row for doctor 1
+        // Seed blank header profile for doctor 1
         $pdo->prepare(
             DbSql::insertIgnore(
                 'zimrx_prescription_header_settings',
@@ -93,7 +103,7 @@ class Migration003PrintLayoutSettings {
             )
         )->execute(['doctor_id' => 1, 'doctor_name' => 'Doctor']);
 
-        // ---- zimrx_ot_note_settings ----
+        // Operation theater note formatting options
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_ot_note_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -105,7 +115,7 @@ class Migration003PrintLayoutSettings {
             )"
         );
 
-        // ---- zimrx_interface_settings ----
+        // Doctor custom UI preferences (collapsed sidebar, panel layouts, theme overrides)
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_interface_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -119,3 +129,4 @@ class Migration003PrintLayoutSettings {
         );
     }
 }
+

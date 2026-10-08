@@ -1,11 +1,11 @@
 <?php
-/**
- * Migration 008  -  Prescription drugs, clinical findings, custom drugs, doses, durations, templates, and sorting
- */
+declare(strict_types=1);
+
+// Medication schema: prescribed drugs, custom catalog, dosages, durations, interaction settings, and reusable templates.
 class Migration008DrugsDosesDurationsAndTemplates {
 
     public function up(PDO $pdo): void {
-        // ---- zimrx_prescription_drugs ----
+        // Prescribed medication line items linked to patient visits
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_prescription_drugs (
                 id " . DbSql::autoIncrement() . ",
@@ -33,7 +33,7 @@ class Migration008DrugsDosesDurationsAndTemplates {
         );
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_zimrx_prescription_drugs_patient ON zimrx_prescription_drugs(patient_id, doctor_id, generic_name)");
 
-        // ---- zimrx_prescription_clinical_findings ----
+        // Structured clinical parameters recorded during the visit
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_prescription_clinical_findings (
                 id " . DbSql::autoIncrement() . ",
@@ -50,7 +50,7 @@ class Migration008DrugsDosesDurationsAndTemplates {
             )"
         );
 
-        // ---- zimrx_user_drugs ----
+        // Doctor personal medication frequency catalog with normalized keys
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_drugs (
                 id " . DbSql::autoIncrement() . ",
@@ -75,7 +75,7 @@ class Migration008DrugsDosesDurationsAndTemplates {
         );
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_zimrx_user_drugs_lookup ON zimrx_user_drugs(doctor_id, brand_name, generic_name)");
 
-        // ---- zimrx_user_custom_drugs ----
+        // Custom brands or formulations added manually by the doctor
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_custom_drugs (
                 id " . DbSql::autoIncrement() . ",
@@ -95,7 +95,7 @@ class Migration008DrugsDosesDurationsAndTemplates {
             )"
         );
 
-        // ---- zimrx_user_drugs_settings ----
+        // Pin and hide toggles for specific medications
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_drugs_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -110,7 +110,7 @@ class Migration008DrugsDosesDurationsAndTemplates {
             )"
         );
 
-        // ---- zimrx_user_drug_hidden ----
+        // System brands hidden by the doctor from search results
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_drug_hidden (
                 id " . DbSql::autoIncrement() . ",
@@ -124,7 +124,7 @@ class Migration008DrugsDosesDurationsAndTemplates {
         );
         $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS uid_user_drug_hidden_brand ON zimrx_user_drug_hidden(doctor_id, system_brand_id)");
 
-        // ---- zimrx_user_drug_override ----
+        // Custom overrides replacing system brand definitions
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_drug_override (
                 id " . DbSql::autoIncrement() . ",
@@ -136,7 +136,7 @@ class Migration008DrugsDosesDurationsAndTemplates {
         );
         $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS uid_user_drug_override_brand ON zimrx_user_drug_override(doctor_id, system_brand_id)");
 
-        // ---- zimrx_user_drug_prescribe_index ----
+        // Fast search index combining system and doctor custom drugs
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_drug_prescribe_index (
                 id " . DbSql::autoIncrement() . ",
@@ -168,7 +168,7 @@ class Migration008DrugsDosesDurationsAndTemplates {
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_user_drug_system_brand_id ON zimrx_user_drug_prescribe_index(system_brand_id)");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_user_drug_active ON zimrx_user_drug_prescribe_index(is_active, source_type)");
 
-        // ---- zimrx_user_drug_doses ----
+        // Dosage patterns (1+0+1, etc.) with usage counts and dosage form links
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_drug_doses (
                 id " . DbSql::autoIncrement() . ",
@@ -190,7 +190,7 @@ class Migration008DrugsDosesDurationsAndTemplates {
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_user_drug_doses_doctor_static ON zimrx_user_drug_doses(doctor_id, static_id)");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_user_drug_doses_doctor_usage ON zimrx_user_drug_doses(doctor_id, usage_count DESC, sort_order ASC, id ASC)");
 
-        // ---- zimrx_user_drug_doses_settings ----
+        // Per-dose settings and customizations
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_drug_doses_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -204,7 +204,7 @@ class Migration008DrugsDosesDurationsAndTemplates {
         );
         $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_zimrx_user_drug_doses_settings_doctor_setting ON zimrx_user_drug_doses_settings(doctor_id, dose_id, setting_key)");
 
-        // ---- zimrx_user_drug_durations ----
+        // Treatment duration terms (7 days, 1 month) with frequency rankings
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_drug_durations (
                 id " . DbSql::autoIncrement() . ",
@@ -226,7 +226,7 @@ class Migration008DrugsDosesDurationsAndTemplates {
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_user_drug_durations_doctor_static ON zimrx_user_drug_durations(doctor_id, static_id)");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_user_drug_durations_doctor_usage ON zimrx_user_drug_durations(doctor_id, usage_count DESC, sort_order ASC, id ASC)");
 
-        // ---- zimrx_user_drug_durations_settings ----
+        // Per-duration settings and customizations
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_drug_durations_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -240,7 +240,7 @@ class Migration008DrugsDosesDurationsAndTemplates {
         );
         $pdo->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_zimrx_user_drug_durations_settings_doctor_setting ON zimrx_user_drug_durations_settings(doctor_id, duration_id, setting_key)");
 
-        // ---- zimrx_rx_grid_settings ----
+        // Grid display preferences: interaction alerts, warning panels
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_rx_grid_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -253,7 +253,7 @@ class Migration008DrugsDosesDurationsAndTemplates {
             )"
         );
 
-        // ---- zimrx_summary_interaction_settings ----
+        // Drug interaction engine preferences and alert thresholds
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_summary_interaction_settings (
                 id " . DbSql::autoIncrement() . ",
@@ -263,7 +263,7 @@ class Migration008DrugsDosesDurationsAndTemplates {
             )"
         );
 
-        // ---- zimrx_user_manufacturer_sorting ----
+        // Doctor preference ranking for pharmaceutical manufacturers
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_user_manufacturer_sorting (
                 id " . DbSql::autoIncrement() . ",
@@ -278,7 +278,7 @@ class Migration008DrugsDosesDurationsAndTemplates {
             )"
         );
 
-        // ---- zimrx_drug_template ----
+        // Single-drug quick prescribe templates
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_drug_template (
                 id " . DbSql::autoIncrement() . ",
@@ -305,7 +305,7 @@ class Migration008DrugsDosesDurationsAndTemplates {
             )"
         );
 
-        // ---- zimrx_regimen_template ----
+        // Multi-drug regimen bundles for specific conditions
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_regimen_template (
                 id " . DbSql::autoIncrement() . ",
@@ -332,7 +332,7 @@ class Migration008DrugsDosesDurationsAndTemplates {
             )"
         );
 
-        // ---- zimrx_prescription_template ----
+        // Full prescription boilerplate templates
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS zimrx_prescription_template (
                 id " . DbSql::autoIncrement() . ",
@@ -360,3 +360,4 @@ class Migration008DrugsDosesDurationsAndTemplates {
         );
     }
 }
+

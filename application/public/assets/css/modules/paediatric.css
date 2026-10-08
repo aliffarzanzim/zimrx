@@ -1,0 +1,475 @@
+/* Paediatric history module controls, MUAC badges, and WHO growth chart dialog */
+
+
+.ph-chart-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 24px;
+    padding: 0 8px;
+    border: 1px solid var(--zrx-sky-400);
+    border-radius: 4px;
+    background: var(--zrx-blue-50);
+    color: var(--zrx-blue-600);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.ph-chart-btn:hover {
+    background: var(--zrx-blue-600);
+    color: var(--zrx-white);
+    border-color: var(--zrx-blue-600);
+}
+
+.ph-select-custom-wrap {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+}
+.ph-select-custom-wrap select {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    font-size: 0.85rem;
+    color: inherit;
+    padding: 0 4px;
+    cursor: pointer;
+}
+.ph-custom-input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: var(--zrx-bg-card);
+    font: inherit;
+    font-size: 0.85rem;
+    padding: 0 4px;
+}
+
+.ph-muac-split {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    height: 100%;
+}
+.ph-muac-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: var(--zrx-border-subtle);
+    color: var(--zrx-text-muted);
+    white-space: nowrap;
+}
+
+.ph-add-row-btn {
+    min-width: 110px;
+    height: 30px;
+    border: 1px solid var(--zrx-border-divider);
+    border-radius: 8px;
+    background: var(--zrx-bg-card);
+    color: var(--zrx-text-main);
+    font: inherit;
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--zrx-shadow-sm);
+    transition: all 0.15s ease;
+}
+.ph-add-row-btn:hover {
+    background: var(--zrx-blue-50);
+    border-color: var(--zrx-primary);
+    color: var(--zrx-primary);
+}
+
+/* Interactive WHO growth chart modal container */
+
+.ph-growth-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.ph-growth-modal[hidden] {
+    display: none;
+}
+.ph-growth-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(2px);
+}
+.ph-growth-panel {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1160px;
+    max-height: 94vh;
+    background: var(--zrx-bg-card);
+    border-radius: 12px;
+    box-shadow: var(--zrx-shadow-modal);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: phModalFadeIn 0.2s ease-out;
+}
+
+@keyframes phModalFadeIn {
+    from { opacity: 0; transform: scale(0.98); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Modal header and gender toggles */
+
+.ph-growth-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    background: var(--zrx-bg-subtle);
+    border-bottom: 1px solid var(--zrx-border-subtle);
+}
+.ph-growth-header-info h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--zrx-text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.ph-growth-header-info h3 svg {
+    color: var(--zrx-blue-600);
+}
+.ph-growth-header-info p {
+    margin: 2px 0 0;
+    font-size: 0.8rem;
+    color: var(--zrx-text-muted);
+}
+.ph-growth-header-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.ph-gender-toggle-wrap {
+    display: inline-flex;
+    background: var(--zrx-border-subtle);
+    padding: 2px;
+    border-radius: 6px;
+}
+.ph-pill-btn {
+    border: none;
+    background: transparent;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--zrx-slate-600);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.ph-pill-btn.active {
+    background: var(--zrx-bg-card);
+    color: var(--zrx-text-main);
+    box-shadow: var(--zrx-shadow-sm);
+}
+.ph-growth-close {
+    border: none;
+    background: transparent;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--zrx-text-muted);
+    cursor: pointer;
+    padding: 0 4px;
+}
+.ph-growth-close:hover {
+    color: var(--zrx-text-main);
+}
+
+/* Patient anthropometric stats ribbon */
+
+.ph-patient-stats-bar {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--zrx-slate-100);
+    border-bottom: 1px solid var(--zrx-border-subtle);
+}
+.ph-stat-card {
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    display: flex;
+    flex-direction: column;
+}
+.ph-stat-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--zrx-text-muted);
+    text-transform: uppercase;
+}
+.ph-stat-val {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--zrx-text-main);
+    margin: 1px 0;
+}
+.ph-stat-sub {
+    font-size: 0.72rem;
+    color: var(--zrx-text-muted);
+}
+.ph-stat-badge {
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 1px 4px;
+    border-radius: 3px;
+    background: var(--zrx-border-subtle);
+    color: var(--zrx-slate-600);
+    align-self: flex-start;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Metric selection tabs and chart standards toolbar */
+
+.ph-chart-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 20px;
+    background: var(--zrx-bg-card);
+    border-bottom: 1px solid var(--zrx-border-subtle);
+}
+.ph-metric-tabs {
+    display: flex;
+    gap: 6px;
+}
+.ph-tab-btn {
+    border: 1px solid var(--zrx-border);
+    background: var(--zrx-bg-subtle);
+    color: var(--zrx-slate-600);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.ph-tab-btn.active {
+    background: var(--zrx-blue-600);
+    color: var(--zrx-white);
+    border-color: var(--zrx-blue-600);
+    box-shadow: var(--zrx-shadow-sm);
+}
+.ph-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.ph-tool-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--zrx-text-muted);
+    margin-right: 4px;
+}
+.ph-btn-group {
+    display: inline-flex;
+    border: 1px solid var(--zrx-border);
+    border-radius: 6px;
+    overflow: hidden;
+}
+.ph-group-btn {
+    border: none;
+    background: var(--zrx-bg-subtle);
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--zrx-slate-600);
+    border-right: 1px solid var(--zrx-border);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.ph-group-btn:last-child {
+    border-right: none;
+}
+.ph-group-btn.active {
+    background: var(--zrx-text-main);
+    color: var(--zrx-white);
+}
+
+/* Canvas plot area and tooltip styling */
+
+.ph-chart-canvas-container {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    flex: 1;
+    min-height: 440px;
+    background: var(--zrx-bg-subtle);
+    overflow: hidden;
+}
+.ph-canvas-wrapper {
+    position: relative;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--zrx-bg-card);
+    border-right: 1px solid var(--zrx-border-subtle);
+}
+#ph-growth-canvas {
+    width: 100%;
+    height: 100%;
+    max-height: 440px;
+    display: block;
+}
+.ph-canvas-tooltip {
+    position: absolute;
+    z-index: 10;
+    background: rgba(15, 23, 42, 0.92);
+    color: var(--zrx-white);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    pointer-events: none;
+    box-shadow: var(--zrx-shadow-md);
+    line-height: 1.4;
+}
+
+/* Clinical interpretation and longitudinal visit list */
+
+.ph-chart-side-panel {
+    padding: 14px 16px;
+    background: var(--zrx-bg-subtle);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow-y: auto;
+}
+.ph-side-section h4 {
+    margin: 0 0 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--zrx-text-main);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+.ph-interpret-box {
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border-subtle);
+    border-radius: 6px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.ph-interpret-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+}
+.ph-ii-label {
+    color: var(--zrx-text-muted);
+}
+.ph-ii-val {
+    font-weight: 600;
+    color: var(--zrx-text-main);
+    text-align: right;
+}
+.ph-multi-visit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+.ph-multi-visit-header h4 {
+    margin: 0;
+}
+.ph-mini-btn {
+    border: 1px solid var(--zrx-border);
+    background: var(--zrx-bg-card);
+    color: var(--zrx-blue-600);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.ph-mini-btn:hover {
+    background: var(--zrx-blue-600);
+    color: var(--zrx-white);
+    border-color: var(--zrx-blue-600);
+}
+.ph-visit-points-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 120px;
+    overflow-y: auto;
+}
+.ph-visit-item {
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border-subtle);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.ph-vi-age {
+    font-weight: 600;
+    color: var(--zrx-violet-500);
+}
+.ph-vi-val {
+    color: var(--zrx-text-main);
+}
+.ph-vi-del {
+    border: none;
+    background: transparent;
+    color: var(--zrx-red-500);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0 4px;
+}
+.ph-no-visits {
+    font-size: 0.75rem;
+    color: var(--zrx-border-divider);
+    font-style: italic;
+}
+
+/* Modal footer actions and print toggles */
+
+.ph-growth-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background: var(--zrx-bg-subtle);
+    border-top: 1px solid var(--zrx-border-subtle);
+}
+.ph-growth-print-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--zrx-slate-600);
+    cursor: pointer;
+}
+.ph-growth-footer-actions {
+    display: flex;
+    gap: 8px;
+}

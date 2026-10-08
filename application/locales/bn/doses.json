@@ -1,0 +1,370 @@
+{
+    "1": {
+        "text": "১+০+১",
+        "alias": "1+0+1, 101, morning and night, shokale rate, sokale rate, twice daily, bd, duto, sokal rat"
+    },
+    "2": {
+        "text": "১+১+১",
+        "alias": "1+1+1, 111, thrice daily, shokale dupure rate, 3 bar, tin bar, tds, tid"
+    },
+    "3": {
+        "text": "১+০+০",
+        "alias": "1+0+0, 100, morning, shokale, sokale, ekta, once daily, od, provate"
+    },
+    "4": {
+        "text": "০+০+১",
+        "alias": "0+0+1, 001, night, rate, bedtime, ghumanor age, once daily, od, raate"
+    },
+    "5": {
+        "text": "০+১+০",
+        "alias": "0+1+0, 010, noon, dupure, dopore, once daily, od, dupur"
+    },
+    "6": {
+        "text": "১+১+১+১",
+        "alias": "1+1+1+1, 1111, four times, char bar, 4 bar, four times daily, qid"
+    },
+    "7": {
+        "text": "২+০+২",
+        "alias": "2+0+2, 202, double dose, dui, duto kore, twice daily"
+    },
+    "8": {
+        "text": "২+২+২",
+        "alias": "2+2+2, 222, dui, duto kore tin bar, thrice daily"
+    },
+    "9": {
+        "text": "২+০+০",
+        "alias": "2+0+0, 200, dui, duto sokale"
+    },
+    "10": {
+        "text": "০+০+২",
+        "alias": "0+0+2, 002, dui, duto rate"
+    },
+    "11": {
+        "text": "২+২+২+২",
+        "alias": "2+2+2+2, 2222, dui, duto kore char bar"
+    },
+    "12": {
+        "text": "৩+৩+৩",
+        "alias": "3+3+3, 333, tin, tinti kore tin bar"
+    },
+    "13": {
+        "text": "২+২+২+২+২+২",
+        "alias": "2+2+2+2+2+2, 222222, 6 times, dui"
+    },
+    "14": {
+        "text": "১/২+০+১/২",
+        "alias": "1/2+0+1/2, half morning half night, odhek, half, 0.5+0+0.5"
+    },
+    "15": {
+        "text": "১/২+০+০",
+        "alias": "1/2+0+0, half morning, half sokale, odhek, half, 0.5"
+    },
+    "16": {
+        "text": "০+০+১/২",
+        "alias": "0+0+1/2, half night, half rate, half, 0.5"
+    },
+    "17": {
+        "text": "১/২+১/২+১/২",
+        "alias": "1/2+1/2+1/2, half thrice, half tin bar, half, 0.5+0.5+0.5"
+    },
+    "18": {
+        "text": "০+১/২+০",
+        "alias": "0+1/2+0, half noon, half dupure, half, 0.5"
+    },
+    "19": {
+        "text": "১/৪+০+০",
+        "alias": "1/4+0+0, quarter, siki, 0.25, fourth, ek choturtangsho"
+    },
+    "20": {
+        "text": "০+০+১/৪",
+        "alias": "0+0+1/4, quarter night, siki rate, 0.25, fourth, quarter"
+    },
+    "21": {
+        "text": "১/৪+১/৪+১/৪",
+        "alias": "1/4+1/4+1/4, quarter thrice, siki tin bar, 0.25 thrice"
+    },
+    "22": {
+        "text": "১ চামচ করে দিনে ২ বার",
+        "alias": "1 spoon twice, 1 tsp twice, 1 chamoch dine 2 bar, 1c, tsp, ek chamoch dubar"
+    },
+    "23": {
+        "text": "১ চামচ করে দিনে ৩ বার",
+        "alias": "1 spoon thrice, 1 tsp three times, 1 chamoch dine 3 bar, 1c, tsp, ek chamoch tinbar"
+    },
+    "24": {
+        "text": "১ চামচ করে দিনে ১ বার",
+        "alias": "1 spoon once, 1 tsp, 1 chamoch dine 1 bar, 1c, tsp, ek chamoch"
+    },
+    "25": {
+        "text": "১ চামচ করে দিনে ৪ বার",
+        "alias": "1 spoon 4 times, 1 tsp four times, 1 chamoch dine 4 bar, 1c, tsp, ek chamoch charbar"
+    },
+    "26": {
+        "text": "আধা চামচ করে দিনে ২ বার",
+        "alias": "half spoon twice, half tsp twice, half chamoch dine 2 bar, half, half tsp, tsp, odhek chamoch"
+    },
+    "27": {
+        "text": "আধা চামচ করে দিনে ৩ বার",
+        "alias": "half spoon thrice, half tsp three times, half chamoch dine 3 bar, half, half tsp, tsp, odhek chamoch"
+    },
+    "28": {
+        "text": "আধা চামচ করে দিনে ১ বার",
+        "alias": "half spoon once, half tsp, half chamoch dine 1 bar, 0.5 tsp, half, half tsp, tsp"
+    },
+    "29": {
+        "text": "দেড় চামচ করে দিনে ২ বার",
+        "alias": "1.5 spoon twice, der chamoch dine 2 bar, tsp, 1.5c, 1.5 tsp twice"
+    },
+    "30": {
+        "text": "দেড় চামচ করে দিনে ৩ বার",
+        "alias": "1.5 spoon thrice, der chamoch dine 3 bar, tsp, 1.5c, 1.5 tsp thrice"
+    },
+    "31": {
+        "text": "২ চামচ করে দিনে ২ বার",
+        "alias": "2 spoons twice, 2 tsp twice, 2 chamoch dine 2 bar, 2c, tsp, dui chamoch dubar"
+    },
+    "32": {
+        "text": "২ চামচ করে দিনে ৩ বার",
+        "alias": "2 spoons thrice, 2 tsp three times, 2 chamoch dine 3 bar, 2c, tsp, dui chamoch tinbar"
+    },
+    "33": {
+        "text": "২ চামচ করে দিনে ১ বার",
+        "alias": "2 spoons once, 2 tsp, 2 chamoch dine 1 bar, 2c, tsp, dui chamoch"
+    },
+    "34": {
+        "text": "২ চামচ করে দিনে ৪ বার",
+        "alias": "2 spoons 4 times, 2 tsp four times, 2 chamoch dine 4 bar, 2c, tsp"
+    },
+    "35": {
+        "text": "আধা চামচ করে দিনে ৪ বার",
+        "alias": "half spoon 4 times, half tsp four times, half chamoch dine 4 bar, half, half tsp, tsp"
+    },
+    "36": {
+        "text": "আধা চামচ করে দিনে ৬ বার",
+        "alias": "half spoon 6 times, half tsp six times, half chamoch dine 6 bar, half, half tsp, tsp"
+    },
+    "37": {
+        "text": "২ চামচ করে দিনে ৫ বার",
+        "alias": "2 spoons 5 times, 2 tsp five times, 2 chamoch dine 5 bar, 2c, tsp"
+    },
+    "38": {
+        "text": "২ চামচ করে দিনে ৬ বার",
+        "alias": "2 spoons 6 times, 2 tsp six times, 2 chamoch dine 6 bar, 2c, tsp"
+    },
+    "39": {
+        "text": "১ ফোঁটা করে দিনে ২ বার",
+        "alias": "1 drop twice, eye drop twice, 1 fota dine 2 bar, 1 drop, eye drop, ear drop, nose drop, drop, ek fota dubar"
+    },
+    "40": {
+        "text": "১ ফোঁটা করে দিনে ৩ বার",
+        "alias": "1 drop thrice, 1 fota dine 3 bar, 1 drop, eye drop, ear drop, nose drop, drop, ek fota tinbar"
+    },
+    "41": {
+        "text": "১ ফোঁটা করে দিনে ১ বার",
+        "alias": "1 drop once, 1 fota, eye drop, ear drop, nose drop, drop, ek fota"
+    },
+    "42": {
+        "text": "১ ফোঁটা করে দিনে ৪ বার",
+        "alias": "1 drop 4 times, 1 fota dine 4 bar, 1 drop, eye drop, ear drop, nose drop, drop"
+    },
+    "43": {
+        "text": "২ ফোঁটা করে দিনে ২ বার",
+        "alias": "2 drops twice, 2 fota dine 2 bar, 2 drops, eye drop, ear drop, nose drop, drop, dui fota"
+    },
+    "44": {
+        "text": "২ ফোঁটা করে দিনে ৩ বার",
+        "alias": "2 drops thrice, 2 fota dine 3 bar, 2 drops, eye drop, ear drop, nose drop, drop"
+    },
+    "45": {
+        "text": "২ ফোঁটা করে দিনে ৪ বার",
+        "alias": "2 drops 4 times, 2 fota dine 4 bar, 2 drops, eye drop, ear drop, nose drop, drop"
+    },
+    "46": {
+        "text": "৫ ফোঁটা করে দিনে ২ বার",
+        "alias": "5 drops twice, 5 fota dine 2 bar, pach fota, 5 drops, eye drop, ear drop, nose drop, drop"
+    },
+    "47": {
+        "text": "৫ ফোঁটা করে দিনে ৩ বার",
+        "alias": "5 drops thrice, 5 fota dine 3 bar, pach fota, 5 drops, eye drop, ear drop, nose drop, drop"
+    },
+    "48": {
+        "text": "১০ ফোঁটা করে দিনে ৩ বার",
+        "alias": "10 drops thrice, 10 fota dine 3 bar, dosh fota, 10 drops, eye drop, ear drop, nose drop, drop"
+    },
+    "49": {
+        "text": "১৫ ফোঁটা করে দিনে ৩ বার",
+        "alias": "15 drops thrice, 15 fota dine 3 bar, ponero fota, 15 drops, eye drop, ear drop, nose drop, drop"
+    },
+    "50": {
+        "text": "২ চাপ করে দিনে ২ বার",
+        "alias": "2 puffs twice, 2 chap dine 2 bar, inhaler, spray, puff, puffs, dui chap"
+    },
+    "51": {
+        "text": "২ চাপ করে দিনে ৩ বার",
+        "alias": "2 puffs thrice, 2 chap dine 3 bar, 2 puffs, inhaler, spray, puff, puffs"
+    },
+    "52": {
+        "text": "১ চাপ করে দিনে ২ বার",
+        "alias": "1 puff twice, 1 chap dine 2 bar, inhaler, spray, puff, puffs, ek chap"
+    },
+    "53": {
+        "text": "১ চাপ করে দিনে ১ বার",
+        "alias": "1 puff once, 1 chap, inhaler puff, spray, puff, puffs, ek chap"
+    },
+    "54": {
+        "text": "২ চাপ করে দিনে ৪ বার",
+        "alias": "2 puffs four times, 2 chap dine 4 bar, 2 puffs, inhaler, spray, puff, puffs"
+    },
+    "55": {
+        "text": "আক্রান্ত স্থানে দৈনিক ২ বার লাগাবেন",
+        "alias": "apply twice daily, cream lagaben 2 bar, ointment, apply, cream, ointment, gel, makhben"
+    },
+    "56": {
+        "text": "আক্রান্ত স্থানে দৈনিক ৩ বার লাগাবেন",
+        "alias": "apply thrice daily, cream lagaben 3 bar, ointment, apply, cream, ointment, gel"
+    },
+    "57": {
+        "text": "আক্রান্ত স্থানে দৈনিক ১ বার লাগাবেন",
+        "alias": "apply once daily, cream lagaben 1 bar, ointment, apply, cream, ointment, gel"
+    },
+    "58": {
+        "text": "১টি করে পায়ুপথে দিনে ২ বার দিবেন",
+        "alias": "1 suppository twice, payupothe 2 bar, supp rectal, rectal, anal, paykhane, suppository"
+    },
+    "59": {
+        "text": "১টি করে পায়ুপথে দিনে ১ বার দিবেন",
+        "alias": "1 suppository once, 1টি পায়খানার রাস্তায় দেবেন, supp rectal, rectal, anal, paykhane, suppository"
+    },
+    "60": {
+        "text": "১টি করে সকালে ও ১টি করে রাতে খাবেন",
+        "alias": "1 tablet morning night, shokale rate, morning night, tablet, 101, 1+0+1, sokale rate, twice daily"
+    },
+    "61": {
+        "text": "১টি করে সকালে খাবেন",
+        "alias": "1 tablet morning, shokale khaben, ekta morning, tablet, 100, 1+0+0, sokale, once daily"
+    },
+    "62": {
+        "text": "১টি করে রাতে ঘুমানোর আগে খাবেন",
+        "alias": "1 tablet night, rate khaben, bedtime, ghumanor age, tablet, 001, 0+0+1, once daily"
+    },
+    "63": {
+        "text": "১টি করে দুপুরে খাবেন",
+        "alias": "1 tablet noon, dupure khaben, ekta dupure, tablet, 010, 0+1+0, once daily"
+    },
+    "64": {
+        "text": "১২ ঘণ্টা পর পর",
+        "alias": "every 12 hours, 12 ghonta por por, 12 hourly, baro ghonta"
+    },
+    "65": {
+        "text": "৮ ঘণ্টা পর পর",
+        "alias": "every 8 hours, 8 ghonta por por, 8 hourly, aat ghonta"
+    },
+    "66": {
+        "text": "৬ ঘণ্টা পর পর",
+        "alias": "every 6 hours, 6 ghonta por por, 6 hourly, choy ghonta"
+    },
+    "67": {
+        "text": "৪ ঘণ্টা পর পর",
+        "alias": "every 4 hours, 4 ghonta por por, 4 hourly, char ghonta"
+    },
+    "68": {
+        "text": "প্রতিদিন ১ বার",
+        "alias": "once daily, daily ekbar, 1 bar, protidin 1 bar, protidin ekbar"
+    },
+    "69": {
+        "text": "প্রতিদিন ২ বার",
+        "alias": "twice daily, daily dubar, 2 bar, protidin 2 bar, protidin dubar"
+    },
+    "70": {
+        "text": "প্রতিদিন ৩ বার",
+        "alias": "thrice daily, three times daily, daily tinbar, 3 bar, protidin 3 bar"
+    },
+    "71": {
+        "text": "প্রতিদিন ৪ বার",
+        "alias": "four times daily, daily charbar, 4 bar, protidin 4 bar"
+    },
+    "72": {
+        "text": "রোজ ১ বার",
+        "alias": "once daily, roj ekbar, 1 bar, roj 1 bar"
+    },
+    "73": {
+        "text": "রোজ ২ বার",
+        "alias": "twice daily, roj dubar, 2 bar, roj 2 bar"
+    },
+    "74": {
+        "text": "রোজ ৩ বার",
+        "alias": "thrice daily, three times daily, roj tinbar, 3 bar, roj 3 bar"
+    },
+    "75": {
+        "text": "রোজ ৪ বার",
+        "alias": "four times daily, roj charbar, 4 bar, roj 4 bar"
+    },
+    "76": {
+        "text": "দৈনিক ১ বার",
+        "alias": "once daily, dainik ekbar, 1 bar, dainik 1 bar"
+    },
+    "77": {
+        "text": "দৈনিক ২ বার",
+        "alias": "twice daily, dainik dubar, 2 bar, dainik 2 bar"
+    },
+    "78": {
+        "text": "দৈনিক ৩ বার",
+        "alias": "thrice daily, three times daily, dainik tinbar, 3 bar, dainik 3 bar"
+    },
+    "79": {
+        "text": "দৈনিক ৪ বার",
+        "alias": "four times daily, dainik charbar, 4 bar, dainik 4 bar"
+    },
+    "80": {
+        "text": "একদিন পর পর",
+        "alias": "alternate days, ekdin por por, ekdin bhalo ekdin por"
+    },
+    "81": {
+        "text": "সপ্তাহে ১ বার",
+        "alias": "once weekly, soptaho e 1 bar, soptah e ekbar, weekly, soptaho 1"
+    },
+    "82": {
+        "text": "সপ্তাহে ২ বার",
+        "alias": "twice weekly, soptaho e 2 bar, soptah e dubar, weekly twice, soptaho 2"
+    },
+    "83": {
+        "text": "১৫ দিন পর পর",
+        "alias": "every 15 days, 15 din por por, ponero din"
+    },
+    "84": {
+        "text": "মাসে ১ বার",
+        "alias": "once a month, mashe 1 bar, mase ekbar, monthly, mash 1"
+    },
+    "85": {
+        "text": "১টি ভায়াল মাংসপেশিতে দিনে ১ বার",
+        "alias": "1 vial IM once, 1v im 1 bar, injection, 1v, mangshe"
+    },
+    "86": {
+        "text": "১টি ভায়াল মাংসপেশিতে দিনে ২ বার",
+        "alias": "1 vial IM twice, 1v im 2 bar, injection, 1v, mangshe"
+    },
+    "87": {
+        "text": "১টি ভায়াল মাংসপেশিতে দিনে ৩ বার",
+        "alias": "1 vial IM thrice, 1v im 3 bar, injection, 1v, mangshe"
+    },
+    "88": {
+        "text": "১টি ভায়াল শিরায় দিনে ১ বার",
+        "alias": "1 vial IV once, 1v iv 1 bar, injection, 1v, shiray"
+    },
+    "89": {
+        "text": "১টি ভায়াল শিরায় দিনে ২ বার",
+        "alias": "1 vial IV twice, 1v iv 2 bar, injection, 1v, shiray"
+    },
+    "90": {
+        "text": "১টি ভায়াল শিরায় দিনে ৩ বার",
+        "alias": "1 vial IV thrice, 1v iv 3 bar, injection, 1v, shiray"
+    },
+    "91": {
+        "text": "১টি অ্যাম্পুল মাংসপেশিতে দিনে ১ বার",
+        "alias": "1 ampoule IM once, 1a im 1 bar, injection, 1a, mangshe"
+    },
+    "92": {
+        "text": "১টি অ্যাম্পুল শিরায় দিনে ১ বার",
+        "alias": "1 ampoule IV once, 1a iv 1 bar, injection, 1a, shiray"
+    }
+}

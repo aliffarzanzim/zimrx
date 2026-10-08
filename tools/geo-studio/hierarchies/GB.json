@@ -1,0 +1,4302 @@
+{
+    "manifest": {
+        "country_code": "GB",
+        "pack_type": "national",
+        "country_name": "United Kingdom",
+        "default_lang": "en",
+        "local_lang": "en",
+        "version": "1.0.0",
+        "release_date": "2026-10-07",
+        "last_updated": "2026-10-07",
+        "author": "Wikidata (Wikimedia Community)",
+        "contributors": [
+            "Wikimedia Contributors",
+            "Alif Farzan Zim"
+        ],
+        "license": "CC0-1.0",
+        "sources": [
+            "Wikidata SPARQL Query Service (https://query.wikidata.org) licensed under Creative Commons CC0 1.0 Universal Public Domain Dedication"
+        ],
+        "notes": "Administrative hierarchy dataset for the United Kingdom imported directly from Wikidata SPARQL Query Service (CC0-1.0 Public Domain). Contains constituent countries, ceremonial counties, council areas, principal areas, districts, boroughs, and towns."
+    },
+    "hierarchy": {
+        "model": "recursive_polymorphic",
+        "child_key": "places",
+        "levels": [
+            {
+                "depth": 1,
+                "types": [
+                    {
+                        "key": "country",
+                        "name_en": "Constituent Country",
+                        "name_loc": "Constituent Country"
+                    }
+                ]
+            },
+            {
+                "depth": 2,
+                "types": [
+                    {
+                        "key": "county",
+                        "name_en": "County",
+                        "name_loc": "County"
+                    },
+                    {
+                        "key": "council_area",
+                        "name_en": "Council Area",
+                        "name_loc": "Council Area"
+                    },
+                    {
+                        "key": "principal_area",
+                        "name_en": "Principal Area",
+                        "name_loc": "Principal Area"
+                    },
+                    {
+                        "key": "district",
+                        "name_en": "District",
+                        "name_loc": "District"
+                    }
+                ]
+            },
+            {
+                "depth": 3,
+                "types": [
+                    {
+                        "key": "district",
+                        "name_en": "District",
+                        "name_loc": "District"
+                    },
+                    {
+                        "key": "borough",
+                        "name_en": "Borough",
+                        "name_loc": "Borough"
+                    },
+                    {
+                        "key": "city",
+                        "name_en": "City",
+                        "name_loc": "City"
+                    },
+                    {
+                        "key": "town",
+                        "name_en": "Town",
+                        "name_loc": "Town"
+                    }
+                ]
+            }
+        ]
+    },
+    "places": [
+        {
+            "en": "England",
+            "loc": "England",
+            "type": "country",
+            "places": [
+                {
+                    "en": "Avon",
+                    "loc": "Avon",
+                    "type": "county"
+                },
+                {
+                    "en": "Bedfordshire",
+                    "loc": "Bedfordshire",
+                    "type": "county"
+                },
+                {
+                    "en": "Berkshire",
+                    "loc": "Berkshire",
+                    "type": "county"
+                },
+                {
+                    "en": "Buckinghamshire",
+                    "loc": "Buckinghamshire",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Amersham",
+                            "loc": "Amersham",
+                            "type": "town",
+                            "postcode": "HP7"
+                        },
+                        {
+                            "en": "Beaconsfield",
+                            "loc": "Beaconsfield",
+                            "type": "town",
+                            "postcode": "HP9"
+                        },
+                        {
+                            "en": "Chesham",
+                            "loc": "Chesham",
+                            "type": "town",
+                            "postcode": "HP5"
+                        },
+                        {
+                            "en": "Gerrards Cross",
+                            "loc": "Gerrards Cross",
+                            "type": "town",
+                            "postcode": "SL9"
+                        },
+                        {
+                            "en": "High Wycombe",
+                            "loc": "High Wycombe",
+                            "type": "town",
+                            "postcode": "HP14"
+                        },
+                        {
+                            "en": "Marlow",
+                            "loc": "Marlow",
+                            "type": "town",
+                            "postcode": "SL7"
+                        },
+                        {
+                            "en": "Princes Risborough",
+                            "loc": "Princes Risborough",
+                            "type": "town",
+                            "postcode": "HP27"
+                        },
+                        {
+                            "en": "Wendover",
+                            "loc": "Wendover",
+                            "type": "town",
+                            "postcode": "HP22"
+                        },
+                        {
+                            "en": "Winslow",
+                            "loc": "Winslow",
+                            "type": "town",
+                            "postcode": "MK18"
+                        }
+                    ]
+                },
+                {
+                    "en": "Cambridgeshire",
+                    "loc": "Cambridgeshire",
+                    "type": "county"
+                },
+                {
+                    "en": "Cheshire",
+                    "loc": "Cheshire",
+                    "type": "county"
+                },
+                {
+                    "en": "City of Bristol",
+                    "loc": "City of Bristol",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Bristol",
+                            "loc": "Bristol",
+                            "type": "city",
+                            "postcode": "BS"
+                        }
+                    ]
+                },
+                {
+                    "en": "City of London",
+                    "loc": "City of London",
+                    "type": "county"
+                },
+                {
+                    "en": "Cornwall",
+                    "loc": "Cornwall",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Bodmin",
+                            "loc": "Bodmin",
+                            "type": "town",
+                            "postcode": "PL31"
+                        },
+                        {
+                            "en": "Callington",
+                            "loc": "Callington",
+                            "type": "town",
+                            "postcode": "PL17"
+                        },
+                        {
+                            "en": "Camborne",
+                            "loc": "Camborne",
+                            "type": "town",
+                            "postcode": "TR14"
+                        },
+                        {
+                            "en": "Camelford",
+                            "loc": "Camelford",
+                            "type": "town",
+                            "postcode": "PL32"
+                        },
+                        {
+                            "en": "Hayle",
+                            "loc": "Hayle",
+                            "type": "town",
+                            "postcode": "TR27"
+                        },
+                        {
+                            "en": "Helston",
+                            "loc": "Helston",
+                            "type": "town",
+                            "postcode": "TR13"
+                        },
+                        {
+                            "en": "Launceston",
+                            "loc": "Launceston",
+                            "type": "town",
+                            "postcode": "PL15"
+                        },
+                        {
+                            "en": "Liskeard",
+                            "loc": "Liskeard",
+                            "type": "town",
+                            "postcode": "PL14"
+                        },
+                        {
+                            "en": "Liskeard",
+                            "loc": "Liskeard",
+                            "type": "town",
+                            "postcode": "PL14"
+                        },
+                        {
+                            "en": "Looe",
+                            "loc": "Looe",
+                            "type": "town",
+                            "postcode": "PL13"
+                        },
+                        {
+                            "en": "Lostwithiel",
+                            "loc": "Lostwithiel",
+                            "type": "town",
+                            "postcode": "PL22"
+                        },
+                        {
+                            "en": "Marazion",
+                            "loc": "Marazion",
+                            "type": "town",
+                            "postcode": "TR17"
+                        },
+                        {
+                            "en": "Newquay",
+                            "loc": "Newquay",
+                            "type": "town",
+                            "postcode": "TR7"
+                        },
+                        {
+                            "en": "Padstow",
+                            "loc": "Padstow",
+                            "type": "town",
+                            "postcode": "PL28"
+                        },
+                        {
+                            "en": "Penryn",
+                            "loc": "Penryn",
+                            "type": "town",
+                            "postcode": "TR10"
+                        },
+                        {
+                            "en": "Penzance",
+                            "loc": "Penzance",
+                            "type": "town",
+                            "postcode": "TR18"
+                        },
+                        {
+                            "en": "Porthleven",
+                            "loc": "Porthleven",
+                            "type": "town",
+                            "postcode": "TR13"
+                        },
+                        {
+                            "en": "Redruth",
+                            "loc": "Redruth",
+                            "type": "town",
+                            "postcode": "TR15"
+                        },
+                        {
+                            "en": "Saltash",
+                            "loc": "Saltash",
+                            "type": "town",
+                            "postcode": "PL12"
+                        },
+                        {
+                            "en": "St Austell",
+                            "loc": "St Austell",
+                            "type": "town",
+                            "postcode": "PL25"
+                        },
+                        {
+                            "en": "St Columb Major",
+                            "loc": "St Columb Major",
+                            "type": "town",
+                            "postcode": "TR9"
+                        },
+                        {
+                            "en": "St Ives",
+                            "loc": "St Ives",
+                            "type": "town",
+                            "postcode": "TR26"
+                        },
+                        {
+                            "en": "St Just",
+                            "loc": "St Just",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Torpoint",
+                            "loc": "Torpoint",
+                            "type": "town",
+                            "postcode": "PL11"
+                        },
+                        {
+                            "en": "Truro",
+                            "loc": "Truro",
+                            "type": "city",
+                            "postcode": "TR1"
+                        },
+                        {
+                            "en": "Wadebridge",
+                            "loc": "Wadebridge",
+                            "type": "town",
+                            "postcode": "PL27"
+                        }
+                    ]
+                },
+                {
+                    "en": "County Durham",
+                    "loc": "County Durham",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Barnard Castle",
+                            "loc": "Barnard Castle",
+                            "type": "town",
+                            "postcode": "DN12"
+                        },
+                        {
+                            "en": "Bishop Auckland",
+                            "loc": "Bishop Auckland",
+                            "type": "town",
+                            "postcode": "DL14"
+                        },
+                        {
+                            "en": "Chester-le-Street",
+                            "loc": "Chester-le-Street",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Consett",
+                            "loc": "Consett",
+                            "type": "town",
+                            "postcode": "DH8"
+                        },
+                        {
+                            "en": "Coxhoe",
+                            "loc": "Coxhoe",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Crook",
+                            "loc": "Crook",
+                            "type": "town",
+                            "postcode": "DL15"
+                        },
+                        {
+                            "en": "Durham",
+                            "loc": "Durham",
+                            "type": "city",
+                            "postcode": "DH1"
+                        },
+                        {
+                            "en": "Peterlee",
+                            "loc": "Peterlee",
+                            "type": "town",
+                            "postcode": "SR8"
+                        },
+                        {
+                            "en": "Seaham",
+                            "loc": "Seaham",
+                            "type": "town",
+                            "postcode": "SR7"
+                        },
+                        {
+                            "en": "Sedgefield",
+                            "loc": "Sedgefield",
+                            "type": "town",
+                            "postcode": "TS21"
+                        },
+                        {
+                            "en": "Shildon",
+                            "loc": "Shildon",
+                            "type": "town",
+                            "postcode": "DL4"
+                        },
+                        {
+                            "en": "Spennymoor",
+                            "loc": "Spennymoor",
+                            "type": "town",
+                            "postcode": "DL16"
+                        },
+                        {
+                            "en": "Stanley",
+                            "loc": "Stanley",
+                            "type": "town",
+                            "postcode": "DH9"
+                        },
+                        {
+                            "en": "Tow Law",
+                            "loc": "Tow Law",
+                            "type": "town",
+                            "postcode": "DL13"
+                        },
+                        {
+                            "en": "Wolsingham",
+                            "loc": "Wolsingham",
+                            "type": "town",
+                            "postcode": "DL13"
+                        }
+                    ]
+                },
+                {
+                    "en": "County of London",
+                    "loc": "County of London",
+                    "type": "county"
+                },
+                {
+                    "en": "Cumbria",
+                    "loc": "Cumbria",
+                    "type": "county"
+                },
+                {
+                    "en": "Derbyshire",
+                    "loc": "Derbyshire",
+                    "type": "county"
+                },
+                {
+                    "en": "Devon",
+                    "loc": "Devon",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Tavistock",
+                            "loc": "Tavistock",
+                            "type": "town",
+                            "postcode": "PL19"
+                        }
+                    ]
+                },
+                {
+                    "en": "Dorset",
+                    "loc": "Dorset",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Beaminster",
+                            "loc": "Beaminster",
+                            "type": "town",
+                            "postcode": "DT8"
+                        },
+                        {
+                            "en": "Blandford Forum",
+                            "loc": "Blandford Forum",
+                            "type": "town",
+                            "postcode": "DT11"
+                        },
+                        {
+                            "en": "Bridport",
+                            "loc": "Bridport",
+                            "type": "town",
+                            "postcode": "DT6"
+                        },
+                        {
+                            "en": "Chickerell",
+                            "loc": "Chickerell",
+                            "type": "town",
+                            "postcode": "DT3"
+                        },
+                        {
+                            "en": "Gillingham",
+                            "loc": "Gillingham",
+                            "type": "town",
+                            "postcode": "SP8"
+                        },
+                        {
+                            "en": "Lyme Regis",
+                            "loc": "Lyme Regis",
+                            "type": "town",
+                            "postcode": "DT7"
+                        },
+                        {
+                            "en": "Portland",
+                            "loc": "Portland",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Shaftesbury",
+                            "loc": "Shaftesbury",
+                            "type": "town",
+                            "postcode": "SP7"
+                        },
+                        {
+                            "en": "Sherborne",
+                            "loc": "Sherborne",
+                            "type": "town",
+                            "postcode": "DT9"
+                        },
+                        {
+                            "en": "Stalbridge",
+                            "loc": "Stalbridge",
+                            "type": "town",
+                            "postcode": "DT10"
+                        },
+                        {
+                            "en": "Sturminster Newton",
+                            "loc": "Sturminster Newton",
+                            "type": "town",
+                            "postcode": "DT10"
+                        },
+                        {
+                            "en": "Swanage",
+                            "loc": "Swanage",
+                            "type": "town",
+                            "postcode": "BH19"
+                        },
+                        {
+                            "en": "Verwood",
+                            "loc": "Verwood",
+                            "type": "town",
+                            "postcode": "BH31"
+                        },
+                        {
+                            "en": "Wareham",
+                            "loc": "Wareham",
+                            "type": "town",
+                            "postcode": "BH20"
+                        },
+                        {
+                            "en": "Weymouth",
+                            "loc": "Weymouth",
+                            "type": "town",
+                            "postcode": "DT4"
+                        },
+                        {
+                            "en": "Wimborne Minster",
+                            "loc": "Wimborne Minster",
+                            "type": "town",
+                            "postcode": "BH21"
+                        }
+                    ]
+                },
+                {
+                    "en": "East Riding of Yorkshire",
+                    "loc": "East Riding of Yorkshire",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Beverley",
+                            "loc": "Beverley",
+                            "type": "town",
+                            "postcode": "HU17"
+                        },
+                        {
+                            "en": "Bridlington",
+                            "loc": "Bridlington",
+                            "type": "town",
+                            "postcode": "YO16"
+                        },
+                        {
+                            "en": "Goole",
+                            "loc": "Goole",
+                            "type": "town",
+                            "postcode": "DN14"
+                        },
+                        {
+                            "en": "Hedon",
+                            "loc": "Hedon",
+                            "type": "town",
+                            "postcode": "HU12"
+                        },
+                        {
+                            "en": "Hessle",
+                            "loc": "Hessle",
+                            "type": "town",
+                            "postcode": "HU13"
+                        },
+                        {
+                            "en": "Hornsea",
+                            "loc": "Hornsea",
+                            "type": "town",
+                            "postcode": "HU18"
+                        },
+                        {
+                            "en": "Howden",
+                            "loc": "Howden",
+                            "type": "town",
+                            "postcode": "DN14"
+                        },
+                        {
+                            "en": "Market Weighton",
+                            "loc": "Market Weighton",
+                            "type": "town",
+                            "postcode": "YO43"
+                        },
+                        {
+                            "en": "Pocklington",
+                            "loc": "Pocklington",
+                            "type": "town",
+                            "postcode": "YO42"
+                        },
+                        {
+                            "en": "Withernsea",
+                            "loc": "Withernsea",
+                            "type": "town",
+                            "postcode": "HU19"
+                        }
+                    ]
+                },
+                {
+                    "en": "East Sussex",
+                    "loc": "East Sussex",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Brighton and Hove",
+                            "loc": "Brighton and Hove",
+                            "type": "city",
+                            "postcode": "BN1"
+                        }
+                    ]
+                },
+                {
+                    "en": "Essex",
+                    "loc": "Essex",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Camulodunum",
+                            "loc": "Camulodunum",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "Gloucestershire",
+                    "loc": "Gloucestershire",
+                    "type": "county"
+                },
+                {
+                    "en": "Greater London",
+                    "loc": "Greater London",
+                    "type": "county",
+                    "postcode": "SW",
+                    "places": [
+                        {
+                            "en": "City of London",
+                            "loc": "City of London",
+                            "type": "city"
+                        },
+                        {
+                            "en": "City of Westminster",
+                            "loc": "City of Westminster",
+                            "type": "city",
+                            "postcode": "W"
+                        },
+                        {
+                            "en": "London",
+                            "loc": "London",
+                            "type": "city",
+                            "postcode": "W"
+                        }
+                    ]
+                },
+                {
+                    "en": "Greater Manchester",
+                    "loc": "Greater Manchester",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Bolton",
+                            "loc": "Bolton",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Bury",
+                            "loc": "Bury",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Manchester",
+                            "loc": "Manchester",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Oldham",
+                            "loc": "Oldham",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Rochdale",
+                            "loc": "Rochdale",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Salford",
+                            "loc": "Salford",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Stockport",
+                            "loc": "Stockport",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Tameside",
+                            "loc": "Tameside",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Trafford",
+                            "loc": "Trafford",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Wigan",
+                            "loc": "Wigan",
+                            "type": "district"
+                        }
+                    ]
+                },
+                {
+                    "en": "Hampshire",
+                    "loc": "Hampshire",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Bordon",
+                            "loc": "Bordon",
+                            "type": "town",
+                            "postcode": "GU35"
+                        }
+                    ]
+                },
+                {
+                    "en": "Herefordshire",
+                    "loc": "Herefordshire",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Hereford",
+                            "loc": "Hereford",
+                            "type": "city",
+                            "postcode": "HR1"
+                        },
+                        {
+                            "en": "Kington",
+                            "loc": "Kington",
+                            "type": "town",
+                            "postcode": "HR5"
+                        },
+                        {
+                            "en": "Ledbury",
+                            "loc": "Ledbury",
+                            "type": "town",
+                            "postcode": "HR8"
+                        },
+                        {
+                            "en": "Leominster",
+                            "loc": "Leominster",
+                            "type": "town",
+                            "postcode": "HR6"
+                        },
+                        {
+                            "en": "Ross-on-Wye",
+                            "loc": "Ross-on-Wye",
+                            "type": "town",
+                            "postcode": "HR9"
+                        }
+                    ]
+                },
+                {
+                    "en": "Hertfordshire",
+                    "loc": "Hertfordshire",
+                    "type": "county"
+                },
+                {
+                    "en": "Humberside",
+                    "loc": "Humberside",
+                    "type": "county"
+                },
+                {
+                    "en": "Isle of Wight",
+                    "loc": "Isle of Wight",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Brading",
+                            "loc": "Brading",
+                            "type": "town",
+                            "postcode": "PO36"
+                        },
+                        {
+                            "en": "Cowes",
+                            "loc": "Cowes",
+                            "type": "town",
+                            "postcode": "PO31"
+                        },
+                        {
+                            "en": "East Cowes",
+                            "loc": "East Cowes",
+                            "type": "town",
+                            "postcode": "PO32"
+                        },
+                        {
+                            "en": "Ryde",
+                            "loc": "Ryde",
+                            "type": "town",
+                            "postcode": "PO33"
+                        },
+                        {
+                            "en": "Sandown",
+                            "loc": "Sandown",
+                            "type": "town",
+                            "postcode": "PO36"
+                        },
+                        {
+                            "en": "Shanklin",
+                            "loc": "Shanklin",
+                            "type": "town",
+                            "postcode": "PO37"
+                        },
+                        {
+                            "en": "Ventnor",
+                            "loc": "Ventnor",
+                            "type": "town",
+                            "postcode": "PO38"
+                        },
+                        {
+                            "en": "Yarmouth",
+                            "loc": "Yarmouth",
+                            "type": "town",
+                            "postcode": "PO41"
+                        }
+                    ]
+                },
+                {
+                    "en": "Kent",
+                    "loc": "Kent",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Dartford",
+                            "loc": "Dartford",
+                            "type": "town",
+                            "postcode": "DA"
+                        }
+                    ]
+                },
+                {
+                    "en": "Lancashire",
+                    "loc": "Lancashire",
+                    "type": "county"
+                },
+                {
+                    "en": "Leicestershire",
+                    "loc": "Leicestershire",
+                    "type": "county"
+                },
+                {
+                    "en": "Lincolnshire",
+                    "loc": "Lincolnshire",
+                    "type": "county"
+                },
+                {
+                    "en": "Merseyside",
+                    "loc": "Merseyside",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Knowsley",
+                            "loc": "Knowsley",
+                            "type": "district",
+                            "postcode": "L36 9YU"
+                        },
+                        {
+                            "en": "Liverpool",
+                            "loc": "Liverpool",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Sefton",
+                            "loc": "Sefton",
+                            "type": "district",
+                            "postcode": "L10, L20 - L23, L29 - L31, L37, L38"
+                        },
+                        {
+                            "en": "St Helens",
+                            "loc": "St Helens",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Wirral",
+                            "loc": "Wirral",
+                            "type": "district"
+                        }
+                    ]
+                },
+                {
+                    "en": "Middlesex",
+                    "loc": "Middlesex",
+                    "type": "county",
+                    "postcode": "TW"
+                },
+                {
+                    "en": "Norfolk",
+                    "loc": "Norfolk",
+                    "type": "county"
+                },
+                {
+                    "en": "North Yorkshire",
+                    "loc": "North Yorkshire",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Bedale",
+                            "loc": "Bedale",
+                            "type": "town",
+                            "postcode": "DL8"
+                        },
+                        {
+                            "en": "Boroughbridge",
+                            "loc": "Boroughbridge",
+                            "type": "town",
+                            "postcode": "YO51"
+                        },
+                        {
+                            "en": "Colburn",
+                            "loc": "Colburn",
+                            "type": "town",
+                            "postcode": "DL9"
+                        },
+                        {
+                            "en": "Filey",
+                            "loc": "Filey",
+                            "type": "town",
+                            "postcode": "YO14"
+                        },
+                        {
+                            "en": "Harrogate",
+                            "loc": "Harrogate",
+                            "type": "town",
+                            "postcode": "HG3"
+                        },
+                        {
+                            "en": "Hawes",
+                            "loc": "Hawes",
+                            "type": "town",
+                            "postcode": "DL8"
+                        },
+                        {
+                            "en": "Helmsley",
+                            "loc": "Helmsley",
+                            "type": "town",
+                            "postcode": "YO62"
+                        },
+                        {
+                            "en": "Kirkbymoorside",
+                            "loc": "Kirkbymoorside",
+                            "type": "town",
+                            "postcode": "YO62"
+                        },
+                        {
+                            "en": "Knaresborough",
+                            "loc": "Knaresborough",
+                            "type": "town",
+                            "postcode": "HG5"
+                        },
+                        {
+                            "en": "Leyburn",
+                            "loc": "Leyburn",
+                            "type": "town",
+                            "postcode": "DL8"
+                        },
+                        {
+                            "en": "Malton",
+                            "loc": "Malton",
+                            "type": "town",
+                            "postcode": "YO17"
+                        },
+                        {
+                            "en": "Masham",
+                            "loc": "Masham",
+                            "type": "town",
+                            "postcode": "HG4"
+                        },
+                        {
+                            "en": "Middleham",
+                            "loc": "Middleham",
+                            "type": "town",
+                            "postcode": "DL8"
+                        },
+                        {
+                            "en": "Northallerton",
+                            "loc": "Northallerton",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Norton-on-Derwent",
+                            "loc": "Norton-on-Derwent",
+                            "type": "town",
+                            "postcode": "YO17"
+                        },
+                        {
+                            "en": "Pickering",
+                            "loc": "Pickering",
+                            "type": "town",
+                            "postcode": "YO18"
+                        },
+                        {
+                            "en": "Richmond",
+                            "loc": "Richmond",
+                            "type": "town",
+                            "postcode": "DL10"
+                        },
+                        {
+                            "en": "Ripon",
+                            "loc": "Ripon",
+                            "type": "city",
+                            "postcode": "HG4"
+                        },
+                        {
+                            "en": "Scarborough",
+                            "loc": "Scarborough",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Selby",
+                            "loc": "Selby",
+                            "type": "town",
+                            "postcode": "YO8"
+                        },
+                        {
+                            "en": "Settle",
+                            "loc": "Settle",
+                            "type": "town",
+                            "postcode": "BD24"
+                        },
+                        {
+                            "en": "Skipton",
+                            "loc": "Skipton",
+                            "type": "town",
+                            "postcode": "BD23"
+                        },
+                        {
+                            "en": "Stokesley",
+                            "loc": "Stokesley",
+                            "type": "town",
+                            "postcode": "TS9"
+                        },
+                        {
+                            "en": "Tadcaster",
+                            "loc": "Tadcaster",
+                            "type": "town",
+                            "postcode": "LS24"
+                        }
+                    ]
+                },
+                {
+                    "en": "Northamptonshire",
+                    "loc": "Northamptonshire",
+                    "type": "county"
+                },
+                {
+                    "en": "Northumberland",
+                    "loc": "Northumberland",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Ashington",
+                            "loc": "Ashington",
+                            "type": "town",
+                            "postcode": "NE63"
+                        },
+                        {
+                            "en": "Berwick-upon-Tweed",
+                            "loc": "Berwick-upon-Tweed",
+                            "type": "town",
+                            "postcode": "TD15"
+                        },
+                        {
+                            "en": "Blyth",
+                            "loc": "Blyth",
+                            "type": "town",
+                            "postcode": "NE24"
+                        },
+                        {
+                            "en": "Cramlington",
+                            "loc": "Cramlington",
+                            "type": "town",
+                            "postcode": "NE23"
+                        },
+                        {
+                            "en": "Haltwhistle",
+                            "loc": "Haltwhistle",
+                            "type": "town",
+                            "postcode": "NE49"
+                        },
+                        {
+                            "en": "Morpeth",
+                            "loc": "Morpeth",
+                            "type": "town",
+                            "postcode": "NE61"
+                        },
+                        {
+                            "en": "Newbiggin-by-the-Sea",
+                            "loc": "Newbiggin-by-the-Sea",
+                            "type": "town",
+                            "postcode": "NE64"
+                        },
+                        {
+                            "en": "Prudhoe",
+                            "loc": "Prudhoe",
+                            "type": "town",
+                            "postcode": "NE42"
+                        },
+                        {
+                            "en": "Wooler",
+                            "loc": "Wooler",
+                            "type": "town",
+                            "postcode": "NE71"
+                        }
+                    ]
+                },
+                {
+                    "en": "Nottinghamshire",
+                    "loc": "Nottinghamshire",
+                    "type": "county"
+                },
+                {
+                    "en": "Oxfordshire",
+                    "loc": "Oxfordshire",
+                    "type": "county"
+                },
+                {
+                    "en": "Rutland",
+                    "loc": "Rutland",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Uppingham",
+                            "loc": "Uppingham",
+                            "type": "town",
+                            "postcode": "LE15"
+                        }
+                    ]
+                },
+                {
+                    "en": "Shropshire",
+                    "loc": "Shropshire",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Bishop's Castle",
+                            "loc": "Bishop's Castle",
+                            "type": "town",
+                            "postcode": "SY9"
+                        },
+                        {
+                            "en": "Bridgnorth",
+                            "loc": "Bridgnorth",
+                            "type": "town",
+                            "postcode": "WV15, WV16"
+                        },
+                        {
+                            "en": "Broseley",
+                            "loc": "Broseley",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Church Stretton",
+                            "loc": "Church Stretton",
+                            "type": "town",
+                            "postcode": "SY6"
+                        },
+                        {
+                            "en": "Cleobury Mortimer",
+                            "loc": "Cleobury Mortimer",
+                            "type": "town",
+                            "postcode": "DY14"
+                        },
+                        {
+                            "en": "Clun",
+                            "loc": "Clun",
+                            "type": "town",
+                            "postcode": "SY7"
+                        },
+                        {
+                            "en": "Craven Arms",
+                            "loc": "Craven Arms",
+                            "type": "town",
+                            "postcode": "SY7"
+                        },
+                        {
+                            "en": "Ludlow",
+                            "loc": "Ludlow",
+                            "type": "town",
+                            "postcode": "SY8"
+                        },
+                        {
+                            "en": "Market Drayton",
+                            "loc": "Market Drayton",
+                            "type": "town",
+                            "postcode": "TF9"
+                        },
+                        {
+                            "en": "Much Wenlock",
+                            "loc": "Much Wenlock",
+                            "type": "town",
+                            "postcode": "TF13"
+                        },
+                        {
+                            "en": "Shifnal",
+                            "loc": "Shifnal",
+                            "type": "town",
+                            "postcode": "TF11"
+                        }
+                    ]
+                },
+                {
+                    "en": "Somerset",
+                    "loc": "Somerset",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Bridgwater",
+                            "loc": "Bridgwater",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Bruton",
+                            "loc": "Bruton",
+                            "type": "town",
+                            "postcode": "BA10"
+                        },
+                        {
+                            "en": "Castle Cary",
+                            "loc": "Castle Cary",
+                            "type": "town",
+                            "postcode": "BA7"
+                        },
+                        {
+                            "en": "Chard",
+                            "loc": "Chard",
+                            "type": "town",
+                            "postcode": "TA20"
+                        },
+                        {
+                            "en": "Crewkerne",
+                            "loc": "Crewkerne",
+                            "type": "town",
+                            "postcode": "TA18"
+                        },
+                        {
+                            "en": "Dulverton",
+                            "loc": "Dulverton",
+                            "type": "town",
+                            "postcode": "TA22"
+                        },
+                        {
+                            "en": "Frome",
+                            "loc": "Frome",
+                            "type": "town",
+                            "postcode": "BA11"
+                        },
+                        {
+                            "en": "Glastonbury",
+                            "loc": "Glastonbury",
+                            "type": "town",
+                            "postcode": "BA6"
+                        },
+                        {
+                            "en": "Ilminster",
+                            "loc": "Ilminster",
+                            "type": "town",
+                            "postcode": "TA19"
+                        },
+                        {
+                            "en": "Langport",
+                            "loc": "Langport",
+                            "type": "town",
+                            "postcode": "TA10"
+                        },
+                        {
+                            "en": "Minehead",
+                            "loc": "Minehead",
+                            "type": "town",
+                            "postcode": "TA24"
+                        },
+                        {
+                            "en": "North Petherton",
+                            "loc": "North Petherton",
+                            "type": "town",
+                            "postcode": "TA6"
+                        },
+                        {
+                            "en": "Shepton Mallet",
+                            "loc": "Shepton Mallet",
+                            "type": "town",
+                            "postcode": "BA4"
+                        },
+                        {
+                            "en": "Somerton",
+                            "loc": "Somerton",
+                            "type": "town",
+                            "postcode": "TA11"
+                        },
+                        {
+                            "en": "South Petherton",
+                            "loc": "South Petherton",
+                            "type": "town",
+                            "postcode": "TA13"
+                        },
+                        {
+                            "en": "Watchet",
+                            "loc": "Watchet",
+                            "type": "town",
+                            "postcode": "TA23"
+                        },
+                        {
+                            "en": "Wellington",
+                            "loc": "Wellington",
+                            "type": "town",
+                            "postcode": "TA21"
+                        },
+                        {
+                            "en": "Wells",
+                            "loc": "Wells",
+                            "type": "city",
+                            "postcode": "BA5"
+                        },
+                        {
+                            "en": "Williton",
+                            "loc": "Williton",
+                            "type": "town",
+                            "postcode": "TA4"
+                        },
+                        {
+                            "en": "Wincanton",
+                            "loc": "Wincanton",
+                            "type": "town",
+                            "postcode": "BA9"
+                        },
+                        {
+                            "en": "Wiveliscombe",
+                            "loc": "Wiveliscombe",
+                            "type": "town",
+                            "postcode": "TA4"
+                        },
+                        {
+                            "en": "Yeovil",
+                            "loc": "Yeovil",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "South Yorkshire",
+                    "loc": "South Yorkshire",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Barnsley",
+                            "loc": "Barnsley",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Doncaster",
+                            "loc": "Doncaster",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Rotherham",
+                            "loc": "Rotherham",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Sheffield",
+                            "loc": "Sheffield",
+                            "type": "district"
+                        }
+                    ]
+                },
+                {
+                    "en": "Staffordshire",
+                    "loc": "Staffordshire",
+                    "type": "county"
+                },
+                {
+                    "en": "Suffolk",
+                    "loc": "Suffolk",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Dommoc",
+                            "loc": "Dommoc",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "Surrey",
+                    "loc": "Surrey",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Godalming",
+                            "loc": "Godalming",
+                            "type": "town",
+                            "postcode": "GU7"
+                        }
+                    ]
+                },
+                {
+                    "en": "Tyne and Wear",
+                    "loc": "Tyne and Wear",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Gateshead",
+                            "loc": "Gateshead",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Newcastle upon Tyne",
+                            "loc": "Newcastle upon Tyne",
+                            "type": "district"
+                        },
+                        {
+                            "en": "North Tyneside",
+                            "loc": "North Tyneside",
+                            "type": "district"
+                        },
+                        {
+                            "en": "South Tyneside",
+                            "loc": "South Tyneside",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Sunderland",
+                            "loc": "Sunderland",
+                            "type": "district"
+                        }
+                    ]
+                },
+                {
+                    "en": "Warwickshire",
+                    "loc": "Warwickshire",
+                    "type": "county"
+                },
+                {
+                    "en": "West Midlands",
+                    "loc": "West Midlands",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Birmingham",
+                            "loc": "Birmingham",
+                            "type": "district"
+                        },
+                        {
+                            "en": "City of Wolverhampton",
+                            "loc": "City of Wolverhampton",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Coventry",
+                            "loc": "Coventry",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Dudley",
+                            "loc": "Dudley",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Sandwell",
+                            "loc": "Sandwell",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Solihull",
+                            "loc": "Solihull",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Walsall",
+                            "loc": "Walsall",
+                            "type": "district"
+                        }
+                    ]
+                },
+                {
+                    "en": "West Sussex",
+                    "loc": "West Sussex",
+                    "type": "county"
+                },
+                {
+                    "en": "West Yorkshire",
+                    "loc": "West Yorkshire",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Bradford",
+                            "loc": "Bradford",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Calderdale",
+                            "loc": "Calderdale",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Kirklees",
+                            "loc": "Kirklees",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Leeds",
+                            "loc": "Leeds",
+                            "type": "district"
+                        },
+                        {
+                            "en": "Wakefield",
+                            "loc": "Wakefield",
+                            "type": "district"
+                        }
+                    ]
+                },
+                {
+                    "en": "Wiltshire",
+                    "loc": "Wiltshire",
+                    "type": "county",
+                    "places": [
+                        {
+                            "en": "Bradford-on-Avon",
+                            "loc": "Bradford-on-Avon",
+                            "type": "town",
+                            "postcode": "BA15"
+                        },
+                        {
+                            "en": "Calne",
+                            "loc": "Calne",
+                            "type": "town",
+                            "postcode": "SN11"
+                        },
+                        {
+                            "en": "Chippenham",
+                            "loc": "Chippenham",
+                            "type": "town",
+                            "postcode": "SN14, SN15"
+                        },
+                        {
+                            "en": "Corsham",
+                            "loc": "Corsham",
+                            "type": "town",
+                            "postcode": "SN13"
+                        },
+                        {
+                            "en": "Cricklade",
+                            "loc": "Cricklade",
+                            "type": "town",
+                            "postcode": "SN6"
+                        },
+                        {
+                            "en": "Devizes",
+                            "loc": "Devizes",
+                            "type": "town",
+                            "postcode": "SN10"
+                        },
+                        {
+                            "en": "Malmesbury",
+                            "loc": "Malmesbury",
+                            "type": "town",
+                            "postcode": "SN16"
+                        },
+                        {
+                            "en": "Melksham",
+                            "loc": "Melksham",
+                            "type": "town",
+                            "postcode": "SN12"
+                        },
+                        {
+                            "en": "Mere",
+                            "loc": "Mere",
+                            "type": "town",
+                            "postcode": "BA12"
+                        },
+                        {
+                            "en": "Royal Wootton Bassett",
+                            "loc": "Royal Wootton Bassett",
+                            "type": "town",
+                            "postcode": "SN4"
+                        },
+                        {
+                            "en": "Salisbury",
+                            "loc": "Salisbury",
+                            "type": "city",
+                            "postcode": "SP1"
+                        },
+                        {
+                            "en": "Tidworth",
+                            "loc": "Tidworth",
+                            "type": "town",
+                            "postcode": "SP9"
+                        },
+                        {
+                            "en": "Warminster",
+                            "loc": "Warminster",
+                            "type": "town",
+                            "postcode": "BA12"
+                        },
+                        {
+                            "en": "Westbury",
+                            "loc": "Westbury",
+                            "type": "town",
+                            "postcode": "BA13"
+                        },
+                        {
+                            "en": "Wilton",
+                            "loc": "Wilton",
+                            "type": "town",
+                            "postcode": "SP2"
+                        }
+                    ]
+                },
+                {
+                    "en": "Worcestershire",
+                    "loc": "Worcestershire",
+                    "type": "county"
+                }
+            ]
+        },
+        {
+            "en": "Scotland",
+            "loc": "Scotland",
+            "type": "country",
+            "places": [
+                {
+                    "en": "Aberdeen City",
+                    "loc": "Aberdeen City",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Aberdeen",
+                            "loc": "Aberdeen",
+                            "type": "city",
+                            "postcode": "AB10-AB13 (parte), AB15, AB16, AB22-AB25"
+                        },
+                        {
+                            "en": "Dyce",
+                            "loc": "Dyce",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "Aberdeenshire",
+                    "loc": "Aberdeenshire",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Ballater",
+                            "loc": "Ballater",
+                            "type": "town",
+                            "postcode": "AB35"
+                        },
+                        {
+                            "en": "Banchory",
+                            "loc": "Banchory",
+                            "type": "town",
+                            "postcode": "AB31"
+                        },
+                        {
+                            "en": "Banff",
+                            "loc": "Banff",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Blackburn",
+                            "loc": "Blackburn",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Ellon",
+                            "loc": "Ellon",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Fraserburgh",
+                            "loc": "Fraserburgh",
+                            "type": "town",
+                            "postcode": "AB43"
+                        },
+                        {
+                            "en": "Huntly",
+                            "loc": "Huntly",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Inverbervie",
+                            "loc": "Inverbervie",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Inverurie",
+                            "loc": "Inverurie",
+                            "type": "town",
+                            "postcode": "AB51"
+                        },
+                        {
+                            "en": "Kemnay",
+                            "loc": "Kemnay",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Kintore",
+                            "loc": "Kintore",
+                            "type": "town",
+                            "postcode": "AB51"
+                        },
+                        {
+                            "en": "Laurencekirk",
+                            "loc": "Laurencekirk",
+                            "type": "town",
+                            "postcode": "AB30"
+                        },
+                        {
+                            "en": "Macduff",
+                            "loc": "Macduff",
+                            "type": "town",
+                            "postcode": "AB44"
+                        },
+                        {
+                            "en": "Maud",
+                            "loc": "Maud",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Peterhead",
+                            "loc": "Peterhead",
+                            "type": "town",
+                            "postcode": "AB42"
+                        },
+                        {
+                            "en": "Portlethen",
+                            "loc": "Portlethen",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Rosehearty",
+                            "loc": "Rosehearty",
+                            "type": "town",
+                            "postcode": "AB43"
+                        },
+                        {
+                            "en": "Stonehaven",
+                            "loc": "Stonehaven",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Turriff",
+                            "loc": "Turriff",
+                            "type": "town",
+                            "postcode": "AB53"
+                        },
+                        {
+                            "en": "Westhill",
+                            "loc": "Westhill",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "Angus",
+                    "loc": "Angus",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Arbroath",
+                            "loc": "Arbroath",
+                            "type": "town",
+                            "postcode": "DD11"
+                        },
+                        {
+                            "en": "Brechin",
+                            "loc": "Brechin",
+                            "type": "town",
+                            "postcode": "DD9"
+                        },
+                        {
+                            "en": "Broughty Ferry",
+                            "loc": "Broughty Ferry",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Carnoustie",
+                            "loc": "Carnoustie",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Forfar",
+                            "loc": "Forfar",
+                            "type": "town",
+                            "postcode": "DD8"
+                        },
+                        {
+                            "en": "Kirriemuir",
+                            "loc": "Kirriemuir",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Monifieth",
+                            "loc": "Monifieth",
+                            "type": "town",
+                            "postcode": "DD5"
+                        },
+                        {
+                            "en": "Montrose",
+                            "loc": "Montrose",
+                            "type": "town",
+                            "postcode": "DD10"
+                        }
+                    ]
+                },
+                {
+                    "en": "Argyll and Bute",
+                    "loc": "Argyll and Bute",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Campbeltown",
+                            "loc": "Campbeltown",
+                            "type": "town",
+                            "postcode": "PA28"
+                        },
+                        {
+                            "en": "Dunoon",
+                            "loc": "Dunoon",
+                            "type": "town",
+                            "postcode": "PA23"
+                        },
+                        {
+                            "en": "Helensburgh",
+                            "loc": "Helensburgh",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Inveraray",
+                            "loc": "Inveraray",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Lochgilphead",
+                            "loc": "Lochgilphead",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Oban",
+                            "loc": "Oban",
+                            "type": "town",
+                            "postcode": "PA34"
+                        },
+                        {
+                            "en": "Rothesay",
+                            "loc": "Rothesay",
+                            "type": "town",
+                            "postcode": "PA20"
+                        },
+                        {
+                            "en": "Tobermory",
+                            "loc": "Tobermory",
+                            "type": "town",
+                            "postcode": "PA75"
+                        }
+                    ]
+                },
+                {
+                    "en": "City of Edinburgh",
+                    "loc": "City of Edinburgh",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Edinburgh",
+                            "loc": "Edinburgh",
+                            "type": "city",
+                            "postcode": "EH1-EH13"
+                        },
+                        {
+                            "en": "Leith",
+                            "loc": "Leith",
+                            "type": "town"
+                        },
+                        {
+                            "en": "South Queensferry",
+                            "loc": "South Queensferry",
+                            "type": "town",
+                            "postcode": "EH30"
+                        }
+                    ]
+                },
+                {
+                    "en": "Clackmannanshire",
+                    "loc": "Clackmannanshire",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Alloa",
+                            "loc": "Alloa",
+                            "type": "town",
+                            "postcode": "FK10"
+                        },
+                        {
+                            "en": "Alva",
+                            "loc": "Alva",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Clackmannan",
+                            "loc": "Clackmannan",
+                            "type": "town",
+                            "postcode": "FK10"
+                        },
+                        {
+                            "en": "Dollar",
+                            "loc": "Dollar",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Menstrie",
+                            "loc": "Menstrie",
+                            "type": "town",
+                            "postcode": "FK11"
+                        },
+                        {
+                            "en": "Tillicoultry",
+                            "loc": "Tillicoultry",
+                            "type": "town",
+                            "postcode": "FK13"
+                        },
+                        {
+                            "en": "Tullibody",
+                            "loc": "Tullibody",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "Dumfries and Galloway",
+                    "loc": "Dumfries and Galloway",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Annan",
+                            "loc": "Annan",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Castle Douglas",
+                            "loc": "Castle Douglas",
+                            "type": "town",
+                            "postcode": "DG7"
+                        },
+                        {
+                            "en": "Creetown",
+                            "loc": "Creetown",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Dalbeattie",
+                            "loc": "Dalbeattie",
+                            "type": "town",
+                            "postcode": "DG5"
+                        },
+                        {
+                            "en": "Dumfries",
+                            "loc": "Dumfries",
+                            "type": "town",
+                            "postcode": "DG1–DG2"
+                        },
+                        {
+                            "en": "Gatehouse of Fleet",
+                            "loc": "Gatehouse of Fleet",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Gretna",
+                            "loc": "Gretna",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Kirkconnel",
+                            "loc": "Kirkconnel",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Kirkcudbright",
+                            "loc": "Kirkcudbright",
+                            "type": "town",
+                            "postcode": "DG6"
+                        },
+                        {
+                            "en": "Langholm",
+                            "loc": "Langholm",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Lochmaben",
+                            "loc": "Lochmaben",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Lockerbie",
+                            "loc": "Lockerbie",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Moffat",
+                            "loc": "Moffat",
+                            "type": "town",
+                            "postcode": "DG10"
+                        },
+                        {
+                            "en": "Newton Stewart",
+                            "loc": "Newton Stewart",
+                            "type": "town",
+                            "postcode": "DG8"
+                        },
+                        {
+                            "en": "Sanquhar",
+                            "loc": "Sanquhar",
+                            "type": "town",
+                            "postcode": "EH32"
+                        },
+                        {
+                            "en": "Stranraer",
+                            "loc": "Stranraer",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Thornhill",
+                            "loc": "Thornhill",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Whithorn",
+                            "loc": "Whithorn",
+                            "type": "town",
+                            "postcode": "DG8"
+                        },
+                        {
+                            "en": "Wigtown",
+                            "loc": "Wigtown",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "Dundee City",
+                    "loc": "Dundee City",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Broughty Ferry",
+                            "loc": "Broughty Ferry",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Dundee",
+                            "loc": "Dundee",
+                            "type": "city",
+                            "postcode": "DD1, DD2, DD3, DD4, DD5"
+                        }
+                    ]
+                },
+                {
+                    "en": "East Ayrshire",
+                    "loc": "East Ayrshire",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Cumnock",
+                            "loc": "Cumnock",
+                            "type": "town",
+                            "postcode": "KA18"
+                        },
+                        {
+                            "en": "Dalmellington",
+                            "loc": "Dalmellington",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Darvel",
+                            "loc": "Darvel",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Galston",
+                            "loc": "Galston",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Kilmarnock",
+                            "loc": "Kilmarnock",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Mauchline",
+                            "loc": "Mauchline",
+                            "type": "town"
+                        },
+                        {
+                            "en": "New Cumnock",
+                            "loc": "New Cumnock",
+                            "type": "town",
+                            "postcode": "KA18"
+                        },
+                        {
+                            "en": "Newmilns",
+                            "loc": "Newmilns",
+                            "type": "town",
+                            "postcode": "KA16 9"
+                        },
+                        {
+                            "en": "Stewarton",
+                            "loc": "Stewarton",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "East Dunbartonshire",
+                    "loc": "East Dunbartonshire",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Bearsden",
+                            "loc": "Bearsden",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Bishopbriggs",
+                            "loc": "Bishopbriggs",
+                            "type": "town",
+                            "postcode": "G64"
+                        },
+                        {
+                            "en": "Kirkintilloch",
+                            "loc": "Kirkintilloch",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Lennoxtown",
+                            "loc": "Lennoxtown",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Lenzie",
+                            "loc": "Lenzie",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Milngavie",
+                            "loc": "Milngavie",
+                            "type": "town",
+                            "postcode": "G62"
+                        }
+                    ]
+                },
+                {
+                    "en": "East Lothian",
+                    "loc": "East Lothian",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Cockenzie and Port Seton",
+                            "loc": "Cockenzie and Port Seton",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Dunbar",
+                            "loc": "Dunbar",
+                            "type": "town",
+                            "postcode": "EH42"
+                        },
+                        {
+                            "en": "Haddington",
+                            "loc": "Haddington",
+                            "type": "town",
+                            "postcode": "EH41"
+                        },
+                        {
+                            "en": "Musselburgh",
+                            "loc": "Musselburgh",
+                            "type": "town",
+                            "postcode": "EH21"
+                        },
+                        {
+                            "en": "North Berwick",
+                            "loc": "North Berwick",
+                            "type": "town",
+                            "postcode": "EH39"
+                        },
+                        {
+                            "en": "Prestonpans",
+                            "loc": "Prestonpans",
+                            "type": "town",
+                            "postcode": "EH32"
+                        },
+                        {
+                            "en": "Tranent",
+                            "loc": "Tranent",
+                            "type": "town",
+                            "postcode": "EH33"
+                        }
+                    ]
+                },
+                {
+                    "en": "East Renfrewshire",
+                    "loc": "East Renfrewshire",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Barrhead",
+                            "loc": "Barrhead",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Clarkston",
+                            "loc": "Clarkston",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Giffnock",
+                            "loc": "Giffnock",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Newton Mearns",
+                            "loc": "Newton Mearns",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "Falkirk",
+                    "loc": "Falkirk",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Bo'ness",
+                            "loc": "Bo'ness",
+                            "type": "town",
+                            "postcode": "EH51"
+                        },
+                        {
+                            "en": "Bonnybridge",
+                            "loc": "Bonnybridge",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Denny",
+                            "loc": "Denny",
+                            "type": "town",
+                            "postcode": "FK6"
+                        },
+                        {
+                            "en": "Falkirk",
+                            "loc": "Falkirk",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Grangemouth",
+                            "loc": "Grangemouth",
+                            "type": "town",
+                            "postcode": "FK3"
+                        },
+                        {
+                            "en": "Larbert",
+                            "loc": "Larbert",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Stenhousemuir",
+                            "loc": "Stenhousemuir",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "Fife",
+                    "loc": "Fife",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Anstruther",
+                            "loc": "Anstruther",
+                            "type": "town",
+                            "postcode": "KY10"
+                        },
+                        {
+                            "en": "Auchtermuchty",
+                            "loc": "Auchtermuchty",
+                            "type": "town",
+                            "postcode": "KY14"
+                        },
+                        {
+                            "en": "Ballingry",
+                            "loc": "Ballingry",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Buckhaven",
+                            "loc": "Buckhaven",
+                            "type": "town",
+                            "postcode": "KY8"
+                        },
+                        {
+                            "en": "Burntisland",
+                            "loc": "Burntisland",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Cardenden",
+                            "loc": "Cardenden",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Cowdenbeath",
+                            "loc": "Cowdenbeath",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Crail",
+                            "loc": "Crail",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Cupar",
+                            "loc": "Cupar",
+                            "type": "town",
+                            "postcode": "KY14"
+                        },
+                        {
+                            "en": "Dalgety Bay",
+                            "loc": "Dalgety Bay",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Dunfermline",
+                            "loc": "Dunfermline",
+                            "type": "city"
+                        },
+                        {
+                            "en": "Dysart",
+                            "loc": "Dysart",
+                            "type": "town",
+                            "postcode": "KY1"
+                        },
+                        {
+                            "en": "East Wemyss",
+                            "loc": "East Wemyss",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Falkland",
+                            "loc": "Falkland",
+                            "type": "town",
+                            "postcode": "KY"
+                        },
+                        {
+                            "en": "Glenrothes",
+                            "loc": "Glenrothes",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Inverkeithing",
+                            "loc": "Inverkeithing",
+                            "type": "town",
+                            "postcode": "KY11"
+                        },
+                        {
+                            "en": "Kelty",
+                            "loc": "Kelty",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Kincardine",
+                            "loc": "Kincardine",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Kinghorn",
+                            "loc": "Kinghorn",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Kirkcaldy",
+                            "loc": "Kirkcaldy",
+                            "type": "town",
+                            "postcode": "KY1"
+                        },
+                        {
+                            "en": "Ladybank",
+                            "loc": "Ladybank",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Leuchars",
+                            "loc": "Leuchars",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Leven",
+                            "loc": "Leven",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Lochgelly",
+                            "loc": "Lochgelly",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Markinch",
+                            "loc": "Markinch",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Methil",
+                            "loc": "Methil",
+                            "type": "town",
+                            "postcode": "KY8"
+                        },
+                        {
+                            "en": "Newburgh",
+                            "loc": "Newburgh",
+                            "type": "town",
+                            "postcode": "KY14"
+                        },
+                        {
+                            "en": "Newport-on-Tay",
+                            "loc": "Newport-on-Tay",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Rosyth",
+                            "loc": "Rosyth",
+                            "type": "town"
+                        },
+                        {
+                            "en": "St Andrews",
+                            "loc": "St Andrews",
+                            "type": "town",
+                            "postcode": "KY16"
+                        },
+                        {
+                            "en": "Tayport",
+                            "loc": "Tayport",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Wormit",
+                            "loc": "Wormit",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "Glasgow City",
+                    "loc": "Glasgow City",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Glasgow",
+                            "loc": "Glasgow",
+                            "type": "city",
+                            "postcode": "G1-G80"
+                        }
+                    ]
+                },
+                {
+                    "en": "Highland",
+                    "loc": "Highland",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Alness",
+                            "loc": "Alness",
+                            "type": "town",
+                            "postcode": "IV17 0"
+                        },
+                        {
+                            "en": "Aviemore",
+                            "loc": "Aviemore",
+                            "type": "town",
+                            "postcode": "PH22 1"
+                        },
+                        {
+                            "en": "Beauly",
+                            "loc": "Beauly",
+                            "type": "town",
+                            "postcode": "IV4"
+                        },
+                        {
+                            "en": "Cromarty",
+                            "loc": "Cromarty",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Dingwall",
+                            "loc": "Dingwall",
+                            "type": "town",
+                            "postcode": "IV15"
+                        },
+                        {
+                            "en": "Dornoch",
+                            "loc": "Dornoch",
+                            "type": "town",
+                            "postcode": "IV25"
+                        },
+                        {
+                            "en": "Fort William",
+                            "loc": "Fort William",
+                            "type": "town",
+                            "postcode": "PH33"
+                        },
+                        {
+                            "en": "Fortrose",
+                            "loc": "Fortrose",
+                            "type": "town",
+                            "postcode": "IV10"
+                        },
+                        {
+                            "en": "Grantown-on-Spey",
+                            "loc": "Grantown-on-Spey",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Invergordon",
+                            "loc": "Invergordon",
+                            "type": "town",
+                            "postcode": "IV18"
+                        },
+                        {
+                            "en": "Inverness",
+                            "loc": "Inverness",
+                            "type": "city",
+                            "postcode": "IV1"
+                        },
+                        {
+                            "en": "Kingussie",
+                            "loc": "Kingussie",
+                            "type": "town",
+                            "postcode": "PH21"
+                        },
+                        {
+                            "en": "Mallaig",
+                            "loc": "Mallaig",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Nairn",
+                            "loc": "Nairn",
+                            "type": "town",
+                            "postcode": "IV12"
+                        },
+                        {
+                            "en": "Portree",
+                            "loc": "Portree",
+                            "type": "town",
+                            "postcode": "IV51"
+                        },
+                        {
+                            "en": "Thurso",
+                            "loc": "Thurso",
+                            "type": "town",
+                            "postcode": "KW14"
+                        },
+                        {
+                            "en": "Wick",
+                            "loc": "Wick",
+                            "type": "town",
+                            "postcode": "KW14"
+                        }
+                    ]
+                },
+                {
+                    "en": "Inverclyde",
+                    "loc": "Inverclyde",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Gourock",
+                            "loc": "Gourock",
+                            "type": "town",
+                            "postcode": "PA19"
+                        },
+                        {
+                            "en": "Greenock",
+                            "loc": "Greenock",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Port Glasgow",
+                            "loc": "Port Glasgow",
+                            "type": "town",
+                            "postcode": "PA14"
+                        }
+                    ]
+                },
+                {
+                    "en": "Midlothian",
+                    "loc": "Midlothian",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Bonnyrigg",
+                            "loc": "Bonnyrigg",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Dalkeith",
+                            "loc": "Dalkeith",
+                            "type": "town",
+                            "postcode": "EH22"
+                        },
+                        {
+                            "en": "Loanhead",
+                            "loc": "Loanhead",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Mayfield",
+                            "loc": "Mayfield",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Penicuik",
+                            "loc": "Penicuik",
+                            "type": "town",
+                            "postcode": "EH26"
+                        },
+                        {
+                            "en": "Shawfair",
+                            "loc": "Shawfair",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "Moray",
+                    "loc": "Moray",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Buckie",
+                            "loc": "Buckie",
+                            "type": "town",
+                            "postcode": "AB56"
+                        },
+                        {
+                            "en": "Burghead",
+                            "loc": "Burghead",
+                            "type": "town",
+                            "postcode": "IV30 5"
+                        },
+                        {
+                            "en": "Dufftown",
+                            "loc": "Dufftown",
+                            "type": "town",
+                            "postcode": "AB55"
+                        },
+                        {
+                            "en": "Elgin",
+                            "loc": "Elgin",
+                            "type": "town",
+                            "postcode": "IV30"
+                        },
+                        {
+                            "en": "Forres",
+                            "loc": "Forres",
+                            "type": "town",
+                            "postcode": "IV36"
+                        },
+                        {
+                            "en": "Keith",
+                            "loc": "Keith",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Lossiemouth",
+                            "loc": "Lossiemouth",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Rothes",
+                            "loc": "Rothes",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "North Ayrshire",
+                    "loc": "North Ayrshire",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Ardeer",
+                            "loc": "Ardeer",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Ardrossan",
+                            "loc": "Ardrossan",
+                            "type": "town",
+                            "postcode": "KA22 7"
+                        },
+                        {
+                            "en": "Beith",
+                            "loc": "Beith",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Dalry",
+                            "loc": "Dalry",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Kilbirnie",
+                            "loc": "Kilbirnie",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Kilwinning",
+                            "loc": "Kilwinning",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Largs",
+                            "loc": "Largs",
+                            "type": "town",
+                            "postcode": "KA26"
+                        },
+                        {
+                            "en": "Millport",
+                            "loc": "Millport",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Saltcoats",
+                            "loc": "Saltcoats",
+                            "type": "town",
+                            "postcode": "KA21"
+                        },
+                        {
+                            "en": "Stevenston",
+                            "loc": "Stevenston",
+                            "type": "town",
+                            "postcode": "KA20"
+                        }
+                    ]
+                },
+                {
+                    "en": "North Lanarkshire",
+                    "loc": "North Lanarkshire",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Airdrie",
+                            "loc": "Airdrie",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Bellshill",
+                            "loc": "Bellshill",
+                            "type": "town",
+                            "postcode": "ML4"
+                        },
+                        {
+                            "en": "Coatbridge",
+                            "loc": "Coatbridge",
+                            "type": "town",
+                            "postcode": "ML5"
+                        },
+                        {
+                            "en": "Cumbernauld",
+                            "loc": "Cumbernauld",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Kilsyth",
+                            "loc": "Kilsyth",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Motherwell",
+                            "loc": "Motherwell",
+                            "type": "town",
+                            "postcode": "ML1"
+                        },
+                        {
+                            "en": "Muirhead",
+                            "loc": "Muirhead",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Shotts",
+                            "loc": "Shotts",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Stepps",
+                            "loc": "Stepps",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Viewpark",
+                            "loc": "Viewpark",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Wishaw",
+                            "loc": "Wishaw",
+                            "type": "town",
+                            "postcode": "ML2"
+                        }
+                    ]
+                },
+                {
+                    "en": "Orkney Islands",
+                    "loc": "Orkney Islands",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Kirkwall",
+                            "loc": "Kirkwall",
+                            "type": "town",
+                            "postcode": "KW15"
+                        },
+                        {
+                            "en": "Stromness",
+                            "loc": "Stromness",
+                            "type": "town",
+                            "postcode": "KW16"
+                        }
+                    ]
+                },
+                {
+                    "en": "Outer Hebrides",
+                    "loc": "Outer Hebrides",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Stornoway",
+                            "loc": "Stornoway",
+                            "type": "town",
+                            "postcode": "HS1"
+                        }
+                    ]
+                },
+                {
+                    "en": "Perth and Kinross",
+                    "loc": "Perth and Kinross",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Aberfeldy",
+                            "loc": "Aberfeldy",
+                            "type": "town",
+                            "postcode": "PH15"
+                        },
+                        {
+                            "en": "Auchterarder",
+                            "loc": "Auchterarder",
+                            "type": "town",
+                            "postcode": "PH3"
+                        },
+                        {
+                            "en": "Birnam",
+                            "loc": "Birnam",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Blackford",
+                            "loc": "Blackford",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Blair Atholl",
+                            "loc": "Blair Atholl",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Blairgowrie",
+                            "loc": "Blairgowrie",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Bridge of Earn",
+                            "loc": "Bridge of Earn",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Coupar Angus",
+                            "loc": "Coupar Angus",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Crieff",
+                            "loc": "Crieff",
+                            "type": "town",
+                            "postcode": "PH7"
+                        },
+                        {
+                            "en": "Dunkeld",
+                            "loc": "Dunkeld",
+                            "type": "town",
+                            "postcode": "PH8"
+                        },
+                        {
+                            "en": "Kinross",
+                            "loc": "Kinross",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Perth",
+                            "loc": "Perth",
+                            "type": "city",
+                            "postcode": "PH1-PH3"
+                        },
+                        {
+                            "en": "Pitlochry",
+                            "loc": "Pitlochry",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Scone",
+                            "loc": "Scone",
+                            "type": "town",
+                            "postcode": "PH, PH2"
+                        }
+                    ]
+                },
+                {
+                    "en": "Renfrewshire",
+                    "loc": "Renfrewshire",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Erskine",
+                            "loc": "Erskine",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Johnstone",
+                            "loc": "Johnstone",
+                            "type": "town",
+                            "postcode": "PA5"
+                        },
+                        {
+                            "en": "Linwood",
+                            "loc": "Linwood",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Paisley",
+                            "loc": "Paisley",
+                            "type": "town",
+                            "postcode": "PA1"
+                        },
+                        {
+                            "en": "Renfrew",
+                            "loc": "Renfrew",
+                            "type": "town",
+                            "postcode": "PA4"
+                        }
+                    ]
+                },
+                {
+                    "en": "Scottish Borders",
+                    "loc": "Scottish Borders",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Coldstream",
+                            "loc": "Coldstream",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Duns",
+                            "loc": "Duns",
+                            "type": "town",
+                            "postcode": "TD11"
+                        },
+                        {
+                            "en": "Earlston",
+                            "loc": "Earlston",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Eyemouth",
+                            "loc": "Eyemouth",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Galashiels",
+                            "loc": "Galashiels",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Greenlaw",
+                            "loc": "Greenlaw",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Hawick",
+                            "loc": "Hawick",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Innerleithen",
+                            "loc": "Innerleithen",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Jedburgh",
+                            "loc": "Jedburgh",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Kelso",
+                            "loc": "Kelso",
+                            "type": "town",
+                            "postcode": "TD5"
+                        },
+                        {
+                            "en": "Lauder",
+                            "loc": "Lauder",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Melrose",
+                            "loc": "Melrose",
+                            "type": "town",
+                            "postcode": "TD6"
+                        },
+                        {
+                            "en": "Newtown St Boswells",
+                            "loc": "Newtown St Boswells",
+                            "type": "town",
+                            "postcode": "TD6"
+                        },
+                        {
+                            "en": "Peebles",
+                            "loc": "Peebles",
+                            "type": "town",
+                            "postcode": "EH45"
+                        },
+                        {
+                            "en": "Selkirk",
+                            "loc": "Selkirk",
+                            "type": "town",
+                            "postcode": "TD7"
+                        }
+                    ]
+                },
+                {
+                    "en": "Shetland Islands",
+                    "loc": "Shetland Islands",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Lerwick",
+                            "loc": "Lerwick",
+                            "type": "town",
+                            "postcode": "ZE1"
+                        }
+                    ]
+                },
+                {
+                    "en": "South Ayrshire",
+                    "loc": "South Ayrshire",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Ayr",
+                            "loc": "Ayr",
+                            "type": "town",
+                            "postcode": "G84"
+                        },
+                        {
+                            "en": "Girvan",
+                            "loc": "Girvan",
+                            "type": "town",
+                            "postcode": "KA26"
+                        },
+                        {
+                            "en": "Maybole",
+                            "loc": "Maybole",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Prestwick",
+                            "loc": "Prestwick",
+                            "type": "town",
+                            "postcode": "KA9"
+                        },
+                        {
+                            "en": "Troon",
+                            "loc": "Troon",
+                            "type": "town",
+                            "postcode": "KA10"
+                        }
+                    ]
+                },
+                {
+                    "en": "South Lanarkshire",
+                    "loc": "South Lanarkshire",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Biggar",
+                            "loc": "Biggar",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Blantyre",
+                            "loc": "Blantyre",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Bothwell",
+                            "loc": "Bothwell",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Cambuslang",
+                            "loc": "Cambuslang",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Carluke",
+                            "loc": "Carluke",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Dalserf",
+                            "loc": "Dalserf",
+                            "type": "town"
+                        },
+                        {
+                            "en": "East Kilbride",
+                            "loc": "East Kilbride",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Hamilton",
+                            "loc": "Hamilton",
+                            "type": "town",
+                            "postcode": "ML3"
+                        },
+                        {
+                            "en": "Lanark",
+                            "loc": "Lanark",
+                            "type": "town",
+                            "postcode": "ML11"
+                        },
+                        {
+                            "en": "Larkhall",
+                            "loc": "Larkhall",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Lesmahagow",
+                            "loc": "Lesmahagow",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Rigside",
+                            "loc": "Rigside",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Rutherglen",
+                            "loc": "Rutherglen",
+                            "type": "town",
+                            "postcode": "G73"
+                        },
+                        {
+                            "en": "Stonehouse",
+                            "loc": "Stonehouse",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Strathaven",
+                            "loc": "Strathaven",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Uddingston",
+                            "loc": "Uddingston",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "Stirling",
+                    "loc": "Stirling",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Bannockburn",
+                            "loc": "Bannockburn",
+                            "type": "town",
+                            "postcode": "FK7"
+                        },
+                        {
+                            "en": "Bridge of Allan",
+                            "loc": "Bridge of Allan",
+                            "type": "town",
+                            "postcode": "FK9"
+                        },
+                        {
+                            "en": "Callander",
+                            "loc": "Callander",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Doune",
+                            "loc": "Doune",
+                            "type": "town",
+                            "postcode": "FK16"
+                        },
+                        {
+                            "en": "Dunblane",
+                            "loc": "Dunblane",
+                            "type": "town",
+                            "postcode": "FK15"
+                        },
+                        {
+                            "en": "Stirling",
+                            "loc": "Stirling",
+                            "type": "city",
+                            "postcode": "FK8"
+                        }
+                    ]
+                },
+                {
+                    "en": "West Dunbartonshire",
+                    "loc": "West Dunbartonshire",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Alexandria",
+                            "loc": "Alexandria",
+                            "type": "town",
+                            "postcode": "G83"
+                        },
+                        {
+                            "en": "Balloch",
+                            "loc": "Balloch",
+                            "type": "town",
+                            "postcode": "G83 8"
+                        },
+                        {
+                            "en": "Bonhill",
+                            "loc": "Bonhill",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Clydebank",
+                            "loc": "Clydebank",
+                            "type": "town",
+                            "postcode": "G60, G81"
+                        },
+                        {
+                            "en": "Dumbarton",
+                            "loc": "Dumbarton",
+                            "type": "town",
+                            "postcode": "G82"
+                        }
+                    ]
+                },
+                {
+                    "en": "West Lothian",
+                    "loc": "West Lothian",
+                    "type": "council_area",
+                    "places": [
+                        {
+                            "en": "Armadale",
+                            "loc": "Armadale",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Bathgate",
+                            "loc": "Bathgate",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Blackburn",
+                            "loc": "Blackburn",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Blackridge",
+                            "loc": "Blackridge",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Broxburn",
+                            "loc": "Broxburn",
+                            "type": "town"
+                        },
+                        {
+                            "en": "East Calder",
+                            "loc": "East Calder",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Linlithgow",
+                            "loc": "Linlithgow",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Livingston",
+                            "loc": "Livingston",
+                            "type": "town",
+                            "postcode": "EH53"
+                        },
+                        {
+                            "en": "Whitburn",
+                            "loc": "Whitburn",
+                            "type": "town"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "en": "Wales",
+            "loc": "Wales",
+            "type": "country",
+            "places": [
+                {
+                    "en": "Bridgend County Borough",
+                    "loc": "Bridgend County Borough",
+                    "type": "principal_area",
+                    "places": [
+                        {
+                            "en": "Bridgend",
+                            "loc": "Bridgend",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Maesteg",
+                            "loc": "Maesteg",
+                            "type": "town",
+                            "postcode": "CF34"
+                        },
+                        {
+                            "en": "Pencoed",
+                            "loc": "Pencoed",
+                            "type": "town",
+                            "postcode": "CF35"
+                        },
+                        {
+                            "en": "Porthcawl",
+                            "loc": "Porthcawl",
+                            "type": "town",
+                            "postcode": "CF36"
+                        }
+                    ]
+                },
+                {
+                    "en": "Caerphilly County Borough",
+                    "loc": "Caerphilly County Borough",
+                    "type": "principal_area",
+                    "places": [
+                        {
+                            "en": "Abercarn",
+                            "loc": "Abercarn",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Bargoed",
+                            "loc": "Bargoed",
+                            "type": "town",
+                            "postcode": "CF81"
+                        },
+                        {
+                            "en": "Blackwood",
+                            "loc": "Blackwood",
+                            "type": "town",
+                            "postcode": "NP12"
+                        },
+                        {
+                            "en": "Caerphilly",
+                            "loc": "Caerphilly",
+                            "type": "town",
+                            "postcode": "CF83"
+                        },
+                        {
+                            "en": "Crumlin",
+                            "loc": "Crumlin",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Gelligaer",
+                            "loc": "Gelligaer",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Newbridge",
+                            "loc": "Newbridge",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Rhymney",
+                            "loc": "Rhymney",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Risca",
+                            "loc": "Risca",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "Cardiff",
+                    "loc": "Cardiff",
+                    "type": "principal_area",
+                    "places": [
+                        {
+                            "en": "Cardiff",
+                            "loc": "Cardiff",
+                            "type": "city",
+                            "postcode": "CF"
+                        },
+                        {
+                            "en": "Ely",
+                            "loc": "Ely",
+                            "type": "town",
+                            "postcode": "CF5"
+                        }
+                    ]
+                },
+                {
+                    "en": "Carmarthenshire",
+                    "loc": "Carmarthenshire",
+                    "type": "principal_area",
+                    "places": [
+                        {
+                            "en": "Garnant",
+                            "loc": "Garnant",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Kidwelly",
+                            "loc": "Kidwelly",
+                            "type": "town",
+                            "postcode": "SA17"
+                        },
+                        {
+                            "en": "Llandeilo",
+                            "loc": "Llandeilo",
+                            "type": "town",
+                            "postcode": "SA19"
+                        },
+                        {
+                            "en": "Llandovery",
+                            "loc": "Llandovery",
+                            "type": "town",
+                            "postcode": "SA20"
+                        },
+                        {
+                            "en": "Llanelli",
+                            "loc": "Llanelli",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Newcastle Emlyn",
+                            "loc": "Newcastle Emlyn",
+                            "type": "town",
+                            "postcode": "SA38"
+                        },
+                        {
+                            "en": "St Clears",
+                            "loc": "St Clears",
+                            "type": "town",
+                            "postcode": "SA33"
+                        },
+                        {
+                            "en": "Whitland",
+                            "loc": "Whitland",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "Ceredigion",
+                    "loc": "Ceredigion",
+                    "type": "principal_area",
+                    "places": [
+                        {
+                            "en": "Aberaeron",
+                            "loc": "Aberaeron",
+                            "type": "town",
+                            "postcode": "SA46"
+                        },
+                        {
+                            "en": "Cardigan",
+                            "loc": "Cardigan",
+                            "type": "town",
+                            "postcode": "SA43"
+                        },
+                        {
+                            "en": "Llandysul",
+                            "loc": "Llandysul",
+                            "type": "town",
+                            "postcode": "SA44"
+                        },
+                        {
+                            "en": "New Quay",
+                            "loc": "New Quay",
+                            "type": "town",
+                            "postcode": "SA45"
+                        },
+                        {
+                            "en": "Tregaron",
+                            "loc": "Tregaron",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "Conwy County Borough",
+                    "loc": "Conwy County Borough",
+                    "type": "principal_area",
+                    "places": [
+                        {
+                            "en": "Colwyn Bay",
+                            "loc": "Colwyn Bay",
+                            "type": "town",
+                            "postcode": "LL29"
+                        },
+                        {
+                            "en": "Llanfairfechan",
+                            "loc": "Llanfairfechan",
+                            "type": "town",
+                            "postcode": "LL33"
+                        },
+                        {
+                            "en": "Old Colwyn",
+                            "loc": "Old Colwyn",
+                            "type": "town",
+                            "postcode": "LL29"
+                        },
+                        {
+                            "en": "Penmaenmawr",
+                            "loc": "Penmaenmawr",
+                            "type": "town",
+                            "postcode": "LL34"
+                        }
+                    ]
+                },
+                {
+                    "en": "Denbighshire",
+                    "loc": "Denbighshire",
+                    "type": "principal_area",
+                    "places": [
+                        {
+                            "en": "Corwen",
+                            "loc": "Corwen",
+                            "type": "town",
+                            "postcode": "LL21"
+                        },
+                        {
+                            "en": "Denbigh",
+                            "loc": "Denbigh",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Llangollen",
+                            "loc": "Llangollen",
+                            "type": "town",
+                            "postcode": "LL20"
+                        },
+                        {
+                            "en": "Rhuddlan",
+                            "loc": "Rhuddlan",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Rhyl",
+                            "loc": "Rhyl",
+                            "type": "town",
+                            "postcode": "LL18"
+                        },
+                        {
+                            "en": "Ruthin",
+                            "loc": "Ruthin",
+                            "type": "town",
+                            "postcode": "LL15"
+                        },
+                        {
+                            "en": "St Asaph",
+                            "loc": "St Asaph",
+                            "type": "city"
+                        },
+                        {
+                            "en": "Tremeirchion",
+                            "loc": "Tremeirchion",
+                            "type": "town",
+                            "postcode": "LL17"
+                        }
+                    ]
+                },
+                {
+                    "en": "Flintshire",
+                    "loc": "Flintshire",
+                    "type": "principal_area",
+                    "places": [
+                        {
+                            "en": "Bagillt",
+                            "loc": "Bagillt",
+                            "type": "town",
+                            "postcode": "CH6"
+                        },
+                        {
+                            "en": "Buckley",
+                            "loc": "Buckley",
+                            "type": "town",
+                            "postcode": "CH7"
+                        },
+                        {
+                            "en": "Caerwys",
+                            "loc": "Caerwys",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Connah's Quay",
+                            "loc": "Connah's Quay",
+                            "type": "town",
+                            "postcode": "CH5"
+                        },
+                        {
+                            "en": "Ewloe",
+                            "loc": "Ewloe",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Flint",
+                            "loc": "Flint",
+                            "type": "town",
+                            "postcode": "CH6"
+                        },
+                        {
+                            "en": "Holywell",
+                            "loc": "Holywell",
+                            "type": "town",
+                            "postcode": "CH8"
+                        },
+                        {
+                            "en": "Mold",
+                            "loc": "Mold",
+                            "type": "town",
+                            "postcode": "CH7"
+                        },
+                        {
+                            "en": "Queensferry",
+                            "loc": "Queensferry",
+                            "type": "town",
+                            "postcode": "CH5"
+                        },
+                        {
+                            "en": "Shotton",
+                            "loc": "Shotton",
+                            "type": "town",
+                            "postcode": "CH5"
+                        }
+                    ]
+                },
+                {
+                    "en": "Gwynedd",
+                    "loc": "Gwynedd",
+                    "type": "principal_area",
+                    "places": [
+                        {
+                            "en": "Bala",
+                            "loc": "Bala",
+                            "type": "town",
+                            "postcode": "LL23"
+                        },
+                        {
+                            "en": "Bangor",
+                            "loc": "Bangor",
+                            "type": "city",
+                            "postcode": "LL57"
+                        },
+                        {
+                            "en": "Barmouth",
+                            "loc": "Barmouth",
+                            "type": "town",
+                            "postcode": "LL42"
+                        },
+                        {
+                            "en": "Bethesda",
+                            "loc": "Bethesda",
+                            "type": "town",
+                            "postcode": "LL57"
+                        },
+                        {
+                            "en": "Blaenau Ffestiniog",
+                            "loc": "Blaenau Ffestiniog",
+                            "type": "town",
+                            "postcode": "LL41"
+                        },
+                        {
+                            "en": "Criccieth",
+                            "loc": "Criccieth",
+                            "type": "town",
+                            "postcode": "LL52"
+                        },
+                        {
+                            "en": "Nefyn",
+                            "loc": "Nefyn",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Porthmadog",
+                            "loc": "Porthmadog",
+                            "type": "town",
+                            "postcode": "LL49"
+                        },
+                        {
+                            "en": "Pwllheli",
+                            "loc": "Pwllheli",
+                            "type": "town",
+                            "postcode": "LL53"
+                        },
+                        {
+                            "en": "Tywyn",
+                            "loc": "Tywyn",
+                            "type": "town",
+                            "postcode": "LL36"
+                        }
+                    ]
+                },
+                {
+                    "en": "Isle of Anglesey",
+                    "loc": "Isle of Anglesey",
+                    "type": "principal_area",
+                    "places": [
+                        {
+                            "en": "Benllech",
+                            "loc": "Benllech",
+                            "type": "town",
+                            "postcode": "LL74"
+                        },
+                        {
+                            "en": "Holyhead",
+                            "loc": "Holyhead",
+                            "type": "town",
+                            "postcode": "LL65"
+                        },
+                        {
+                            "en": "Menai Bridge",
+                            "loc": "Menai Bridge",
+                            "type": "town",
+                            "postcode": "LL59"
+                        }
+                    ]
+                },
+                {
+                    "en": "Merthyr Tydfil County Borough",
+                    "loc": "Merthyr Tydfil County Borough",
+                    "type": "principal_area",
+                    "places": [
+                        {
+                            "en": "Merthyr Tydfil",
+                            "loc": "Merthyr Tydfil",
+                            "type": "town",
+                            "postcode": "CF47"
+                        },
+                        {
+                            "en": "Treharris",
+                            "loc": "Treharris",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "Monmouthshire",
+                    "loc": "Monmouthshire",
+                    "type": "principal_area",
+                    "places": [
+                        {
+                            "en": "Caldicot",
+                            "loc": "Caldicot",
+                            "type": "town",
+                            "postcode": "NP26"
+                        },
+                        {
+                            "en": "Chepstow",
+                            "loc": "Chepstow",
+                            "type": "town",
+                            "postcode": "NP16"
+                        },
+                        {
+                            "en": "Usk",
+                            "loc": "Usk",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "Neath Port Talbot",
+                    "loc": "Neath Port Talbot",
+                    "type": "principal_area",
+                    "places": [
+                        {
+                            "en": "Aberavon",
+                            "loc": "Aberavon",
+                            "type": "town",
+                            "postcode": "SA12"
+                        },
+                        {
+                            "en": "Briton Ferry",
+                            "loc": "Briton Ferry",
+                            "type": "town",
+                            "postcode": "SA11"
+                        },
+                        {
+                            "en": "Glynneath",
+                            "loc": "Glynneath",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Neath",
+                            "loc": "Neath",
+                            "type": "town",
+                            "postcode": "SA10–11"
+                        },
+                        {
+                            "en": "Pontardawe",
+                            "loc": "Pontardawe",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Port Talbot",
+                            "loc": "Port Talbot",
+                            "type": "town",
+                            "postcode": "SA12"
+                        }
+                    ]
+                },
+                {
+                    "en": "Newport",
+                    "loc": "Newport",
+                    "type": "principal_area",
+                    "places": [
+                        {
+                            "en": "Newport",
+                            "loc": "Newport",
+                            "type": "city",
+                            "postcode": "NP"
+                        },
+                        {
+                            "en": "Newport",
+                            "loc": "Newport",
+                            "type": "town",
+                            "postcode": "TF10"
+                        }
+                    ]
+                },
+                {
+                    "en": "Pembrokeshire",
+                    "loc": "Pembrokeshire",
+                    "type": "principal_area",
+                    "places": [
+                        {
+                            "en": "Goodwick",
+                            "loc": "Goodwick",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Milford Haven",
+                            "loc": "Milford Haven",
+                            "type": "town",
+                            "postcode": "SA73"
+                        },
+                        {
+                            "en": "Narberth",
+                            "loc": "Narberth",
+                            "type": "town",
+                            "postcode": "SA67"
+                        },
+                        {
+                            "en": "Newport",
+                            "loc": "Newport",
+                            "type": "town",
+                            "postcode": "SA42"
+                        },
+                        {
+                            "en": "Neyland",
+                            "loc": "Neyland",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Pembroke",
+                            "loc": "Pembroke",
+                            "type": "town",
+                            "postcode": "SA71"
+                        },
+                        {
+                            "en": "Pembroke Dock",
+                            "loc": "Pembroke Dock",
+                            "type": "town",
+                            "postcode": "SA72"
+                        },
+                        {
+                            "en": "St David's and the Cathedral Close",
+                            "loc": "St David's and the Cathedral Close",
+                            "type": "city"
+                        },
+                        {
+                            "en": "Tenby",
+                            "loc": "Tenby",
+                            "type": "town",
+                            "postcode": "SA70"
+                        }
+                    ]
+                },
+                {
+                    "en": "Rhondda Cynon Taf",
+                    "loc": "Rhondda Cynon Taf",
+                    "type": "principal_area",
+                    "places": [
+                        {
+                            "en": "Aberdare",
+                            "loc": "Aberdare",
+                            "type": "town",
+                            "postcode": "CF44"
+                        },
+                        {
+                            "en": "Ferndale",
+                            "loc": "Ferndale",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Llantrisant",
+                            "loc": "Llantrisant",
+                            "type": "town",
+                            "postcode": "CF72"
+                        },
+                        {
+                            "en": "Llantwit Fardre",
+                            "loc": "Llantwit Fardre",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Tonypandy",
+                            "loc": "Tonypandy",
+                            "type": "town",
+                            "postcode": "CF40"
+                        }
+                    ]
+                },
+                {
+                    "en": "Swansea",
+                    "loc": "Swansea",
+                    "type": "principal_area",
+                    "places": [
+                        {
+                            "en": "Gorseinon",
+                            "loc": "Gorseinon",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Morriston",
+                            "loc": "Morriston",
+                            "type": "town",
+                            "postcode": "SA6"
+                        },
+                        {
+                            "en": "Swansea",
+                            "loc": "Swansea",
+                            "type": "city",
+                            "postcode": "SA1-SA7"
+                        }
+                    ]
+                },
+                {
+                    "en": "The Vale of Glamorgan",
+                    "loc": "The Vale of Glamorgan",
+                    "type": "principal_area",
+                    "places": [
+                        {
+                            "en": "Barry",
+                            "loc": "Barry",
+                            "type": "town",
+                            "postcode": "CF62–63"
+                        },
+                        {
+                            "en": "Llantwit Major",
+                            "loc": "Llantwit Major",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Penarth",
+                            "loc": "Penarth",
+                            "type": "town",
+                            "postcode": "CF64"
+                        }
+                    ]
+                },
+                {
+                    "en": "Torfaen",
+                    "loc": "Torfaen",
+                    "type": "principal_area",
+                    "places": [
+                        {
+                            "en": "Abersychan",
+                            "loc": "Abersychan",
+                            "type": "town",
+                            "postcode": "NP4"
+                        },
+                        {
+                            "en": "Cwmbran",
+                            "loc": "Cwmbran",
+                            "type": "town",
+                            "postcode": "NP44"
+                        },
+                        {
+                            "en": "Pontypool",
+                            "loc": "Pontypool",
+                            "type": "town",
+                            "postcode": "NP4"
+                        }
+                    ]
+                },
+                {
+                    "en": "Wrexham County Borough",
+                    "loc": "Wrexham County Borough",
+                    "type": "principal_area",
+                    "places": [
+                        {
+                            "en": "Chirk",
+                            "loc": "Chirk",
+                            "type": "town",
+                            "postcode": "LL14"
+                        },
+                        {
+                            "en": "Wrexham",
+                            "loc": "Wrexham",
+                            "type": "city",
+                            "postcode": "LL11-14"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "en": "Northern Ireland",
+            "loc": "Northern Ireland",
+            "type": "country",
+            "places": [
+                {
+                    "en": "Antrim and Newtownabbey",
+                    "loc": "Antrim and Newtownabbey",
+                    "type": "district",
+                    "places": [
+                        {
+                            "en": "Antrim",
+                            "loc": "Antrim",
+                            "type": "town",
+                            "postcode": "BT41"
+                        },
+                        {
+                            "en": "Greenisland",
+                            "loc": "Greenisland",
+                            "type": "town",
+                            "postcode": "BT38"
+                        }
+                    ]
+                },
+                {
+                    "en": "Ards and North Down",
+                    "loc": "Ards and North Down",
+                    "type": "district",
+                    "places": [
+                        {
+                            "en": "Newtownards",
+                            "loc": "Newtownards",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "Armagh City, Banbridge and Craigavon",
+                    "loc": "Armagh City, Banbridge and Craigavon",
+                    "type": "district",
+                    "places": [
+                        {
+                            "en": "Armagh",
+                            "loc": "Armagh",
+                            "type": "city",
+                            "postcode": "BT60"
+                        },
+                        {
+                            "en": "Craigavon",
+                            "loc": "Craigavon",
+                            "type": "town",
+                            "postcode": "BT64"
+                        },
+                        {
+                            "en": "Tandragee",
+                            "loc": "Tandragee",
+                            "type": "town",
+                            "postcode": "BT62"
+                        }
+                    ]
+                },
+                {
+                    "en": "Belfast",
+                    "loc": "Belfast",
+                    "type": "district",
+                    "places": [
+                        {
+                            "en": "Belfast",
+                            "loc": "Belfast",
+                            "type": "city"
+                        }
+                    ]
+                },
+                {
+                    "en": "Causeway Coast and Glens",
+                    "loc": "Causeway Coast and Glens",
+                    "type": "district",
+                    "places": [
+                        {
+                            "en": "Coleraine",
+                            "loc": "Coleraine",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Portrush",
+                            "loc": "Portrush",
+                            "type": "town",
+                            "postcode": "BT56"
+                        }
+                    ]
+                },
+                {
+                    "en": "Derry City and Strabane",
+                    "loc": "Derry City and Strabane",
+                    "type": "district",
+                    "places": [
+                        {
+                            "en": "Derry",
+                            "loc": "Derry",
+                            "type": "city",
+                            "postcode": "BT47"
+                        },
+                        {
+                            "en": "Strabane",
+                            "loc": "Strabane",
+                            "type": "town",
+                            "postcode": "BT82"
+                        }
+                    ]
+                },
+                {
+                    "en": "Fermanagh and Omagh",
+                    "loc": "Fermanagh and Omagh",
+                    "type": "district",
+                    "places": [
+                        {
+                            "en": "Enniskillen",
+                            "loc": "Enniskillen",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Omagh",
+                            "loc": "Omagh",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "Lisburn and Castlereagh",
+                    "loc": "Lisburn and Castlereagh",
+                    "type": "district",
+                    "places": [
+                        {
+                            "en": "Carryduff",
+                            "loc": "Carryduff",
+                            "type": "town",
+                            "postcode": "BT8"
+                        },
+                        {
+                            "en": "Lisburn",
+                            "loc": "Lisburn",
+                            "type": "city"
+                        }
+                    ]
+                },
+                {
+                    "en": "Mid Ulster",
+                    "loc": "Mid Ulster",
+                    "type": "district",
+                    "places": [
+                        {
+                            "en": "Cookstown",
+                            "loc": "Cookstown",
+                            "type": "town",
+                            "postcode": "BT80"
+                        },
+                        {
+                            "en": "Dungannon",
+                            "loc": "Dungannon",
+                            "type": "town"
+                        }
+                    ]
+                },
+                {
+                    "en": "Mid and East Antrim",
+                    "loc": "Mid and East Antrim",
+                    "type": "district",
+                    "places": [
+                        {
+                            "en": "Ballymena",
+                            "loc": "Ballymena",
+                            "type": "town"
+                        },
+                        {
+                            "en": "Carrickfergus",
+                            "loc": "Carrickfergus",
+                            "type": "town",
+                            "postcode": "BT38"
+                        }
+                    ]
+                },
+                {
+                    "en": "Newry, Mourne and Down",
+                    "loc": "Newry, Mourne and Down",
+                    "type": "district",
+                    "places": [
+                        {
+                            "en": "Newry",
+                            "loc": "Newry",
+                            "type": "city"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

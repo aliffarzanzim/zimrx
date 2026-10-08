@@ -1,0 +1,2278 @@
+{
+    "success": true,
+    "from_cache": false,
+    "is_offline": false,
+    "timestamp": "2026-10-07 12:29:34",
+    "total_countries": 252,
+    "total_postal_dumps": 121,
+    "countries": [
+        {
+            "code": "AF",
+            "name": "Afghanistan",
+            "capital": "Kabul",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "AX",
+            "name": "Aland Islands",
+            "capital": "Mariehamn",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "AL",
+            "name": "Albania",
+            "capital": "Tirana",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "DZ",
+            "name": "Algeria",
+            "capital": "Algiers",
+            "continent": "AF",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "AS",
+            "name": "American Samoa",
+            "capital": "Pago Pago",
+            "continent": "OC",
+            "has_postal": true,
+            "postal_format": "#####-####",
+            "is_offline": false
+        },
+        {
+            "code": "AD",
+            "name": "Andorra",
+            "capital": "Andorra la Vella",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "AD###",
+            "is_offline": false
+        },
+        {
+            "code": "AO",
+            "name": "Angola",
+            "capital": "Luanda",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "AI",
+            "name": "Anguilla",
+            "capital": "The Valley",
+            "continent": "NA",
+            "has_postal": true,
+            "postal_format": "AI-####",
+            "is_offline": false
+        },
+        {
+            "code": "AQ",
+            "name": "Antarctica",
+            "capital": "",
+            "continent": "AN",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "AG",
+            "name": "Antigua and Barbuda",
+            "capital": "St. John's",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "AR",
+            "name": "Argentina",
+            "capital": "Buenos Aires",
+            "continent": "SA",
+            "has_postal": true,
+            "postal_format": "@####@@@",
+            "is_offline": false
+        },
+        {
+            "code": "AM",
+            "name": "Armenia",
+            "capital": "Yerevan",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "######",
+            "is_offline": false
+        },
+        {
+            "code": "AW",
+            "name": "Aruba",
+            "capital": "Oranjestad",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "AU",
+            "name": "Australia",
+            "capital": "Canberra",
+            "continent": "OC",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "AT",
+            "name": "Austria",
+            "capital": "Vienna",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "AZ",
+            "name": "Azerbaijan",
+            "capital": "Baku",
+            "continent": "AS",
+            "has_postal": true,
+            "postal_format": "AZ ####",
+            "is_offline": false
+        },
+        {
+            "code": "BS",
+            "name": "Bahamas",
+            "capital": "Nassau",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "BH",
+            "name": "Bahrain",
+            "capital": "Manama",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "####|###",
+            "is_offline": false
+        },
+        {
+            "code": "BD",
+            "name": "Bangladesh",
+            "capital": "Dhaka",
+            "continent": "AS",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "BB",
+            "name": "Barbados",
+            "capital": "Bridgetown",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "BB#####",
+            "is_offline": false
+        },
+        {
+            "code": "BY",
+            "name": "Belarus",
+            "capital": "Minsk",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "######",
+            "is_offline": false
+        },
+        {
+            "code": "BE",
+            "name": "Belgium",
+            "capital": "Brussels",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "BZ",
+            "name": "Belize",
+            "capital": "Belmopan",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "BJ",
+            "name": "Benin",
+            "capital": "Porto-Novo",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "BM",
+            "name": "Bermuda",
+            "capital": "Hamilton",
+            "continent": "NA",
+            "has_postal": true,
+            "postal_format": "@@ ##",
+            "is_offline": false
+        },
+        {
+            "code": "BT",
+            "name": "Bhutan",
+            "capital": "Thimphu",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "BO",
+            "name": "Bolivia",
+            "capital": "Sucre",
+            "continent": "SA",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "BQ",
+            "name": "Bonaire, Saint Eustatius and Saba",
+            "capital": "",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "BA",
+            "name": "Bosnia and Herzegovina",
+            "capital": "Sarajevo",
+            "continent": "EU",
+            "has_postal": false,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "BW",
+            "name": "Botswana",
+            "capital": "Gaborone",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "BV",
+            "name": "Bouvet Island",
+            "capital": "",
+            "continent": "AN",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "BR",
+            "name": "Brazil",
+            "capital": "Brasilia",
+            "continent": "SA",
+            "has_postal": true,
+            "postal_format": "#####-###",
+            "is_offline": false
+        },
+        {
+            "code": "IO",
+            "name": "British Indian Ocean Territory",
+            "capital": "Diego Garcia",
+            "continent": "AS",
+            "has_postal": true,
+            "postal_format": "BBND 1ZZ",
+            "is_offline": false
+        },
+        {
+            "code": "VG",
+            "name": "British Virgin Islands",
+            "capital": "Road Town",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "BN",
+            "name": "Brunei",
+            "capital": "Bandar Seri Begawan",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "@@####",
+            "is_offline": false
+        },
+        {
+            "code": "BG",
+            "name": "Bulgaria",
+            "capital": "Sofia",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "BF",
+            "name": "Burkina Faso",
+            "capital": "Ouagadougou",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "BI",
+            "name": "Burundi",
+            "capital": "Gitega",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "CV",
+            "name": "Cabo Verde",
+            "capital": "Praia",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "KH",
+            "name": "Cambodia",
+            "capital": "Phnom Penh",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "CM",
+            "name": "Cameroon",
+            "capital": "Yaounde",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "CA",
+            "name": "Canada",
+            "capital": "Ottawa",
+            "continent": "NA",
+            "has_postal": true,
+            "postal_format": "@#@ #@#",
+            "is_offline": false
+        },
+        {
+            "code": "KY",
+            "name": "Cayman Islands",
+            "capital": "George Town",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "CF",
+            "name": "Central African Republic",
+            "capital": "Bangui",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "TD",
+            "name": "Chad",
+            "capital": "N'Djamena",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "TKCA 1ZZ",
+            "is_offline": false
+        },
+        {
+            "code": "CL",
+            "name": "Chile",
+            "capital": "Santiago",
+            "continent": "SA",
+            "has_postal": true,
+            "postal_format": "#######",
+            "is_offline": false
+        },
+        {
+            "code": "CN",
+            "name": "China",
+            "capital": "Beijing",
+            "continent": "AS",
+            "has_postal": true,
+            "postal_format": "######",
+            "is_offline": false
+        },
+        {
+            "code": "CX",
+            "name": "Christmas Island",
+            "capital": "Flying Fish Cove",
+            "continent": "OC",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "CC",
+            "name": "Cocos Islands",
+            "capital": "West Island",
+            "continent": "AS",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "CO",
+            "name": "Colombia",
+            "capital": "Bogota",
+            "continent": "SA",
+            "has_postal": true,
+            "postal_format": "######",
+            "is_offline": false
+        },
+        {
+            "code": "KM",
+            "name": "Comoros",
+            "capital": "Moroni",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "CK",
+            "name": "Cook Islands",
+            "capital": "Avarua",
+            "continent": "OC",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "CR",
+            "name": "Costa Rica",
+            "capital": "San Jose",
+            "continent": "NA",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "HR",
+            "name": "Croatia",
+            "capital": "Zagreb",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "CU",
+            "name": "Cuba",
+            "capital": "Havana",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "CP #####",
+            "is_offline": false
+        },
+        {
+            "code": "CW",
+            "name": "Curacao",
+            "capital": "Willemstad",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "CY",
+            "name": "Cyprus",
+            "capital": "Nicosia",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "CZ",
+            "name": "Czechia",
+            "capital": "Prague",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "### ##",
+            "is_offline": false
+        },
+        {
+            "code": "CD",
+            "name": "Democratic Republic of the Congo",
+            "capital": "Kinshasa",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "DK",
+            "name": "Denmark",
+            "capital": "Copenhagen",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "DJ",
+            "name": "Djibouti",
+            "capital": "Djibouti",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "DM",
+            "name": "Dominica",
+            "capital": "Roseau",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "DO",
+            "name": "Dominican Republic",
+            "capital": "Santo Domingo",
+            "continent": "NA",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "EC",
+            "name": "Ecuador",
+            "capital": "Quito",
+            "continent": "SA",
+            "has_postal": true,
+            "postal_format": "@####@",
+            "is_offline": false
+        },
+        {
+            "code": "EG",
+            "name": "Egypt",
+            "capital": "Cairo",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "SV",
+            "name": "El Salvador",
+            "capital": "San Salvador",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "CP ####",
+            "is_offline": false
+        },
+        {
+            "code": "GQ",
+            "name": "Equatorial Guinea",
+            "capital": "Ciudad de la Paz",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "ER",
+            "name": "Eritrea",
+            "capital": "Asmara",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "EE",
+            "name": "Estonia",
+            "capital": "Tallinn",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "SZ",
+            "name": "Eswatini",
+            "capital": "Mbabane",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "@###",
+            "is_offline": false
+        },
+        {
+            "code": "ET",
+            "name": "Ethiopia",
+            "capital": "Addis Ababa",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "FK",
+            "name": "Falkland Islands",
+            "capital": "Stanley",
+            "continent": "SA",
+            "has_postal": true,
+            "postal_format": "FIQQ 1ZZ",
+            "is_offline": false
+        },
+        {
+            "code": "FO",
+            "name": "Faroe Islands",
+            "capital": "Torshavn",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "###",
+            "is_offline": false
+        },
+        {
+            "code": "FJ",
+            "name": "Fiji",
+            "capital": "Suva",
+            "continent": "OC",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "FI",
+            "name": "Finland",
+            "capital": "Helsinki",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "FR",
+            "name": "France",
+            "capital": "Paris",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "GF",
+            "name": "French Guiana",
+            "capital": "Cayenne",
+            "continent": "SA",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "PF",
+            "name": "French Polynesia",
+            "capital": "Papeete",
+            "continent": "OC",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "TF",
+            "name": "French Southern Territories",
+            "capital": "Port-aux-Francais",
+            "continent": "AN",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "GA",
+            "name": "Gabon",
+            "capital": "Libreville",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "GM",
+            "name": "Gambia",
+            "capital": "Banjul",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "GE",
+            "name": "Georgia",
+            "capital": "Tbilisi",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "DE",
+            "name": "Germany",
+            "capital": "Berlin",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "GH",
+            "name": "Ghana",
+            "capital": "Accra",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "GI",
+            "name": "Gibraltar",
+            "capital": "Gibraltar",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "GX11 1AA",
+            "is_offline": false
+        },
+        {
+            "code": "GR",
+            "name": "Greece",
+            "capital": "Athens",
+            "continent": "EU",
+            "has_postal": false,
+            "postal_format": "### ##",
+            "is_offline": false
+        },
+        {
+            "code": "GL",
+            "name": "Greenland",
+            "capital": "Nuuk",
+            "continent": "NA",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "GD",
+            "name": "Grenada",
+            "capital": "St. George's",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "GP",
+            "name": "Guadeloupe",
+            "capital": "Basse-Terre",
+            "continent": "NA",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "GU",
+            "name": "Guam",
+            "capital": "Hagatna",
+            "continent": "OC",
+            "has_postal": true,
+            "postal_format": "969##",
+            "is_offline": false
+        },
+        {
+            "code": "GT",
+            "name": "Guatemala",
+            "capital": "Guatemala City",
+            "continent": "NA",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "GG",
+            "name": "Guernsey",
+            "capital": "St Peter Port",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "@# #@@|@## #@@|@@# #@@|@@## #@@|@#@ #@@|@@#@ #@@|GIR0AA",
+            "is_offline": false
+        },
+        {
+            "code": "GN",
+            "name": "Guinea",
+            "capital": "Conakry",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "GW",
+            "name": "Guinea-Bissau",
+            "capital": "Bissau",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "GY",
+            "name": "Guyana",
+            "capital": "Georgetown",
+            "continent": "SA",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "HT",
+            "name": "Haiti",
+            "capital": "Port-au-Prince",
+            "continent": "NA",
+            "has_postal": true,
+            "postal_format": "HT####",
+            "is_offline": false
+        },
+        {
+            "code": "HM",
+            "name": "Heard Island and McDonald Islands",
+            "capital": "",
+            "continent": "AN",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "HN",
+            "name": "Honduras",
+            "capital": "Tegucigalpa",
+            "continent": "NA",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "HK",
+            "name": "Hong Kong",
+            "capital": "Hong Kong",
+            "continent": "AS",
+            "has_postal": true,
+            "postal_format": "######",
+            "is_offline": false
+        },
+        {
+            "code": "HU",
+            "name": "Hungary",
+            "capital": "Budapest",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "IS",
+            "name": "Iceland",
+            "capital": "Reykjavik",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "###",
+            "is_offline": false
+        },
+        {
+            "code": "IN",
+            "name": "India",
+            "capital": "New Delhi",
+            "continent": "AS",
+            "has_postal": true,
+            "postal_format": "######",
+            "is_offline": false
+        },
+        {
+            "code": "ID",
+            "name": "Indonesia",
+            "capital": "Jakarta",
+            "continent": "AS",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "IR",
+            "name": "Iran",
+            "capital": "Tehran",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "##########",
+            "is_offline": false
+        },
+        {
+            "code": "IQ",
+            "name": "Iraq",
+            "capital": "Baghdad",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "IE",
+            "name": "Ireland",
+            "capital": "Dublin",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "@@@ @@@@",
+            "is_offline": false
+        },
+        {
+            "code": "IM",
+            "name": "Isle of Man",
+            "capital": "Douglas",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "@# #@@|@## #@@|@@# #@@|@@## #@@|@#@ #@@|@@#@ #@@|GIR0AA",
+            "is_offline": false
+        },
+        {
+            "code": "IL",
+            "name": "Israel",
+            "capital": "Jerusalem",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "#######",
+            "is_offline": false
+        },
+        {
+            "code": "IT",
+            "name": "Italy",
+            "capital": "Rome",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "CI",
+            "name": "Ivory Coast",
+            "capital": "Yamoussoukro",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "JM",
+            "name": "Jamaica",
+            "capital": "Kingston",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "JP",
+            "name": "Japan",
+            "capital": "Tokyo",
+            "continent": "AS",
+            "has_postal": true,
+            "postal_format": "###-####",
+            "is_offline": false
+        },
+        {
+            "code": "JE",
+            "name": "Jersey",
+            "capital": "Saint Helier",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "@# #@@|@## #@@|@@# #@@|@@## #@@|@#@ #@@|@@#@ #@@|GIR0AA",
+            "is_offline": false
+        },
+        {
+            "code": "JO",
+            "name": "Jordan",
+            "capital": "Amman",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "KZ",
+            "name": "Kazakhstan",
+            "capital": "Nur-Sultan",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "######",
+            "is_offline": false
+        },
+        {
+            "code": "KE",
+            "name": "Kenya",
+            "capital": "Nairobi",
+            "continent": "AF",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "KI",
+            "name": "Kiribati",
+            "capital": "Tarawa",
+            "continent": "OC",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "XK",
+            "name": "Kosovo",
+            "capital": "Pristina",
+            "continent": "EU",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "KW",
+            "name": "Kuwait",
+            "capital": "Kuwait City",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "KG",
+            "name": "Kyrgyzstan",
+            "capital": "Bishkek",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "######",
+            "is_offline": false
+        },
+        {
+            "code": "LA",
+            "name": "Laos",
+            "capital": "Vientiane",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "LV",
+            "name": "Latvia",
+            "capital": "Riga",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "LV-####",
+            "is_offline": false
+        },
+        {
+            "code": "LB",
+            "name": "Lebanon",
+            "capital": "Beirut",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "#### ####|####",
+            "is_offline": false
+        },
+        {
+            "code": "LS",
+            "name": "Lesotho",
+            "capital": "Maseru",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "###",
+            "is_offline": false
+        },
+        {
+            "code": "LR",
+            "name": "Liberia",
+            "capital": "Monrovia",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "LY",
+            "name": "Libya",
+            "capital": "Tripoli",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "LI",
+            "name": "Liechtenstein",
+            "capital": "Vaduz",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "LT",
+            "name": "Lithuania",
+            "capital": "Vilnius",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "LT-#####",
+            "is_offline": false
+        },
+        {
+            "code": "LU",
+            "name": "Luxembourg",
+            "capital": "Luxembourg",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "L-####",
+            "is_offline": false
+        },
+        {
+            "code": "MO",
+            "name": "Macao",
+            "capital": "Macao",
+            "continent": "AS",
+            "has_postal": true,
+            "postal_format": "######",
+            "is_offline": false
+        },
+        {
+            "code": "MG",
+            "name": "Madagascar",
+            "capital": "Antananarivo",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "###",
+            "is_offline": false
+        },
+        {
+            "code": "MW",
+            "name": "Malawi",
+            "capital": "Lilongwe",
+            "continent": "AF",
+            "has_postal": true,
+            "postal_format": "######",
+            "is_offline": false
+        },
+        {
+            "code": "MY",
+            "name": "Malaysia",
+            "capital": "Kuala Lumpur",
+            "continent": "AS",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "MV",
+            "name": "Maldives",
+            "capital": "Male",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "ML",
+            "name": "Mali",
+            "capital": "Bamako",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "MT",
+            "name": "Malta",
+            "capital": "Valletta",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "@@@ ####",
+            "is_offline": false
+        },
+        {
+            "code": "MH",
+            "name": "Marshall Islands",
+            "capital": "Majuro",
+            "continent": "OC",
+            "has_postal": true,
+            "postal_format": "#####-####",
+            "is_offline": false
+        },
+        {
+            "code": "MQ",
+            "name": "Martinique",
+            "capital": "Fort-de-France",
+            "continent": "NA",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "MR",
+            "name": "Mauritania",
+            "capital": "Nouakchott",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "MU",
+            "name": "Mauritius",
+            "capital": "Port Louis",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "YT",
+            "name": "Mayotte",
+            "capital": "Mamoudzou",
+            "continent": "AF",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "MX",
+            "name": "Mexico",
+            "capital": "Mexico City",
+            "continent": "NA",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "FM",
+            "name": "Micronesia",
+            "capital": "Palikir",
+            "continent": "OC",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "MD",
+            "name": "Moldova",
+            "capital": "Chisinau",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "MD-####",
+            "is_offline": false
+        },
+        {
+            "code": "MC",
+            "name": "Monaco",
+            "capital": "Monaco",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "MN",
+            "name": "Mongolia",
+            "capital": "Ulaanbaatar",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "######",
+            "is_offline": false
+        },
+        {
+            "code": "ME",
+            "name": "Montenegro",
+            "capital": "Podgorica",
+            "continent": "EU",
+            "has_postal": false,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "MS",
+            "name": "Montserrat",
+            "capital": "Plymouth",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "MA",
+            "name": "Morocco",
+            "capital": "Rabat",
+            "continent": "AF",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "MZ",
+            "name": "Mozambique",
+            "capital": "Maputo",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "MM",
+            "name": "Myanmar",
+            "capital": "Nay Pyi Taw",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "NA",
+            "name": "Namibia",
+            "capital": "Windhoek",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "NR",
+            "name": "Nauru",
+            "capital": "Yaren",
+            "continent": "OC",
+            "has_postal": true,
+            "postal_format": "NRU68",
+            "is_offline": false
+        },
+        {
+            "code": "NP",
+            "name": "Nepal",
+            "capital": "Kathmandu",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "AN",
+            "name": "Netherlands Antilles",
+            "capital": "Willemstad",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "NC",
+            "name": "New Caledonia",
+            "capital": "Noumea",
+            "continent": "OC",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "NZ",
+            "name": "New Zealand",
+            "capital": "Wellington",
+            "continent": "OC",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "NI",
+            "name": "Nicaragua",
+            "capital": "Managua",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "###-###-#",
+            "is_offline": false
+        },
+        {
+            "code": "NE",
+            "name": "Niger",
+            "capital": "Niamey",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "NG",
+            "name": "Nigeria",
+            "capital": "Abuja",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "######",
+            "is_offline": false
+        },
+        {
+            "code": "NU",
+            "name": "Niue",
+            "capital": "Alofi",
+            "continent": "OC",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "NF",
+            "name": "Norfolk Island",
+            "capital": "Kingston",
+            "continent": "OC",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "KP",
+            "name": "North Korea",
+            "capital": "Pyongyang",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "###-###",
+            "is_offline": false
+        },
+        {
+            "code": "MK",
+            "name": "North Macedonia",
+            "capital": "Skopje",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "MP",
+            "name": "Northern Mariana Islands",
+            "capital": "Saipan",
+            "continent": "OC",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "NO",
+            "name": "Norway",
+            "capital": "Oslo",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "OM",
+            "name": "Oman",
+            "capital": "Muscat",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "###",
+            "is_offline": false
+        },
+        {
+            "code": "PK",
+            "name": "Pakistan",
+            "capital": "Islamabad",
+            "continent": "AS",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "PW",
+            "name": "Palau",
+            "capital": "Melekeok",
+            "continent": "OC",
+            "has_postal": true,
+            "postal_format": "96940",
+            "is_offline": false
+        },
+        {
+            "code": "PS",
+            "name": "Palestinian Territory",
+            "capital": "East Jerusalem",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "PA",
+            "name": "Panama",
+            "capital": "Panama City",
+            "continent": "NA",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "PG",
+            "name": "Papua New Guinea",
+            "capital": "Port Moresby",
+            "continent": "OC",
+            "has_postal": false,
+            "postal_format": "###",
+            "is_offline": false
+        },
+        {
+            "code": "PY",
+            "name": "Paraguay",
+            "capital": "Asuncion",
+            "continent": "SA",
+            "has_postal": false,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "PE",
+            "name": "Peru",
+            "capital": "Lima",
+            "continent": "SA",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "PH",
+            "name": "Philippines",
+            "capital": "Manila",
+            "continent": "AS",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "PN",
+            "name": "Pitcairn",
+            "capital": "Adamstown",
+            "continent": "OC",
+            "has_postal": true,
+            "postal_format": "PCRN 1ZZ",
+            "is_offline": false
+        },
+        {
+            "code": "PL",
+            "name": "Poland",
+            "capital": "Warsaw",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "##-###",
+            "is_offline": false
+        },
+        {
+            "code": "PT",
+            "name": "Portugal",
+            "capital": "Lisbon",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "####-###",
+            "is_offline": false
+        },
+        {
+            "code": "PR",
+            "name": "Puerto Rico",
+            "capital": "San Juan",
+            "continent": "NA",
+            "has_postal": true,
+            "postal_format": "#####-####",
+            "is_offline": false
+        },
+        {
+            "code": "QA",
+            "name": "Qatar",
+            "capital": "Doha",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "CG",
+            "name": "Republic of the Congo",
+            "capital": "Brazzaville",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "RE",
+            "name": "Reunion",
+            "capital": "Saint-Denis",
+            "continent": "AF",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "RO",
+            "name": "Romania",
+            "capital": "Bucharest",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "######",
+            "is_offline": false
+        },
+        {
+            "code": "RU",
+            "name": "Russia",
+            "capital": "Moscow",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "######",
+            "is_offline": false
+        },
+        {
+            "code": "RW",
+            "name": "Rwanda",
+            "capital": "Kigali",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "BL",
+            "name": "Saint Barthelemy",
+            "capital": "Gustavia",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "SH",
+            "name": "Saint Helena",
+            "capital": "Jamestown",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "STHL 1ZZ",
+            "is_offline": false
+        },
+        {
+            "code": "KN",
+            "name": "Saint Kitts and Nevis",
+            "capital": "Basseterre",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "LC",
+            "name": "Saint Lucia",
+            "capital": "Castries",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "MF",
+            "name": "Saint Martin",
+            "capital": "Marigot",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "PM",
+            "name": "Saint Pierre and Miquelon",
+            "capital": "Saint-Pierre",
+            "continent": "NA",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "VC",
+            "name": "Saint Vincent and the Grenadines",
+            "capital": "Kingstown",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "WS",
+            "name": "Samoa",
+            "capital": "Apia",
+            "continent": "OC",
+            "has_postal": true,
+            "postal_format": "AS 96799",
+            "is_offline": false
+        },
+        {
+            "code": "SM",
+            "name": "San Marino",
+            "capital": "San Marino",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "4789#",
+            "is_offline": false
+        },
+        {
+            "code": "ST",
+            "name": "Sao Tome and Principe",
+            "capital": "Sao Tome",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "SA",
+            "name": "Saudi Arabia",
+            "capital": "Riyadh",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "SN",
+            "name": "Senegal",
+            "capital": "Dakar",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "RS",
+            "name": "Serbia",
+            "capital": "Belgrade",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "CS",
+            "name": "Serbia and Montenegro",
+            "capital": "Belgrade",
+            "continent": "EU",
+            "has_postal": false,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "SC",
+            "name": "Seychelles",
+            "capital": "Victoria",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "SL",
+            "name": "Sierra Leone",
+            "capital": "Freetown",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "SG",
+            "name": "Singapore",
+            "capital": "Singapore",
+            "continent": "AS",
+            "has_postal": true,
+            "postal_format": "######",
+            "is_offline": false
+        },
+        {
+            "code": "SX",
+            "name": "Sint Maarten",
+            "capital": "Philipsburg",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "SK",
+            "name": "Slovakia",
+            "capital": "Bratislava",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "### ##",
+            "is_offline": false
+        },
+        {
+            "code": "SI",
+            "name": "Slovenia",
+            "capital": "Ljubljana",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "SB",
+            "name": "Solomon Islands",
+            "capital": "Honiara",
+            "continent": "OC",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "SO",
+            "name": "Somalia",
+            "capital": "Mogadishu",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "@@  #####",
+            "is_offline": false
+        },
+        {
+            "code": "ZA",
+            "name": "South Africa",
+            "capital": "Pretoria",
+            "continent": "AF",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "GS",
+            "name": "South Georgia and the South Sandwich Islands",
+            "capital": "Grytviken",
+            "continent": "AN",
+            "has_postal": true,
+            "postal_format": "SIQQ 1ZZ",
+            "is_offline": false
+        },
+        {
+            "code": "KR",
+            "name": "South Korea",
+            "capital": "Seoul",
+            "continent": "AS",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "SS",
+            "name": "South Sudan",
+            "capital": "Juba",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "ES",
+            "name": "Spain",
+            "capital": "Madrid",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "LK",
+            "name": "Sri Lanka",
+            "capital": "Colombo",
+            "continent": "AS",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "SD",
+            "name": "Sudan",
+            "capital": "Khartoum",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "SR",
+            "name": "Suriname",
+            "capital": "Paramaribo",
+            "continent": "SA",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "SJ",
+            "name": "Svalbard and Jan Mayen",
+            "capital": "Longyearbyen",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "SE",
+            "name": "Sweden",
+            "capital": "Stockholm",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "### ##",
+            "is_offline": false
+        },
+        {
+            "code": "CH",
+            "name": "Switzerland",
+            "capital": "Bern",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "SY",
+            "name": "Syria",
+            "capital": "Damascus",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "TW",
+            "name": "Taiwan",
+            "capital": "Taipei",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "TJ",
+            "name": "Tajikistan",
+            "capital": "Dushanbe",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "######",
+            "is_offline": false
+        },
+        {
+            "code": "TZ",
+            "name": "Tanzania",
+            "capital": "Dodoma",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "TH",
+            "name": "Thailand",
+            "capital": "Bangkok",
+            "continent": "AS",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "NL",
+            "name": "The Netherlands",
+            "capital": "Amsterdam",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "#### @@",
+            "is_offline": false
+        },
+        {
+            "code": "TL",
+            "name": "Timor Leste",
+            "capital": "Dili",
+            "continent": "OC",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "TG",
+            "name": "Togo",
+            "capital": "Lome",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "TK",
+            "name": "Tokelau",
+            "capital": "",
+            "continent": "OC",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "TO",
+            "name": "Tonga",
+            "capital": "Nuku'alofa",
+            "continent": "OC",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "TT",
+            "name": "Trinidad and Tobago",
+            "capital": "Port of Spain",
+            "continent": "NA",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "TN",
+            "name": "Tunisia",
+            "capital": "Tunis",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "TR",
+            "name": "Turkey",
+            "capital": "Ankara",
+            "continent": "AS",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "TM",
+            "name": "Turkmenistan",
+            "capital": "Ashgabat",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "######",
+            "is_offline": false
+        },
+        {
+            "code": "TC",
+            "name": "Turks and Caicos Islands",
+            "capital": "Cockburn Town",
+            "continent": "NA",
+            "has_postal": true,
+            "postal_format": "TKCA 1ZZ",
+            "is_offline": false
+        },
+        {
+            "code": "TV",
+            "name": "Tuvalu",
+            "capital": "Funafuti",
+            "continent": "OC",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "VI",
+            "name": "U.S. Virgin Islands",
+            "capital": "Charlotte Amalie",
+            "continent": "NA",
+            "has_postal": true,
+            "postal_format": "#####-####",
+            "is_offline": false
+        },
+        {
+            "code": "UG",
+            "name": "Uganda",
+            "capital": "Kampala",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "UA",
+            "name": "Ukraine",
+            "capital": "Kyiv",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "AE",
+            "name": "United Arab Emirates",
+            "capital": "Abu Dhabi",
+            "continent": "AS",
+            "has_postal": true,
+            "postal_format": "##### #####",
+            "is_offline": false
+        },
+        {
+            "code": "GB",
+            "name": "United Kingdom",
+            "capital": "London",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "@# #@@|@## #@@|@@# #@@|@@## #@@|@#@ #@@|@@#@ #@@|GIR0AA",
+            "is_offline": false
+        },
+        {
+            "code": "US",
+            "name": "United States",
+            "capital": "Washington",
+            "continent": "NA",
+            "has_postal": true,
+            "postal_format": "#####-####",
+            "is_offline": false
+        },
+        {
+            "code": "UM",
+            "name": "United States Minor Outlying Islands",
+            "capital": "",
+            "continent": "OC",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "UY",
+            "name": "Uruguay",
+            "capital": "Montevideo",
+            "continent": "SA",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "UZ",
+            "name": "Uzbekistan",
+            "capital": "Tashkent",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "######",
+            "is_offline": false
+        },
+        {
+            "code": "VU",
+            "name": "Vanuatu",
+            "capital": "Port Vila",
+            "continent": "OC",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "VA",
+            "name": "Vatican",
+            "capital": "Vatican City",
+            "continent": "EU",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "VE",
+            "name": "Venezuela",
+            "capital": "Caracas",
+            "continent": "SA",
+            "has_postal": false,
+            "postal_format": "####",
+            "is_offline": false
+        },
+        {
+            "code": "VN",
+            "name": "Vietnam",
+            "capital": "Hanoi",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "######",
+            "is_offline": false
+        },
+        {
+            "code": "WF",
+            "name": "Wallis and Futuna",
+            "capital": "Mata Utu",
+            "continent": "OC",
+            "has_postal": true,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "EH",
+            "name": "Western Sahara",
+            "capital": "El-Aaiun",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "YE",
+            "name": "Yemen",
+            "capital": "Sanaa",
+            "continent": "AS",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        },
+        {
+            "code": "ZM",
+            "name": "Zambia",
+            "capital": "Lusaka",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "#####",
+            "is_offline": false
+        },
+        {
+            "code": "ZW",
+            "name": "Zimbabwe",
+            "capital": "Harare",
+            "continent": "AF",
+            "has_postal": false,
+            "postal_format": "",
+            "is_offline": false
+        }
+    ]
+}

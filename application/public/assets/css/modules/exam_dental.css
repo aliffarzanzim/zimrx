@@ -1,0 +1,257 @@
+/* Dental odontogram, tooth grid arches, surfaces, and pathological status styles */
+
+.zrx-dental-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.65rem;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+.zrx-dental-mode-toggle {
+    display: flex;
+    gap: 0.35rem;
+    background: var(--zrx-border-subtle);
+    padding: 3px;
+    border-radius: 6px;
+}
+.zrx-dental-type-btn {
+    border: none;
+    background: transparent;
+    color: var(--zrx-slate-600);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.12s;
+}
+.zrx-dental-type-btn.active {
+    background: var(--zrx-bg-card);
+    color: var(--zrx-text-main);
+    box-shadow: var(--zrx-shadow-sm);
+}
+.zrx-dental-dmft-badge {
+    background: var(--zrx-blue-50);
+    border: 1px solid var(--zrx-blue-200);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 0.72rem;
+    color: var(--zrx-blue-800);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.zrx-dental-dmft-badge strong {
+    color: var(--zrx-text-main);
+    font-weight: 700;
+}
+
+.zrx-odontogram-card {
+    background: var(--zrx-bg-subtle);
+    border: 1px solid var(--zrx-border);
+    border-radius: 6px;
+    padding: 0.65rem;
+    margin-bottom: 0.65rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: auto;
+}
+.zrx-odontogram-arch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+.zrx-arch-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--zrx-text-muted);
+    margin: 0.2rem 0;
+}
+.zrx-arch-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+}
+.zrx-quadrant {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+}
+.zrx-arch-midline {
+    width: 2px;
+    height: 38px;
+    background: var(--zrx-border-divider);
+}
+.zrx-tooth-btn {
+    border: 1px solid var(--zrx-border);
+    background: var(--zrx-bg-card);
+    border-radius: 4px;
+    padding: 2px;
+    width: 28px;
+    height: 42px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.12s;
+    user-select: none;
+}
+.zrx-tooth-btn:hover {
+    border-color: var(--zrx-primary);
+    background: var(--zrx-blue-50);
+}
+.zrx-tooth-btn.active {
+    border-color: var(--zrx-text-main);
+    box-shadow: 0 0 0 2px var(--zrx-text-main);
+    transform: scale(1.05);
+}
+.zrx-tooth-num {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--zrx-slate-600);
+    line-height: 1;
+}
+.zrx-tooth-box {
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--zrx-border-divider);
+    border-radius: 3px;
+    background: var(--zrx-slate-100);
+    display: block;
+    position: relative;
+    transition: background 0.12s;
+}
+
+/* Pathological status and restoration indicators */
+
+.zrx-tooth-btn.caries .zrx-tooth-box {
+    background: var(--zrx-red-500);
+    border-color: var(--zrx-red-700);
+}
+.zrx-tooth-btn.filled .zrx-tooth-box {
+    background: var(--zrx-blue-500);
+    border-color: var(--zrx-primary-hover);
+}
+.zrx-tooth-btn.missing .zrx-tooth-box {
+    background: var(--zrx-border-divider);
+    border-color: var(--zrx-text-muted);
+    opacity: 0.6;
+}
+.zrx-tooth-btn.missing .zrx-tooth-box::after {
+    content: "✕";
+    font-size: 11px;
+    color: var(--zrx-white);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.zrx-tooth-btn.rct .zrx-tooth-box {
+    background: var(--zrx-violet-500);
+    border-color: var(--zrx-violet-700);
+}
+.zrx-tooth-btn.crown .zrx-tooth-box {
+    background: var(--zrx-amber-500);
+    border-color: var(--zrx-amber-700);
+}
+
+.zrx-arch-divider {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 90%;
+    max-width: 520px;
+    border-top: 1px dashed var(--zrx-border);
+    margin: 0.35rem 0;
+    padding-top: 0.2rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--zrx-border-divider);
+}
+
+.zrx-dental-inspector-card {
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
+    border-radius: 6px;
+    padding: 0.6rem;
+    margin-bottom: 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+.zrx-dental-insp-head {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--zrx-border-subtle);
+}
+.zrx-dental-insp-badge {
+    background: var(--zrx-blue-100);
+    color: var(--zrx-blue-800);
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 4px;
+}
+.zrx-dental-insp-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--zrx-text-main);
+}
+.zrx-dental-insp-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1.2fr;
+    gap: 0.55rem;
+    align-items: start;
+}
+@media (max-width: 900px) {
+    .zrx-dental-insp-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.zrx-dental-surfaces-group {
+    display: flex;
+    gap: 3px;
+    flex-wrap: wrap;
+}
+.zrx-dental-surf-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    border: 1px solid var(--zrx-border);
+    border-radius: 3px;
+    padding: 2px 5px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--zrx-bg-card);
+}
+.zrx-dental-surf-pill:has(input:checked) {
+    background: var(--zrx-blue-100);
+    border-color: var(--zrx-blue-500);
+    color: var(--zrx-blue-800);
+}
+.zrx-dental-surf-pill input {
+    margin: 0;
+}
+.zrx-dental-perio-row {
+    display: flex;
+    gap: 0.65rem;
+    border-top: 1px dashed var(--zrx-border-subtle);
+    padding-top: 0.45rem;
+}
+@media (max-width: 768px) {
+    .zrx-dental-perio-row {
+        flex-direction: column;
+    }
+}
+

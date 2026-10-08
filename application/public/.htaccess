@@ -1,0 +1,53 @@
+# ==============================================================================
+# ZimRx Production Apache / cPanel Hardening Configuration
+# ==============================================================================
+
+# Disable directory browsing
+Options -Indexes
+
+# Disable server signature
+ServerSignature Off
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # 1. Block direct HTTP access to internal PHP engine, modules, views, & migration directories
+    RewriteRule ^(db|lib|migrations|tests|modules|views)(/.*)?$ - [F,L,NC]
+
+    # 1b. Block direct HTTP access to internal include scripts & dependency manifests
+    RewriteRule ^(config|auth|db|header|footer)\.php$ - [F,L,NC]
+    RewriteRule ^composer\.(json|lock)$ - [F,L,NC]
+
+    # 2. Block direct HTTP access to private clinic database, cache, and backups
+    RewriteRule ^userdata/(database|cache|backups)(/.*)?$ - [F,L,NC]
+
+    # 3. Block direct HTTP access to confidential patient reports and internal chat media
+    #    (All clinical reports must be accessed via authenticated endpoint: api/view_report.php)
+    RewriteRule ^(userdata/)?uploads/reports(/.*)?$ - [F,L,NC]
+    RewriteRule ^(userdata/)?uploads/chat(/.*)?$ - [F,L,NC]
+
+    # 4. Block vendor directory except for public browser assets (NicEdit, Flatpickr)
+    RewriteCond %{REQUEST_URI} !^/vendor/nicedit/ [NC]
+    RewriteCond %{REQUEST_URI} !^/vendor/flatpickr/ [NC]
+    RewriteRule ^vendor(/.*)?$ - [F,L,NC]
+</IfModule>
+
+# 5. Prevent direct downloading of database files, logs, and sensitive configs
+<FilesMatch "(?i)\.(db|db3|sqlite|sqlite3|sql|mdb|accdb|log|env|bak|tmp|phar|db-wal|db-shm|sqlite-wal|sqlite-shm)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# 6. Global security headers for MIME sniffing, clickjacking, and CSP defense
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob:; connect-src 'self' http://127.0.0.1:* http://localhost:*; frame-ancestors 'self'; base-uri 'self'; form-action 'self';"
+</IfModule>
