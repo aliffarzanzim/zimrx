@@ -299,8 +299,8 @@ try {
         $stCountry->execute();
         $practiceCountry = (string)($stCountry->fetchColumn() ?: 'INT');
     }
-    \ZimRx\Db\DbConnections::ensureReferenceDatabaseExists(ZIMRX_DB_SYSTEMDATA, $practiceCountry);
-    \ZimRx\Db\DbConnections::ensureReferenceDatabaseExists(ZIMRX_DB_STATIC, $practiceCountry);
+    \DbConnections::ensureReferenceDatabaseExists(ZIMRX_DB_SYSTEMDATA, $practiceCountry);
+    \DbConnections::ensureReferenceDatabaseExists(ZIMRX_DB_STATIC, $practiceCountry);
     
     echo '1';
 } catch (Throwable $e) {

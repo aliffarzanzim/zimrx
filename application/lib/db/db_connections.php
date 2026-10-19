@@ -196,3 +196,9 @@ class DbConnections {
     }
 }
 
+// Safety alias for namespaced callers
+if (!class_exists('ZimRx\Db\DbConnections', false)) {
+    class_alias(DbConnections::class, 'ZimRx\Db\DbConnections');
+}
+
+

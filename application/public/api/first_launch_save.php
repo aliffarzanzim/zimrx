@@ -149,7 +149,7 @@ try {
         "UPDATE zimrx_app_config
          SET config_value = 'initializing', updated_at = CURRENT_TIMESTAMP
          WHERE config_key = 'setup_complete'
-           AND config_value = '0'"
+           AND config_value IN ('0', 'initializing')"
     );
     $claim->execute();
 
@@ -290,8 +290,8 @@ try {
     $pdo->commit();
 
     // Dynamically compile regional clinical reference databases based on clinician selection
-    \ZimRx\Db\DbConnections::ensureReferenceDatabaseExists(ZIMRX_DB_SYSTEMDATA, $country);
-    \ZimRx\Db\DbConnections::ensureReferenceDatabaseExists(ZIMRX_DB_STATIC, $country);
+    \DbConnections::ensureReferenceDatabaseExists(ZIMRX_DB_SYSTEMDATA, $country);
+    \DbConnections::ensureReferenceDatabaseExists(ZIMRX_DB_STATIC, $country);
 
     // Clean up one-time network setup token if it existed
     if (isset($setupTokenFile) && file_exists($setupTokenFile)) {
