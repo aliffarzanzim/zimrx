@@ -806,6 +806,9 @@ function zrx_render_drug_rows(array $drugs, array $options): string {
         }
 
         $drugRowFormat = (string)($options['drug_row_format'] ?? 'standard');
+        $isGenericMode = (($options['prescribing_mode'] ?? '') === 'generic') || !empty($drug['is_generic_mode']);
+        $alreadyHasGeneric = ($generic !== '' && stripos($drugName, $generic) !== false);
+        $canShowGenericSubtitle = $showGeneric && $generic !== '' && $generic !== $drugName && !$isGenericMode && !$alreadyHasGeneric;
 
         if ($drugRowFormat === 'labelled') {
             $brandFontSize = preview_escape((string)($options['right_font_size'] ?? '11')) . 'pt';
@@ -822,7 +825,7 @@ function zrx_render_drug_rows(array $drugs, array $options): string {
                     <?php if ($generic !== ''): ?>
                         <div class="zrx-drug-subrow"><span class="zrx-lbl-generic"><?= preview_escape($lblGeneric) ?> </span><span class="zrx-drug-generic" data-generic="<?= preview_escape($generic) ?>" style="font-size: <?= $brandFontSize ?>; <?= $showGeneric ? 'display: inline-block;' : 'display: none;' ?>"><?= preview_escape($generic) ?></span></div>
                     <?php endif; ?>
-                    <?php if ($brand !== ''): ?>
+                    <?php if ($brand !== '' && !$isGenericMode && $brand !== $generic && !$alreadyHasGeneric): ?>
                         <div class="zrx-drug-subrow"><span class="zrx-lbl-brand"><?= preview_escape($lblBrand) ?> </span><span class="zrx-drug-brand"><?= preview_escape($brand) ?></span></div>
                     <?php endif; ?>
                     <?php if ($instruction !== '' || $dose !== '' || $duration !== ''): ?>
@@ -842,7 +845,7 @@ function zrx_render_drug_rows(array $drugs, array $options): string {
                 <?= $numberHtml ?>
                 <td colspan="3" class="zrx-drug-name-cell">
                     <span class="zrx-drug-brand"><?= preview_escape($drugName) ?></span>
-                    <?php if ($generic !== '' && $generic !== $drugName): ?>
+                    <?php if ($canShowGenericSubtitle): ?>
                         <?php
                             $gWrapper = (string)($options['generic_wrapper'] ?? 'none');
                             $gFormatted = $generic;
@@ -895,6 +898,8 @@ function zrx_render_advice(array $items, array $options): string {
 }
 
 $doctorId = current_user_doctor_id();
+global $pdo;
+$pdo = (isset($pdo) && $pdo instanceof PDO) ? $pdo : DbConnections::userdata();
 $header = zimrx_print_load_header_settings($pdo, $doctorId);
 $options = zimrx_print_load_options($pdo, $doctorId);
 $sampleData = zimrx_print_sample_preview_data($header);
@@ -1095,7 +1100,7 @@ $revisit = trim((string)($clinical['revisit'] ?? ''));
         }
 
         .zrx-drug-generic {
-            display: <?= $showGeneric ? ((($options['generic_position'] ?? 'below') === 'below') ? 'block' : 'inline-block') : 'none' ?>;
+            display: <?= (($options['disp_generic'] ?? 'yes') === 'yes') ? ((($options['generic_position'] ?? 'below') === 'below') ? 'block' : 'inline-block') : 'none' ?>;
             font-family: "<?= preview_escape((string)($options['generic_font'] ?? 'Tinos')) ?>", "Tinos", serif;
             font-size: <?= preview_escape((string)($options['generic_font_size'] ?? '10')) ?>pt;
             <?php

@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/init.php';
 require_login();
 require_once ZIMRX_BASE_DIR . '/lib/rx_regimen_lib.php';
+require_once ZIMRX_BASE_DIR . '/lib/rx_template_lib.php';
 
 function rx_regimen_local_route_context(array $context): bool {
     $text = rx_norm(
@@ -59,11 +60,21 @@ function rx_regimen_response(array $rows, string $source): array {
     ];
 }
 
-function rx_regimen_instruction_row(array $context, array $instruction): array {
+function rx_regimen_instruction_row(array $context, array $instruction, string $preferredLang = 'bn'): array {
+    $bn = rx_clean($instruction['instruction_bn'] ?? '');
+    $en = rx_clean($instruction['instruction_en'] ?? '');
+    $display = ($preferredLang === 'en') ? ($en !== '' ? $en : $bn) : ($bn !== '' ? $bn : $en);
+
     return [
         'dose' => '',
-        'instruction' => rx_clean($instruction['instruction_bn'] ?? ''),
+        'dose_bn' => '',
+        'dose_en' => '',
+        'instruction' => $display,
+        'instruction_bn' => $bn,
+        'instruction_en' => $en,
         'duration' => '',
+        'duration_bn' => '',
+        'duration_en' => '',
         'brand_id' => $context['brand_id'] ?? '',
         'catalog_id' => $context['catalog_id'] ?? '',
         'generic_id' => $context['generic_id'] ?? '',
@@ -74,12 +85,18 @@ function rx_regimen_instruction_row(array $context, array $instruction): array {
     ];
 }
 
-function rx_regimen_with_instruction_default(array $rows, array $context, ?array $defaultInstruction): array {
-    if (!$defaultInstruction || rx_clean($defaultInstruction['instruction_bn'] ?? '') === '') {
+function rx_regimen_with_instruction_default(array $rows, array $context, ?array $defaultInstruction, string $preferredLang = 'bn'): array {
+    if (!$defaultInstruction) {
         return $rows;
     }
 
-    $instruction = rx_clean($defaultInstruction['instruction_bn'] ?? '');
+    $bn = rx_clean($defaultInstruction['instruction_bn'] ?? '');
+    $en = rx_clean($defaultInstruction['instruction_en'] ?? '');
+    $instruction = ($preferredLang === 'en') ? ($en !== '' ? $en : $bn) : ($bn !== '' ? $bn : $en);
+    if ($instruction === '') {
+        return $rows;
+    }
+
     $anotherRow = (int)($defaultInstruction['default_instruction_in_another_row'] ?? 0) === 1;
 
     if (!$rows) {
@@ -87,8 +104,14 @@ function rx_regimen_with_instruction_default(array $rows, array $context, ?array
             return [
                 [
                     'dose' => '',
+                    'dose_bn' => '',
+                    'dose_en' => '',
                     'instruction' => '',
+                    'instruction_bn' => '',
+                    'instruction_en' => '',
                     'duration' => '',
+                    'duration_bn' => '',
+                    'duration_en' => '',
                     'brand_id' => $context['brand_id'] ?? '',
                     'catalog_id' => $context['catalog_id'] ?? '',
                     'generic_id' => $context['generic_id'] ?? '',
@@ -97,25 +120,27 @@ function rx_regimen_with_instruction_default(array $rows, array $context, ?array
                     'strength' => $context['strength'] ?? '',
                     'form' => $context['form'] ?? '',
                 ],
-                rx_regimen_instruction_row($context, $defaultInstruction),
+                rx_regimen_instruction_row($context, $defaultInstruction, $preferredLang),
             ];
         }
-        return [rx_regimen_instruction_row($context, $defaultInstruction)];
+        return [rx_regimen_instruction_row($context, $defaultInstruction, $preferredLang)];
     }
 
     if ($anotherRow) {
         foreach ($rows as &$row) {
-            if (rx_norm($row['instruction'] ?? '') === rx_norm($instruction)) {
+            if (rx_norm($row['instruction'] ?? '') === rx_norm($instruction) || rx_norm($row['instruction_bn'] ?? '') === rx_norm($bn) || rx_norm($row['instruction_en'] ?? '') === rx_norm($en)) {
                 $row['instruction'] = '';
             }
         }
         unset($row);
-        $rows[] = rx_regimen_instruction_row($context, $defaultInstruction);
+        $rows[] = rx_regimen_instruction_row($context, $defaultInstruction, $preferredLang);
         return $rows;
     }
 
     if (rx_clean($rows[0]['instruction'] ?? '') === '') {
         $rows[0]['instruction'] = $instruction;
+        $rows[0]['instruction_bn'] = $bn;
+        $rows[0]['instruction_en'] = $en;
     }
     return $rows;
 }
@@ -181,7 +206,7 @@ function rx_regimen_system_template_rows(PDO $systemPdo, array $context, string 
     $catalogId = $context['catalog_id'] ?? '';
     $finalRows = [];
     foreach ($grouped as $rowNum => $entry) {
-        $p = $entry['primary'] ?? $entry['bn'] ?? $entry['en'];
+        $p = $entry['primary'] ?? ($preferredLang === 'en' ? ($entry['en'] ?? $entry['bn']) : ($entry['bn'] ?? $entry['en']));
         if (!$p) continue;
 
         $bn = $entry['bn'] ?? [];
@@ -209,6 +234,52 @@ function rx_regimen_system_template_rows(PDO $systemPdo, array $context, string 
     return $finalRows;
 }
 
+function rx_enrich_learned_row_language(array $row, string $preferredLang): array {
+    if (empty($row['dose_bn']) || empty($row['dose_en'])) {
+        $doseVal = rx_clean($row['dose'] ?? '');
+        if ($doseVal !== '' && function_exists('rx_phrase_find_static_match')) {
+            $m = rx_phrase_find_static_match('dose', $doseVal);
+            if ($m) {
+                $row['dose_bn'] = $m['value_bn'] ?? ($m['dosage_bn'] ?? '');
+                $row['dose_en'] = $m['value_en'] ?? ($m['dosage_en'] ?? '');
+            }
+        }
+    }
+    if (!empty($row['dose_en']) && !empty($row['dose_bn'])) {
+        $row['dose'] = ($preferredLang === 'en') ? $row['dose_en'] : $row['dose_bn'];
+    }
+
+    if (empty($row['instruction_bn']) || empty($row['instruction_en'])) {
+        $instVal = rx_clean($row['instruction'] ?? '');
+        if ($instVal !== '' && function_exists('rx_find_static_instruction_match')) {
+            $m = rx_find_static_instruction_match($instVal);
+            if ($m) {
+                $row['instruction_bn'] = $m['instruction_bn'] ?? '';
+                $row['instruction_en'] = $m['instruction_en'] ?? '';
+            }
+        }
+    }
+    if (!empty($row['instruction_en']) && !empty($row['instruction_bn'])) {
+        $row['instruction'] = ($preferredLang === 'en') ? $row['instruction_en'] : $row['instruction_bn'];
+    }
+
+    if (empty($row['duration_bn']) || empty($row['duration_en'])) {
+        $durVal = rx_clean($row['duration'] ?? '');
+        if ($durVal !== '' && function_exists('rx_phrase_find_static_match')) {
+            $m = rx_phrase_find_static_match('duration', $durVal);
+            if ($m) {
+                $row['duration_bn'] = $m['value_bn'] ?? ($m['duration_bn'] ?? '');
+                $row['duration_en'] = $m['value_en'] ?? ($m['duration_en'] ?? '');
+            }
+        }
+    }
+    if (!empty($row['duration_en']) && !empty($row['duration_bn'])) {
+        $row['duration'] = ($preferredLang === 'en') ? $row['duration_en'] : $row['duration_bn'];
+    }
+
+    return $row;
+}
+
 try {
     $userPdo = rx_user_pdo();
     $systemPdo = rx_system_pdo();
@@ -221,17 +292,16 @@ try {
     $strengthNorm = rx_norm_compact($context['strength']);
     $formNorm = rx_norm_compact($context['form']);
     $doctorId = current_user_doctor_id();
-    $defaultInstruction = rx_instruction_default_for_form($context['form'], $doctorId);
-    $preferredLang = rx_clean($_GET['lang'] ?? '') ?: 'bn';
-    if ($preferredLang !== 'bn' && $preferredLang !== 'en') {
-        $preferredLang = 'bn';
-    }
+    $preferredLang = function_exists('zimrx_clinical_language')
+        ? zimrx_clinical_language($userPdo, $doctorId, $_GET['lang'] ?? null)
+        : (rx_clean($_GET['lang'] ?? '') ?: 'en');
+    $defaultInstruction = rx_instruction_default_for_form($context['form'], $doctorId, $preferredLang);
 
     if ($genericId !== '' && $hasSystemTemplate) {
         $templateRows = rx_regimen_system_template_rows($systemPdo, $context, $strengthNorm, $formNorm, $preferredLang);
         if ($templateRows) {
             rx_json(rx_regimen_response(
-                rx_regimen_with_instruction_default($templateRows, $context, $defaultInstruction),
+                rx_regimen_with_instruction_default($templateRows, $context, $defaultInstruction, $preferredLang),
                 'drug_template'
             ));
         }
@@ -251,8 +321,9 @@ try {
         $stmt->execute($exactParams);
         $row = $stmt->fetch();
         if ($row && !rx_regimen_should_skip_learned_row($row, $context)) {
+            $enriched = rx_enrich_learned_row_language($row, $preferredLang);
             rx_json(rx_regimen_response(
-                rx_regimen_with_instruction_default([$row], $context, $defaultInstruction),
+                rx_regimen_with_instruction_default([$enriched], $context, $defaultInstruction, $preferredLang),
                 'learned_drug'
             ));
         }
@@ -280,8 +351,9 @@ try {
             $stmt->execute($genericParams);
             $row = $stmt->fetch();
             if ($row && !rx_regimen_should_skip_learned_row($row, $context)) {
+                $enriched = rx_enrich_learned_row_language($row, $preferredLang);
                 rx_json(rx_regimen_response(
-                    rx_regimen_with_instruction_default([$row], $context, $defaultInstruction),
+                    rx_regimen_with_instruction_default([$enriched], $context, $defaultInstruction, $preferredLang),
                     'learned_generic'
                 ));
             }
@@ -290,7 +362,7 @@ try {
 
     if ($defaultInstruction) {
         rx_json(rx_regimen_response(
-            rx_regimen_with_instruction_default([], $context, $defaultInstruction),
+            rx_regimen_with_instruction_default([], $context, $defaultInstruction, $preferredLang),
             'instruction_template'
         ));
     }

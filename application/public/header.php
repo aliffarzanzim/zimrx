@@ -126,6 +126,10 @@ if (empty($zrx_dd_bg) || $zrx_dd_bg === '#ebedf0' || $zrx_dd_bg === '#edf2f7' ||
     } else {
         $zrx_help_initial_lang = ($zrx_practice_country === 'BD') ? 'bn' : 'en';
     }
+    $zrx_clinical_lang = function_exists('zimrx_clinical_language')
+        ? zimrx_clinical_language($pdo ?? null, current_user_doctor_id())
+        : (!empty($configs['clinical_lang']) ? strtolower(trim((string)$configs['clinical_lang'])) : (($zrx_practice_country === 'BD') ? 'bn' : 'en'));
+
     $zrx_initial_guidelines = [];
     require_once ZIMRX_BASE_DIR . '/lib/Services/LocaleService.php';
     try {
@@ -137,6 +141,7 @@ if (empty($zrx_dd_bg) || $zrx_dd_bg === '#ebedf0' || $zrx_dd_bg === '#edf2f7' ||
     window.ZimRxSavedTableColumns = <?= json_encode($zrx_saved_tbl_cols, JSON_UNESCAPED_SLASHES) ?>;
     window.ZimRxCsrfToken = <?= json_encode(function_exists('zimrx_csrf_token') ? zimrx_csrf_token() : '') ?>;
     window.ZimRxPracticeCountry = <?= json_encode($zrx_practice_country, JSON_UNESCAPED_SLASHES) ?>;
+    window.ZimRxClinicalLang = <?= json_encode($zrx_clinical_lang) ?>;
     window.ZimRxHelpInitialLang = <?= json_encode($zrx_help_initial_lang) ?>;
     window.ZimRxHelpGuidelinesCatalogs = {
         <?= json_encode($zrx_help_initial_lang) ?>: <?= json_encode($zrx_initial_guidelines, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>

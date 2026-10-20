@@ -285,5 +285,18 @@ return [
     'clinical_languages' => [
         'BD' => 'bn',
     ],
+    'help_languages' => [
+        'BD' => 'bn',
+    ],
+    'header_defaults' => [
+        'BD' => [
+            'left' => 'doctor_native',
+            'right' => 'doctor_en',
+        ],
+        'default' => [
+            'left' => 'doctor_en',
+            'right' => 'clinic',
+        ],
+    ],
 ];
 

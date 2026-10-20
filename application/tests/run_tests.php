@@ -1111,6 +1111,11 @@ class ZimRxTestSuite {
         $this->assert(\ZimRx\Services\CountryService::getDefaultClinicalLanguage('BD') === 'bn', "CountryService maps BD practice default clinical language to Bengali ('bn')");
         $this->assert(\ZimRx\Services\CountryService::getDefaultClinicalLanguage('US') === null, "CountryService returns null for unmapped countries defaulting to interface language");
         $this->assert(isset(\ZimRx\Services\CountryService::getCountryClinicalLanguages()['BD']), "CountryService provides country clinical languages dictionary");
+        $this->assert(\ZimRx\Services\CountryService::getDefaultHelpLanguage('BD') === 'bn', "CountryService maps BD practice default in-app guide language to Bengali ('bn')");
+        $this->assert(\ZimRx\Services\CountryService::getDefaultHelpLanguage('US') === null, "CountryService returns null for unmapped countries help language");
+        $this->assert(isset(\ZimRx\Services\CountryService::getCountryHelpLanguages()['BD']), "CountryService provides country help languages dictionary");
+        $this->assert(\ZimRx\Services\CountryService::getDefaultHeaderSides('BD') === ['left' => 'doctor_native', 'right' => 'doctor_en'], "CountryService resolves default header layout for BD");
+        $this->assert(\ZimRx\Services\CountryService::getDefaultHeaderSides('US') === ['left' => 'doctor_en', 'right' => 'clinic'], "CountryService resolves default header layout for international/US");
         $formularies = \ZimRx\Services\CountryService::getAvailableFormularies();
         $this->assert(isset($formularies['BD']), "CountryService discovers Bangladesh formulary pack manifest");
         $this->assert(\ZimRx\Services\CountryService::hasFormulary('BD'), "CountryService confirms BD commercial formulary is available");
@@ -1125,6 +1130,85 @@ class ZimRxTestSuite {
         $this->assert(\ZimRx\Services\CountryService::getDefaultPrescribingMode('BD') === 'dual', "CountryService resolves default prescribing mode 'dual' for BD");
         $this->assert(\ZimRx\Services\CountryService::getDefaultPrescribingMode('INT') === 'generic', "CountryService resolves default prescribing mode 'generic' for INT");
         $this->assert(is_array($bdPack['contributors'] ?? null) && count($bdPack['contributors']) >= 1, "BD formulary manifest defines contributors registry");
+
+        // Verify Rx Prescription module dynamic mode rendering (Dual vs Single Generic)
+        require_once __DIR__ . '/../public/api/zrx_icons.php';
+        $renderRx = function(PDO $dbMock): string {
+            global $pdo;
+            $oldPdo = $pdo ?? null;
+            $pdo = $dbMock;
+            ob_start();
+            include __DIR__ . '/../views/modules/rx.php';
+            $html = (string)ob_get_clean();
+            $pdo = $oldPdo;
+            return $html;
+        };
+
+        // 1. Dual / Brand Mode
+        $memDbDual = new PDO('sqlite::memory:');
+        $memDbDual->exec("CREATE TABLE zimrx_app_config (config_key TEXT PRIMARY KEY, config_value TEXT)");
+        $memDbDual->exec("INSERT INTO zimrx_app_config VALUES ('prescribing_mode', 'brand')");
+        $dualHtml = $renderRx($memDbDual);
+        $this->assert(
+            str_contains($dualHtml, '<th class="rx-th-brand">Brand</th>') &&
+            str_contains($dualHtml, '<th class="rx-th-generic">Generic</th>') &&
+            str_contains($dualHtml, '<col class="rx-col-brand">') &&
+            !str_contains($dualHtml, 'rx-th-generic-main'),
+            "Rx table renders both Brand and Generic columns in dual/brand prescribing mode"
+        );
+
+        // 2. Single Generic Mode
+        $memDbGeneric = new PDO('sqlite::memory:');
+        $memDbGeneric->exec("CREATE TABLE zimrx_app_config (config_key TEXT PRIMARY KEY, config_value TEXT)");
+        $memDbGeneric->exec("INSERT INTO zimrx_app_config VALUES ('prescribing_mode', 'generic')");
+        $genericHtml = $renderRx($memDbGeneric);
+        $this->assert(
+            str_contains($genericHtml, '<th class="rx-th-generic-main">Generic</th>') &&
+            str_contains($genericHtml, '<col class="rx-col-generic-main">') &&
+            str_contains($genericHtml, 'rx-input rx-brand-input rx-generic-input') &&
+            !str_contains($genericHtml, '<th class="rx-th-brand">Brand</th>'),
+            "Rx table renders merged single 'Generic' column without Brand column in generic prescribing mode"
+        );
+
+        // Verify Prescription Print Preview Generic Subtitle Deduplication
+        require_once __DIR__ . '/../lib/print_setup_lib.php';
+        $optionsDual = zimrx_print_load_options($memDbDual, 1);
+        $this->assert(($optionsDual['prescribing_mode'] ?? '') === 'brand', "zimrx_print_load_options loads brand prescribing_mode");
+        $optionsGeneric = zimrx_print_load_options($memDbGeneric, 1);
+        $this->assert(($optionsGeneric['prescribing_mode'] ?? '') === 'generic', "zimrx_print_load_options loads generic prescribing_mode");
+
+        $_SESSION['user_id'] = 1;
+        $_SESSION['doctor_id'] = 1;
+        ob_start();
+        include_once __DIR__ . '/../public/prescription_preview.php';
+        ob_end_clean();
+
+        // 1. Dual Mode with commercial brand: prints (Paracetamol) in brackets
+        $htmlDual = zrx_render_drug_rows([
+            ['brand' => 'TAB. NAPA 500 MG', 'generic' => 'Paracetamol', 'generic_name' => 'Paracetamol', 'dose' => '1+0+1']
+        ], ['prescribing_mode' => 'brand', 'generic_wrapper' => 'parentheses', 'disp_generic' => 'yes']);
+        $this->assert(
+            str_contains($htmlDual, 'TAB. NAPA 500 MG') && str_contains($htmlDual, '(Paracetamol)'),
+            "Dual Mode print preview displays commercial brand with bracketed generic ingredient"
+        );
+
+        // 2. Generic Mode: suppresses duplicate (Paracetamol) in brackets
+        $htmlGeneric = zrx_render_drug_rows([
+            ['brand' => 'TAB. PARACETAMOL 500 MG', 'generic' => 'Paracetamol', 'generic_name' => 'Paracetamol', 'dose' => '1+0+1']
+        ], ['prescribing_mode' => 'generic', 'generic_wrapper' => 'parentheses', 'disp_generic' => 'yes']);
+        $this->assert(
+            str_contains($htmlGeneric, 'TAB. PARACETAMOL 500 MG') && !str_contains($htmlGeneric, '(Paracetamol)'),
+            "Generic Mode print preview suppresses redundant bracketed generic subtitle"
+        );
+
+        // 3. Dual Mode with generic formulation: suppresses duplicate (Metformin) in brackets
+        $htmlGenericInDual = zrx_render_drug_rows([
+            ['brand' => 'TAB. METFORMIN 500 MG', 'generic' => 'Metformin', 'generic_name' => 'Metformin', 'dose' => '1+0+1']
+        ], ['prescribing_mode' => 'brand', 'generic_wrapper' => 'parentheses', 'disp_generic' => 'yes']);
+        $this->assert(
+            str_contains($htmlGenericInDual, 'TAB. METFORMIN 500 MG') && !str_contains($htmlGenericInDual, '(Metformin)'),
+            "Dual Mode print preview suppresses redundant bracketed subtitle when drug title already contains generic"
+        );
     }
 
 
@@ -1508,6 +1592,10 @@ class ZimRxTestSuite {
             isset($flEn['section_help_lang'], $flBn['section_help_lang'], $flEn['prescribing_mode_label'], $flBn['prescribing_mode_label']),
             "first_launch provides essential localized form section strings in English and Bengali"
         );
+        $this->assert(
+            isset($flEn['header_left_side_label'], $flBn['header_left_side_label'], $flEn['header_edit_note'], $flBn['header_edit_note'], $flEn['error_required_fields'], $flBn['error_required_fields'], $flEn['type_clinic'], $flBn['type_clinic']),
+            "first_launch provides modular prescription letterhead side selection catalog strings"
+        );
 
         require_once __DIR__ . '/../public/api/zrx_icons.php';
         $this->assert(str_contains(zrx_icon('arrow-right', 14), '<svg') && isset(ZimRxIcon::getAll()['arrow-right']), "global icon registry provides arrow-right SVG vector");
@@ -1613,6 +1701,55 @@ class ZimRxTestSuite {
         $this->assert(
             ($staticAdvices[0]['category_bn'] ?? '') === 'সাধারণ উপদেশ',
             "rx_phrase_static_rows('advice') maps category_bn from LocaleService ('সাধারণ উপদেশ')"
+        );
+
+        // Clinical language resolution tests
+        require_once __DIR__ . '/../lib/rx_regimen_lib.php';
+        require_once __DIR__ . '/../lib/rx_template_lib.php';
+        require_once __DIR__ . '/../lib/print_setup_lib.php';
+
+        $userDb = DbConnections::userdata();
+        $this->assert(function_exists('zimrx_clinical_language'), "zimrx_clinical_language helper exists");
+        $this->assert(zimrx_clinical_language(null, null, 'en') === 'en', "Explicit request language 'en' resolves correctly");
+        $this->assert(zimrx_clinical_language(null, null, 'bn') === 'bn', "Explicit request language 'bn' resolves correctly");
+
+        // Verify dose suggestions in English vs Bengali
+        $enDoseSuggestions = rx_phrase_suggestions_for_type('dose', '', 1, 10, 'en');
+        $this->assert(!empty($enDoseSuggestions), "Dose suggestions return rows in English mode");
+        $this->assert(
+            isset($enDoseSuggestions[0]['value']) && preg_match('/^[0-9\+\s]+$/', $enDoseSuggestions[0]['value']),
+            "Dose suggestions in English mode use western digits ('{$enDoseSuggestions[0]['value']}')"
+        );
+        $bnDoseSuggestions = rx_phrase_suggestions_for_type('dose', '', 1, 10, 'bn');
+        $this->assert(
+            isset($bnDoseSuggestions[0]['value']) && !preg_match('/^[0-9\+\s]+$/', $bnDoseSuggestions[0]['value']),
+            "Dose suggestions in Bengali mode use Bengali digits ('{$bnDoseSuggestions[0]['value']}')"
+        );
+
+        // Verify instruction suggestions in English vs Bengali
+        $enInstSuggestions = rx_instruction_suggestions('', 1, 10, 'en');
+        $this->assert(!empty($enInstSuggestions), "Instruction suggestions return rows in English mode");
+        $this->assert(
+            isset($enInstSuggestions[0]['value']) && preg_match('/^[a-zA-Z\s]+$/', $enInstSuggestions[0]['value']),
+            "Instruction suggestions in English mode use English text ('{$enInstSuggestions[0]['value']}')"
+        );
+        $bnInstSuggestions = rx_instruction_suggestions('', 1, 10, 'bn');
+        $this->assert(
+            isset($bnInstSuggestions[0]['value']) && !preg_match('/^[a-zA-Z\s]+$/', $bnInstSuggestions[0]['value']),
+            "Instruction suggestions in Bengali mode use Bengali text ('{$bnInstSuggestions[0]['value']}')"
+        );
+
+        // Verify print options harmonization with clinical language
+        $userDb->exec("UPDATE zimrx_app_config SET config_value = 'en' WHERE config_key = 'clinical_lang'");
+        $userDb->exec("DELETE FROM zimrx_interface_settings WHERE setting_key = 'clinical_lang' AND doctor_id = 99");
+        $userDb->exec("DELETE FROM zimrx_prescription_print_layout_settings WHERE doctor_id = 99");
+        $enPrintOpts = zimrx_print_load_options($userDb, 99);
+        $this->assert(
+            ($enPrintOpts['dose_language'] ?? '') === 'english'
+            && ($enPrintOpts['duration_language'] ?? '') === 'english'
+            && ($enPrintOpts['instruction_language'] ?? '') === 'english'
+            && ($enPrintOpts['advice_language'] ?? '') === 'english',
+            "Print setup automatically defaults dose, duration, instruction, and advice languages to 'english' when clinical_lang is 'en'"
         );
     }
 

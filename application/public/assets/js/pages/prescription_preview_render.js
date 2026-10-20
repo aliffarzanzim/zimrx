@@ -579,6 +579,9 @@ function renderDrugRows(drugs) {
         }
 
         const format = previewOptions.drug_row_format || 'standard';
+        const isGenericMode = String(previewOptions.prescribing_mode || '') === 'generic' || Boolean(drug && drug.is_generic_mode);
+        const alreadyHasGeneric = Boolean(generic && drugName && drugName.toLowerCase().includes(generic.toLowerCase()));
+        const canShowGenericSubtitle = showGeneric && generic && generic !== drugName && !isGenericMode && !alreadyHasGeneric;
 
         if (format === 'labelled') {
             const brandFontSize = (previewOptions.right_font_size || '11') + 'pt';
@@ -589,7 +592,7 @@ function renderDrugRows(drugs) {
             if (generic) {
                 html += `<div style="margin-bottom: 3px;"><span style="font-weight: bold; font-family: 'Tinos';" class="zrx-lbl-generic">${escapeHtml(lblGeneric)} </span><span class="zrx-drug-generic" data-generic="${escapeHtml(generic)}" style="font-family: 'Tinos', serif; font-style: normal; font-weight: normal; font-size: ${brandFontSize}; ${showGeneric ? 'display: inline-block;' : 'display: none;'}">${escapeHtml(generic)}</span></div>`;
             }
-            if (brand) {
+            if (brand && !isGenericMode && brand !== generic && !alreadyHasGeneric) {
                 html += `<div style="margin-bottom: 3px;"><span style="font-weight: bold; font-family: 'Tinos';" class="zrx-lbl-brand">${escapeHtml(lblBrand)} </span><span class="zrx-drug-brand" style="font-weight: normal;">${escapeHtml(brand)}</span></div>`;
             }
             if (dose || instruction || duration) {
@@ -600,7 +603,7 @@ function renderDrugRows(drugs) {
             if (!isContinuation) {
                 html += `<tr class="zrx-drug-name-row">${numberHtml}`;
                 html += `<td colspan="3" class="zrx-drug-name-cell"><span class="zrx-drug-brand">${escapeHtml(drugName)}</span>`;
-                if (showGeneric && generic && generic !== drugName) {
+                if (canShowGenericSubtitle) {
                     let gFormatted = generic;
                     const wrapper = previewOptions.generic_wrapper || 'none';
                     if (wrapper === 'parentheses') gFormatted = '(' + generic + ')';

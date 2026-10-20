@@ -296,12 +296,15 @@ function zimrx_print_load_header_settings(PDO $pdo, int $doctorId): array {
 function zimrx_print_load_options(PDO $pdo, int $doctorId): array {
     $defaults = zimrx_print_default_options();
 
-    $pdo->prepare(DbSql::insertIgnore('zimrx_prescription_print_layout_settings', 'doctor_id', ':doctor_id'))
-        ->execute(['doctor_id' => $doctorId]);
+    $layout = [];
+    if (zimrx_db_table_exists($pdo, 'zimrx_prescription_print_layout_settings')) {
+        $pdo->prepare(DbSql::insertIgnore('zimrx_prescription_print_layout_settings', 'doctor_id', ':doctor_id'))
+            ->execute(['doctor_id' => $doctorId]);
 
-    $stmt = $pdo->prepare("SELECT * FROM zimrx_prescription_print_layout_settings WHERE doctor_id = :doctor_id LIMIT 1");
-    $stmt->execute(['doctor_id' => $doctorId]);
-    $layout = $stmt->fetch() ?: [];
+        $stmt = $pdo->prepare("SELECT * FROM zimrx_prescription_print_layout_settings WHERE doctor_id = :doctor_id LIMIT 1");
+        $stmt->execute(['doctor_id' => $doctorId]);
+        $layout = $stmt->fetch() ?: [];
+    }
 
     $advanced = json_decode((string)($layout['print_settings_json'] ?? '{}'), true);
     if (!is_array($advanced)) {
@@ -378,6 +381,15 @@ function zimrx_print_load_options(PDO $pdo, int $doctorId): array {
         }
     }
 
+    // Harmonize default dose, duration, instruction, and advice print languages with clinical language
+    $clinicalLang = function_exists('zimrx_clinical_language') ? zimrx_clinical_language($pdo, $doctorId) : 'en';
+    $defaultPrintLang = ($clinicalLang === 'bn') ? 'bengali' : 'english';
+    foreach (['dose_language', 'duration_language', 'instruction_language', 'advice_language'] as $langField) {
+        if (!array_key_exists($langField, $advanced) || $advanced[$langField] === '') {
+            $options[$langField] = $defaultPrintLang;
+        }
+    }
+
     // =========================================================================
     // One-Time Schema Migration Boundary: Canonical Settings to Render Tokens
     // Maps canonical database configuration keys to the preview/render engine
@@ -436,6 +448,29 @@ function zimrx_print_load_options(PDO $pdo, int $doctorId): array {
             $options['right_height'] = (string)$bodyHeight;
         }
     }
+
+    $prescribingMode = 'brand';
+    try {
+        $hasDoctorOverride = false;
+        if (zimrx_db_table_exists($pdo, 'zimrx_interface_settings')) {
+            $stmtM = $pdo->prepare("SELECT setting_value FROM zimrx_interface_settings WHERE doctor_id = :doc AND setting_scope = 'prescribing' AND setting_key = 'prescribing_mode' LIMIT 1");
+            $stmtM->execute(['doc' => $doctorId]);
+            $val = (string)($stmtM->fetchColumn() ?: '');
+            if ($val !== '') {
+                $prescribingMode = $val;
+                $hasDoctorOverride = true;
+            }
+        }
+        if (!$hasDoctorOverride && zimrx_db_table_exists($pdo, 'zimrx_app_config')) {
+            $val2 = (string)($pdo->query("SELECT config_value FROM zimrx_app_config WHERE config_key = 'prescribing_mode' LIMIT 1")->fetchColumn() ?: '');
+            if ($val2 !== '') {
+                $prescribingMode = $val2;
+            }
+        }
+    } catch (Throwable) {
+        $prescribingMode = 'brand';
+    }
+    $options['prescribing_mode'] = $prescribingMode;
 
     return $options;
 }

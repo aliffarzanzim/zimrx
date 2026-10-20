@@ -96,7 +96,8 @@
                 li.addEventListener('mousedown', (event) => {
                     event.preventDefault();
                     input.value = item.category || '';
-                    fetch('api/search_advice.php?category=' + encodeURIComponent(item.category || ''))
+                    const lang = window.ZimRxClinicalLang || '';
+                    fetch('api/search_advice.php?category=' + encodeURIComponent(item.category || '') + (lang ? '&lang=' + encodeURIComponent(lang) : ''))
                         .then((res) => res.json())
                         .then(fillAdvices)
                         .catch(() => {});
@@ -113,7 +114,7 @@
                 li.addEventListener('mousedown', (event) => {
                     event.preventDefault();
                     input.value = item.advice || '';
-                    input.dataset.printBengali = item.advice || '';
+                    input.dataset.printBengali = item.advice_bn || item.advice || '';
                     input.dataset.printEnglish = item.advice_en || item.advice || '';
                     closeDropdown();
                 });
@@ -136,9 +137,11 @@
             return;
         }
         timer = window.setTimeout(() => {
+            const lang = window.ZimRxClinicalLang || '';
+            const langParam = lang ? '&lang=' + encodeURIComponent(lang) : '';
             const url = type === 'category'
-                ? 'api/search_advice.php?mode=category&q=' + encodeURIComponent(q)
-                : 'api/search_advice.php?q=' + encodeURIComponent(q);
+                ? 'api/search_advice.php?mode=category&q=' + encodeURIComponent(q) + langParam
+                : 'api/search_advice.php?q=' + encodeURIComponent(q) + langParam;
             fetch(url)
                 .then((res) => res.json())
                 .then((items) => renderDropdown(input, items, type))

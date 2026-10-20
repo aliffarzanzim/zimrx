@@ -111,7 +111,7 @@ function executeSqlStream(PDO $pdo, string $sqlFile, ?int &$stmtCount = 0): void
 /**
  * Compiles the dynamic prescribe catalog (drug_prescribe_bd / drug_prescribe) and FTS5 search index.
  */
-function compilePrescribeCatalog(PDO $pdo): void
+function compilePrescribeCatalog(PDO $pdo, ?string $sqlFile = null): void
 {
     $hasBrandBd = (bool)$pdo->query(
         "SELECT 1 FROM sqlite_master WHERE type='table' AND name='drug_brand_bd'"
@@ -177,7 +177,28 @@ function compilePrescribeCatalog(PDO $pdo): void
         }
     }
 
-    $formOrders = ['TAB.' => 1, 'CAP.' => 2, 'SYP.' => 3, 'SUSP.' => 4, 'NEB.' => 5, 'INJ.' => 6];
+    $formOrdersByForm = [];
+    if ($hasFormTable) {
+        $formTable = $pdo->query("SELECT 1 FROM sqlite_master WHERE type IN ('table', 'view') AND name='drug_dosage_form'")->fetchColumn()
+            ? 'drug_dosage_form' : 'drug_forms';
+        $formStmt2 = $pdo->query("SELECT form, form_variant, form_order FROM {$formTable}");
+        while ($f = $formStmt2->fetch(PDO::FETCH_ASSOC)) {
+            $std = strtolower(trim((string)$f['form']));
+            $ord = (int)($f['form_order'] ?? 999);
+            if ($ord > 0 && $ord < 999) {
+                $formOrdersByForm[$std] = $ord;
+                $var = trim((string)($f['form_variant'] ?? ''));
+                if ($var !== '') {
+                    foreach (explode(',', $var) as $v) {
+                        $vk = strtolower(trim($v));
+                        if ($vk !== '') {
+                            $formOrdersByForm[$vk] = $ord;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     $fallbackMfgShort = function (string $name): string {
         $name = trim($name);
@@ -190,13 +211,23 @@ function compilePrescribeCatalog(PDO $pdo): void
         return $parts[0] ?? (string)$name;
     };
 
-    $resolveFormOrder = function (string $presBrandShort) use ($formOrders): int {
-        $upper = strtoupper(trim($presBrandShort));
-        foreach ($formOrders as $prefix => $order) {
-            if ($upper === $prefix || str_starts_with($upper, $prefix . ' ')) {
-                return $order;
-            }
+    $resolveFormOrder = function (string $formName, string $presShort) use ($formOrdersByForm): int {
+        $fLower = strtolower(trim($formName));
+        if (isset($formOrdersByForm[$fLower])) {
+            return $formOrdersByForm[$fLower];
         }
+        $combined = $fLower . ' ' . strtolower($presShort);
+        if (preg_match('/\b(tablet|tab|caplet|dispersible|chewable)\b/i', $combined)) return 1;
+        if (preg_match('/\b(capsule|cap)\b/i', $combined)) return 2;
+        if (preg_match('/\b(syrup|syp|linctus|elixir)\b/i', $combined)) return 3;
+        if (preg_match('/\b(suspension|susp)\b/i', $combined)) return 4;
+        if (preg_match('/\b(nebuliser|nebulizer|neb|respule)\b/i', $combined)) return 5;
+        if (preg_match('/\b(injection|inj|infusion|iv|im|sc)\b/i', $combined)) return 6;
+        if (preg_match('/\b(drops?|eye drops?|ear drops?|nasal drops?)\b/i', $combined)) return 7;
+        if (preg_match('/\b(inhaler|spray|mdi|dpi|rotacap)\b/i', $combined)) return 8;
+        if (preg_match('/\b(cream|ointment|gel|lotion|paste|liniment)\b/i', $combined)) return 9;
+        if (preg_match('/\b(suppository|pessary|enema)\b/i', $combined)) return 10;
+        if (preg_match('/\b(powder|sachet|granules?)\b/i', $combined)) return 11;
         return 999;
     };
 
@@ -423,7 +454,7 @@ function compilePrescribeCatalog(PDO $pdo): void
             $lblGenFull = $applyTemplate($rule['pres_full'], $rule, $genName, $formVar ?: $form, $genName, $strength, true);
 
             $mfgPref = $mfgOrder[$mfgId] ?? 9999;
-            $fOrder = $resolveFormOrder($presBrandShort);
+            $fOrder = $resolveFormOrder($formVar ?: $form, $presBrandShort);
 
             $insStmt->execute([
                 $brandId,
@@ -530,6 +561,79 @@ function compilePrescribeCatalog(PDO $pdo): void
     } else {
         // Generic/International mode from drug_generic_product
         buildDbLog("[BUILD] Compiling generic clinical products prescribe catalog...");
+
+        // Calculate clinical prevalence priority dynamically from database / seeds (no hardcoding)
+        $genericPrevalenceRanks = [];
+        $brandCounts = [];
+        $formulationCounts = [];
+
+        $hasBrandTable = (bool)$pdo->query(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='drug_brand_bd'"
+        )->fetchColumn();
+
+        if ($hasBrandTable) {
+            $bStmt = $pdo->query("SELECT generic_id, strength, count(*) as cnt FROM drug_brand_bd WHERE generic_id IS NOT NULL AND generic_id != '' GROUP BY generic_id, strength");
+            while ($bRow = $bStmt->fetch(PDO::FETCH_ASSOC)) {
+                $gid = (string)$bRow['generic_id'];
+                $cnt = (int)$bRow['cnt'];
+                $brandCounts[$gid] = ($brandCounts[$gid] ?? 0) + $cnt;
+                $str = strtolower(preg_replace('/\s+/', '', (string)$bRow['strength']));
+                $formulationCounts[$gid . '|' . $str] = ($formulationCounts[$gid . '|' . $str] ?? 0) + $cnt;
+            }
+        } else {
+            $seedsDir = ($sqlFile !== null && $sqlFile !== '') ? dirname($sqlFile) : __DIR__;
+            $bdSeedPath = $seedsDir . DIRECTORY_SEPARATOR . 'zimrx_drugs_bd.sql';
+            if (file_exists($bdSeedPath)) {
+                $handle = @fopen($bdSeedPath, 'r');
+                if ($handle) {
+                    while (($line = fgets($handle)) !== false) {
+                        if (str_starts_with($line, 'INSERT INTO "drug_brand_bd"')) {
+                            $inner = trim(substr($line, strpos($line, '(') + 1));
+                            $inner = rtrim($inner, ");\r\n");
+                            $parts = str_getcsv($inner, ',', "'", '\\');
+                            if (isset($parts[1])) {
+                                $gid = trim((string)$parts[1]);
+                                $str = isset($parts[6]) ? strtolower(preg_replace('/\s+/', '', (string)$parts[6])) : '';
+                                $brandCounts[$gid] = ($brandCounts[$gid] ?? 0) + 1;
+                                if ($str !== '') {
+                                    $formulationCounts[$gid . '|' . $str] = ($formulationCounts[$gid . '|' . $str] ?? 0) + 1;
+                                }
+                            }
+                        }
+                    }
+                    fclose($handle);
+                }
+            }
+        }
+
+        $prodCounts = [];
+        $hasProdTable = (bool)$pdo->query(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='drug_generic_product'"
+        )->fetchColumn();
+        if ($hasProdTable) {
+            $prodStmt = $pdo->query("SELECT generic_id, count(product_id) as cnt FROM drug_generic_product WHERE generic_id IS NOT NULL AND generic_id != '' GROUP BY generic_id ORDER BY cnt DESC");
+            while ($pRow = $prodStmt->fetch(PDO::FETCH_ASSOC)) {
+                $prodCounts[(string)$pRow['generic_id']] = (int)$pRow['cnt'];
+            }
+        }
+
+        $allGenericIds = array_unique(array_merge(array_keys($brandCounts), array_keys($prodCounts)));
+        usort($allGenericIds, function ($a, $b) use ($brandCounts, $prodCounts) {
+            $bcA = $brandCounts[$a] ?? 0;
+            $bcB = $brandCounts[$b] ?? 0;
+            if ($bcA !== $bcB) {
+                return $bcB <=> $bcA;
+            }
+            $pcA = $prodCounts[$a] ?? 0;
+            $pcB = $prodCounts[$b] ?? 0;
+            return $pcB <=> $pcA;
+        });
+
+        $rankNum = 1;
+        foreach ($allGenericIds as $gid) {
+            $genericPrevalenceRanks[$gid] = $rankNum++;
+        }
+
         $pdo->exec("
             DROP TABLE IF EXISTS drug_prescribe_generic;
             CREATE TABLE drug_prescribe_generic (
@@ -555,11 +659,12 @@ function compilePrescribeCatalog(PDO $pdo): void
                 who_eml_category TEXT,
                 prescribe_generic_short TEXT,
                 prescribe_generic_full TEXT,
+                clinical_priority INTEGER,
                 form_order INTEGER
             );
         ");
 
-        $insSql = "INSERT INTO drug_prescribe_generic VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        $insSql = "INSERT INTO drug_prescribe_generic VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         $insStmt = $pdo->prepare($insSql);
 
         $query = "
@@ -570,19 +675,16 @@ function compilePrescribeCatalog(PDO $pdo): void
                 g.is_safe_in_paediatric, g.requires_tapering, g.immediate_warning, g.pregnancy_category
             FROM drug_generic_product p
             LEFT JOIN drug_generic g ON CAST(p.generic_id AS INTEGER) = g.generic_id
-            ORDER BY p.product_id
+            ORDER BY CAST(p.generic_id AS INTEGER), p.form_id, p.product_id
         ";
         $srcStmt = $pdo->query($query);
-        $count = 0;
-        $pdo->beginTransaction();
+        $allProducts = [];
 
         while ($row = $srcStmt->fetch(PDO::FETCH_ASSOC)) {
-            $prodId = (int)$row['product_id'];
             $genId = trim((string)$row['generic_id']);
             $form = trim((string)$row['form']);
             $strength = trim((string)$row['strength']);
             $genName = trim((string)$row['generic_name']);
-            $drugCls = $drugClasses[$genId] ?? '';
 
             $ruleKey = strtolower($form);
             $rule = $rulesByStd[$ruleKey] ?? ($rulesByForm[$ruleKey] ?? null);
@@ -598,32 +700,98 @@ function compilePrescribeCatalog(PDO $pdo): void
             }
 
             $presGeneric = $applyTemplate($rule['pres_gen'], $rule, $genName, $form, $genName, $strength, false);
-            $fOrder = $resolveFormOrder($presGeneric);
+            $baseFOrder = $resolveFormOrder($form, $presGeneric);
+            $cPriority = $genericPrevalenceRanks[$genId] ?? 9999;
+            $strKey = strtolower(preg_replace('/\s+/', '', $strength));
+            $weight = $formulationCounts[$genId . '|' . $strKey] ?? 0;
+
+            $allProducts[] = [
+                'prodId' => (int)$row['product_id'],
+                'genId' => $genId,
+                'drugCls' => $drugClasses[$genId] ?? '',
+                'form' => $form,
+                'genName' => $genName,
+                'usGen' => $row['us_generic_name'] ?? '',
+                'whoAtc' => $row['who_atc_class'] ?? '',
+                'isAb' => $row['is_antibiotic'] ?? '',
+                'isHa' => $row['is_high_alert_medicine'] ?? '',
+                'isPreg' => $row['is_safe_in_pregnancy'] ?? '',
+                'isLact' => $row['is_safe_in_lactation'] ?? '',
+                'reqRenal' => $row['require_renal_adjustments'] ?? '',
+                'isHep' => $row['is_safe_in_hepatic_impairment'] ?? '',
+                'isPaed' => $row['is_safe_in_paediatric'] ?? '',
+                'reqTap' => $row['requires_tapering'] ?? '',
+                'immWarn' => $row['immediate_warning'] ?? '',
+                'pregCat' => $row['pregnancy_category'] ?? '',
+                'strength' => $strength,
+                'isEml' => (int)($row['is_who_eml'] ?? 0),
+                'emlCat' => $row['who_eml_category'] ?? '',
+                'presGeneric' => $presGeneric,
+                'cPriority' => $cPriority,
+                'baseFOrder' => $baseFOrder,
+                'weight' => $weight,
+            ];
+        }
+
+        usort($allProducts, function($a, $b) {
+            if ($a['cPriority'] !== $b['cPriority']) {
+                return $a['cPriority'] <=> $b['cPriority'];
+            }
+            if ($a['baseFOrder'] !== $b['baseFOrder']) {
+                return $a['baseFOrder'] <=> $b['baseFOrder'];
+            }
+            if ($a['weight'] !== $b['weight']) {
+                return $b['weight'] <=> $a['weight'];
+            }
+            return $a['prodId'] <=> $b['prodId'];
+        });
+
+        // Compute hierarchical form_order: base * 100 + popularity sub-rank
+        $formRanks = [];
+        foreach ($allProducts as &$p) {
+            $fKey = $p['genId'] . '|' . $p['baseFOrder'];
+            $formRanks[$fKey] = ($formRanks[$fKey] ?? 0) + 1;
+            $subRank = min(99, $formRanks[$fKey]);
+            $p['fOrder'] = ($p['baseFOrder'] * 100) + $subRank;
+        }
+        unset($p);
+
+        $count = 0;
+        $seenGenerics = [];
+        $pdo->beginTransaction();
+
+        foreach ($allProducts as $p) {
+            $dedupKey = strtolower($p['genId'] . '|||' . $p['presGeneric']);
+            if (isset($seenGenerics[$dedupKey])) {
+                continue;
+            }
+            $seenGenerics[$dedupKey] = true;
 
             $insStmt->execute([
-                $prodId,
-                $genId,
-                $drugCls,
-                $form,
-                $genName,
-                $row['us_generic_name'] ?? '',
-                $row['who_atc_class'] ?? '',
-                $row['is_antibiotic'] ?? '',
-                $row['is_high_alert_medicine'] ?? '',
-                $row['is_safe_in_pregnancy'] ?? '',
-                $row['is_safe_in_lactation'] ?? '',
-                $row['require_renal_adjustments'] ?? '',
-                $row['is_safe_in_hepatic_impairment'] ?? '',
-                $row['is_safe_in_paediatric'] ?? '',
-                $row['requires_tapering'] ?? '',
-                $row['immediate_warning'] ?? '',
-                $row['pregnancy_category'] ?? '',
-                $strength,
-                (int)($row['is_who_eml'] ?? 0),
-                $row['who_eml_category'] ?? '',
-                $presGeneric,
-                $presGeneric,
-                $fOrder,
+                $p['prodId'],
+                $p['genId'],
+                $p['drugCls'],
+                $p['form'],
+                $p['genName'],
+                $p['usGen'],
+                $p['whoAtc'],
+                $p['isAb'],
+                $p['isHa'],
+                $p['isPreg'],
+                $p['isLact'],
+                $p['reqRenal'],
+                $p['isHep'],
+                $p['isPaed'],
+                $p['reqTap'],
+                $p['immWarn'],
+                $p['pregCat'],
+                $p['strength'],
+                $p['isEml'],
+                $p['emlCat'],
+                $p['presGeneric'],
+                $p['presGeneric'],
+                $p['cPriority'],
+                $p['fOrder'],
             ]);
 
             $count++;
@@ -634,6 +802,7 @@ function compilePrescribeCatalog(PDO $pdo): void
             CREATE INDEX IF NOT EXISTS idx_drug_prescribe_gen_id ON drug_prescribe_generic(generic_id);
             CREATE INDEX IF NOT EXISTS idx_drug_prescribe_gen_name ON drug_prescribe_generic(generic_name);
             CREATE INDEX IF NOT EXISTS idx_drug_prescribe_gen_pres ON drug_prescribe_generic(prescribe_generic_short);
+            CREATE INDEX IF NOT EXISTS idx_drug_prescribe_gen_priority ON drug_prescribe_generic(clinical_priority, form_order, prescribe_generic_short);
             CREATE VIEW IF NOT EXISTS drug_prescribe AS SELECT 
                 product_id AS brand_id, generic_id, '' AS manufacturer_id, '' AS manufacturer_name,
                 '' AS manufacturer_name_short, drug_class, generic_name AS brand_name, form, form AS form_variant,
@@ -643,7 +812,7 @@ function compilePrescribeCatalog(PDO $pdo): void
                 strength, '' AS price, '' AS packsize, prescribe_generic_short AS prescribe_brand_short,
                 prescribe_generic_full AS prescribe_brand_full, prescribe_generic_short, prescribe_generic_full,
                 prescribe_generic_short AS labelled_generic_short, prescribe_generic_full AS labelled_generic_full,
-                9999 AS manufacturer_preference, form_order
+                clinical_priority AS manufacturer_preference, form_order
             FROM drug_prescribe_generic;
             DROP TABLE IF EXISTS fts_drug_prescribe;
             CREATE VIRTUAL TABLE fts_drug_prescribe USING fts5(
@@ -805,7 +974,7 @@ function buildDatabaseFromSql(
                 }
             }
 
-            compilePrescribeCatalog($pdo);
+            compilePrescribeCatalog($pdo, $sqlFile);
         }
 
         // If compiling zimrx_static.db, check for regional address hierarchy packs matching selected country

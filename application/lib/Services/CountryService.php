@@ -115,6 +115,54 @@ final class CountryService
         return self::load()['clinical_languages'] ?? [];
     }
 
+    /**
+     * Returns recommended in-app guide/help language code for a country (e.g. 'BD' => 'bn'), or null if unmapped
+     */
+    public static function getDefaultHelpLanguage(string $code): ?string
+    {
+        $langs = self::load()['help_languages'] ?? [];
+        return $langs[strtoupper(trim($code))] ?? null;
+    }
+
+    /**
+     * Returns the full country to help/guide language map
+     * @return array<string, string>
+     */
+    public static function getCountryHelpLanguages(): array
+    {
+        return self::load()['help_languages'] ?? [];
+    }
+
+    /**
+     * Returns default prescription letterhead left/right configuration for a country.
+     * @return array{left: string, right: string}
+     */
+    public static function getDefaultHeaderSides(string $code): array
+    {
+        $c = strtoupper(trim($code));
+        $map = self::load()['header_defaults'] ?? [];
+        if (isset($map[$c]) && is_array($map[$c])) {
+            return [
+                'left' => (string)($map[$c]['left'] ?? 'doctor_en'),
+                'right' => (string)($map[$c]['right'] ?? 'clinic'),
+            ];
+        }
+        $def = $map['default'] ?? ['left' => 'doctor_en', 'right' => 'clinic'];
+        return [
+            'left' => (string)($def['left'] ?? 'doctor_en'),
+            'right' => (string)($def['right'] ?? 'clinic'),
+        ];
+    }
+
+    /**
+     * Returns the full country to prescription header layout configuration map
+     * @return array<string, array{left: string, right: string}>
+     */
+    public static function getCountryHeaderDefaults(): array
+    {
+        return self::load()['header_defaults'] ?? [];
+    }
+
     /** @var array<string, array<string, mixed>>|null */
     private static ?array $formularies = null;
 

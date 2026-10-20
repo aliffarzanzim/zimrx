@@ -87,11 +87,38 @@ try {
         return $fmt($text);
     };
 
-    // Detect whether left/native inputs contain Bengali script
-    $isNativeBn = (bool)preg_match('/[\x{0980}-\x{09FF}]/u', $name_native . $qualifications_native);
+    $leftType = trim((string)($_POST['left_type'] ?? ''));
+    $rightType = trim((string)($_POST['right_type'] ?? ''));
 
-    // If an international user fills English details but leaves native side empty, auto-balance
-    if ($name_native === '' && $name_en !== '') {
+    if (!$isSkip) {
+        $missing = [];
+        if ($leftType === 'clinic') {
+            if ($name_native === '') $missing[] = 'Clinic Name';
+        } else {
+            if ($name_native === '') $missing[] = 'Doctor Name';
+            if ($qualifications_native === '') $missing[] = 'Qualifications';
+        }
+
+        if ($rightType === 'clinic') {
+            if ($name_en === '') $missing[] = 'Clinic Name';
+        } else {
+            if ($name_en === '') $missing[] = 'Doctor Name (English)';
+            if ($qualifications_en === '') $missing[] = 'Qualifications (English)';
+        }
+
+        if (!empty($missing)) {
+            http_response_code(422);
+            echo 'Please fill in the required letterhead fields, or click Skip below.';
+            exit();
+        }
+    }
+
+    // Detect script in each block
+    $isLeftBn = (bool)preg_match('/[\x{0980}-\x{09FF}]/u', $name_native . $qualifications_native);
+    $isRightBn = (bool)preg_match('/[\x{0980}-\x{09FF}]/u', $name_en . $qualifications_en);
+
+    // If legacy request with unconfigured sides fills English details but leaves native side empty, auto-balance
+    if ($leftType === '' && $rightType === '' && $name_native === '' && $name_en !== '') {
         $name_native           = $name_en;
         $qualifications_native = $qualifications_en;
         $designation_native    = $designation_en;
@@ -106,90 +133,96 @@ try {
         $institute_en      = '';
         $speciality_en     = '';
         $license_en        = '';
-        $isNativeBn        = false;
+        $isLeftBn          = false;
+        $isRightBn         = false;
     }
 
     // Font selection: SolaimanLipi/Kongsho for Bengali, Tinos for English/Latin
-    $leftHeadFont = $isNativeBn ? 'kongsho' : 'tinos';
-    $leftBodyFont = $isNativeBn ? 'solaimanlipi' : 'tinos';
-    $leftHeadSize = $isNativeBn ? 'size="5"' : 'size="4"';
-    $wordSpacing  = $isNativeBn ? '' : 'word-spacing:-0.05em;';
+    $leftHeadFont = $isLeftBn ? 'kongsho' : 'tinos';
+    $leftBodyFont = $isLeftBn ? 'solaimanlipi' : 'tinos';
+    $leftHeadSize = $isLeftBn ? 'size="5"' : 'size="4"';
+    $leftWordSpacing = $isLeftBn ? '' : 'word-spacing:-0.05em;';
 
-    // Left (Native / Doctor) Block HTML generation
+    $rightHeadFont = $isRightBn ? 'kongsho' : 'tinos';
+    $rightBodyFont = $isRightBn ? 'solaimanlipi' : 'tinos';
+    $rightHeadSize = $isRightBn ? 'size="5"' : 'size="4"';
+    $rightWordSpacing = $isRightBn ? '' : 'word-spacing:-0.05em;';
+
+    // Left Block HTML generation
     $leftHtml = [];
     if ($name_native !== '') {
-        $leftHtml[] = '<p class="zrx-header-left-line-1" style="margin-bottom:-3.5px;"><b><font face="' . $leftHeadFont . '" ' . $leftHeadSize . '><span style="' . $wordSpacing . '">' . $fmt($name_native) . '</span></font></b></p>';
+        $leftHtml[] = '<p class="zrx-header-left-line-1" style="margin-bottom:-3.5px;"><b><font face="' . $leftHeadFont . '" ' . $leftHeadSize . '><span style="' . $leftWordSpacing . '">' . $fmt($name_native) . '</span></font></b></p>';
     }
     if ($qualifications_native !== '') {
-        $leftHtml[] = '<p class="zrx-header-left-line-2"><b><font face="' . $leftBodyFont . '"><span style="font-size:11pt;' . $wordSpacing . '">' . $formatQualifications($qualifications_native, $qualifications_en) . '</span></font></b></p>';
+        $leftHtml[] = '<p class="zrx-header-left-line-2"><b><font face="' . $leftBodyFont . '"><span style="font-size:11pt;' . $leftWordSpacing . '">' . $formatQualifications($qualifications_native, $qualifications_en) . '</span></font></b></p>';
     }
     if ($designation_native !== '') {
-        $leftHtml[] = '<p class="zrx-header-left-line-3"><b><font face="' . $leftBodyFont . '"><span style="font-size:11pt;' . $wordSpacing . '">' . $fmt($designation_native) . '</span></font></b></p>';
+        $leftHtml[] = '<p class="zrx-header-left-line-3"><b><font face="' . $leftBodyFont . '"><span style="font-size:11pt;' . $leftWordSpacing . '">' . $fmt($designation_native) . '</span></font></b></p>';
     }
     if ($institute_native !== '') {
-        $leftHtml[] = '<p class="zrx-header-left-line-4"><font face="' . $leftBodyFont . '"><span style="font-size:11pt;' . $wordSpacing . '">' . $fmt($institute_native) . '</span></font></p>';
+        $leftHtml[] = '<p class="zrx-header-left-line-4"><font face="' . $leftBodyFont . '"><span style="font-size:11pt;' . $leftWordSpacing . '">' . $fmt($institute_native) . '</span></font></p>';
     }
     if ($speciality_native !== '') {
-        $leftHtml[] = '<p class="zrx-header-left-line-5"><font face="' . $leftBodyFont . '"><span style="font-size:11pt;' . $wordSpacing . '">' . $fmt($speciality_native) . '</span></font></p>';
+        $leftHtml[] = '<p class="zrx-header-left-line-5"><font face="' . $leftBodyFont . '"><span style="font-size:11pt;' . $leftWordSpacing . '">' . $fmt($speciality_native) . '</span></font></p>';
     }
     if ($license_native !== '') {
-        $leftHtml[] = '<p class="zrx-header-left-line-6"><font face="' . $leftBodyFont . '"><span style="font-size:11pt;' . $wordSpacing . '">' . $fmt($license_native) . '</span></font></p>';
+        $leftHtml[] = '<p class="zrx-header-left-line-6"><font face="' . $leftBodyFont . '"><span style="font-size:11pt;' . $leftWordSpacing . '">' . $fmt($license_native) . '</span></font></p>';
     }
     if ($phone_native !== '') {
-        $leftHtml[] = '<p class="zrx-header-left-line-7"><font face="' . $leftBodyFont . '"><span style="font-size:11pt;' . $wordSpacing . '">' . $fmt($phone_native) . '</span></font></p>';
+        $leftHtml[] = '<p class="zrx-header-left-line-7"><font face="' . $leftBodyFont . '"><span style="font-size:11pt;' . $leftWordSpacing . '">' . $fmt($phone_native) . '</span></font></p>';
     }
     $leftBlockHtml = implode('', $leftHtml);
 
-    // Right (English / Clinic) Block HTML generation
+    // Right Block HTML generation
     $rightHtml = [];
     if ($name_en !== '') {
-        $rightHtml[] = '<p class="zrx-header-right-line-1"><b><font face="tinos" size="4"><span style="word-spacing:-0.05em;">' . $fmt($name_en) . '</span></font></b></p>';
+        $rightHtml[] = '<p class="zrx-header-right-line-1"><b><font face="' . $rightHeadFont . '" ' . $rightHeadSize . '><span style="' . $rightWordSpacing . '">' . $fmt($name_en) . '</span></font></b></p>';
     }
     if ($qualifications_en !== '') {
-        $rightHtml[] = '<p class="zrx-header-right-line-2"><b><font face="tinos"><span style="font-size:11pt;word-spacing:-0.05em;">' . $formatQualifications($qualifications_en, $qualifications_native) . '</span></font></b></p>';
+        $rightHtml[] = '<p class="zrx-header-right-line-2"><b><font face="' . $rightBodyFont . '"><span style="font-size:11pt;' . $rightWordSpacing . '">' . $formatQualifications($qualifications_en, $qualifications_native) . '</span></font></b></p>';
     }
     if ($designation_en !== '') {
-        $rightHtml[] = '<p class="zrx-header-right-line-3"><b><font face="tinos"><span style="font-size:11pt;word-spacing:-0.05em;">' . $fmt($designation_en) . '</span></font></b></p>';
+        $rightHtml[] = '<p class="zrx-header-right-line-3"><b><font face="' . $rightBodyFont . '"><span style="font-size:11pt;' . $rightWordSpacing . '">' . $fmt($designation_en) . '</span></font></b></p>';
     }
     if ($institute_en !== '') {
-        $rightHtml[] = '<p class="zrx-header-right-line-4"><font face="tinos"><span style="font-size:11pt;word-spacing:-0.05em;">' . $fmt($institute_en) . '</span></font></p>';
+        $rightHtml[] = '<p class="zrx-header-right-line-4"><font face="' . $rightBodyFont . '"><span style="font-size:11pt;' . $rightWordSpacing . '">' . $fmt($institute_en) . '</span></font></p>';
     }
     if ($speciality_en !== '') {
-        $rightHtml[] = '<p class="zrx-header-right-line-5"><font face="tinos"><span style="font-size:11pt;word-spacing:-0.05em;">' . $fmt($speciality_en) . '</span></font></p>';
+        $rightHtml[] = '<p class="zrx-header-right-line-5"><font face="' . $rightBodyFont . '"><span style="font-size:11pt;' . $rightWordSpacing . '">' . $fmt($speciality_en) . '</span></font></p>';
     }
     if ($license_en !== '') {
-        $rightHtml[] = '<p class="zrx-header-right-line-6"><font face="tinos"><span style="font-size:11pt;word-spacing:-0.05em;">' . $fmt($license_en) . '</span></font></p>';
+        $rightHtml[] = '<p class="zrx-header-right-line-6"><font face="' . $rightBodyFont . '"><span style="font-size:11pt;' . $rightWordSpacing . '">' . $fmt($license_en) . '</span></font></p>';
     }
     if ($phone_en !== '') {
-        $rightHtml[] = '<p class="zrx-header-right-line-7"><font face="tinos"><span style="font-size:11pt;word-spacing:-0.05em;">' . $fmt($phone_en) . '</span></font></p>';
+        $rightHtml[] = '<p class="zrx-header-right-line-7"><font face="' . $rightBodyFont . '"><span style="font-size:11pt;' . $rightWordSpacing . '">' . $fmt($phone_en) . '</span></font></p>';
     }
     $rightBlockHtml = implode('', $rightHtml);
     $onboardDefaults = zimrx_onboarding_defaults();
     $footerHtml = (string)($onboardDefaults['footer_html'] ?? '');
 
-    // Resolve physician profile attributes based on regional mode
-    if ($isNativeBn) {
-        $displayName       = $name_en !== '' ? $name_en : ($name_native !== '' ? $name_native : 'Doctor');
-        $docFullNameEn     = $name_en !== '' ? $name_en : 'Doctor';
-        $docFullNameNative = $name_native;
+    // Resolve physician profile attributes based on column configurations
+    if ($leftType === 'clinic') {
+        $displayName       = $name_en !== '' ? $name_en : 'Doctor';
+        $docFullNameEn     = $name_en;
+        $docFullNameNative = $isRightBn ? $name_en : '';
         $docDesigEn        = $designation_en;
-        $docDesigNative    = $designation_native;
+        $docDesigNative    = $isRightBn ? $designation_en : '';
         $docInstEn         = $institute_en;
-        $docInstNative     = $institute_native;
+        $docInstNative     = $isRightBn ? $institute_en : '';
         $docQualEn         = $qualifications_en;
-        $docQualNative     = $qualifications_native;
+        $docQualNative     = $isRightBn ? $qualifications_en : '';
         $docSpecEn         = $speciality_en;
-        $docSpecNative     = $speciality_native;
+        $docSpecNative     = $isRightBn ? $speciality_en : '';
         $docLicEn          = $license_en;
-        $docLicNative      = $license_native;
+        $docLicNative      = $isRightBn ? $license_en : '';
         $docPhone          = $phone_en !== '' ? $phone_en : $phone_native;
-        $headerDoctorName  = $name_en !== '' ? $name_en : $name_native;
-        $headerQual        = $qualifications_en !== '' ? $qualifications_en : $qualifications_native;
-        $headerSpec        = $speciality_en !== '' ? $speciality_en : $speciality_native;
-        $headerLic         = $license_en !== '' ? $license_en : $license_native;
-        $chamberName       = $institute_en !== '' ? $institute_en : $institute_native;
-    } else {
-        // International/Monolingual: Left side represents the physician; Right side represents the practice
+        $headerDoctorName  = $displayName;
+        $headerQual        = $qualifications_en;
+        $headerSpec        = $speciality_en;
+        $headerLic         = $license_en;
+        $chamberName       = $name_native;
+    } elseif ($rightType === 'clinic' || (!$isLeftBn && $leftType !== 'doctor_native')) {
+        // Standard International / English doctor on left, Practice on right
         $displayName       = $name_native !== '' ? $name_native : ($name_en !== '' ? $name_en : 'Doctor');
         $docFullNameEn     = $name_native !== '' ? $name_native : ($name_en !== '' ? $name_en : 'Doctor');
         $docFullNameNative = '';
@@ -209,6 +242,27 @@ try {
         $headerSpec        = $speciality_native;
         $headerLic         = $license_native;
         $chamberName       = $name_en;
+    } else {
+        // Dual-Language: Left side is Native doctor, Right side is English doctor (Classic BD)
+        $displayName       = $name_en !== '' ? $name_en : ($name_native !== '' ? $name_native : 'Doctor');
+        $docFullNameEn     = $name_en !== '' ? $name_en : 'Doctor';
+        $docFullNameNative = $name_native;
+        $docDesigEn        = $designation_en;
+        $docDesigNative    = $designation_native;
+        $docInstEn         = $institute_en;
+        $docInstNative     = $institute_native;
+        $docQualEn         = $qualifications_en;
+        $docQualNative     = $qualifications_native;
+        $docSpecEn         = $speciality_en;
+        $docSpecNative     = $speciality_native;
+        $docLicEn          = $license_en;
+        $docLicNative      = $license_native;
+        $docPhone          = $phone_en !== '' ? $phone_en : $phone_native;
+        $headerDoctorName  = $name_en !== '' ? $name_en : $name_native;
+        $headerQual        = $qualifications_en !== '' ? $qualifications_en : $qualifications_native;
+        $headerSpec        = $speciality_en !== '' ? $speciality_en : $speciality_native;
+        $headerLic         = $license_en !== '' ? $license_en : $license_native;
+        $chamberName       = $institute_en !== '' ? $institute_en : $institute_native;
     }
 
     // Synchronize zimrx_doctors table

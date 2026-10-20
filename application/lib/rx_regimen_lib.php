@@ -447,14 +447,21 @@ function rx_instruction_matches_term(array $row, string $term): bool {
     return false;
 }
 
-function rx_instruction_suggestions(string $term = '', ?int $doctorId = null, int $limit = 100): array {
+function rx_instruction_suggestions(string $term = '', ?int $doctorId = null, int $limit = 100, ?string $lang = null): array {
     $doctorId = $doctorId ?: rx_active_doctor_id();
+    $lang = $lang ?: (function_exists('zimrx_clinical_language') ? zimrx_clinical_language(null, $doctorId) : 'en');
     $results = [];
 
     foreach (rx_instruction_template_rows($doctorId, false) as $row) {
+        $bn = rx_clean($row['instruction_bn'] ?? '');
+        $en = rx_clean($row['instruction_en'] ?? '');
+        $display = ($lang === 'en') ? ($en !== '' ? $en : $bn) : ($bn !== '' ? $bn : $en);
+
         $item = $row + [
-            'value' => rx_clean($row['instruction_bn'] ?? ''),
-            'label' => rx_clean($row['instruction_bn'] ?? ''),
+            'value' => $display,
+            'label' => $display,
+            'instruction_bn' => $bn,
+            'instruction_en' => $en,
         ];
 
         if ($item['value'] === '' || !rx_instruction_matches_term($item, $term)) {
@@ -467,16 +474,23 @@ function rx_instruction_suggestions(string $term = '', ?int $doctorId = null, in
     return array_slice($results, 0, $limit);
 }
 
-function rx_instruction_default_for_form(string $form, ?int $doctorId = null): ?array {
+function rx_instruction_default_for_form(string $form, ?int $doctorId = null, ?string $lang = null): ?array {
     $formKey = rx_dosage_form_key($form);
     if ($formKey === '') {
         return null;
     }
 
     $doctorId = $doctorId ?: rx_active_doctor_id();
+    $lang = $lang ?: (function_exists('zimrx_clinical_language') ? zimrx_clinical_language(null, $doctorId) : 'en');
+
     foreach (rx_instruction_template_rows($doctorId, false) as $row) {
         foreach (rx_json_string_list($row['default_dosage_form'] ?? '[]') as $candidateForm) {
             if (rx_dosage_form_key($candidateForm) === $formKey) {
+                $bn = rx_clean($row['instruction_bn'] ?? '');
+                $en = rx_clean($row['instruction_en'] ?? '');
+                $row['instruction'] = ($lang === 'en') ? ($en !== '' ? $en : $bn) : ($bn !== '' ? $bn : $en);
+                $row['instruction_bn'] = $bn;
+                $row['instruction_en'] = $en;
                 return $row;
             }
         }

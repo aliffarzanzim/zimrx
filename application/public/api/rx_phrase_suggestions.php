@@ -25,6 +25,10 @@ try {
     $term = rx_clean($_GET['term'] ?? '');
     $termLike = '%' . $term . '%';
     $context = rx_context_from_request($_GET);
+    $doctorId = rx_active_doctor_id();
+    $preferredLang = function_exists('zimrx_clinical_language')
+        ? zimrx_clinical_language($userPdo, $doctorId, $_GET['lang'] ?? null)
+        : (rx_clean($_GET['lang'] ?? '') ?: 'en');
 
     $suggestions = [];
     $seen = [];
@@ -116,7 +120,7 @@ try {
         }
     };
 
-    $searchTemplateTable = function (PDO $sourcePdo, int $scoreBase) use ($type, $term, $termLike, $context, $addSuggestion) {
+    $searchTemplateTable = function (PDO $sourcePdo, int $scoreBase) use ($type, $term, $termLike, $context, $addSuggestion, $preferredLang) {
         if (!rx_table_exists($sourcePdo, 'drug_template') || $context['generic_id'] === '') {
             return;
         }
@@ -129,11 +133,6 @@ try {
         $columnExpr = $map[$type] ?? '';
         if ($columnExpr === '') {
             return;
-        }
-
-        $preferredLang = rx_clean($_GET['lang'] ?? '') ?: 'bn';
-        if ($preferredLang !== 'bn' && $preferredLang !== 'en') {
-            $preferredLang = 'bn';
         }
 
         $whereTerm = $term === '' ? '' : "AND {$columnExpr} LIKE :term";
@@ -170,15 +169,25 @@ try {
     $searchTemplateTable($systemPdo, 150);
 
     if ($type === 'instruction') {
-        foreach (rx_instruction_suggestions($term, rx_active_doctor_id(), 100) as $row) {
+        foreach (rx_instruction_suggestions($term, $doctorId, 100, $preferredLang) as $row) {
             $addSuggestion($row['value'], 10 + (int)$row['usage_count'] + ((int)$row['is_pinned'] * 1000), [
-                'is_pinned' => (int)($row['is_pinned'] ?? 0)
+                'is_pinned' => (int)($row['is_pinned'] ?? 0),
+                'instruction_bn' => (string)($row['instruction_bn'] ?? ''),
+                'instruction_en' => (string)($row['instruction_en'] ?? ''),
+                'value_bn' => (string)($row['instruction_bn'] ?? ''),
+                'value_en' => (string)($row['instruction_en'] ?? ''),
             ]);
         }
     } elseif (in_array($type, ['dose', 'duration'], true)) {
-        foreach (rx_phrase_suggestions_for_type($type, $term, rx_active_doctor_id(), 100) as $row) {
+        foreach (rx_phrase_suggestions_for_type($type, $term, $doctorId, 100, $preferredLang) as $row) {
             $addSuggestion($row['value'], 10 + (int)($row['usage_count'] ?? 0) + ((int)($row['is_pinned'] ?? 0) * 1000), [
                 'is_pinned' => (int)($row['is_pinned'] ?? 0),
+                'value_bn' => (string)($row['value_bn'] ?? ''),
+                'value_en' => (string)($row['value_en'] ?? ''),
+                'dosage_bn' => (string)($row['value_bn'] ?? ''),
+                'dosage_en' => (string)($row['value_en'] ?? ''),
+                'duration_bn' => (string)($row['value_bn'] ?? ''),
+                'duration_en' => (string)($row['value_en'] ?? ''),
             ]);
         }
     }

@@ -91,7 +91,7 @@ function goStep3() {
 
     if (!country) {
         const i18n = window.ZimRxFirstLaunchI18n || {};
-        showError(i18n.error_select_country || 'Please choose your country or practice territory.');
+        showError(i18n.error_select_country || '');
         if (countrySelect) countrySelect.focus();
         return;
     }
@@ -205,7 +205,7 @@ function updateFormularyState(countryCode) {
             iconSpan.innerHTML = ZimRxIcon.render('info-circle', 14);
         }
         if (textSpan) {
-            const rawTpl = i18n.formulary_available_desc || 'Dual Mode available for this region ({brands} brands, {manufacturers} manufacturers, {templates} templates).';
+            const rawTpl = i18n.formulary_available_desc || '';
             const lang = window.ZimRxCurrentLang || 'en';
             const formatNum = (num) => {
                 const formatted = Number(num || 0).toLocaleString('en-US');
@@ -240,7 +240,7 @@ function updateFormularyState(countryCode) {
             iconSpan.innerHTML = ZimRxIcon.render('info-circle', 14);
         }
         if (textSpan) {
-            textSpan.textContent = i18n.formulary_unavailable_desc || 'Generic Mode only for this region.';
+            textSpan.textContent = i18n.formulary_unavailable_desc || '';
         }
         if (brandBtn) {
             brandBtn.classList.add('disabled');
@@ -289,7 +289,7 @@ function updateAddressState(countryCode) {
             iconSpan.innerHTML = ZimRxIcon.render('map-pin', 14);
         }
         if (textSpan) {
-            const rawTpl = i18n.address_available_desc || 'Address hierarchy available for this region ({places} administrative places & postal codes). Auto-complete dropdown suggestions enabled.';
+            const rawTpl = i18n.address_available_desc || '';
             textSpan.textContent = rawTpl.replace('{places}', formatNum(pack.places_count));
         }
     } else {
@@ -301,7 +301,7 @@ function updateAddressState(countryCode) {
             iconSpan.innerHTML = ZimRxIcon.render('info-circle', 14);
         }
         if (textSpan) {
-            textSpan.textContent = i18n.address_unavailable_desc || 'Address hierarchy is not yet bundled for this region. Patient addresses will be entered as free text. (Open-source contributors can contribute region places via Geo Studio in tools/geo-studio).';
+            textSpan.textContent = i18n.address_unavailable_desc || '';
         }
     }
 }
@@ -318,11 +318,11 @@ function selectChoice(group, el) {
         const uInput = document.getElementById('accountUsername');
         if (uLabel && uInput) {
             if (isMulti) {
-                uLabel.textContent = uLabel.dataset.labelAdmin || 'Admin Username';
-                uInput.placeholder = uLabel.dataset.placeholderAdmin || 'admin';
+                uLabel.textContent = uLabel.dataset.labelAdmin || '';
+                uInput.placeholder = uLabel.dataset.placeholderAdmin || '';
             } else {
-                uLabel.textContent = uLabel.dataset.labelDoctor || 'Doctor Username';
-                uInput.placeholder = uLabel.dataset.placeholderDoctor || 'doctor';
+                uLabel.textContent = uLabel.dataset.labelDoctor || '';
+                uInput.placeholder = uLabel.dataset.placeholderDoctor || '';
             }
         }
     } else if (group === 'install') {
@@ -363,25 +363,36 @@ function saveSetup() {
         || new URLSearchParams(window.location.search).get('lang') 
         || 'en';
 
-    if (!username) { showError('Please enter a username.'); return; }
+    const i18n = window.ZimRxFirstLaunchI18n || {};
+
+    if (!username) { showError(i18n.error_username_required || ''); return; }
     if (!/^[a-zA-Z0-9_.-]{2,50}$/.test(username)) {
-        showError('Username must be 2-50 characters (letters, numbers, underscores, dots, or hyphens).');
+        showError(i18n.error_username_invalid || '');
         return;
     }
     if (!password) {
-        if (!window.ZimRxHasExistingAccount) {
-            showError('Please enter a password.');
-            return;
-        }
-    } else {
-        if (password.length < 8) { showError('Password must be at least 8 characters.'); return; }
-        if (password !== confirm) { showError('Passwords do not match.'); return; }
+        showError(i18n.error_password_required || '');
+        const passEl = document.getElementById('password');
+        if (passEl) passEl.focus();
+        return;
+    }
+    if (password.length < 8) {
+        showError(i18n.error_password_min || '');
+        const passEl = document.getElementById('password');
+        if (passEl) passEl.focus();
+        return;
+    }
+    if (password !== confirm) {
+        showError(i18n.error_password_mismatch || '');
+        const confirmEl = document.getElementById('confirmPassword');
+        if (confirmEl) confirmEl.focus();
+        return;
     }
 
     const btn = document.getElementById('btnSaveSetup');
     const origHtml = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Setting up practice and databases...';
+    btn.innerHTML = '<span class="spinner"></span>' + (i18n.saving_setup || '');
 
     const setupToken = document.getElementById('setupToken')?.value.trim() || new URLSearchParams(window.location.search).get('setup_token') || '';
 
@@ -415,7 +426,7 @@ function saveSetup() {
         window.location = data.redirect;
     })
     .catch(() => {
-        showError('A network error occurred. Please try again.');
+        showError(i18n.error_network || '');
         btn.disabled = false;
         btn.innerHTML = origHtml;
     });
@@ -428,12 +439,75 @@ function goStep3FromStep4() {
     window.location = 'first_launch.php?' + params.toString();
 }
 
+// Step 4 header side type switching
+function onHeaderTypeChange(side, type) {
+    const schemas = window.ZimRxHeaderSchemas || {};
+    const schema = schemas[type];
+    if (!schema) return;
+
+    const nativeIds = ['name_native', 'qualifications_native', 'designation_native', 'institute_native', 'speciality_native', 'license_native', 'phone_native'];
+    const enIds = ['name_en', 'qualifications_en', 'designation_en', 'institute_en', 'speciality_en', 'license_en', 'phone_en'];
+    const ids = (side === 'left') ? nativeIds : enIds;
+
+    for (let i = 0; i < 7; i++) {
+        const txtEl = document.getElementById(`txt_${side}_${i + 1}`);
+        const starEl = document.getElementById(`star_${side}_${i + 1}`);
+        const input = document.getElementById(ids[i]);
+
+        if (txtEl && schema.labels && schema.labels[i]) {
+            txtEl.textContent = schema.labels[i];
+        }
+        const isReq = Boolean(schema.required && schema.required[i]);
+        if (starEl) {
+            starEl.classList.toggle('hidden', !isReq);
+        }
+        if (input) {
+            if (schema.placeholders && schema.placeholders[i]) {
+                input.placeholder = schema.placeholders[i];
+            }
+            if (schema.labels && schema.labels[i]) {
+                input.setAttribute('aria-label', schema.labels[i]);
+            }
+            input.dataset.required = isReq ? '1' : '0';
+            if (!isReq) {
+                input.classList.remove('fl-input-error');
+            }
+        }
+    }
+}
+
 // Step 4 doctor profile setup
 function saveDoctor() {
     clearError();
     const btn = document.getElementById('btnSaveDoctor');
     if (!btn) return;
     const origHtml = btn.innerHTML;
+
+    // Validate mandatory fields
+    const panel4 = document.getElementById('panel4');
+    const inputs = panel4 ? panel4.querySelectorAll('input[type="text"]') : [];
+    let firstInvalid = null;
+    let missingRequired = false;
+
+    inputs.forEach(input => {
+        input.classList.remove('fl-input-error');
+        if (input.dataset.required === '1' && !input.value.trim()) {
+            input.classList.add('fl-input-error');
+            missingRequired = true;
+            if (!firstInvalid) {
+                firstInvalid = input;
+            }
+        }
+    });
+
+    if (missingRequired) {
+        const i18n = window.ZimRxFirstLaunchI18n || {};
+        showError(i18n.error_required_fields || '');
+        if (firstInvalid) {
+            firstInvalid.focus();
+        }
+        return;
+    }
 
     const fields = ['name_native','qualifications_native','designation_native','institute_native',
                     'speciality_native','license_native','phone_native',
@@ -443,11 +517,17 @@ function saveDoctor() {
     const form = new FormData();
     fields.forEach(f => {
         const el = document.getElementById(f);
-        if (el) form.append(f, el.value);
+        if (el) form.append(f, el.value.trim());
     });
 
+    const leftType = document.getElementById('leftSideType')?.value || '';
+    const rightType = document.getElementById('rightSideType')?.value || '';
+    if (leftType) form.append('left_type', leftType);
+    if (rightType) form.append('right_type', rightType);
+
+    const i18n = window.ZimRxFirstLaunchI18n || {};
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Saving…';
+    btn.innerHTML = '<span class="spinner"></span>' + (i18n.saving_doctor || '');
 
     fetch('api/header_onboarding_ajax.php', {
         method: 'POST',
@@ -458,13 +538,13 @@ function saveDoctor() {
         if (res.trim() === '1') {
             window.location = 'prescription.php';
         } else {
-            showError('Could not save doctor info: ' + res);
+            showError(res.trim());
             btn.disabled = false;
             btn.innerHTML = origHtml;
         }
     })
     .catch(() => {
-        showError('Network error. Please try again.');
+        showError(i18n.error_network || '');
         btn.disabled = false;
         btn.innerHTML = origHtml;
     });
@@ -473,11 +553,12 @@ function saveDoctor() {
 // Step 4 skip and finalize setup
 function skipDoctor() {
     clearError();
+    const i18n = window.ZimRxFirstLaunchI18n || {};
     const btn = document.getElementById('btnSaveDoctor');
     const skipLink = document.querySelector('.step4-skip a');
     if (skipLink) {
         skipLink.style.pointerEvents = 'none';
-        skipLink.textContent = 'Finalizing...';
+        skipLink.textContent = i18n.finalizing || '';
     }
     if (btn) btn.disabled = true;
 
@@ -495,20 +576,20 @@ function skipDoctor() {
         if (res.trim() === '1') {
             window.location = 'prescription.php';
         } else {
-            showError('Could not finalize setup: ' + res);
+            showError((i18n.error_finalize_setup || '') + res);
             if (btn) btn.disabled = false;
             if (skipLink) {
                 skipLink.style.pointerEvents = 'auto';
-                skipLink.textContent = "Skip - I'll fill this in later";
+                skipLink.textContent = i18n.btn_skip || '';
             }
         }
     })
     .catch(() => {
-        showError('Network error while finalizing setup.');
+        showError(i18n.error_network || '');
         if (btn) btn.disabled = false;
         if (skipLink) {
             skipLink.style.pointerEvents = 'auto';
-            skipLink.textContent = "Skip - I'll fill this in later";
+            skipLink.textContent = i18n.btn_skip || '';
         }
     });
 }
@@ -549,16 +630,36 @@ function skipDoctor() {
                 }
                 return;
             }
-            const map = window.ZimRxCountryClinicalMap || {};
-            const suggestedLang = map[countryCode] || 'en';
+            const clinicalMap = window.ZimRxCountryClinicalMap || {};
+            const suggestedClinical = clinicalMap[countryCode] || 'en';
 
-            if (clinicalSelect && clinicalSelect.value !== suggestedLang) {
-                clinicalSelect.value = suggestedLang;
+            const helpMap = window.ZimRxCountryHelpMap || {};
+            const suggestedHelp = helpMap[countryCode] || suggestedClinical || 'en';
+
+            if (clinicalSelect && clinicalSelect.value !== suggestedClinical) {
+                clinicalSelect.value = suggestedClinical;
                 clinicalSelect.dispatchEvent(new Event('change', { bubbles: true }));
             }
-            if (helpSelect && helpSelect.value !== suggestedLang) {
-                helpSelect.value = suggestedLang;
+            if (helpSelect && helpSelect.value !== suggestedHelp) {
+                helpSelect.value = suggestedHelp;
                 helpSelect.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+
+            const headerDefaultsMap = window.ZimRxCountryHeaderDefaults || {};
+            const defaultSides = headerDefaultsMap[countryCode] || headerDefaultsMap['default'] || { left: 'doctor_en', right: 'clinic' };
+            const leftSelect = document.getElementById('leftSideType');
+            const rightSelect = document.getElementById('rightSideType');
+            if (leftSelect && defaultSides.left) {
+                leftSelect.value = defaultSides.left;
+                if (typeof onHeaderTypeChange === 'function') {
+                    onHeaderTypeChange('left', defaultSides.left);
+                }
+            }
+            if (rightSelect && defaultSides.right) {
+                rightSelect.value = defaultSides.right;
+                if (typeof onHeaderTypeChange === 'function') {
+                    onHeaderTypeChange('right', defaultSides.right);
+                }
             }
 
             // Dynamically refresh formulary pack & address hierarchy availability
@@ -582,8 +683,73 @@ function skipDoctor() {
     }
 
     function onInitReady() {
+        if (window.ZimRxDropdown && typeof window.ZimRxDropdown.autoEnhance === 'function') {
+            window.ZimRxDropdown.autoEnhance();
+        }
+
+        const flLangSelect = document.getElementById('flLangSelect');
+        if (flLangSelect) {
+            flLangSelect.addEventListener('change', function() {
+                changeSetupLang(this.value);
+            });
+        }
+
+        const step1Lang = document.getElementById('step1Lang');
+        if (step1Lang) {
+            step1Lang.addEventListener('change', function() {
+                changeSetupLang(this.value);
+            });
+        }
+
         setupCountryClinicalSync();
         initTermsScrollEnforcement();
+        setupStep3Inputs();
+        setupStep4Inputs();
+    }
+
+    function setupStep3Inputs() {
+        const step3FieldIds = ['accountUsername', 'password', 'confirmPassword', 'recoveryEmail'];
+        const step3Inputs = step3FieldIds
+            .map(id => document.getElementById(id))
+            .filter(Boolean);
+
+        step3Inputs.forEach((input, idx) => {
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (idx < step3Inputs.length - 1) {
+                        step3Inputs[idx + 1].focus();
+                    } else {
+                        saveSetup();
+                    }
+                }
+            });
+        });
+    }
+
+    function setupStep4Inputs() {
+        const panel4 = document.getElementById('panel4');
+        if (!panel4) return;
+        const textInputs = Array.from(panel4.querySelectorAll('input[type="text"]'));
+
+        textInputs.forEach((input, idx) => {
+            input.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    this.classList.remove('fl-input-error');
+                }
+            });
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (idx < textInputs.length - 1) {
+                        textInputs[idx + 1].focus();
+                    } else {
+                        saveDoctor();
+                    }
+                }
+            });
+        });
     }
 
     if (document.readyState === 'loading') {

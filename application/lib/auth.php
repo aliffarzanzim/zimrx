@@ -315,3 +315,80 @@ function zimrx_verify_patient_ownership(PDO $pdo, int $doctorId, int $patientId,
     return (bool)$chk->fetch();
 }
 
+/**
+ * Resolves the active clinical prescribing language (e.g. 'en', 'bn').
+ * Priority: request param -> doctor interface settings -> app config -> practice country default.
+ */
+function zimrx_clinical_language(?PDO $pdo = null, ?int $doctorId = null, ?string $requestLang = null): string {
+    if ($requestLang !== null) {
+        $cleanReq = strtolower(trim($requestLang));
+        if (in_array($cleanReq, ['bn', 'en'], true)) {
+            return $cleanReq;
+        }
+    }
+
+    if (!empty($_GET['lang'])) {
+        $cleanGet = strtolower(trim((string)$_GET['lang']));
+        if (in_array($cleanGet, ['bn', 'en'], true)) {
+            return $cleanGet;
+        }
+    }
+
+    if (!empty($_GET['clinical_lang'])) {
+        $cleanCl = strtolower(trim((string)$_GET['clinical_lang']));
+        if (in_array($cleanCl, ['bn', 'en'], true)) {
+            return $cleanCl;
+        }
+    }
+
+    $db = $pdo;
+    if (!$db) {
+        if (function_exists('rx_user_pdo')) {
+            try {
+                $db = rx_user_pdo();
+            } catch (Throwable) {}
+        }
+        if (!$db && isset($GLOBALS['pdo']) && $GLOBALS['pdo'] instanceof PDO) {
+            $db = $GLOBALS['pdo'];
+        }
+        if (!$db && class_exists('DbConnections')) {
+            try {
+                $db = DbConnections::userdata();
+            } catch (Throwable) {}
+        }
+    }
+
+    if (!$db) {
+        return 'en';
+    }
+
+    $docId = $doctorId ?: (function_exists('current_user_doctor_id') ? current_user_doctor_id() : 0);
+    if ($docId > 0 && function_exists('zimrx_db_table_exists') && zimrx_db_table_exists($db, 'zimrx_interface_settings')) {
+        try {
+            $stmt = $db->prepare("SELECT setting_value FROM zimrx_interface_settings WHERE doctor_id = :did AND setting_scope = 'prescribing' AND setting_key = 'clinical_lang' LIMIT 1");
+            $stmt->execute(['did' => $docId]);
+            $val = strtolower(trim((string)$stmt->fetchColumn()));
+            if (in_array($val, ['bn', 'en'], true)) {
+                return $val;
+            }
+        } catch (Throwable) {}
+    }
+
+    if (function_exists('zimrx_db_table_exists') && zimrx_db_table_exists($db, 'zimrx_app_config')) {
+        try {
+            $stmt = $db->query("SELECT config_value FROM zimrx_app_config WHERE config_key = 'clinical_lang' LIMIT 1");
+            $val = strtolower(trim((string)($stmt ? $stmt->fetchColumn() : '')));
+            if (in_array($val, ['bn', 'en'], true)) {
+                return $val;
+            }
+            $stmtCountry = $db->query("SELECT config_value FROM zimrx_app_config WHERE config_key = 'practice_country' LIMIT 1");
+            $country = strtoupper(trim((string)($stmtCountry ? $stmtCountry->fetchColumn() : '')));
+            if ($country === 'BD') {
+                return 'bn';
+            }
+        } catch (Throwable) {}
+    }
+
+    return 'en';
+}
+

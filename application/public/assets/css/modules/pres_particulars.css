@@ -343,8 +343,14 @@ select[data-zrx-enhanced="true"] {
 
 .clear-action-wrap {
     position: relative;
-    display: inline-block;
+    display: block;
     width: 100%;
+}
+
+.clear-action-wrap .btn,
+#btn-clear-fields {
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .clear-options-menu {

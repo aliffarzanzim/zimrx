@@ -744,6 +744,7 @@ body.rx-auto-row-size-enabled .rx-input { white-space: pre-wrap; overflow: hidde
 .rx-col-del { width: 36px; }
 .rx-col-no { width: 38px; }
 .rx-col-generic { width: 18%; }
+.rx-col-generic-main { width: 38%; }
 .rx-col-dose { width: 16%; }
 .rx-col-instruction { width: 20%; }
 .rx-col-duration { width: 12%; }
@@ -752,6 +753,7 @@ body.rx-auto-row-size-enabled .rx-input { white-space: pre-wrap; overflow: hidde
 .rx-th-del { width: 36px; text-align: center; }
 .rx-th-no { width: 38px; text-align: center; padding: 0; }
 .rx-th-generic { width: 18%; }
+.rx-th-generic-main { width: 38%; }
 .rx-th-dose { width: 16%; }
 .rx-th-instruction { width: 20%; }
 .rx-th-duration { width: 12%; }

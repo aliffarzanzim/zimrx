@@ -29,15 +29,48 @@ declare(strict_types=1);
         </div>
     </div>
 
+<?php
+$rxPrescribingMode = 'brand';
+try {
+    global $pdo;
+    $rxDb = (isset($pdo) && $pdo instanceof PDO) ? $pdo : DbConnections::userdata();
+    $rxDocId = function_exists('prescription_active_doctor_id') ? prescription_active_doctor_id() : (int)($_SESSION['doctor_id'] ?? 1);
+    $hasDoctorOverride = false;
+    if (function_exists('zimrx_db_table_exists') && zimrx_db_table_exists($rxDb, 'zimrx_interface_settings')) {
+        $st = $rxDb->prepare("SELECT setting_value FROM zimrx_interface_settings WHERE doctor_id = :doc AND setting_scope = 'prescribing' AND setting_key = 'prescribing_mode' LIMIT 1");
+        $st->execute(['doc' => $rxDocId]);
+        $modeVal = (string)($st->fetchColumn() ?: '');
+        if ($modeVal !== '') {
+            $rxPrescribingMode = $modeVal;
+            $hasDoctorOverride = true;
+        }
+    }
+    if (!$hasDoctorOverride && function_exists('zimrx_db_table_exists') && zimrx_db_table_exists($rxDb, 'zimrx_app_config')) {
+        $st2 = $rxDb->query("SELECT config_value FROM zimrx_app_config WHERE config_key = 'prescribing_mode' LIMIT 1");
+        $confVal = (string)($st2->fetchColumn() ?: '');
+        if ($confVal !== '') {
+            $rxPrescribingMode = $confVal;
+        }
+    }
+} catch (Throwable) {
+    $rxPrescribingMode = 'brand';
+}
+$isGenericRxMode = ($rxPrescribingMode === 'generic');
+$rxClinicalLang = function_exists('zimrx_clinical_language') ? zimrx_clinical_language($rxDb, $rxDocId) : 'en';
+?>
     <!-- Table Grid -->
     <div class="rx-table-container">
-        <table class="rx-table" id="rx-table">
+        <table class="rx-table <?= $isGenericRxMode ? 'is-generic-mode' : '' ?>" id="rx-table" data-prescribing-mode="<?= htmlspecialchars($rxPrescribingMode, ENT_QUOTES, 'UTF-8') ?>" data-clinical-lang="<?= htmlspecialchars($rxClinicalLang, ENT_QUOTES, 'UTF-8') ?>">
             <colgroup>
                 <col class="rx-col-drag">
                 <col class="rx-col-del">
                 <col class="rx-col-no">
-                <col>
+                <?php if ($isGenericRxMode): ?>
+                <col class="rx-col-generic-main">
+                <?php else: ?>
+                <col class="rx-col-brand">
                 <col class="rx-col-generic">
+                <?php endif; ?>
                 <col class="rx-col-dose">
                 <col class="rx-col-instruction">
                 <col class="rx-col-duration">
@@ -47,8 +80,12 @@ declare(strict_types=1);
                     <th class="rx-th-drag"></th>
                     <th class="rx-th-del"></th>
                     <th class="rx-th-no">#</th>
-                    <th>Brand</th>
+                    <?php if ($isGenericRxMode): ?>
+                    <th class="rx-th-generic-main">Generic</th>
+                    <?php else: ?>
+                    <th class="rx-th-brand">Brand</th>
                     <th class="rx-th-generic">Generic</th>
+                    <?php endif; ?>
                     <th class="rx-th-dose">Dose</th>
                     <th class="rx-th-instruction">Instruction</th>
                     <th class="rx-th-duration">Duration</th>
@@ -64,11 +101,19 @@ declare(strict_types=1);
                     </td>
                     <td class="rx-action rx-del pc-action pc-del"><button type="button" title="Remove Row">X</button></td>
                     <td class="rx-action rx-no pc-row-no"><?= $i ?></td>
+                    <?php if ($isGenericRxMode): ?>
+                    <td class="rx-col-generic-main">
+                        <textarea class="rx-input rx-brand-input rx-generic-input" autocomplete="off" rows="1"></textarea>
+                        <input type="hidden" name="brand_id[]" class="brand_id">
+                        <input type="hidden" name="generic_id[]" class="generic_id">
+                    </td>
+                    <?php else: ?>
                     <td>
                         <textarea class="rx-input rx-brand-input" autocomplete="off" rows="1"></textarea>
                         <input type="hidden" name="brand_id[]" class="brand_id">
                     </td>
                     <td><textarea class="rx-input rx-generic-input" autocomplete="off" rows="1"></textarea></td>
+                    <?php endif; ?>
                     <td><textarea class="rx-input rx-dose-input" autocomplete="off" rows="1"></textarea></td>
                     <td><textarea class="rx-input rx-instruction-input" autocomplete="off" rows="1"></textarea></td>
                     <td><textarea class="rx-input rx-duration-input" autocomplete="off" rows="1"></textarea></td>

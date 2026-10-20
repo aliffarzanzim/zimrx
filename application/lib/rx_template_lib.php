@@ -329,13 +329,17 @@ function rx_phrase_matches(array $row, string $term): bool {
     return false;
 }
 
-function rx_phrase_suggestions_for_type(string $type, string $term = '', ?int $doctorId = null, int $limit = 100): array {
+function rx_phrase_suggestions_for_type(string $type, string $term = '', ?int $doctorId = null, int $limit = 100, ?string $lang = null): array {
+    $doctorId = $doctorId ?: rx_active_doctor_id();
+    $lang = $lang ?: (function_exists('zimrx_clinical_language') ? zimrx_clinical_language(null, $doctorId) : 'en');
     $results = [];
     foreach (rx_phrase_rows($type, $doctorId, false) as $row) {
         if (!rx_phrase_matches($row, $term)) {
             continue;
         }
-        $value = rx_clean($row['value_bn'] ?? '');
+        $bn = rx_clean($row['value_bn'] ?? '');
+        $en = rx_clean($row['value_en'] ?? '');
+        $value = ($lang === 'en') ? ($en !== '' ? $en : $bn) : ($bn !== '' ? $bn : $en);
         if ($value === '') {
             continue;
         }

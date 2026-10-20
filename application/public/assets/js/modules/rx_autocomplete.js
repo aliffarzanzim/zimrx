@@ -334,21 +334,42 @@ function initRxAutocomplete() {
         const moveIcon = ZimRxDropdown.renderIcon('move', 14);
 
 
-        row.innerHTML = `
-            <td class="rx-action rx-drag pc-action pc-drag" style="padding: 0 !important;">
-                <button type="button" class="pc-row-move-btn rx-row-move-btn zrx-drag-handle" title="Move Row">${moveIcon}</button>
-            </td>
-            <td class="rx-action rx-del pc-action pc-del"><button type="button" title="Remove Row">X</button></td>
-            <td class="rx-action rx-no pc-row-no">${rowNumber}</td>
-            <td>
-                <textarea class="rx-input rx-brand-input" autocomplete="off" rows="1"></textarea>
-                <input type="hidden" name="brand_id[]" class="brand_id">
-            </td>
-            <td><textarea class="rx-input rx-generic-input" autocomplete="off" rows="1"></textarea></td>
-            <td><textarea class="rx-input rx-dose-input" autocomplete="off" rows="1"></textarea></td>
-            <td><textarea class="rx-input rx-instruction-input" autocomplete="off" rows="1"></textarea></td>
-            <td><textarea class="rx-input rx-duration-input" autocomplete="off" rows="1"></textarea></td>
-        `;
+        const isGenericMode = document.getElementById('rx-table')?.classList.contains('is-generic-mode')
+            || document.getElementById('rx-table')?.dataset.prescribingMode === 'generic';
+
+        if (isGenericMode) {
+            row.innerHTML = `
+                <td class="rx-action rx-drag pc-action pc-drag">
+                    <button type="button" class="pc-row-move-btn rx-row-move-btn zrx-drag-handle" title="Move Row">${moveIcon}</button>
+                </td>
+                <td class="rx-action rx-del pc-action pc-del"><button type="button" title="Remove Row">X</button></td>
+                <td class="rx-action rx-no pc-row-no">${rowNumber}</td>
+                <td class="rx-col-generic-main">
+                    <textarea class="rx-input rx-brand-input rx-generic-input" autocomplete="off" rows="1"></textarea>
+                    <input type="hidden" name="brand_id[]" class="brand_id">
+                    <input type="hidden" name="generic_id[]" class="generic_id">
+                </td>
+                <td><textarea class="rx-input rx-dose-input" autocomplete="off" rows="1"></textarea></td>
+                <td><textarea class="rx-input rx-instruction-input" autocomplete="off" rows="1"></textarea></td>
+                <td><textarea class="rx-input rx-duration-input" autocomplete="off" rows="1"></textarea></td>
+            `;
+        } else {
+            row.innerHTML = `
+                <td class="rx-action rx-drag pc-action pc-drag">
+                    <button type="button" class="pc-row-move-btn rx-row-move-btn zrx-drag-handle" title="Move Row">${moveIcon}</button>
+                </td>
+                <td class="rx-action rx-del pc-action pc-del"><button type="button" title="Remove Row">X</button></td>
+                <td class="rx-action rx-no pc-row-no">${rowNumber}</td>
+                <td>
+                    <textarea class="rx-input rx-brand-input" autocomplete="off" rows="1"></textarea>
+                    <input type="hidden" name="brand_id[]" class="brand_id">
+                </td>
+                <td><textarea class="rx-input rx-generic-input" autocomplete="off" rows="1"></textarea></td>
+                <td><textarea class="rx-input rx-dose-input" autocomplete="off" rows="1"></textarea></td>
+                <td><textarea class="rx-input rx-instruction-input" autocomplete="off" rows="1"></textarea></td>
+                <td><textarea class="rx-input rx-duration-input" autocomplete="off" rows="1"></textarea></td>
+            `;
+        }
         row.querySelectorAll('.rx-input').forEach((field) => {
             field.setAttribute('wrap', rxSettings.autoRowSize ? 'soft' : 'off');
         });
@@ -441,6 +462,10 @@ function initRxAutocomplete() {
         params.set('strength', selectedDrug.strength || '');
         params.set('generic', selectedDrug.generic || selectedDrug.generic_name || '');
         params.set('brand', selectedDrug.full_form_brand_name || selectedDrug.pres_new_upper || selectedDrug.brand_name || '');
+
+        const rxTable = document.getElementById('rx-table');
+        const clinicalLang = window.ZimRxClinicalLang || (rxTable ? rxTable.dataset.clinicalLang : '') || 'en';
+        params.set('lang', clinicalLang);
 
         return params;
     };
@@ -678,10 +703,14 @@ function initRxAutocomplete() {
         }
 
         const genInp = row ? row.querySelector('.rx-generic-input') : null;
-        setRxFieldValue(genInp, getGenericDisplayName(item));
+        if (genInp && genInp !== input) {
+            setRxFieldValue(genInp, getGenericDisplayName(item));
+        }
 
         const bidInp = row ? row.querySelector('.brand_id') : null;
         if (bidInp) bidInp.value = item.id || '';
+        const gidInp = row ? row.querySelector('.generic_id') : null;
+        if (gidInp) gidInp.value = item.generic_id || '';
 
         showRxInfoBar(item);
         closeRxDropdown();

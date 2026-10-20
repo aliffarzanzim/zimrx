@@ -15,6 +15,9 @@ try {
     $mode = trim((string)($_GET['mode'] ?? 'advice'));
 
     $doctorId = rx_active_doctor_id();
+    $preferredLang = function_exists('zimrx_clinical_language')
+        ? zimrx_clinical_language(null, $doctorId, $_GET['lang'] ?? null)
+        : (rx_clean($_GET['lang'] ?? '') ?: 'en');
     $settings = rx_phrase_settings('advice', $doctorId);
     $allRows = rx_phrase_rows('advice', $doctorId, false); // false means exclude hidden!
 
@@ -22,7 +25,9 @@ try {
         $normQ = mb_strtolower($q, 'UTF-8');
         $groups = [];
         foreach ($allRows as $row) {
-            $catKey = trim($row['category_en'] ?: $row['category_bn'] ?: 'Uncategorized');
+            $catEn = trim((string)($row['category_en'] ?? ''));
+            $catBn = trim((string)($row['category_bn'] ?? ''));
+            $catKey = ($preferredLang === 'en') ? ($catEn ?: $catBn ?: 'Uncategorized') : ($catBn ?: $catEn ?: 'Uncategorized');
             if ($catKey === '') {
                 $catKey = 'Uncategorized';
             }
@@ -30,6 +35,8 @@ try {
             if (!isset($groups[$catKey])) {
                 $groups[$catKey] = [
                     'category' => $catKey,
+                    'category_en' => $catEn,
+                    'category_bn' => $catBn,
                     'total' => 0,
                     'is_pinned' => 0,
                     'sort_order' => (int)($row['sort_order'] ?? 0),
@@ -127,7 +134,7 @@ try {
     $results = [];
     $idx = 0;
     foreach ($allRows as $row) {
-        if ($category !== '' && trim($row['category_en'] ?? '') !== $category) {
+        if ($category !== '' && trim($row['category_en'] ?? '') !== $category && trim($row['category_bn'] ?? '') !== $category) {
             continue;
         }
         
@@ -147,11 +154,21 @@ try {
             }
         }
         
+        $valBn = (string)($row['value_bn'] ?? '');
+        $valEn = (string)($row['value_en'] ?? '');
+        $catEn = (string)($row['category_en'] ?? '');
+        $catBn = (string)($row['category_bn'] ?? '');
+        $adviceDisplay = ($preferredLang === 'en') ? ($valEn !== '' ? $valEn : $valBn) : ($valBn !== '' ? $valBn : $valEn);
+        $categoryDisplay = ($preferredLang === 'en') ? ($catEn !== '' ? $catEn : $catBn) : ($catBn !== '' ? $catBn : $catEn);
+
         $results[] = [
             'id' => $row['id'],
-            'category' => $row['category_en'],
-            'advice' => $row['value_bn'],
-            'advice_en' => $row['value_en'],
+            'category' => $categoryDisplay,
+            'category_en' => $catEn,
+            'category_bn' => $catBn,
+            'advice' => $adviceDisplay,
+            'advice_bn' => $valBn,
+            'advice_en' => $valEn,
             'is_pinned' => $row['is_pinned'],
             'original_index' => $idx++
         ];

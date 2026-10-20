@@ -97,43 +97,18 @@ try {
         exit;
     }
 
-    $hasExistingPassword = false;
-    $existingPasswordHash = '';
-    if (zimrx_db_table_exists($pdo, 'zimrx_user_accounts')) {
-        if ($isSoloMode) {
-            $existing = $pdo->prepare("SELECT id, display_name, password_hash FROM zimrx_user_accounts WHERE doctor_id = 1 LIMIT 1");
-            $existing->execute();
-            $account = $existing->fetch(PDO::FETCH_ASSOC);
-            if ($account && !empty($account['password_hash'])) {
-                $hasExistingPassword = true;
-                $existingPasswordHash = (string)$account['password_hash'];
-            }
-        } else {
-            $existing = $pdo->prepare("SELECT id, display_name, password_hash FROM zimrx_user_accounts WHERE username = :u OR role IN ('admin', 'superadmin') ORDER BY id ASC LIMIT 1");
-            $existing->execute(['u' => $username]);
-            $account = $existing->fetch(PDO::FETCH_ASSOC);
-            if ($account && !empty($account['password_hash'])) {
-                $hasExistingPassword = true;
-                $existingPasswordHash = (string)$account['password_hash'];
-            }
-        }
+    if ($password === '') {
+        http_response_code(422);
+        echo json_encode(['error' => 'Password is required.']);
+        exit;
     }
 
-    if ($password === '') {
-        if (!$hasExistingPassword) {
-            http_response_code(422);
-            echo json_encode(['error' => 'Password is required.']);
-            exit;
-        }
-        $passwordHash = $existingPasswordHash;
-    } else {
-        if (!zimrx_validate_password_strength($password)) {
-            http_response_code(422);
-            echo json_encode(['error' => 'Password must contain at least 8 characters.']);
-            exit;
-        }
-        $passwordHash = zimrx_password_hash($password);
+    if (!zimrx_validate_password_strength($password)) {
+        http_response_code(422);
+        echo json_encode(['error' => 'Password must contain at least 8 characters.']);
+        exit;
     }
+    $passwordHash = zimrx_password_hash($password);
 
     // Ensure setup_complete key exists
     $pdo->prepare(
@@ -268,6 +243,32 @@ try {
             ON CONFLICT(doctor_id, setting_scope, setting_key) DO UPDATE SET
                 setting_value = :mode, updated_at = CURRENT_TIMESTAMP
         ")->execute(['doc_id' => $sessionDoctorId, 'mode' => $prescribingMode]);
+
+        $pdo->prepare("
+            INSERT INTO zimrx_interface_settings (doctor_id, setting_scope, setting_key, setting_value, updated_at)
+            VALUES (:doc_id, 'prescribing', 'clinical_lang', :clang, CURRENT_TIMESTAMP)
+            ON CONFLICT(doctor_id, setting_scope, setting_key) DO UPDATE SET
+                setting_value = :clang, updated_at = CURRENT_TIMESTAMP
+        ")->execute(['doc_id' => $sessionDoctorId, 'clang' => $clinicalLang]);
+    }
+
+    if ($sessionDoctorId > 0 && zimrx_db_table_exists($pdo, 'zimrx_prescription_print_layout_settings')) {
+        $printLang = ($clinicalLang === 'bn') ? 'bengali' : 'english';
+        $stPrint = $pdo->prepare("SELECT print_settings_json FROM zimrx_prescription_print_layout_settings WHERE doctor_id = :did LIMIT 1");
+        $stPrint->execute(['did' => $sessionDoctorId]);
+        $existingJson = (string)($stPrint->fetchColumn() ?: '');
+        $adv = json_decode($existingJson, true) ?: [];
+        $adv['dose_language'] = $printLang;
+        $adv['duration_language'] = $printLang;
+        $adv['instruction_language'] = $printLang;
+        $adv['advice_language'] = $printLang;
+        $newJson = json_encode($adv, JSON_UNESCAPED_UNICODE);
+        $pdo->prepare("
+            INSERT INTO zimrx_prescription_print_layout_settings (doctor_id, print_settings_json, updated_at)
+            VALUES (:did, :json, CURRENT_TIMESTAMP)
+            ON CONFLICT(doctor_id) DO UPDATE SET
+                print_settings_json = :json, updated_at = CURRENT_TIMESTAMP
+        ")->execute(['did' => $sessionDoctorId, 'json' => $newJson]);
     }
 
     if ($sessionDoctorId > 0 && zimrx_db_table_exists($pdo, 'zimrx_prescription_header_settings')) {

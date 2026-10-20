@@ -1,6 +1,11 @@
 // Prescription preview data collector, snapshot builder, and print payload extractor.
 function collectRxPreviewDrugs() {
   const rows = document.querySelectorAll('#rx-tbody tr');
+  const rxTable = document.getElementById('rx-table');
+  const isGenericMode = Boolean(
+    rxTable?.classList.contains('is-generic-mode') ||
+    rxTable?.dataset.prescribingMode === 'generic'
+  );
   return Array.from(rows).map((row) => {
     const getValue = (selector) => {
       const input = row.querySelector(selector);
@@ -17,6 +22,7 @@ function collectRxPreviewDrugs() {
     }
 
     return {
+      is_generic_mode: isGenericMode,
       brand: getValue('.rx-brand-input'),
       generic: getValue('.rx-generic-input'),
       dose: getValue('.rx-dose-input'),
