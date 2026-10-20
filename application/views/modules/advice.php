@@ -7,9 +7,10 @@ declare(strict_types=1);
     <div class="advice-left">
         <div class="advice-header-row">
             <span class="advice-title">&#x0989;&#x09AA;&#x09A6;&#x09C7;&#x09B6;&#x0983;</span>
-            <div class="rx-search-box advice-template-box">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <div class="rx-search-box advice-template-box autocomplete-wrapper" style="position: relative;">
+                <?= zrx_icon('search', 14) ?>
                 <input type="text" class="advice-template-input" placeholder="Advice Template / Category" autocomplete="off">
+                <ul class="zrx-dropdown advice-template-dropdown"></ul>
             </div>
         </div>
 

@@ -60,7 +60,8 @@
             renderItem = null,
             debounceMs = 120,
             minLength = 0,
-            allowEmptyClick = false
+            allowEmptyClick = false,
+            floating = false
         }) {
             if (!input || !list) return null;
 
@@ -68,6 +69,16 @@
             let timer = null;
             let isKeyboardNav = false;
             let keyboardNavTimer = null;
+
+            function updateFloatingPosition() {
+                if (!floating || !list.classList.contains('show')) return;
+                const rect = input.getBoundingClientRect();
+                list.style.position = 'absolute';
+                list.style.top = (rect.bottom + window.scrollY) + 'px';
+                list.style.left = (rect.left + window.scrollX) + 'px';
+                list.style.minWidth = rect.width + 'px';
+                list.style.zIndex = '9999';
+            }
 
             function setKeyboardNavMode() {
                 isKeyboardNav = true;
@@ -78,6 +89,10 @@
             }
 
             function close() {
+                if (floating) {
+                    window.removeEventListener('scroll', updateFloatingPosition);
+                    window.removeEventListener('resize', updateFloatingPosition);
+                }
                 list.classList.remove('show');
                 if (wrapper) wrapper.classList.remove('open');
                 activeIdx = -1;
@@ -85,6 +100,14 @@
 
             function open() {
                 closeAll(wrapper || list);
+                if (floating) {
+                    if (!list.parentNode || list.parentNode !== document.body) {
+                        document.body.appendChild(list);
+                    }
+                    updateFloatingPosition();
+                    window.addEventListener('scroll', updateFloatingPosition, { passive: true });
+                    window.addEventListener('resize', updateFloatingPosition);
+                }
                 list.classList.add('show');
                 if (wrapper) wrapper.classList.add('open');
             }
@@ -217,10 +240,20 @@
                 }
             });
 
+            function destroy() {
+                close();
+                if (floating && list.parentNode === document.body) {
+                    list.remove();
+                }
+                activeInstances.delete(instance);
+            }
+
             const instance = {
                 wrapper: wrapper || list,
+                list,
                 close,
                 open,
+                destroy,
                 refresh: () => queryAndRender(input.value.trim())
             };
             activeInstances.add(instance);
