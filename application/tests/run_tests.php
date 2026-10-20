@@ -45,6 +45,10 @@ class ZimRxTestSuite {
         echo " ZimRx Automated Quality & Security Test Suite\n";
         echo "========================================================\n\n";
 
+        try {
+            (new DbMigrator(__DIR__ . '/../migrations'))->run(DbConnections::userdata());
+        } catch (Throwable) {}
+
         $this->testPasswordSecurity();
         $this->testCsrfSecurity();
         $this->testDatabasePragmas();

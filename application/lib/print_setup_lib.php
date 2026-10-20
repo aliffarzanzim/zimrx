@@ -254,6 +254,13 @@ function zimrx_print_load_header_settings(PDO $pdo, int $doctorId): array {
     $onboardDefaults = zimrx_onboarding_defaults();
     $defaultFooter = (string)($onboardDefaults['footer_html'] ?? '');
 
+    if (!zimrx_db_table_exists($pdo, 'zimrx_prescription_header_settings')) {
+        return [
+            'doctor_name' => function_exists('current_user_name') ? current_user_name() : 'Doctor',
+            'footer_html' => $defaultFooter,
+        ];
+    }
+
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM zimrx_prescription_header_settings WHERE doctor_id = :doctor_id");
     $stmt->execute(['doctor_id' => $doctorId]);
     $exists = (int)$stmt->fetchColumn() > 0;
@@ -679,41 +686,43 @@ function zimrx_print_save_setup(PDO $pdo, int $doctorId, array $data): void {
         $stmt->execute($layoutParams);
     }
 
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM zimrx_prescription_header_settings WHERE doctor_id = :doctor_id");
-    $stmt->execute(['doctor_id' => $doctorId]);
-    $exists = (int)$stmt->fetchColumn() > 0;
+    if (zimrx_db_table_exists($pdo, 'zimrx_prescription_header_settings')) {
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM zimrx_prescription_header_settings WHERE doctor_id = :doctor_id");
+        $stmt->execute(['doctor_id' => $doctorId]);
+        $exists = (int)$stmt->fetchColumn() > 0;
 
-    if (!$exists) {
-        try {
-            $pdo->prepare(
-                "INSERT INTO zimrx_prescription_header_settings (doctor_id, doctor_name) VALUES (:doctor_id, :doctor_name)"
-            )->execute([
-                'doctor_id' => $doctorId,
-                'doctor_name' => current_user_name(),
-            ]);
-        } catch (Throwable) {
-            // Ignore if already inserted concurrently
-        }
-    }
-
-    $headerSql = [];
-    $headerParams = ['doctor_id' => $doctorId];
-    foreach ($headerFields as $field) {
-        if (array_key_exists($field, $data)) {
-            $headerSql[] = "{$field} = :{$field}";
-            $value = (string)$data[$field];
-            if ($field === 'bg_color') {
-                $value = strtoupper(ltrim(trim($value), '#'));
-            } elseif (!in_array($field, ['footer_html', 'left_block_html', 'right_block_html'], true)) {
-                $value = trim($value);
+        if (!$exists) {
+            try {
+                $pdo->prepare(
+                    "INSERT INTO zimrx_prescription_header_settings (doctor_id, doctor_name) VALUES (:doctor_id, :doctor_name)"
+                )->execute([
+                    'doctor_id' => $doctorId,
+                    'doctor_name' => current_user_name(),
+                ]);
+            } catch (Throwable) {
+                // Ignore if already inserted concurrently
             }
-            $headerParams[$field] = $value;
         }
-    }
-    if ($headerSql) {
-        $headerSql[] = "updated_at = CURRENT_TIMESTAMP";
-        $stmt = $pdo->prepare("UPDATE zimrx_prescription_header_settings SET " . implode(', ', $headerSql) . " WHERE doctor_id = :doctor_id");
-        $stmt->execute($headerParams);
+
+        $headerSql = [];
+        $headerParams = ['doctor_id' => $doctorId];
+        foreach ($headerFields as $field) {
+            if (array_key_exists($field, $data)) {
+                $headerSql[] = "{$field} = :{$field}";
+                $value = (string)$data[$field];
+                if ($field === 'bg_color') {
+                    $value = strtoupper(ltrim(trim($value), '#'));
+                } elseif (!in_array($field, ['footer_html', 'left_block_html', 'right_block_html'], true)) {
+                    $value = trim($value);
+                }
+                $headerParams[$field] = $value;
+            }
+        }
+        if ($headerSql) {
+            $headerSql[] = "updated_at = CURRENT_TIMESTAMP";
+            $stmt = $pdo->prepare("UPDATE zimrx_prescription_header_settings SET " . implode(', ', $headerSql) . " WHERE doctor_id = :doctor_id");
+            $stmt->execute($headerParams);
+        }
     }
 }
 
