@@ -129,13 +129,7 @@ function zimrx_begin_immediate(PDO $pdo): bool {
     if ($pdo->inTransaction()) {
         return false;
     }
-    $driver = strtolower((string)$pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
-    if ($driver === 'sqlite') {
-        $pdo->exec('BEGIN IMMEDIATE');
-    } else {
-        $pdo->beginTransaction();
-    }
-    return true;
+    return $pdo->beginTransaction();
 }
 
 function zimrx_commit_if_started(PDO $pdo, bool $started): void {
