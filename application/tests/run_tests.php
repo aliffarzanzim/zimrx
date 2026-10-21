@@ -77,6 +77,7 @@ class ZimRxTestSuite {
         $this->testClinicalLocaleCatalogs();
         $this->testApplicationSecurityHeadersAndLint();
         $this->testPatientSequenceAllocationAndConcurrency();
+        $this->testEmrTimelineBlobOptimizationAndMemoryScaling();
 
         echo "\n--------------------------------------------------------\n";
         echo "Test Results: {$this->passed} passed, {$this->failed} failed\n";
@@ -1765,7 +1766,7 @@ class ZimRxTestSuite {
     }
 
     private function testApplicationSecurityHeadersAndLint(): void {
-        echo "\n[26/27] Testing Application Security Headers, Post-Auth CSRF & PHP Syntax Lint...\n";
+        echo "\n[26/28] Testing Application Security Headers, Post-Auth CSRF & PHP Syntax Lint...\n";
 
         // 1. Verify defense-in-depth security headers in init.php
         $initContent = (string)file_get_contents(__DIR__ . '/../public/init.php');
@@ -1829,7 +1830,7 @@ class ZimRxTestSuite {
     }
 
     private function testPatientSequenceAllocationAndConcurrency(): void {
-        echo "\n[27/27] Testing Patient Sequence Atomic Allocation & Concurrency Safety...\n";
+        echo "\n[27/28] Testing Patient Sequence Atomic Allocation & Concurrency Safety...\n";
 
         $testPdo = new PDO('sqlite::memory:');
         $testPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -1919,6 +1920,123 @@ class ZimRxTestSuite {
         $this->assert(!$nestedTx && $testPdo->inTransaction(), "zimrx_begin_immediate() avoids nested transaction collisions");
         zimrx_rollback_if_started($testPdo, $txStarted);
         $this->assert(!$testPdo->inTransaction(), "zimrx_rollback_if_started() safely rolls back active transaction");
+    }
+
+    private function testEmrTimelineBlobOptimizationAndMemoryScaling(): void {
+        echo "\n[28/28] Testing EMR Longitudinal Timeline Blob Optimization & Memory Scaling...\n";
+
+        $testPdo = new PDO('sqlite::memory:');
+        $testPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $testPdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+        $migrator = new DbMigrator(__DIR__ . '/../migrations');
+        $migrator->run($testPdo);
+
+        $doctorId = 1;
+        $testPdo->prepare("
+            INSERT INTO zimrx_patients (doctor_id, reg_no, full_name, mobile, created_at, updated_at)
+            VALUES (?, 'P2600100', 'Chronic Longitudinal Patient', '01800000000', datetime('now'), datetime('now'))
+        ")->execute([$doctorId]);
+        $patientId = (int)$testPdo->lastInsertId();
+
+        $heavyHtml = str_repeat('<div class="rx-page-header">Letterhead Clinic</div><p>Detailed prescribed medications...</p>', 500);
+        $heavyRichText = json_encode(['ops' => array_fill(0, 100, ['insert' => 'Long clinical notes and progress reports.'])]);
+        $sampleSnapshot = json_encode([
+            'modules' => [
+                'chief_complaints' => [['name' => 'Fever'], ['name' => 'Cough']],
+                'diagnosis' => [['name' => 'Upper Respiratory Tract Infection']],
+                'medications' => array_fill(0, 10, ['drug_name' => 'Amoxicillin 500mg', 'dose' => '1+0+1'])
+            ]
+        ]);
+
+        $insVisit = $testPdo->prepare("
+            INSERT INTO zimrx_visits (
+                patient_id, doctor_id, visit_no, visit_id, visit_date,
+                metrics_json, prescription_html, rich_text_json, clinical_snapshot_json, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, '{\"bp\":\"120/80\",\"pulse\":72}', ?, ?, ?, datetime('now'), datetime('now'))
+        ");
+
+        for ($i = 1; $i <= 40; $i++) {
+            $date = date('Y-m-d', strtotime("-{$i} months"));
+            $insVisit->execute([$patientId, $doctorId, $i, "V26{$i}", $date, $heavyHtml, $heavyRichText, $sampleSnapshot]);
+        }
+
+        // 1. Verify lightweight timeline query in emr.php excludes heavy HTML and rich text
+        $emrPhpContent = (string)file_get_contents(__DIR__ . '/../public/emr.php');
+        $this->assert(
+            !str_contains($emrPhpContent, 'prescription_html AS print_html')
+            && !str_contains($emrPhpContent, 'rich_text_json')
+            && str_contains($emrPhpContent, 'unset($v[\'clinical_snapshot_json\'])'),
+            "emr.php timeline query eliminates heavy HTML/rich-text blobs and unsets snapshot per row"
+        );
+
+        // 2. Measure memory consumption when projecting timeline
+        $memBefore = memory_get_usage();
+        $stmtVisits = $testPdo->prepare(
+            "SELECT v.id as visit_record_id, v.visit_id, v.visit_no, v.visit_date, v.next_visit,
+                    v.age_at_visit, v.weight_at_visit, v.weight_unit_at_visit, v.metrics_json,
+                    v.id as prescription_id, v.clinical_snapshot_json
+             FROM zimrx_visits v
+             WHERE v.patient_id = :pid AND v.doctor_id = :did
+             ORDER BY v.visit_date DESC, v.id DESC"
+        );
+        $stmtVisits->execute(['pid' => $patientId, 'did' => $doctorId]);
+
+        $timeline = [];
+        while ($v = $stmtVisits->fetch(PDO::FETCH_ASSOC)) {
+            $ccList = [];
+            $dxList = [];
+            if (!empty($v['clinical_snapshot_json'])) {
+                $snap = json_decode($v['clinical_snapshot_json'], true);
+                if (is_array($snap)) {
+                    $clinical = $snap['clinical'] ?? $snap['modules'] ?? $snap;
+                    $pcs = $clinical['pc'] ?? $clinical['chief_complaints'] ?? [];
+                    if (is_array($pcs)) {
+                        foreach ($pcs as $item) {
+                            $val = is_array($item) ? ($item['name'] ?? $item['term'] ?? '') : (string)$item;
+                            if (trim($val) !== '') $ccList[] = trim($val);
+                        }
+                    }
+                    $dxs = $clinical['dx'] ?? $clinical['diagnosis'] ?? [];
+                    if (is_array($dxs)) {
+                        foreach ($dxs as $item) {
+                            $val = is_array($item) ? ($item['name'] ?? $item['diagnosis'] ?? '') : (string)$item;
+                            if (trim($val) !== '') $dxList[] = trim($val);
+                        }
+                    }
+                }
+            }
+            $v['chief_complaints'] = implode(', ', $ccList);
+            $v['primary_diagnosis'] = implode(', ', $dxList);
+            unset($v['clinical_snapshot_json']);
+            $timeline[] = $v;
+        }
+
+        $memDelta = memory_get_usage() - $memBefore;
+        $this->assert(count($timeline) === 40, "Lightweight timeline successfully loaded all 40 encounters");
+        $this->assert(
+            $memDelta < 500000,
+            "40-visit timeline memory delta remains sub-500KB (actual delta: " . round($memDelta / 1024, 1) . " KB)"
+        );
+        $this->assert(
+            !empty($timeline[0]['chief_complaints']) && $timeline[0]['chief_complaints'] === 'Fever, Cough',
+            "Timeline projection extracts chief complaints faithfully ('{$timeline[0]['chief_complaints']}')"
+        );
+        $this->assert(
+            !empty($timeline[0]['primary_diagnosis']) && $timeline[0]['primary_diagnosis'] === 'Upper Respiratory Tract Infection',
+            "Timeline projection extracts primary diagnosis faithfully ('{$timeline[0]['primary_diagnosis']}')"
+        );
+        $this->assert(!isset($timeline[0]['clinical_snapshot_json']), "Timeline rows do not retain heavy snapshot JSON");
+        $this->assert(!isset($timeline[0]['prescription_html']), "Timeline rows do not retain heavy prescription HTML");
+
+        // 3. Verify on-demand visit loading via emr_api.php
+        $emrApiContent = (string)file_get_contents(__DIR__ . '/../public/api/emr_api.php');
+        $this->assert(
+            str_contains($emrApiContent, "'get_visit_details'")
+            && str_contains($emrApiContent, "'module_json'")
+            && !str_contains($emrApiContent, 'v.prescription_html, v.rich_text_json'),
+            "emr_api.php loads full encounter details asynchronously on-demand and omits blobs from get_patient"
+        );
     }
 }
 

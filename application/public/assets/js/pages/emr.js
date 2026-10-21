@@ -68,18 +68,36 @@ function openPastRxDrawer(visitIdentifier) {
                     content.appendChild(list);
                 }
 
-                if (data.prescription && data.prescription.module_json) {
+                if (data.prescription && (data.prescription.module_json || data.prescription.clinical_snapshot_json)) {
                     try {
-                        const mod = JSON.parse(data.prescription.module_json);
-                        if (Array.isArray(mod.chief_complaints) && mod.chief_complaints.length > 0) {
+                        const rawMod = data.prescription.module_json || data.prescription.clinical_snapshot_json;
+                        const parsed = typeof rawMod === 'string' ? JSON.parse(rawMod) : rawMod;
+                        const mod = parsed.modules || parsed.clinical || parsed;
+                        const ccItems = Array.isArray(mod.chief_complaints) ? mod.chief_complaints : (Array.isArray(mod.pc) ? mod.pc : []);
+                        const dxItems = Array.isArray(mod.diagnosis) ? mod.diagnosis : (Array.isArray(mod.dx) ? mod.dx : []);
+
+                        if (ccItems.length > 0) {
                             appendText(content, 'h5', 'Chief Complaints', '', 'font-size: 0.85rem; text-transform: uppercase; color: #475569; margin: 1rem 0 0.5rem;');
-                            appendText(content, 'p', mod.chief_complaints.map(c => c.name || '').filter(Boolean).join(', '), '', 'font-size: 0.86rem; color: #1e293b;');
+                            appendText(content, 'p', ccItems.map(c => typeof c === 'object' ? (c.name || c.term || '') : String(c)).filter(Boolean).join(', '), '', 'font-size: 0.86rem; color: #1e293b;');
                         }
-                        if (Array.isArray(mod.diagnosis) && mod.diagnosis.length > 0) {
+                        if (dxItems.length > 0) {
                             appendText(content, 'h5', 'Diagnosis', '', 'font-size: 0.85rem; text-transform: uppercase; color: #475569; margin: 1rem 0 0.5rem;');
-                            appendText(content, 'p', mod.diagnosis.map(d => d.name || '').filter(Boolean).join(', '), '', 'font-size: 0.86rem; color: #1e293b;');
+                            appendText(content, 'p', dxItems.map(d => typeof d === 'object' ? (d.name || d.diagnosis || '') : String(d)).filter(Boolean).join(', '), '', 'font-size: 0.86rem; color: #1e293b;');
                         }
                     } catch(e) {}
+                }
+
+                if (data.prescription && data.prescription.prescription_html) {
+                    const printWrap = document.createElement('div');
+                    printWrap.style.cssText = 'margin-top: 1.5rem; border-top: 1px solid #e2e8f0; padding-top: 1rem;';
+                    const rxBtn = document.createElement('a');
+                    rxBtn.className = 'btn-emr btn-emr-outline btn-emr-sm';
+                    rxBtn.style.cssText = 'display: inline-block; text-decoration: none;';
+                    rxBtn.href = 'prescription_preview.php?visit_id=' + encodeURIComponent(visit.id || visit.visit_record_id || visitIdentifier);
+                    rxBtn.target = '_blank';
+                    rxBtn.textContent = '🖨 Open Printable Prescription';
+                    printWrap.appendChild(rxBtn);
+                    content.appendChild(printWrap);
                 }
             })
             .catch(err => {

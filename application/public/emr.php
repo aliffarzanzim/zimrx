@@ -101,7 +101,7 @@ if ($requestedVisit !== '' || $requestedVisitRecordId > 0) {
 
         // Fetch previous visits for the Past Rx Reference Drawer
         $stmtPast = $pdo->prepare(
-            "SELECT v.id, v.visit_id, v.visit_no, v.visit_date, v.clinical_snapshot_json, v.prescription_html AS print_html, v.rich_text_json
+            "SELECT v.id, v.visit_id, v.visit_no, v.visit_date
              FROM zimrx_visits v
              WHERE v.patient_id = :pid AND v.id != :curr_id AND v.doctor_id = :did
              ORDER BY v.visit_date DESC, v.id DESC LIMIT 15"
@@ -127,17 +127,45 @@ if ($requestedVisit !== '' || $requestedVisitRecordId > 0) {
     if ($patient) {
         $patientId = (int)$patient['id'];
 
-        // Get visits timeline
+        // Get visits timeline (lightweight projection, excludes heavy HTML & rich-text blobs)
         $stmtVisits = $pdo->prepare(
             "SELECT v.id as visit_record_id, v.visit_id, v.visit_no, v.visit_date, v.next_visit,
                     v.age_at_visit, v.weight_at_visit, v.weight_unit_at_visit, v.metrics_json,
-                    v.id as prescription_id, v.clinical_snapshot_json, v.prescription_html AS print_html, v.rich_text_json
+                    v.id as prescription_id, v.clinical_snapshot_json
              FROM zimrx_visits v
              WHERE v.patient_id = :pid AND v.doctor_id = :did
              ORDER BY v.visit_date DESC, v.id DESC"
         );
         $stmtVisits->execute(['pid' => $patientId, 'did' => $currentDoctorId]);
-        $timeline = $stmtVisits->fetchAll(PDO::FETCH_ASSOC);
+        $timeline = [];
+        while ($v = $stmtVisits->fetch(PDO::FETCH_ASSOC)) {
+            $ccList = [];
+            $dxList = [];
+            if (!empty($v['clinical_snapshot_json'])) {
+                $snap = json_decode($v['clinical_snapshot_json'], true);
+                if (is_array($snap)) {
+                    $clinical = $snap['clinical'] ?? $snap['modules'] ?? $snap;
+                    $pcs = $clinical['pc'] ?? $clinical['chief_complaints'] ?? [];
+                    if (is_array($pcs)) {
+                        foreach ($pcs as $item) {
+                            $val = is_array($item) ? ($item['name'] ?? $item['term'] ?? '') : (string)$item;
+                            if (trim($val) !== '') $ccList[] = trim($val);
+                        }
+                    }
+                    $dxs = $clinical['dx'] ?? $clinical['diagnosis'] ?? [];
+                    if (is_array($dxs)) {
+                        foreach ($dxs as $item) {
+                            $val = is_array($item) ? ($item['name'] ?? $item['diagnosis'] ?? '') : (string)$item;
+                            if (trim($val) !== '') $dxList[] = trim($val);
+                        }
+                    }
+                }
+            }
+            $v['chief_complaints'] = implode(', ', $ccList);
+            $v['primary_diagnosis'] = implode(', ', $dxList);
+            unset($v['clinical_snapshot_json']);
+            $timeline[] = $v;
+        }
 
         // Get Allergies (scoped to this doctor's patients only)
         $stmtAllergies = $pdo->prepare(
@@ -342,15 +370,6 @@ if ($patient && !empty($patient['id'])) {
                             </thead>
                             <tbody>
                                 <?php foreach ($timeline as $t): 
-                                    $mod = !empty($t['module_json']) ? json_decode($t['module_json'], true) : [];
-                                    $ccArr = [];
-                                    $dxArr = [];
-                                    if (!empty($mod['chief_complaints'])) {
-                                        foreach ((array)$mod['chief_complaints'] as $c) if (!empty($c['name'])) $ccArr[] = $c['name'];
-                                    }
-                                    if (!empty($mod['diagnosis'])) {
-                                        foreach ((array)$mod['diagnosis'] as $d) if (!empty($d['name'])) $dxArr[] = $d['name'];
-                                    }
                                     $metrics = !empty($t['metrics_json']) ? json_decode($t['metrics_json'], true) : [];
                                     $bp = $metrics['bp'] ?? '';
                                 ?>
@@ -359,8 +378,8 @@ if ($patient && !empty($patient['id'])) {
                                     <td><span class="emr-meta-pill visit-pill"><?= htmlspecialchars($t['visit_id'] ?: 'V' . $t['visit_record_id']) ?></span></td>
                                     <td><span class="emr-meta-pill">#<?= htmlspecialchars($t['visit_no'] ?: '1') ?></span></td>
                                     <?php if (!$isNonClinical): ?>
-                                    <td><?= htmlspecialchars(!empty($ccArr) ? implode(', ', $ccArr) : '--') ?></td>
-                                    <td><?= htmlspecialchars(!empty($dxArr) ? implode(', ', $dxArr) : '--') ?></td>
+                                    <td><?= htmlspecialchars($t['chief_complaints'] ?: '--') ?></td>
+                                    <td><?= htmlspecialchars($t['primary_diagnosis'] ?: '--') ?></td>
                                     <td><?= htmlspecialchars($bp ? "BP: $bp" : ($t['weight_at_visit'] ? "Wt: " . $t['weight_at_visit'] . ($t['weight_unit_at_visit'] ?: 'kg') : '--')) ?></td>
                                     <td class="zrx-ta-r">
                                         <button type="button" class="btn-emr btn-emr-outline btn-emr-sm" onclick="openPastRxDrawer('<?= htmlspecialchars($t['visit_id'] ?: (string)$t['visit_record_id']) ?>')">

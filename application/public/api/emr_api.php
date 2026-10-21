@@ -131,11 +131,11 @@ switch ($action) {
 
         $patientId = (int)$patient['id'];
 
-        // Get all historical visits for this patient scoped to doctor
+        // Get all historical visits for this patient scoped to doctor (lightweight projection)
         $stmtVisits = $pdo->prepare(
             "SELECT v.id as visit_record_id, v.visit_id, v.visit_no, v.visit_date, v.next_visit,
                     v.age_at_visit, v.weight_at_visit, v.weight_unit_at_visit, v.height_at_visit, v.height_unit_at_visit,
-                    v.metrics_json, v.billing_json, v.clinical_snapshot_json, v.prescription_html, v.rich_text_json,
+                    v.metrics_json, v.clinical_snapshot_json,
                     v.id as prescription_id, v.created_at as rx_created_at
              FROM zimrx_visits v
              WHERE v.patient_id = :patient_id AND v.doctor_id = :doctor_id
@@ -289,9 +289,14 @@ switch ($action) {
         $visitRecordId = (int)$visit['id'];
 
         // Get prescription snapshot from visit row
+        $snapJson = (string)($visit['clinical_snapshot_json'] ?? '');
+        $snapArr = !empty($snapJson) ? json_decode($snapJson, true) : [];
+        $modArr = is_array($snapArr) ? ($snapArr['modules'] ?? $snapArr['clinical'] ?? $snapArr) : [];
+
         $prescription = [
             'prescription_html' => (string)($visit['prescription_html'] ?? ''),
-            'clinical_snapshot_json' => (string)($visit['clinical_snapshot_json'] ?? ''),
+            'clinical_snapshot_json' => $snapJson,
+            'module_json' => json_encode($modArr, JSON_UNESCAPED_UNICODE),
             'rich_text_json' => (string)($visit['rich_text_json'] ?? ''),
         ];
 
