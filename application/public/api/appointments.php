@@ -212,7 +212,7 @@ function confirmed_appointment_no(PDO $pdo, string $date, int $requestedNo, arra
 }
 
 function next_reg_no(PDO $pdo, string $date, int $doctorId): string {
-    return zimrx_generate_reg_no($pdo, $date);
+    return zimrx_preview_patient_reg_no($pdo, $doctorId, $date);
 }
 
 function is_unique_constraint_error(Throwable $e): bool {
@@ -760,8 +760,18 @@ function save_patient(PDO $pdo, array $payload, string $date, int $doctorId): ar
         )"
     );
 
+    $assignedRegNo = '';
+    if ($regNo !== '') {
+        $checkStmt = $pdo->prepare("SELECT 1 FROM zimrx_patients WHERE UPPER(reg_no) = UPPER(:reg_no) LIMIT 1");
+        $checkStmt->execute(['reg_no' => $regNo]);
+        if (!$checkStmt->fetchColumn()) {
+            $assignedRegNo = $regNo;
+            zimrx_sync_patient_sequence_highwater($pdo, $doctorId, $regNo);
+        }
+    }
+
     for ($attempt = 0; $attempt < 5; $attempt++) {
-        $params['reg_no'] = $regNo !== '' ? $regNo : next_reg_no($pdo, $date, $doctorId);
+        $params['reg_no'] = $assignedRegNo !== '' ? $assignedRegNo : zimrx_allocate_patient_reg_no($pdo, $doctorId, $date);
         try {
             $stmt->execute($params);
             $newPatientId = (int)$pdo->lastInsertId();
@@ -777,7 +787,8 @@ function save_patient(PDO $pdo, array $payload, string $date, int $doctorId): ar
 
             return load_patient($pdo, $newPatientId, $doctorId);
         } catch (PDOException $e) {
-            if ($regNo !== '' || !is_unique_constraint_error($e)) {
+            $assignedRegNo = '';
+            if (!is_unique_constraint_error($e)) {
                 throw $e;
             }
         }
@@ -989,7 +1000,7 @@ try {
     $appointmentNo = $requestedAppointmentNo;
     $appointmentTimeInput = value($payload, 'appointment_time');
 
-    $pdo->beginTransaction();
+    zimrx_begin_immediate($pdo);
     $patient = save_patient($pdo, $payload, $date, $doctorId);
     $visitNo = (int)value($payload, 'visit_no');
     if ($visitNo <= 0) {

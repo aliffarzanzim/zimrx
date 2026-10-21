@@ -34,6 +34,7 @@ require_once __DIR__ . '/../lib/Services/AppointmentService.php';
 require_once __DIR__ . '/../lib/Services/BillingService.php';
 require_once __DIR__ . '/../lib/Services/PatientIpsExportService.php';
 require_once __DIR__ . '/../lib/Services/LocaleService.php';
+require_once __DIR__ . '/../lib/emr_identity_lib.php';
 
 class ZimRxTestSuite {
     private int $passed = 0;
@@ -75,6 +76,7 @@ class ZimRxTestSuite {
         $this->testInternationalPatientSummaryExport();
         $this->testClinicalLocaleCatalogs();
         $this->testApplicationSecurityHeadersAndLint();
+        $this->testPatientSequenceAllocationAndConcurrency();
 
         echo "\n--------------------------------------------------------\n";
         echo "Test Results: {$this->passed} passed, {$this->failed} failed\n";
@@ -241,6 +243,11 @@ class ZimRxTestSuite {
             DbSchema::columnExists($testPdo, 'zimrx_prescription_header_settings', 'license_no') &&
             DbSchema::columnExists($testPdo, 'zimrx_user_advices', 'category_native'),
             "Migration 015 generalizes doctor localization schema (_native and license_no)"
+        );
+
+        $this->assert(
+            DbSchema::tableExists($testPdo, 'zimrx_patient_sequences'),
+            "Migration 016 provisions zimrx_patient_sequences table"
         );
 
         require_once __DIR__ . '/../lib/print_setup_lib.php';
@@ -1758,7 +1765,7 @@ class ZimRxTestSuite {
     }
 
     private function testApplicationSecurityHeadersAndLint(): void {
-        echo "\n[26/26] Testing Application Security Headers, Post-Auth CSRF & PHP Syntax Lint...\n";
+        echo "\n[26/27] Testing Application Security Headers, Post-Auth CSRF & PHP Syntax Lint...\n";
 
         // 1. Verify defense-in-depth security headers in init.php
         $initContent = (string)file_get_contents(__DIR__ . '/../public/init.php');
@@ -1819,6 +1826,99 @@ class ZimRxTestSuite {
             $checkedCount >= 170 && empty($failedFiles),
             "100% of application PHP files pass syntax linting without errors (checked {$checkedCount} files)"
         );
+    }
+
+    private function testPatientSequenceAllocationAndConcurrency(): void {
+        echo "\n[27/27] Testing Patient Sequence Atomic Allocation & Concurrency Safety...\n";
+
+        $testPdo = new PDO('sqlite::memory:');
+        $testPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $testPdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+        $migrator = new DbMigrator(__DIR__ . '/../migrations');
+        $migrator->run($testPdo);
+
+        $this->assert(
+            DbSchema::tableExists($testPdo, 'zimrx_patient_sequences'),
+            "Migration 016 creates zimrx_patient_sequences table on isolated in-memory DB"
+        );
+
+        $doctorId = 1;
+        $testDate = '2026-10-21';
+        $expectedPrefix = 'P26';
+
+        // 1. Non-destructive preview
+        $preview1 = zimrx_preview_patient_reg_no($testPdo, $doctorId, $testDate);
+        $preview2 = zimrx_preview_patient_reg_no($testPdo, $doctorId, $testDate);
+        $this->assert(
+            $preview1 === $expectedPrefix . '00001' && $preview2 === $expectedPrefix . '00001',
+            "zimrx_preview_patient_reg_no() is idempotent and non-destructive ({$preview1})"
+        );
+
+        $initialRows = (int)$testPdo->query("SELECT COUNT(*) FROM zimrx_patient_sequences WHERE doctor_id = 1 AND prefix = '{$expectedPrefix}'")->fetchColumn();
+        $this->assert($initialRows === 0, "Preview does not create sequence rows in database");
+
+        // 2. Monotonic atomic allocation
+        $allocated1 = zimrx_allocate_patient_reg_no($testPdo, $doctorId, $testDate);
+        $allocated2 = zimrx_allocate_patient_reg_no($testPdo, $doctorId, $testDate);
+        $allocated3 = zimrx_allocate_patient_reg_no($testPdo, $doctorId, $testDate);
+
+        $this->assert(
+            $allocated1 === $expectedPrefix . '00001'
+            && $allocated2 === $expectedPrefix . '00002'
+            && $allocated3 === $expectedPrefix . '00003',
+            "zimrx_allocate_patient_reg_no() increments sequence monotonically (00001 -> 00002 -> 00003)"
+        );
+
+        // Preview now matches next unallocated number
+        $previewAfterAlloc = zimrx_preview_patient_reg_no($testPdo, $doctorId, $testDate);
+        $this->assert(
+            $previewAfterAlloc === $expectedPrefix . '00004',
+            "Preview accurately reflects current sequence state after allocations (got: {$previewAfterAlloc})"
+        );
+
+        // 3. Highwater mark synchronization with custom / out-of-order IDs
+        zimrx_sync_patient_sequence_highwater($testPdo, $doctorId, $expectedPrefix . '00050');
+        $allocatedAfterJump = zimrx_allocate_patient_reg_no($testPdo, $doctorId, $testDate);
+        $this->assert(
+            $allocatedAfterJump === $expectedPrefix . '00051',
+            "Highwater mark synchronization advances sequence to avoid colliding with custom IDs (got: {$allocatedAfterJump})"
+        );
+
+        // Non-matching custom ID prefix should not alter the P26 sequence
+        zimrx_sync_patient_sequence_highwater($testPdo, $doctorId, 'EXT9999');
+        $allocatedUnchanged = zimrx_allocate_patient_reg_no($testPdo, $doctorId, $testDate);
+        $this->assert(
+            $allocatedUnchanged === $expectedPrefix . '00052',
+            "Highwater sync ignores custom IDs with non-matching prefixes"
+        );
+
+        // 4. Pre-existing database records seeding
+        $seedPdo = new PDO('sqlite::memory:');
+        $seedPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $seedPdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        $migrator->run($seedPdo);
+
+        // Insert legacy patient with reg_no = P2600025
+        $seedPdo->prepare("
+            INSERT INTO zimrx_patients (doctor_id, reg_no, full_name, mobile, created_at, updated_at)
+            VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))
+        ")->execute([$doctorId, $expectedPrefix . '00025', 'Legacy Patient', '01700000000']);
+
+        // Allocate for a fresh sequence row - must seed from existing zimrx_patients
+        $seededAlloc = zimrx_allocate_patient_reg_no($seedPdo, $doctorId, $testDate);
+        $this->assert(
+            $seededAlloc === $expectedPrefix . '00026',
+            "Fresh sequence row correctly seeds from highest existing patient reg_no in database (got: {$seededAlloc})"
+        );
+
+        // 5. Transaction safety helper
+        $txStarted = zimrx_begin_immediate($testPdo);
+        $this->assert($txStarted && $testPdo->inTransaction(), "zimrx_begin_immediate() enters transaction cleanly");
+        $nestedTx = zimrx_begin_immediate($testPdo);
+        $this->assert(!$nestedTx && $testPdo->inTransaction(), "zimrx_begin_immediate() avoids nested transaction collisions");
+        zimrx_rollback_if_started($testPdo, $txStarted);
+        $this->assert(!$testPdo->inTransaction(), "zimrx_rollback_if_started() safely rolls back active transaction");
     }
 }
 

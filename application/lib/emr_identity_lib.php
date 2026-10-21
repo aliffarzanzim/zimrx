@@ -109,7 +109,196 @@ function zimrx_save_emr_settings(PDO $pdo, array $payload): array {
     return zimrx_get_emr_settings($pdo);
 }
 
-function zimrx_generate_reg_no(PDO $pdo, ?string $date = null): string {
+function zimrx_ensure_patient_sequences_schema(PDO $pdo): void {
+    if (!DbSchema::tableExists($pdo, 'zimrx_patient_sequences')) {
+        $pdo->exec(
+            "CREATE TABLE IF NOT EXISTS zimrx_patient_sequences (
+                id " . DbSql::autoIncrement() . ",
+                doctor_id " . DbSql::intType() . " NOT NULL DEFAULT 0,
+                prefix TEXT NOT NULL,
+                last_seq " . DbSql::intType() . " NOT NULL DEFAULT 0,
+                updated_at " . DbSql::timestampColumn() . ",
+                UNIQUE(doctor_id, prefix)
+            )"
+        );
+        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_zimrx_patient_sequences_lookup ON zimrx_patient_sequences(doctor_id, prefix)");
+    }
+}
+
+function zimrx_begin_immediate(PDO $pdo): bool {
+    if ($pdo->inTransaction()) {
+        return false;
+    }
+    $driver = strtolower((string)$pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
+    if ($driver === 'sqlite') {
+        $pdo->exec('BEGIN IMMEDIATE');
+    } else {
+        $pdo->beginTransaction();
+    }
+    return true;
+}
+
+function zimrx_commit_if_started(PDO $pdo, bool $started): void {
+    if ($started && $pdo->inTransaction()) {
+        $pdo->commit();
+    }
+}
+
+function zimrx_rollback_if_started(PDO $pdo, bool $started): void {
+    if ($started && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+}
+
+function zimrx_find_max_existing_patient_seq(PDO $pdo, int $doctorId, string $prefix): int {
+    $pfxLen = strlen($prefix);
+    $maxExisting = 0;
+    $sql = "SELECT reg_no FROM zimrx_patients WHERE UPPER(reg_no) LIKE UPPER(:pfx)";
+    $params = ['pfx' => $prefix . '%'];
+    if ($doctorId > 0) {
+        $sql .= " AND (doctor_id = :did OR doctor_id = 0 OR doctor_id IS NULL)";
+        $params['did'] = $doctorId;
+    }
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    while ($val = $stmt->fetchColumn()) {
+        $suffix = substr((string)$val, $pfxLen);
+        if (ctype_digit($suffix)) {
+            $num = (int)$suffix;
+            if ($num > $maxExisting) {
+                $maxExisting = $num;
+            }
+        }
+    }
+    return $maxExisting;
+}
+
+function zimrx_sync_patient_sequence_highwater(PDO $pdo, int $doctorId, string $regNo): void {
+    zimrx_ensure_patient_sequences_schema($pdo);
+    if (!preg_match('/^([A-Za-z]+[0-9]{2})([0-9]+)$/', trim($regNo), $m)) {
+        return;
+    }
+    $prefix = strtoupper($m[1]);
+    $seq = (int)$m[2];
+    if ($seq <= 0) {
+        return;
+    }
+
+    $ins = $pdo->prepare(
+        DbSql::insertIgnore('zimrx_patient_sequences', 'doctor_id, prefix, last_seq, updated_at', ':did, :pfx, :lseq, ' . DbSql::now())
+    );
+    $ins->execute(['did' => $doctorId, 'pfx' => $prefix, 'lseq' => $seq]);
+
+    $upd = $pdo->prepare(
+        "UPDATE zimrx_patient_sequences
+         SET last_seq = :seq, updated_at = " . DbSql::now() . "
+         WHERE doctor_id = :did AND prefix = :pfx AND last_seq < :seq"
+    );
+    $upd->execute(['seq' => $seq, 'did' => $doctorId, 'pfx' => $prefix]);
+}
+
+function zimrx_generate_random_reg_no(PDO $pdo, string $prefix, int $digits, bool $autoExpand, array &$settings): string {
+    $checkStmt = $pdo->prepare("SELECT 1 FROM zimrx_patients WHERE UPPER(reg_no) = UPPER(:reg_no) LIMIT 1");
+    $maxVal = (int)str_repeat('9', $digits);
+    $attempts = 0;
+
+    do {
+        $num = random_int(1, $maxVal);
+        $candidate = $prefix . str_pad((string)$num, $digits, '0', STR_PAD_LEFT);
+        $checkStmt->execute(['reg_no' => $candidate]);
+        $exists = (bool)$checkStmt->fetchColumn();
+        $attempts++;
+
+        if ($attempts > 50 && $autoExpand) {
+            $digits++;
+            $maxVal = (int)str_repeat('9', $digits);
+            $settings['yearly_patient_flow'] = $maxVal;
+            zimrx_save_emr_settings($pdo, $settings);
+            $attempts = 0;
+        }
+    } while ($exists && $attempts < 200);
+
+    return $candidate;
+}
+
+function zimrx_allocate_patient_reg_no(PDO $pdo, int $doctorId, ?string $date = null): string {
+    zimrx_ensure_patient_sequences_schema($pdo);
+    $started = zimrx_begin_immediate($pdo);
+
+    try {
+        $dt = null;
+        if ($date) {
+            $dt = DateTime::createFromFormat('Y-m-d', trim($date)) ?: DateTime::createFromFormat('d/m/Y', trim($date));
+        }
+        if (!$dt) {
+            $dt = new DateTime();
+        }
+
+        $yearCode = $dt->format('y');
+        $prefix = 'P' . $yearCode;
+
+        $settings = zimrx_get_emr_settings($pdo);
+        $yearlyDigits = (int)$settings['yearly_digits'];
+        $autoExpand = !empty($settings['auto_expand']);
+        $isRandom = $settings['reg_id_mode'] === 'random';
+
+        if ($isRandom) {
+            $candidate = zimrx_generate_random_reg_no($pdo, $prefix, $yearlyDigits, $autoExpand, $settings);
+            zimrx_commit_if_started($pdo, $started);
+            return $candidate;
+        }
+
+        $checkSeqStmt = $pdo->prepare("SELECT last_seq FROM zimrx_patient_sequences WHERE doctor_id = :did AND prefix = :pfx");
+        $checkSeqStmt->execute(['did' => $doctorId, 'pfx' => $prefix]);
+        $existingSeq = $checkSeqStmt->fetchColumn();
+
+        if ($existingSeq === false) {
+            $seedVal = zimrx_find_max_existing_patient_seq($pdo, $doctorId, $prefix);
+            $insertStmt = $pdo->prepare(
+                DbSql::insertIgnore('zimrx_patient_sequences', 'doctor_id, prefix, last_seq, updated_at', ':did, :pfx, :lseq, ' . DbSql::now())
+            );
+            $insertStmt->execute(['did' => $doctorId, 'pfx' => $prefix, 'lseq' => $seedVal]);
+        }
+
+        $checkPatientStmt = $pdo->prepare("SELECT 1 FROM zimrx_patients WHERE UPPER(reg_no) = UPPER(:reg_no) LIMIT 1");
+        $updateStmt = $pdo->prepare(
+            "UPDATE zimrx_patient_sequences
+             SET last_seq = last_seq + 1, updated_at = " . DbSql::now() . "
+             WHERE doctor_id = :did AND prefix = :pfx"
+        );
+        $getStmt = $pdo->prepare("SELECT last_seq FROM zimrx_patient_sequences WHERE doctor_id = :did AND prefix = :pfx");
+
+        $candidate = '';
+        $maxAttempts = 1000;
+
+        do {
+            $updateStmt->execute(['did' => $doctorId, 'pfx' => $prefix]);
+            $getStmt->execute(['did' => $doctorId, 'pfx' => $prefix]);
+            $allocated = (int)$getStmt->fetchColumn();
+
+            $digits = max(strlen((string)$allocated), $yearlyDigits);
+            if ($allocated > (int)$settings['yearly_patient_flow'] && $autoExpand) {
+                $settings['yearly_patient_flow'] = (int)str_repeat('9', $digits);
+                zimrx_save_emr_settings($pdo, $settings);
+            }
+
+            $candidate = $prefix . str_pad((string)$allocated, $digits, '0', STR_PAD_LEFT);
+            $checkPatientStmt->execute(['reg_no' => $candidate]);
+            $exists = (bool)$checkPatientStmt->fetchColumn();
+            $maxAttempts--;
+        } while ($exists && $maxAttempts > 0);
+
+        zimrx_commit_if_started($pdo, $started);
+        return $candidate;
+    } catch (Throwable $e) {
+        zimrx_rollback_if_started($pdo, $started);
+        throw $e;
+    }
+}
+
+function zimrx_preview_patient_reg_no(PDO $pdo, int $doctorId, ?string $date = null): string {
+    zimrx_ensure_patient_sequences_schema($pdo);
+
     $dt = null;
     if ($date) {
         $dt = DateTime::createFromFormat('Y-m-d', trim($date)) ?: DateTime::createFromFormat('d/m/Y', trim($date));
@@ -118,80 +307,41 @@ function zimrx_generate_reg_no(PDO $pdo, ?string $date = null): string {
         $dt = new DateTime();
     }
 
-    $year = (int)$dt->format('Y');
     $yearCode = $dt->format('y');
     $prefix = 'P' . $yearCode;
 
     $settings = zimrx_get_emr_settings($pdo);
     $yearlyDigits = (int)$settings['yearly_digits'];
-    $autoExpand = !empty($settings['auto_expand']);
-    $isRandom = $settings['reg_id_mode'] === 'random';
 
-    $checkStmt = $pdo->prepare("SELECT 1 FROM zimrx_patients WHERE UPPER(reg_no) = UPPER(:reg_no) LIMIT 1");
+    $checkSeqStmt = $pdo->prepare("SELECT last_seq FROM zimrx_patient_sequences WHERE doctor_id = :did AND prefix = :pfx");
+    $checkSeqStmt->execute(['did' => $doctorId, 'pfx' => $prefix]);
+    $existingSeq = $checkSeqStmt->fetchColumn();
 
-    if ($isRandom) {
-        $digits = $yearlyDigits;
-        $maxVal = (int)str_repeat('9', $digits);
-        $attempts = 0;
-
-        do {
-            $num = random_int(1, $maxVal);
-            $candidate = $prefix . str_pad((string)$num, $digits, '0', STR_PAD_LEFT);
-            $checkStmt->execute(['reg_no' => $candidate]);
-            $exists = (bool)$checkStmt->fetchColumn();
-            $attempts++;
-
-            if ($attempts > 50 && $autoExpand) {
-                $digits++;
-                $maxVal = (int)str_repeat('9', $digits);
-                $settings['yearly_patient_flow'] = $maxVal;
-                zimrx_save_emr_settings($pdo, $settings);
-                $attempts = 0;
-            }
-        } while ($exists && $attempts < 200);
-
-        return $candidate;
+    if ($existingSeq === false) {
+        $lastSeq = zimrx_find_max_existing_patient_seq($pdo, $doctorId, $prefix);
+    } else {
+        $lastSeq = (int)$existingSeq;
     }
 
-    // Sequential mode: count total patients registered for this year
-    $countStmt = $pdo->prepare(
-        "SELECT COUNT(*) FROM zimrx_patients
-         WHERE strftime('%Y', created_at) = :year
-            OR created_at LIKE :year_prefix
-            OR substr(reg_no, 2, 2) = :year_code"
-    );
-    $countStmt->execute([
-        'year' => (string)$year,
-        'year_prefix' => (string)$year . '-%',
-        'year_code' => $yearCode,
-    ]);
-    $totalCount = (int)$countStmt->fetchColumn();
+    $nextTarget = $lastSeq + 1;
+    $digits = max(strlen((string)$nextTarget), $yearlyDigits);
 
-    $target = $totalCount + 1;
-    $digits = max(strlen((string)$target), $yearlyDigits);
-
-    // Auto-expand setting check
-    if ($target > (int)$settings['yearly_patient_flow'] && $autoExpand) {
-        $settings['yearly_patient_flow'] = (int)str_repeat('9', $digits);
-        zimrx_save_emr_settings($pdo, $settings);
-    }
-
-    // Smart-skip collision loop
+    $checkPatientStmt = $pdo->prepare("SELECT 1 FROM zimrx_patients WHERE UPPER(reg_no) = UPPER(:reg_no) LIMIT 1");
     do {
-        $candidate = $prefix . str_pad((string)$target, $digits, '0', STR_PAD_LEFT);
-        $checkStmt->execute(['reg_no' => $candidate]);
-        $exists = (bool)$checkStmt->fetchColumn();
+        $candidate = $prefix . str_pad((string)$nextTarget, $digits, '0', STR_PAD_LEFT);
+        $checkPatientStmt->execute(['reg_no' => $candidate]);
+        $exists = (bool)$checkPatientStmt->fetchColumn();
         if ($exists) {
-            $target++;
-            $digits = max(strlen((string)$target), $digits);
-            if ($target > (int)$settings['yearly_patient_flow'] && $autoExpand) {
-                $settings['yearly_patient_flow'] = (int)str_repeat('9', $digits);
-                zimrx_save_emr_settings($pdo, $settings);
-            }
+            $nextTarget++;
+            $digits = max(strlen((string)$nextTarget), $digits);
         }
     } while ($exists);
 
     return $candidate;
+}
+
+function zimrx_generate_reg_no(PDO $pdo, ?string $date = null, int $doctorId = 0): string {
+    return zimrx_preview_patient_reg_no($pdo, $doctorId, $date);
 }
 
 function zimrx_generate_visit_id(PDO $pdo, ?string $date = null): string {
