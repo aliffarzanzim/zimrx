@@ -1,11 +1,13 @@
 // Prescription print preview renderer generating HTML layout, slots, drug table, and interactive doctor stamp.
-const previewOptionsEl = document.getElementById('previewOptionsData');
+const hasDom = typeof document !== 'undefined';
+const previewOptionsEl = hasDom ? document.getElementById('previewOptionsData') : null;
 let previewOptions = previewOptionsEl ? JSON.parse(previewOptionsEl.textContent || '{}') : {};
-const previewDefaultEl = document.getElementById('previewDefaultDataJson');
+const previewDefaultEl = hasDom ? document.getElementById('previewDefaultDataJson') : null;
 const previewDefaultData = previewDefaultEl ? JSON.parse(previewDefaultEl.textContent || '{}') : {};
 let previewCurrentData = previewDefaultData;
 
 function getCookie(name) {
+    if (!hasDom) return '';
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return decodeURIComponent(parts.pop().split(';').shift());
@@ -564,7 +566,7 @@ function renderDrugRows(drugs) {
 
         if (!isContinuation) {
             if (!isFirstDrug) {
-                html += '<tr><td colspan="4" class="zrx-drug-gap">&nbsp;</td></tr>';
+                html += '<tr class="zrx-drug-gap-row"><td colspan="4" class="zrx-drug-gap">&nbsp;</td></tr>';
             }
             isFirstDrug = false;
         }
@@ -573,50 +575,56 @@ function renderDrugRows(drugs) {
 
         let numberHtml = '';
         if (!isContinuation) {
-            numberHtml = showDrugNo ? `<td class="zrx-drug-number">${escapeHtml(getPrintDrugNumberLabel(counter))}</td>` : `<td class="zrx-drug-number zrx-drug-bullet">${escapeHtml(drugBullet)}</td>`;
+            numberHtml = showDrugNo
+                ? `<td class="zrx-drug-number">${escapeHtml(getPrintDrugNumberLabel(counter))}</td>`
+                : `<td class="zrx-drug-number zrx-drug-bullet">${escapeHtml(drugBullet)}</td>`;
         } else {
-            numberHtml = `<td class="zrx-drug-number"></td>`;
+            numberHtml = '<td class="zrx-drug-number"></td>';
         }
 
-        const format = previewOptions.drug_row_format || 'standard';
         const isGenericMode = String(previewOptions.prescribing_mode || '') === 'generic' || Boolean(drug && drug.is_generic_mode);
         const alreadyHasGeneric = Boolean(generic && drugName && drugName.toLowerCase().includes(generic.toLowerCase()));
         const canShowGenericSubtitle = showGeneric && generic && generic !== drugName && !isGenericMode && !alreadyHasGeneric;
 
-        if (format === 'labelled') {
-            const brandFontSize = (previewOptions.right_font_size || '11') + 'pt';
-            const lblGeneric = previewOptions.lbl_generic || 'Generic Name:';
-            const lblBrand = previewOptions.lbl_brand || 'Brand Name Recommendation:';
-            const lblInstruction = previewOptions.lbl_instruction || 'Instruction:';
+        if (drugRowFormat === 'labelled') {
+            const brandFontSize = escapeHtml(String(previewOptions.right_font_size || '11')) + 'pt';
+            let lblGeneric = String(previewOptions.lbl_generic || 'Generic Name:');
+            if (!lblGeneric.trim()) lblGeneric = 'Generic Name:';
+            let lblBrand = String(previewOptions.lbl_brand || 'Brand Name Recommendation:');
+            if (!lblBrand.trim()) lblBrand = 'Brand Name Recommendation:';
+            let lblInstruction = String(previewOptions.lbl_instruction || 'Instruction:');
+            if (!lblInstruction.trim()) lblInstruction = 'Instruction:';
+
             html += `<tr class="zrx-drug-name-row">${numberHtml}<td colspan="3" class="zrx-drug-name-cell">`;
             if (generic) {
-                html += `<div style="margin-bottom: 3px;"><span style="font-weight: bold; font-family: 'Tinos';" class="zrx-lbl-generic">${escapeHtml(lblGeneric)} </span><span class="zrx-drug-generic" data-generic="${escapeHtml(generic)}" style="font-family: 'Tinos', serif; font-style: normal; font-weight: normal; font-size: ${brandFontSize}; ${showGeneric ? 'display: inline-block;' : 'display: none;'}">${escapeHtml(generic)}</span></div>`;
+                html += `<div class="zrx-drug-subrow"><span class="zrx-lbl-generic">${escapeHtml(lblGeneric)} </span><span class="zrx-drug-generic" data-generic="${escapeHtml(generic)}" style="font-size: ${brandFontSize}; ${showGeneric ? 'display: inline-block;' : 'display: none;'}">${escapeHtml(generic)}</span></div>`;
             }
             if (brand && !isGenericMode && brand !== generic && !alreadyHasGeneric) {
-                html += `<div style="margin-bottom: 3px;"><span style="font-weight: bold; font-family: 'Tinos';" class="zrx-lbl-brand">${escapeHtml(lblBrand)} </span><span class="zrx-drug-brand" style="font-weight: normal;">${escapeHtml(brand)}</span></div>`;
+                html += `<div class="zrx-drug-subrow"><span class="zrx-lbl-brand">${escapeHtml(lblBrand)} </span><span class="zrx-drug-brand">${escapeHtml(brand)}</span></div>`;
             }
-            if (dose || instruction || duration) {
-                html += `<div><span style="${isContinuation ? 'visibility: hidden;' : ''} font-weight: bold; font-family: 'Tinos';" class="zrx-lbl-instruction">${escapeHtml(lblInstruction)} </span><span class="zrx-drug-dose">${escapeHtml(dose)}</span><span class="zrx-drug-instruction">${instruction ? '- ' + escapeHtml(instruction) : ''}</span><span class="zrx-drug-duration">${duration ? '- ' + escapeHtml(duration) : ''}</span></div>`;
+            if (instruction || dose || duration) {
+                const visClass = isContinuation ? ' zrx-vis-hidden' : '';
+                html += `<div><span class="zrx-lbl-instruction${visClass}">${escapeHtml(lblInstruction)} </span><span class="zrx-drug-dose">${escapeHtml(dose)}</span><span class="zrx-drug-instruction">${instruction ? '- ' + escapeHtml(instruction) : ''}</span><span class="zrx-drug-duration">${duration ? '- ' + escapeHtml(duration) : ''}</span></div>`;
             }
-            html += `</td></tr>`;
+            html += '</td></tr>';
         } else {
             if (!isContinuation) {
                 html += `<tr class="zrx-drug-name-row">${numberHtml}`;
                 html += `<td colspan="3" class="zrx-drug-name-cell"><span class="zrx-drug-brand">${escapeHtml(drugName)}</span>`;
                 if (canShowGenericSubtitle) {
                     let gFormatted = generic;
-                    const wrapper = previewOptions.generic_wrapper || 'none';
+                    const wrapper = String(previewOptions.generic_wrapper || 'none');
                     if (wrapper === 'parentheses') gFormatted = '(' + generic + ')';
                     else if (wrapper === 'brackets') gFormatted = '[' + generic + ']';
                     else if (wrapper === 'hyphen') gFormatted = '- ' + generic;
-                    const isBelow = (previewOptions.generic_position || 'below') === 'below';
+                    const isBelow = String(previewOptions.generic_position || 'below') === 'below';
                     html += ` <span class="zrx-drug-generic" data-generic="${escapeHtml(generic)}" style="display: ${isBelow ? 'block' : 'inline-block'};">${escapeHtml(gFormatted)}</span>`;
                 }
                 html += '</td></tr>';
             }
 
             if (dose || instruction || duration) {
-                html += `<tr class="zrx-drug-detail-row"><td class="zrx-drug-detail-pad"></td><td class="zrx-drug-dose">${escapeHtml(dose)}</td><td class="zrx-drug-instruction">${instruction ? `- ${escapeHtml(instruction)}` : ''}</td><td class="zrx-drug-duration">${duration ? `- ${escapeHtml(duration)}` : ''}</td></tr>`;
+                html += `<tr class="zrx-drug-detail-row"><td class="zrx-drug-detail-pad"></td><td class="zrx-drug-dose">${escapeHtml(dose)}</td><td class="zrx-drug-instruction">${instruction ? '- ' + escapeHtml(instruction) : ''}</td><td class="zrx-drug-duration">${duration ? '- ' + escapeHtml(duration) : ''}</td></tr>`;
             }
         }
 
@@ -793,55 +801,58 @@ function applyPreviewData(data) {
     }
 }
 
-const serverSnapshotEl = document.getElementById('previewServerSnapshotData');
-const serverSnapshot = serverSnapshotEl ? JSON.parse(serverSnapshotEl.textContent || 'null') : null;
-const snapshot = serverSnapshot || getStoredPreviewData();
-if (snapshot) {
-    applyPreviewData(snapshot);
+if (hasDom) {
+    const serverSnapshotEl = document.getElementById('previewServerSnapshotData');
+    const serverSnapshot = serverSnapshotEl ? JSON.parse(serverSnapshotEl.textContent || 'null') : null;
+    const snapshot = serverSnapshot || getStoredPreviewData();
+    if (snapshot) {
+        applyPreviewData(snapshot);
+    }
+    if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'PREVIEW_DOM_READY' }, window.location.origin);
+    }
+
+    window.addEventListener('message', event => {
+        if (!event.data) {
+            return;
+        }
+
+        if (event.data.type === 'SYNC_PREVIEW_DRUG_FORMAT') {
+            previewOptions = { ...previewOptions, ...(event.data.options || {}) };
+            setHtml('#preview-drug-rows', renderDrugRows((previewCurrentData.clinical || {}).drugs || []));
+            return;
+        }
+
+        if (event.data.type === 'SYNC_PREVIEW_PATIENT_LABELS') {
+            previewOptions = { ...previewOptions, ...(event.data.options || {}) };
+            setHtml('.zrx-patient-strip', renderPatientTable(previewCurrentData.patient || {}));
+            schedulePatientAddressFit();
+            setHtml('#preview-left-sections', renderLeftSections(previewCurrentData.clinical || {}));
+            scheduleHistoryLabelGapFit();
+            return;
+        }
+
+        if (event.data.type !== 'SYNC_PREVIEW_DATA') {
+            return;
+        }
+
+        applyPreviewData(event.data.data || {});
+
+        const footer = document.getElementById('preview-footer');
+        if (footer && event.data.data.footer_html !== undefined) {
+            const html = String(event.data.data.footer_html || '').trim();
+            footer.innerHTML = html;
+            footer.style.display = html && (previewOptions.display_footer || 'yes') !== 'no' ? 'block' : 'none';
+        }
+
+        const headerEl = document.getElementById('pageHeader');
+        if (headerEl && event.data.data.bgcolor) {
+            headerEl.style.background = '#' + event.data.data.bgcolor;
+        }
+    });
 }
-if (window.parent && window.parent !== window) {
-    window.parent.postMessage({ type: 'PREVIEW_DOM_READY' }, window.location.origin);
-}
 
-window.addEventListener('message', event => {
-    if (!event.data) {
-        return;
-    }
-
-    if (event.data.type === 'SYNC_PREVIEW_DRUG_FORMAT') {
-        previewOptions = { ...previewOptions, ...(event.data.options || {}) };
-        setHtml('#preview-drug-rows', renderDrugRows((previewCurrentData.clinical || {}).drugs || []));
-        return;
-    }
-
-    if (event.data.type === 'SYNC_PREVIEW_PATIENT_LABELS') {
-        previewOptions = { ...previewOptions, ...(event.data.options || {}) };
-        setHtml('.zrx-patient-strip', renderPatientTable(previewCurrentData.patient || {}));
-        schedulePatientAddressFit();
-        setHtml('#preview-left-sections', renderLeftSections(previewCurrentData.clinical || {}));
-        scheduleHistoryLabelGapFit();
-        return;
-    }
-
-    if (event.data.type !== 'SYNC_PREVIEW_DATA') {
-        return;
-    }
-
-    applyPreviewData(event.data.data || {});
-
-    const footer = document.getElementById('preview-footer');
-    if (footer && event.data.data.footer_html !== undefined) {
-        const html = String(event.data.data.footer_html || '').trim();
-        footer.innerHTML = html;
-        footer.style.display = html && (previewOptions.display_footer || 'yes') !== 'no' ? 'block' : 'none';
-    }
-
-    const headerEl = document.getElementById('pageHeader');
-    if (headerEl && event.data.data.bgcolor) {
-        headerEl.style.background = '#' + event.data.data.bgcolor;
-    }
-});
-
+if (hasDom) {
 (function waitForPrescriptionFonts() {
     const root = document.documentElement;
     const reveal = (className) => {
@@ -1044,3 +1055,18 @@ window.addEventListener('message', event => {
         }
     });
 })();
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        renderDrugRows,
+        renderAdvice,
+        renderPatientTable,
+        renderLeftSections,
+        setPreviewOptions: (opts) => { previewOptions = { ...(opts || {}) }; },
+        setPreviewCurrentData: (data) => { previewCurrentData = { ...(data || {}) }; },
+        getPreviewOptions: () => previewOptions,
+        escapeHtml,
+        cleanText,
+    };
+}

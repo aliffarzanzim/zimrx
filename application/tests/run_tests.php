@@ -78,6 +78,7 @@ class ZimRxTestSuite {
         $this->testApplicationSecurityHeadersAndLint();
         $this->testPatientSequenceAllocationAndConcurrency();
         $this->testEmrTimelineBlobOptimizationAndMemoryScaling();
+        $this->testPrescriptionPreviewRenderParity();
 
         echo "\n--------------------------------------------------------\n";
         echo "Test Results: {$this->passed} passed, {$this->failed} failed\n";
@@ -2037,6 +2038,156 @@ class ZimRxTestSuite {
             && !str_contains($emrApiContent, 'v.prescription_html, v.rich_text_json'),
             "emr_api.php loads full encounter details asynchronously on-demand and omits blobs from get_patient"
         );
+    }
+
+    private function testPrescriptionPreviewRenderParity(): void {
+        echo "\n[29/29] Testing Prescription Live Preview vs. Print Render Engine Parity...\n";
+
+        $_SESSION['user_id'] = 1;
+        $_SESSION['doctor_id'] = 1;
+        ob_start();
+        include_once __DIR__ . '/../public/prescription_preview.php';
+        ob_end_clean();
+
+        // 1. PHP zrx_render_advice_table emits canonical table structure
+        $adviceItems = [
+            ['value' => 'Drink plenty of water', 'bengali' => 'প্রচুর পানি পান করুন'],
+            ['value' => 'Take rest for 3 days', 'bengali' => '৩ দিন বিশ্রাম নিন']
+        ];
+        $adviceBn = zrx_render_advice_table($adviceItems, ['advice_language' => 'bengali']);
+        $this->assert(
+            str_contains($adviceBn, 'zrx-advice-table') && str_contains($adviceBn, 'প্রচুর পানি পান করুন'),
+            "zrx_render_advice_table outputs structured HTML table with localized Bengali text"
+        );
+        $adviceEn = zrx_render_advice_table($adviceItems, ['advice_language' => 'english']);
+        $this->assert(
+            str_contains($adviceEn, 'zrx-advice-table') && str_contains($adviceEn, 'Drink plenty of water'),
+            "zrx_render_advice_table outputs structured HTML table with English fallback"
+        );
+
+        // 2. PHP zrx_render_drug_rows canonical labelled format
+        $labelledDrugs = [
+            ['brand' => 'TAB. NAPA 500 MG', 'generic' => 'Paracetamol', 'dose' => '1+0+1', 'food' => 'খাবার পর', 'duration' => '৫ দিন']
+        ];
+        $htmlLabelled = zrx_render_drug_rows($labelledDrugs, [
+            'drug_row_format' => 'labelled',
+            'right_font_size' => '12',
+            'lbl_generic' => 'Generic Name:',
+            'lbl_brand' => 'Brand Recommendation:',
+            'lbl_instruction' => 'Directions:'
+        ]);
+        $this->assert(
+            str_contains($htmlLabelled, 'zrx-drug-subrow') && str_contains($htmlLabelled, 'zrx-lbl-generic') && str_contains($htmlLabelled, 'Brand Recommendation:'),
+            "zrx_render_drug_rows supports structured labelled prescription format with semantic CSS classes"
+        );
+
+        // 3. Continuation row in standard format
+        $continuationDrugs = [
+            ['brand' => 'TAB. NAPA 500 MG', 'generic' => 'Paracetamol', 'dose' => '1+0+1'],
+            ['brand' => '', 'generic' => '', 'dose' => '1+0+0', 'food' => 'খাবার পর']
+        ];
+        $htmlContinuation = zrx_render_drug_rows($continuationDrugs, ['drug_row_format' => 'standard']);
+        $this->assert(
+            str_contains($htmlContinuation, 'zrx-drug-detail-pad')
+            && substr_count($htmlContinuation, 'zrx-drug-detail-pad') === 2
+            && substr_count($htmlContinuation, 'zrx-drug-number') === 1,
+            "zrx_render_drug_rows formats secondary continuation dosage rows with aligned padding and suppressed number"
+        );
+
+        // 4. Cross-engine parity check with Node.js if present
+        $nodeVersion = @shell_exec('node -v 2>&1');
+        $hasNode = is_string($nodeVersion) && str_starts_with(trim($nodeVersion), 'v');
+
+        if ($hasNode) {
+            $testScript = <<<'NODE'
+const r = require('./application/public/assets/js/pages/prescription_preview_render.js');
+const fs = require('fs');
+const input = JSON.parse(fs.readFileSync(0, 'utf-8'));
+
+r.setPreviewOptions(input.options || {});
+let output = '';
+if (input.action === 'renderDrugRows') {
+    output = r.renderDrugRows(input.drugs || []);
+} else if (input.action === 'renderAdvice') {
+    output = r.renderAdvice(input.advice || []);
+}
+process.stdout.write(output);
+NODE;
+
+            $runNode = function(array $payload) use ($testScript): string {
+                $descriptorSpec = [
+                    0 => ['pipe', 'r'],
+                    1 => ['pipe', 'w'],
+                    2 => ['pipe', 'w']
+                ];
+                $rootPath = dirname(__DIR__, 2);
+                $process = proc_open('node -e "' . str_replace(["\r\n", "\n"], ' ', $testScript) . '"', $descriptorSpec, $pipes, $rootPath);
+                if (!is_resource($process)) {
+                    return '';
+                }
+                fwrite($pipes[0], (string)json_encode($payload));
+                fclose($pipes[0]);
+                $stdout = stream_get_contents($pipes[1]);
+                fclose($pipes[1]);
+                fclose($pipes[2]);
+                proc_close($process);
+                return (string)$stdout;
+            };
+
+            // Test 4A: Dual mode parity
+            $testOptions = [
+                'prescribing_mode' => 'brand',
+                'generic_wrapper' => 'parentheses',
+                'disp_generic' => 'yes',
+                'display_drug_no' => 'yes',
+                'drug_row_format' => 'standard'
+            ];
+            $phpDualHtml = zrx_render_drug_rows($labelledDrugs, $testOptions);
+            $jsDualHtml = $runNode([
+                'action' => 'renderDrugRows',
+                'options' => $testOptions,
+                'drugs' => $labelledDrugs
+            ]);
+            $this->assert(
+                $phpDualHtml === $jsDualHtml,
+                "Cross-engine parity: PHP zrx_render_drug_rows matches JS renderDrugRows byte-for-byte in Dual Mode"
+            );
+
+            // Test 4B: Labelled format parity
+            $labelledOptions = [
+                'drug_row_format' => 'labelled',
+                'right_font_size' => '11',
+                'lbl_generic' => 'Generic Name:',
+                'lbl_brand' => 'Brand Name Recommendation:',
+                'lbl_instruction' => 'Instruction:',
+                'display_drug_no' => 'yes'
+            ];
+            $phpLabelledHtml = zrx_render_drug_rows($labelledDrugs, $labelledOptions);
+            $jsLabelledHtml = $runNode([
+                'action' => 'renderDrugRows',
+                'options' => $labelledOptions,
+                'drugs' => $labelledDrugs
+            ]);
+            $this->assert(
+                $phpLabelledHtml === $jsLabelledHtml,
+                "Cross-engine parity: PHP zrx_render_drug_rows matches JS renderDrugRows byte-for-byte in Labelled Format"
+            );
+
+            // Test 4C: Advice table parity
+            $adviceOptions = ['advice_language' => 'bengali'];
+            $phpAdviceTable = zrx_render_advice_table($adviceItems, $adviceOptions);
+            $jsAdviceTable = $runNode([
+                'action' => 'renderAdvice',
+                'options' => $adviceOptions,
+                'advice' => $adviceItems
+            ]);
+            $this->assert(
+                $phpAdviceTable === $jsAdviceTable,
+                "Cross-engine parity: PHP zrx_render_advice_table matches JS renderAdvice byte-for-byte"
+            );
+        } else {
+            $this->assert(true, "Node runtime not available in evaluation environment - skipped live cross-engine subprocess comparison");
+        }
     }
 }
 

@@ -760,7 +760,7 @@ function zrx_render_drug_rows(array $drugs, array $options): string {
         $drugBullet = '•';
     }
 
-    ob_start();
+    $html = '';
     $counter = 1;
     $isFirstDrug = true;
     foreach ($drugs as $drug) {
@@ -784,17 +784,13 @@ function zrx_render_drug_rows(array $drugs, array $options): string {
 
         if (!$isContinuation) {
             if (!$isFirstDrug) {
-                echo '<tr class="zrx-drug-gap-row"><td colspan="4" class="zrx-drug-gap">&nbsp;</td></tr>';
+                $html .= '<tr class="zrx-drug-gap-row"><td colspan="4" class="zrx-drug-gap">&nbsp;</td></tr>';
             }
             $isFirstDrug = false;
         }
 
-        $drugName = $brand;
-        if ($drugName === '' && $generic !== '') {
-            $drugName = $generic;
-        }
+        $drugName = $brand !== '' ? $brand : $generic;
 
-        $numberHtml = '';
         if (!$isContinuation) {
             if ($displayDrugNo) {
                 $numberHtml = '<td class="zrx-drug-number">' . preview_escape(zrx_drug_number_label($counter, $options)) . '</td>';
@@ -805,7 +801,6 @@ function zrx_render_drug_rows(array $drugs, array $options): string {
             $numberHtml = '<td class="zrx-drug-number"></td>';
         }
 
-        $drugRowFormat = (string)($options['drug_row_format'] ?? 'standard');
         $isGenericMode = (($options['prescribing_mode'] ?? '') === 'generic') || !empty($drug['is_generic_mode']);
         $alreadyHasGeneric = ($generic !== '' && stripos($drugName, $generic) !== false);
         $canShowGenericSubtitle = $showGeneric && $generic !== '' && $generic !== $drugName && !$isGenericMode && !$alreadyHasGeneric;
@@ -818,65 +813,49 @@ function zrx_render_drug_rows(array $drugs, array $options): string {
             if (trim($lblBrand) === '') $lblBrand = 'Brand Name Recommendation:';
             $lblInstruction = (string)($options['lbl_instruction'] ?? 'Instruction:');
             if (trim($lblInstruction) === '') $lblInstruction = 'Instruction:';
-            ?>
-            <tr class="zrx-drug-name-row">
-                <?= $numberHtml ?>
-                <td colspan="3" class="zrx-drug-name-cell">
-                    <?php if ($generic !== ''): ?>
-                        <div class="zrx-drug-subrow"><span class="zrx-lbl-generic"><?= preview_escape($lblGeneric) ?> </span><span class="zrx-drug-generic" data-generic="<?= preview_escape($generic) ?>" style="font-size: <?= $brandFontSize ?>; <?= $showGeneric ? 'display: inline-block;' : 'display: none;' ?>"><?= preview_escape($generic) ?></span></div>
-                    <?php endif; ?>
-                    <?php if ($brand !== '' && !$isGenericMode && $brand !== $generic && !$alreadyHasGeneric): ?>
-                        <div class="zrx-drug-subrow"><span class="zrx-lbl-brand"><?= preview_escape($lblBrand) ?> </span><span class="zrx-drug-brand"><?= preview_escape($brand) ?></span></div>
-                    <?php endif; ?>
-                    <?php if ($instruction !== '' || $dose !== '' || $duration !== ''): ?>
-                        <div><span class="zrx-lbl-instruction <?= $isContinuation ? 'zrx-vis-hidden' : '' ?>"><?= preview_escape($lblInstruction) ?> </span>
-                            <span class="zrx-drug-dose"><?= preview_escape($dose) ?></span>
-                            <span class="zrx-drug-instruction"><?= $instruction !== '' ? '- ' . preview_escape($instruction) : '' ?></span>
-                            <span class="zrx-drug-duration"><?= $duration !== '' ? '- ' . preview_escape($duration) : '' ?></span>
-                        </div>
-                    <?php endif; ?>
-                </td>
-            </tr>
-            <?php
+
+            $html .= '<tr class="zrx-drug-name-row">' . $numberHtml . '<td colspan="3" class="zrx-drug-name-cell">';
+            if ($generic !== '') {
+                $html .= '<div class="zrx-drug-subrow"><span class="zrx-lbl-generic">' . preview_escape($lblGeneric) . ' </span><span class="zrx-drug-generic" data-generic="' . preview_escape($generic) . '" style="font-size: ' . $brandFontSize . '; ' . ($showGeneric ? 'display: inline-block;' : 'display: none;') . '">' . preview_escape($generic) . '</span></div>';
+            }
+            if ($brand !== '' && !$isGenericMode && $brand !== $generic && !$alreadyHasGeneric) {
+                $html .= '<div class="zrx-drug-subrow"><span class="zrx-lbl-brand">' . preview_escape($lblBrand) . ' </span><span class="zrx-drug-brand">' . preview_escape($brand) . '</span></div>';
+            }
+            if ($instruction !== '' || $dose !== '' || $duration !== '') {
+                $visClass = $isContinuation ? ' zrx-vis-hidden' : '';
+                $html .= '<div><span class="zrx-lbl-instruction' . $visClass . '">' . preview_escape($lblInstruction) . ' </span><span class="zrx-drug-dose">' . preview_escape($dose) . '</span><span class="zrx-drug-instruction">' . ($instruction !== '' ? '- ' . preview_escape($instruction) : '') . '</span><span class="zrx-drug-duration">' . ($duration !== '' ? '- ' . preview_escape($duration) : '') . '</span></div>';
+            }
+            $html .= '</td></tr>';
         } else {
             if (!$isContinuation) {
-            ?>
-            <tr class="zrx-drug-name-row">
-                <?= $numberHtml ?>
-                <td colspan="3" class="zrx-drug-name-cell">
-                    <span class="zrx-drug-brand"><?= preview_escape($drugName) ?></span>
-                    <?php if ($canShowGenericSubtitle): ?>
-                        <?php
-                            $gWrapper = (string)($options['generic_wrapper'] ?? 'none');
-                            $gFormatted = $generic;
-                            if ($gWrapper === 'parentheses') $gFormatted = '(' . $generic . ')';
-                            elseif ($gWrapper === 'brackets') $gFormatted = '[' . $generic . ']';
-                            elseif ($gWrapper === 'hyphen') $gFormatted = '- ' . $generic;
-                        ?>
-                        <span class="zrx-drug-generic" data-generic="<?= preview_escape($generic) ?>" style="<?= $showGeneric ? ((($options['generic_position'] ?? 'below') === 'below') ? 'display: block;' : 'display: inline-block;') : 'display: none;' ?>"><?= preview_escape($gFormatted) ?></span>
-                    <?php endif; ?>
-                </td>
-            </tr>
-            <?php } ?>
-        <?php if ($dose !== '' || $instruction !== '' || $duration !== ''): ?>
-            <tr class="zrx-drug-detail-row">
-                <td class="zrx-drug-detail-pad"></td>
-                <td class="zrx-drug-dose"><?= preview_escape($dose) ?></td>
-                <td class="zrx-drug-instruction"><?= $instruction !== '' ? '- ' . preview_escape($instruction) : '' ?></td>
-                <td class="zrx-drug-duration"><?= $duration !== '' ? '- ' . preview_escape($duration) : '' ?></td>
-            </tr>
-        <?php endif; ?>
-        <?php
+                $html .= '<tr class="zrx-drug-name-row">' . $numberHtml;
+                $html .= '<td colspan="3" class="zrx-drug-name-cell"><span class="zrx-drug-brand">' . preview_escape($drugName) . '</span>';
+                if ($canShowGenericSubtitle) {
+                    $gWrapper = (string)($options['generic_wrapper'] ?? 'none');
+                    $gFormatted = $generic;
+                    if ($gWrapper === 'parentheses') $gFormatted = '(' . $generic . ')';
+                    elseif ($gWrapper === 'brackets') $gFormatted = '[' . $generic . ']';
+                    elseif ($gWrapper === 'hyphen') $gFormatted = '- ' . $generic;
+                    $isBelow = (($options['generic_position'] ?? 'below') === 'below');
+                    $html .= ' <span class="zrx-drug-generic" data-generic="' . preview_escape($generic) . '" style="display: ' . ($isBelow ? 'block' : 'inline-block') . ';">' . preview_escape($gFormatted) . '</span>';
+                }
+                $html .= '</td></tr>';
+            }
+
+            if ($dose !== '' || $instruction !== '' || $duration !== '') {
+                $html .= '<tr class="zrx-drug-detail-row"><td class="zrx-drug-detail-pad"></td><td class="zrx-drug-dose">' . preview_escape($dose) . '</td><td class="zrx-drug-instruction">' . ($instruction !== '' ? '- ' . preview_escape($instruction) : '') . '</td><td class="zrx-drug-duration">' . ($duration !== '' ? '- ' . preview_escape($duration) : '') . '</td></tr>';
+            }
         }
+
         if (!$isContinuation) {
             $counter++;
         }
     }
 
-    return (string)ob_get_clean();
+    return $html;
 }
 
-function zrx_render_advice(array $items, array $options): string {
+function zrx_render_advice_table(array $items, array $options): string {
     $rows = [];
     $language = (string)($options['advice_language'] ?? 'bengali');
     foreach ($items as $item) {
@@ -894,7 +873,16 @@ function zrx_render_advice(array $items, array $options): string {
         return '';
     }
 
-    return '<div id="preview-advice-wrap" class="zrx-advice-section"><table class="zrx-advice-table"><tbody id="preview-advice-rows"><tr><td colspan="2"><u><b>&#x0989;&#x09AA;&#x09A6;&#x09C7;&#x09B6;&#x0983;</b></u></td></tr>' . implode('', $rows) . '</tbody></table></div>';
+    return '<table class="zrx-advice-table"><tbody id="preview-advice-rows"><tr><td colspan="2"><u><b>&#x0989;&#x09AA;&#x09A6;&#x09C7;&#x09B6;&#x0983;</b></u></td></tr>' . implode('', $rows) . '</tbody></table>';
+}
+
+function zrx_render_advice(array $items, array $options): string {
+    $table = zrx_render_advice_table($items, $options);
+    if ($table === '') {
+        return '';
+    }
+
+    return '<div id="preview-advice-wrap" class="zrx-advice-section">' . $table . '</div>';
 }
 
 $doctorId = current_user_doctor_id();
@@ -925,6 +913,18 @@ if (!in_array((string)($options['bn_font'] ?? ''), $availableFonts, true)) {
 }
 if (!in_array((string)($options['upd_font'] ?? ''), $availableFonts, true)) {
     $options['upd_font'] = 'SolaimanLipi';
+}
+
+if ($serverSnapshotJson !== 'null' && $serverSnapshotJson !== '') {
+    $decodedSnapshot = json_decode($serverSnapshotJson, true);
+    if (is_array($decodedSnapshot)) {
+        if (!empty($decodedSnapshot['patient']) && is_array($decodedSnapshot['patient'])) {
+            $sampleData['patient'] = array_merge($sampleData['patient'] ?? [], $decodedSnapshot['patient']);
+        }
+        if (!empty($decodedSnapshot['clinical']) && is_array($decodedSnapshot['clinical'])) {
+            $sampleData['clinical'] = array_merge($sampleData['clinical'] ?? [], $decodedSnapshot['clinical']);
+        }
+    }
 }
 
 $patient = $sampleData['patient'];
@@ -1268,7 +1268,8 @@ $revisit = trim((string)($clinical['revisit'] ?? ''));
                 <div id="preview-text-pad-wrap" class="zrx-text-pad" hidden></div>
             <?php endif; ?>
 
-            <?= zrx_render_advice($clinical['advice'] ?? [], $options) ?>
+            <?php $adviceTableHtml = zrx_render_advice_table($clinical['advice'] ?? [], $options); ?>
+            <div id="preview-advice-wrap" class="zrx-advice-section" <?= $adviceTableHtml === '' ? 'hidden' : '' ?>><?= $adviceTableHtml ?></div>
 
             <?php if ($revisit !== ''): ?>
                 <div id="preview-revisit-wrap" class="zrx-followup">
