@@ -28,7 +28,7 @@ function initRxAutocomplete() {
         autoRowSize: false,
         showWarnings: true,
         warningTypes: { ...defaultWarningTypes },
-        showInteractions: true
+        showInteractions: false
     };
     let rxSettings = { ...defaultRxSettings };
     let currentRxInfoItem = null;
@@ -117,7 +117,7 @@ function initRxAutocomplete() {
         }
         rxSettings.autoRowSize = Boolean(rxSettings.autoRowSize);
         rxSettings.showWarnings = rxSettings.showWarnings !== false;
-        rxSettings.showInteractions = rxSettings.showInteractions !== false;
+        rxSettings.showInteractions = Boolean(rxSettings.showInteractions);
         rxSettings.warningTypes = {
             ...defaultWarningTypes,
             ...(rxSettings.warningTypes && typeof rxSettings.warningTypes === 'object' ? rxSettings.warningTypes : {})

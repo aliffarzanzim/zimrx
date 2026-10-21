@@ -31,9 +31,6 @@ function getLayoutConfig() {
   };
   const normalizeRightLayout = (layout) => {
     const next = Array.isArray(layout) ? [...layout] : [...defaultRightLayout];
-    if (next.includes("Rx") && !next.includes("Drug Summary & Interaction")) {
-      next.splice(next.indexOf("Rx") + 1, 0, "Drug Summary & Interaction");
-    }
     const reportsIndex = next.indexOf("Reports");
     if (reportsIndex !== -1) {
       const replacement = [];
@@ -358,11 +355,13 @@ function saveSettings() {
   localStorage.setItem(storageKeys.dropdownTheme, themeKey);
   localStorage.setItem(storageKeys.dropdownHoverBg, ddBg);
   localStorage.setItem(storageKeys.dropdownHoverText, ddText);
+  localStorage.setItem('zimrx_layout_v', '3');
 
   // Save to Cookies so that the server can prerender instantly
   document.cookie = `zimrx_left_layout=${encodeURIComponent(JSON.stringify(newLeftLayout))}; path=/; max-age=31536000; SameSite=Lax`;
   document.cookie = `zimrx_right_layout=${encodeURIComponent(JSON.stringify(newRightLayout))}; path=/; max-age=31536000; SameSite=Lax`;
   document.cookie = `zimrx_history_layout=${encodeURIComponent(JSON.stringify(newHistoryLayout))}; path=/; max-age=31536000; SameSite=Lax`;
+  document.cookie = `zimrx_layout_v=3; path=/; max-age=31536000; SameSite=Lax`;
   document.cookie = `zimrx_dropdown_theme=${encodeURIComponent(themeKey)}; path=/; max-age=31536000; SameSite=Lax`;
   document.cookie = `zimrx_dropdown_hover_bg=${encodeURIComponent(ddBg)}; path=/; max-age=31536000; SameSite=Lax`;
   document.cookie = `zimrx_dropdown_hover_text=${encodeURIComponent(ddText)}; path=/; max-age=31536000; SameSite=Lax`;
@@ -485,9 +484,53 @@ if (document.readyState === 'loading') {
 // Sync layout settings between localStorage and cookies
 (function() {
   try {
-    const localLeft = localStorage.getItem(storageKeys.leftLayout);
-    const localRight = localStorage.getItem(storageKeys.rightLayout);
-    const localHistory = localStorage.getItem(storageKeys.historyLayout);
+    const getCookieValue = (name) => {
+      const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      return match ? decodeURIComponent(match[2].replace(/\+/g, ' ')) : null;
+    };
+
+    let localLeft = localStorage.getItem(storageKeys.leftLayout);
+    let localRight = localStorage.getItem(storageKeys.rightLayout);
+    let localHistory = localStorage.getItem(storageKeys.historyLayout);
+    const localV = localStorage.getItem('zimrx_layout_v');
+    const cookieV = getCookieValue('zimrx_layout_v');
+
+    // Auto-migrate legacy layout if version 3 is not established in localStorage
+    if (localV !== '3') {
+      try {
+        if (localLeft) {
+          const parsedLeft = JSON.parse(localLeft);
+          if (Array.isArray(parsedLeft)) {
+            localLeft = JSON.stringify(parsedLeft.filter(m => m !== 'Note' && m !== 'Paediatric History'));
+            localStorage.setItem(storageKeys.leftLayout, localLeft);
+          }
+        }
+      } catch (_) {}
+
+      try {
+        if (localRight) {
+          const parsedRight = JSON.parse(localRight);
+          if (Array.isArray(parsedRight)) {
+            localRight = JSON.stringify(parsedRight.filter(m => m !== 'Drug Summary & Interaction'));
+            localStorage.setItem(storageKeys.rightLayout, localRight);
+          }
+        }
+      } catch (_) {}
+
+      localStorage.setItem('zimrx_layout_v', '3');
+    }
+
+    // Auto-migrate cookie if not version 3
+    if (cookieV !== '3') {
+      document.cookie = `zimrx_layout_v=3; path=/; max-age=31536000; SameSite=Lax`;
+      if (localLeft) {
+        document.cookie = `zimrx_left_layout=${encodeURIComponent(localLeft)}; path=/; max-age=31536000; SameSite=Lax`;
+      }
+      if (localRight) {
+        document.cookie = `zimrx_right_layout=${encodeURIComponent(localRight)}; path=/; max-age=31536000; SameSite=Lax`;
+      }
+    }
+
     let needsCookieSync = false;
 
     // Sync from localStorage to cookies
@@ -509,12 +552,6 @@ if (document.readyState === 'loading') {
       return;
     }
 
-    // Sync from cookies to localStorage
-    const getCookieValue = (name) => {
-      const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-      return match ? decodeURIComponent(match[2]) : null;
-    };
-
     const cookieLeft = getCookieValue('zimrx_left_layout');
     const cookieRight = getCookieValue('zimrx_right_layout');
     const cookieHistory = getCookieValue('zimrx_history_layout');
@@ -527,6 +564,9 @@ if (document.readyState === 'loading') {
     }
     if (cookieHistory && cookieHistory !== localHistory) {
       localStorage.setItem(storageKeys.historyLayout, cookieHistory);
+    }
+    if (cookieV === '3' && localV !== '3') {
+      localStorage.setItem('zimrx_layout_v', '3');
     }
   } catch(e) {
     console.error("Layout cookie auto-sync failed:", e);

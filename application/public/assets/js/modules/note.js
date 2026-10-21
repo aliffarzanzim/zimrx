@@ -1,6 +1,7 @@
 // Clinical notes module managing repeating rows and dynamic textarea resizing.
 (function() {
     const wrapper = document.getElementById('note-wrapper');
+    if (!wrapper) return;
     const tbody = document.getElementById('note-tbody');
     const template = document.getElementById('note-row-template');
     const addBtn = wrapper.querySelector('.note-add-row-btn');

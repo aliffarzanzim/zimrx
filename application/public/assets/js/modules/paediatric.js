@@ -1,6 +1,9 @@
 // Paediatric history module and WHO/CDC growth chart vector plotting controller.
 
 function initPaediatricModule() {
+  if (!document.getElementById('ph-module-wrapper')) {
+    return;
+  }
   if (window.__zimrxPaediatricInitialized) {
     refreshPaediatricPatientData();
     return;

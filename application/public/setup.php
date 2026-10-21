@@ -11,17 +11,66 @@ $page_title = "ZimRx - Layout Configurator";
 $availableLeftModules  = ["P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology", "Psychiatry", "Orthopaedics", "Urology", "Neurology", "Cardiology", "Pulmonology", "Endocrinology", "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History", ""];
 $availableRightModules = ["Rx", "Drug Summary & Interaction", "Advice", "Report Entry", "Upload Reports & Documents", "Calculators", "Ophthalmology", "Text Pad", "OT Note", "Font Format", ""];
 
-$defaultLeftLayout  = ["P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology", "Psychiatry", "Orthopaedics", "Urology", "Neurology", "Cardiology", "Pulmonology", "Endocrinology", "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History"];
-$defaultRightLayout = ["Rx", "Drug Summary & Interaction", "Advice", "Report Entry", "Upload Reports & Documents", "Calculators", "Ophthalmology", "Text Pad", "OT Note", "Font Format"];
+$defaultLeftLayout  = ["P/C", "AI Analyzer", "History", "P/E", "Dx", "Ix", "Plan", "O/H", "M/H"];
+$defaultRightLayout = ["Rx", "Advice", "Report Entry", "Upload Reports & Documents", "Calculators", "Text Pad", "OT Note", "Font Format"];
 
-function decode_layout_cookie(string $name, array $default): array {
-    if (!isset($_COOKIE[$name])) return $default;
-    $decoded = json_decode(urldecode($_COOKIE[$name]), true);
-    return is_array($decoded) ? $decoded : $default;
+$doctorId = current_user_doctor_id();
+
+function decode_layout_source(PDO $pdo, int $doctorId, string $cookieName, string $settingKey, array $default): array {
+    $dbVal = null;
+    if ($doctorId > 0 && function_exists('zimrx_db_table_exists') && zimrx_db_table_exists($pdo, 'zimrx_interface_settings')) {
+        try {
+            $stmt = $pdo->prepare("SELECT setting_value FROM zimrx_interface_settings WHERE doctor_id = :doc AND setting_scope = 'dashboard' AND setting_key = :k LIMIT 1");
+            $stmt->execute(['doc' => $doctorId, 'k' => $settingKey]);
+            $val = $stmt->fetchColumn();
+            if ($val) {
+                $decoded = json_decode((string)$val, true);
+                if (is_array($decoded)) {
+                    $dbVal = array_values(array_filter($decoded, fn($m) => $m !== ''));
+                }
+            }
+        } catch (Throwable $e) {}
+    }
+
+    if ($dbVal !== null) {
+        return $dbVal;
+    }
+
+    $raw = null;
+    if (isset($_COOKIE[$cookieName])) {
+        $decoded = json_decode(urldecode($_COOKIE[$cookieName]), true);
+        if (!is_array($decoded)) {
+            $decoded = json_decode($_COOKIE[$cookieName], true);
+        }
+        if (is_array($decoded)) {
+            $raw = array_values(array_filter($decoded, fn($m) => $m !== ''));
+        }
+    }
+
+    if ($raw === null) {
+        return $default;
+    }
+
+    $layoutV = $_COOKIE['zimrx_layout_v'] ?? '';
+    if ($layoutV !== '3') {
+        if ($settingKey === 'left_layout') {
+            $raw = array_values(array_filter($raw, fn($m) => $m !== 'Note' && $m !== 'Paediatric History'));
+        } elseif ($settingKey === 'right_layout') {
+            $raw = array_values(array_filter($raw, fn($m) => $m !== 'Drug Summary & Interaction'));
+        }
+    }
+
+    return $raw;
 }
 
-$leftLayout  = decode_layout_cookie('zimrx_left_layout',  $defaultLeftLayout);
-$rightLayout = decode_layout_cookie('zimrx_right_layout', $defaultRightLayout);
+$leftLayout  = decode_layout_source($pdo, $doctorId, 'zimrx_left_layout',  'left_layout',  $defaultLeftLayout);
+$rightLayout = decode_layout_source($pdo, $doctorId, 'zimrx_right_layout', 'right_layout', $defaultRightLayout);
+
+if (($_COOKIE['zimrx_layout_v'] ?? '') !== '3' && !headers_sent()) {
+    setcookie('zimrx_layout_v', '3', time() + 31536000, '/', '', false, false);
+    setcookie('zimrx_left_layout', json_encode(array_values(array_filter($leftLayout, fn($m) => $m !== '')), JSON_UNESCAPED_UNICODE), time() + 31536000, '/', '', false, false);
+    setcookie('zimrx_right_layout', json_encode(array_values(array_filter($rightLayout, fn($m) => $m !== '')), JSON_UNESCAPED_UNICODE), time() + 31536000, '/', '', false, false);
+}
 
 $availableHistoryModules = ['medical', 'treatment', 'habits', 'diet-hypersensitivity', 'drug-history', ''];
 $historyModuleLabels = [
@@ -33,7 +82,7 @@ $historyModuleLabels = [
     ''                   => '-- None --',
 ];
 $defaultHistoryLayout = ['medical', 'treatment', 'habits', 'diet-hypersensitivity', 'drug-history'];
-$historyLayout = decode_layout_cookie('zimrx_history_layout', $defaultHistoryLayout);
+$historyLayout = decode_layout_source($pdo, $doctorId, 'zimrx_history_layout', 'history_layout', $defaultHistoryLayout);
 while (count($historyLayout) < 5) $historyLayout[] = '';
 
 // Pad to 32 slots

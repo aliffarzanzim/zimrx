@@ -226,25 +226,14 @@ $prescription_prefill = prescription_query_prefill();
 $page_title = "ZimRx - New Prescription";
 $body_class = trim(($body_class ?? '') . ' zimrx-prescription-hold');
 $extra_css = ['assets/css/pages/prescription.css'];
-include 'header.php';
-?>
 
-    <?php
-    // Include the patient particulars component.
-    include ZIMRX_BASE_DIR . '/views/modules/pres_particulars.php';
-    ?>
-
-<?php
-// Clinical module grid layout and file mappings
 $default_left_layout = [
-  "P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination",
-  "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology", "Psychiatry", "Orthopaedics", "Urology", "Neurology", "Cardiology", "Pulmonology", "Endocrinology",
-  "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History"
+  "P/C", "AI Analyzer", "History", "P/E", "Dx", "Ix", "Plan", "O/H", "M/H"
 ];
 
 $default_right_layout = [
-  "Rx", "Drug Summary & Interaction", "Advice", "Report Entry", "Upload Reports & Documents", "Calculators",
-  "Ophthalmology", "Text Pad", "OT Note", "Font Format"
+  "Rx", "Advice", "Report Entry", "Upload Reports & Documents", "Calculators",
+  "Text Pad", "OT Note", "Font Format"
 ];
 
 $module_file_map = [
@@ -328,59 +317,68 @@ function normalize_left_history_layout(array $layout): array {
     return $normalized;
 }
 
-// Load user-customized layout if available via Cookies
-$left_layout = $default_left_layout;
-if (isset($_COOKIE['zimrx_left_layout'])) {
-    $decoded = json_decode($_COOKIE['zimrx_left_layout'], true);
-    if (is_array($decoded)) {
-        $left_layout = $decoded;
-    }
-}
-$left_layout = normalize_left_history_layout($left_layout);
-if (in_array('P/E', $left_layout, true)) {
-    $peIndex = array_search('P/E', $left_layout, true);
-    $specialtyModules = [
-        'Breast Examination',
-        'Local Examination',
-        'Burn Assessment',
-        'ENT Examination',
-        'Dental Chart',
-        'Diabetic Foot',
-        'Dermatology',
-        'Psychiatry',
-        'Orthopaedics',
-        'Urology',
-        'Neurology',
-        'Cardiology',
-        'Pulmonology',
-        'Endocrinology'
-    ];
-    $leftInsert = [];
-    foreach ($specialtyModules as $specMod) {
-        if (!in_array($specMod, $left_layout, true)) {
-            $leftInsert[] = $specMod;
+$prescriptionDoctorId = prescription_active_doctor_id();
+$layoutV = $_COOKIE['zimrx_layout_v'] ?? '';
+
+// Check database first if doctor is authenticated
+$db_left = null;
+$db_right = null;
+if ($prescriptionDoctorId > 0 && function_exists('zimrx_db_table_exists') && zimrx_db_table_exists($pdo, 'zimrx_interface_settings')) {
+    try {
+        $stmt = $pdo->prepare("SELECT setting_key, setting_value FROM zimrx_interface_settings WHERE doctor_id = :doc AND setting_scope = 'dashboard' AND setting_key IN ('left_layout', 'right_layout')");
+        $stmt->execute(['doc' => $prescriptionDoctorId]);
+        $rows = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+        if (!empty($rows['left_layout'])) {
+            $dec = json_decode((string)$rows['left_layout'], true);
+            if (is_array($dec)) $db_left = array_values(array_filter($dec, fn($m) => $m !== ''));
         }
+        if (!empty($rows['right_layout'])) {
+            $dec = json_decode((string)$rows['right_layout'], true);
+            if (is_array($dec)) $db_right = array_values(array_filter($dec, fn($m) => $m !== ''));
+        }
+    } catch (Throwable $e) {}
+}
+
+if ($db_left !== null) {
+    $left_layout = $db_left;
+} elseif (isset($_COOKIE['zimrx_left_layout'])) {
+    $decoded = json_decode(urldecode($_COOKIE['zimrx_left_layout']), true);
+    if (!is_array($decoded)) {
+        $decoded = json_decode($_COOKIE['zimrx_left_layout'], true);
     }
-    if (!empty($leftInsert)) {
-        array_splice($left_layout, $peIndex + 1, 0, $leftInsert);
+    $left_layout = is_array($decoded) ? array_values(array_filter($decoded, fn($m) => $m !== '')) : $default_left_layout;
+} else {
+    $left_layout = $default_left_layout;
+}
+
+if ($db_right !== null) {
+    $right_layout = $db_right;
+} elseif (isset($_COOKIE['zimrx_right_layout'])) {
+    $decoded = json_decode(urldecode($_COOKIE['zimrx_right_layout']), true);
+    if (!is_array($decoded)) {
+        $decoded = json_decode($_COOKIE['zimrx_right_layout'], true);
+    }
+    $right_layout = is_array($decoded) ? array_values(array_filter($decoded, fn($m) => $m !== '')) : $default_right_layout;
+} else {
+    $right_layout = $default_right_layout;
+}
+
+// Auto-migrate legacy layouts if version 3 is not yet established
+if ($layoutV !== '3') {
+    if ($db_left === null) {
+        $left_layout = array_values(array_filter($left_layout, fn($m) => $m !== 'Note' && $m !== 'Paediatric History'));
+    }
+    if ($db_right === null) {
+        $right_layout = array_values(array_filter($right_layout, fn($m) => $m !== 'Drug Summary & Interaction'));
+    }
+    if (!headers_sent()) {
+        setcookie('zimrx_layout_v', '3', time() + 31536000, '/', '', false, false);
+        setcookie('zimrx_left_layout', json_encode($left_layout, JSON_UNESCAPED_UNICODE), time() + 31536000, '/', '', false, false);
+        setcookie('zimrx_right_layout', json_encode($right_layout, JSON_UNESCAPED_UNICODE), time() + 31536000, '/', '', false, false);
     }
 }
 
-$right_layout = $default_right_layout;
-if (isset($_COOKIE['zimrx_right_layout'])) {
-    $decoded = json_decode($_COOKIE['zimrx_right_layout'], true);
-    if (is_array($decoded)) {
-        $right_layout = $decoded;
-    }
-}
-if (in_array('Rx', $right_layout, true) && !in_array('Drug Summary & Interaction', $right_layout, true)) {
-    $rxIndex = array_search('Rx', $right_layout, true);
-    array_splice($right_layout, $rxIndex + 1, 0, ['Drug Summary & Interaction']);
-}
-if (in_array('Text Pad', $right_layout, true) && !in_array('Ophthalmology', $right_layout, true)) {
-    $tpIndex = array_search('Text Pad', $right_layout, true);
-    array_splice($right_layout, $tpIndex, 0, ['Ophthalmology']);
-}
+$left_layout = normalize_left_history_layout($left_layout);
 $reportsIndex = array_search('Reports', $right_layout, true);
 if ($reportsIndex !== false) {
     $reports_replacement = [];
@@ -392,7 +390,14 @@ if ($reportsIndex !== false) {
     }
     array_splice($right_layout, $reportsIndex, 1, $reports_replacement);
 }
+
+include 'header.php';
 ?>
+
+    <?php
+    // Include the patient particulars component.
+    include ZIMRX_BASE_DIR . '/views/modules/pres_particulars.php';
+    ?>
 
     <div class="app-container zrx-page-container">
         <aside class="sidebar" id="sidebar-modules">

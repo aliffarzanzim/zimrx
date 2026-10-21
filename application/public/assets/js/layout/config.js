@@ -10,15 +10,13 @@ const availableRightModules =[
   "Ophthalmology", "Text Pad", "OT Note", "Font Format", ""
 ];
 
-const defaultLeftLayout =[
-  "P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination",
-  "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology", "Psychiatry", "Orthopaedics", "Urology", "Neurology", "Cardiology", "Pulmonology", "Endocrinology",
-  "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History"
+const defaultLeftLayout = [
+  "P/C", "AI Analyzer", "History", "P/E", "Dx", "Ix", "Plan", "O/H", "M/H"
 ];
 
-const defaultRightLayout =[
-  "Rx", "Drug Summary & Interaction", "Advice", "Report Entry", "Upload Reports & Documents", "Calculators",
-  "Ophthalmology", "Text Pad", "OT Note", "Font Format"
+const defaultRightLayout = [
+  "Rx", "Advice", "Report Entry", "Upload Reports & Documents", "Calculators",
+  "Text Pad", "OT Note", "Font Format"
 ];
 
 const storageKeys = {

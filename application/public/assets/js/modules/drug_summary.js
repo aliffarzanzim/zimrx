@@ -42,7 +42,7 @@
     }
 
     function interactionsEnabled() {
-        return getRxSettings().showInteractions !== false;
+        return Boolean(getRxSettings().showInteractions);
     }
 
     function applyInteractionVisibility() {

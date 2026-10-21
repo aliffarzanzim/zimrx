@@ -79,6 +79,7 @@ class ZimRxTestSuite {
         $this->testPatientSequenceAllocationAndConcurrency();
         $this->testEmrTimelineBlobOptimizationAndMemoryScaling();
         $this->testPrescriptionPreviewRenderParity();
+        $this->testDefaultModuleLayoutSettings();
 
         echo "\n--------------------------------------------------------\n";
         echo "Test Results: {$this->passed} passed, {$this->failed} failed\n";
@@ -2188,6 +2189,89 @@ NODE;
         } else {
             $this->assert(true, "Node runtime not available in evaluation environment - skipped live cross-engine subprocess comparison");
         }
+    }
+
+    private function testDefaultModuleLayoutSettings(): void {
+        echo "\n[30/30] Testing Clinical Dashboard Default Layout Configuration & Module Enablement...\n";
+
+        // 1. Verify setup.php defaults and available options
+        $setupContent = (string)file_get_contents(__DIR__ . '/../public/setup.php');
+        $this->assert(
+            str_contains($setupContent, '"Note"') && str_contains($setupContent, '"Paediatric History"'),
+            "setup.php maintains Note and Paediatric History in available left elements"
+        );
+        $this->assert(
+            str_contains($setupContent, '"Drug Summary & Interaction"'),
+            "setup.php maintains Drug Summary & Interaction in available right elements"
+        );
+        $this->assert(
+            preg_match('/\$defaultLeftLayout\s*=\s*\[([^\]]+)\];/', $setupContent, $leftMatches) === 1
+            && !str_contains($leftMatches[1], '"Note"')
+            && !str_contains($leftMatches[1], '"Paediatric History"'),
+            "setup.php default left layout turns off Note and Paediatric History by default"
+        );
+        $this->assert(
+            preg_match('/\$defaultRightLayout\s*=\s*\[([^\]]+)\];/', $setupContent, $rightMatches) === 1
+            && !str_contains($rightMatches[1], '"Drug Summary & Interaction"'),
+            "setup.php default right layout turns off Drug Summary & Interaction by default"
+        );
+
+        // 2. Verify prescription.php defaults and file mappings
+        $prescriptionContent = (string)file_get_contents(__DIR__ . '/../public/prescription.php');
+        $this->assert(
+            preg_match('/\$default_left_layout\s*=\s*\[([^\]]+)\];/s', $prescriptionContent, $pLeftMatches) === 1
+            && !str_contains($pLeftMatches[1], '"Note"')
+            && !str_contains($pLeftMatches[1], '"Paediatric History"'),
+            "prescription.php default left layout turns off Note and Paediatric History by default"
+        );
+        $this->assert(
+            preg_match('/\$default_right_layout\s*=\s*\[([^\]]+)\];/s', $prescriptionContent, $pRightMatches) === 1
+            && !str_contains($pRightMatches[1], '"Drug Summary & Interaction"'),
+            "prescription.php default right layout turns off Drug Summary & Interaction by default"
+        );
+        $this->assert(
+            !str_contains($prescriptionContent, "array_splice(\$right_layout, \$rxIndex + 1, 0, ['Drug Summary & Interaction'])"),
+            "prescription.php does not force-inject Drug Summary & Interaction when not enabled"
+        );
+        $this->assert(
+            str_contains($prescriptionContent, '"Note" => "note.php"')
+            && str_contains($prescriptionContent, '"Paediatric History" => "paediatric.php"')
+            && str_contains($prescriptionContent, '"Drug Summary & Interaction" => "drug_summary.php"'),
+            "prescription.php maintains module file mappings so modules render when enabled from setup.php"
+        );
+
+        // 3. Verify JavaScript config.js and dashboard.js
+        $configJsContent = (string)file_get_contents(__DIR__ . '/../public/assets/js/layout/config.js');
+        $this->assert(
+            preg_match('/const defaultLeftLayout\s*=\s*\[([^\]]+)\];/s', $configJsContent, $jsLeftMatches) === 1
+            && !str_contains($jsLeftMatches[1], '"Note"')
+            && !str_contains($jsLeftMatches[1], '"Paediatric History"'),
+            "config.js defaultLeftLayout turns off Note and Paediatric History by default"
+        );
+        $this->assert(
+            preg_match('/const defaultRightLayout\s*=\s*\[([^\]]+)\];/s', $configJsContent, $jsRightMatches) === 1
+            && !str_contains($jsRightMatches[1], '"Drug Summary & Interaction"'),
+            "config.js defaultRightLayout turns off Drug Summary & Interaction by default"
+        );
+
+        $dashboardJsContent = (string)file_get_contents(__DIR__ . '/../public/assets/js/layout/dashboard.js');
+        $this->assert(
+            !str_contains($dashboardJsContent, 'next.splice(next.indexOf("Rx") + 1, 0, "Drug Summary & Interaction")'),
+            "dashboard.js normalizeRightLayout does not force-inject Drug Summary & Interaction"
+        );
+
+        // 4. Verify defensive element guards in note.js and paediatric.js
+        $noteJsContent = (string)file_get_contents(__DIR__ . '/../public/assets/js/modules/note.js');
+        $this->assert(
+            str_contains($noteJsContent, "if (!wrapper) return;"),
+            "note.js guards against missing note-wrapper when disabled by default"
+        );
+
+        $paediatricJsContent = (string)file_get_contents(__DIR__ . '/../public/assets/js/modules/paediatric.js');
+        $this->assert(
+            str_contains($paediatricJsContent, "if (!document.getElementById('ph-module-wrapper'))"),
+            "paediatric.js guards against missing ph-module-wrapper when disabled by default"
+        );
     }
 }
 
