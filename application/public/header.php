@@ -56,9 +56,66 @@ if (empty($zrx_dd_bg) || $zrx_dd_bg === '#ebedf0' || $zrx_dd_bg === '#edf2f7' ||
         setcookie('zimrx_dropdown_hover_text', '#ffffff', time() + 31536000, '/', '', false, false);
     }
 }
+
+require_once ZIMRX_BASE_DIR . '/lib/Services/LocaleService.php';
+require_once ZIMRX_BASE_DIR . '/lib/Services/CountryService.php';
+
+$zrx_locales = \ZimRx\Services\LocaleService::default();
+$zrx_avail_header_langs = $zrx_locales->availableForCatalog('header');
+
+$zrx_practice_country = '';
+$zrx_interface_lang = '';
+$zrx_help_initial_lang = '';
+$zrx_clinical_config = '';
+
+if (isset($pdo) && $pdo instanceof PDO && function_exists('zimrx_db_table_exists') && zimrx_db_table_exists($pdo, 'zimrx_app_config')) {
+    try {
+        $st = $pdo->prepare("SELECT config_key, config_value FROM zimrx_app_config WHERE config_key IN ('practice_country', 'help_lang', 'clinical_lang', 'interface_lang')");
+        $st->execute();
+        while ($row = $st->fetch(PDO::FETCH_ASSOC)) {
+            $val = trim((string)$row['config_value']);
+            match ($row['config_key']) {
+                'practice_country' => $zrx_practice_country = strtoupper($val),
+                'interface_lang'   => $zrx_interface_lang = strtolower($val),
+                'help_lang'        => $zrx_help_initial_lang = strtolower($val),
+                'clinical_lang'    => $zrx_clinical_config = strtolower($val),
+                default            => null,
+            };
+        }
+    } catch (Throwable $e) {}
+}
+
+// 1. Dynamic interface language resolution (request -> config -> country default -> fallback 'en')
+if (!empty($_GET['interface_lang'])) {
+    $zrx_interface_lang = strtolower(trim((string)$_GET['interface_lang']));
+} elseif (empty($zrx_interface_lang)) {
+    $zrx_interface_lang = ($zrx_practice_country !== '') ? (\ZimRx\Services\CountryService::getDefaultClinicalLanguage($zrx_practice_country) ?? 'en') : 'en';
+}
+if (!array_key_exists($zrx_interface_lang, $zrx_avail_header_langs)) {
+    $zrx_interface_lang = 'en';
+}
+
+// 2. Dynamic help language resolution
+if (empty($zrx_help_initial_lang)) {
+    $zrx_help_initial_lang = $zrx_interface_lang;
+}
+
+// 3. Clinical language resolution
+$zrx_clinical_lang = function_exists('zimrx_clinical_language')
+    ? zimrx_clinical_language($pdo ?? null, current_user_doctor_id())
+    : ($zrx_clinical_config !== '' ? $zrx_clinical_config : $zrx_interface_lang);
+
+$zrx_initial_guidelines = [];
+$zrx_hdr_strings = [];
+try {
+    $zrx_initial_guidelines = $zrx_locales->catalog($zrx_help_initial_lang, 'help_guidelines');
+    $zrx_hdr_strings = $zrx_locales->catalog($zrx_interface_lang, 'header');
+} catch (Throwable $e) {}
+
+$th = static fn (string $key): string => htmlspecialchars((string)($zrx_hdr_strings[$key] ?? ''), ENT_QUOTES, 'UTF-8');
 ?>
 <!DOCTYPE html>
-<html lang="en" data-dropdown-theme="<?= htmlspecialchars($zrx_dd_theme) ?>">
+<html lang="<?= htmlspecialchars($zrx_interface_lang) ?>" data-dropdown-theme="<?= htmlspecialchars($zrx_dd_theme) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -100,41 +157,6 @@ if (empty($zrx_dd_bg) || $zrx_dd_bg === '#ebedf0' || $zrx_dd_bg === '#edf2f7' ||
             error_log('[ZimRx] Unable to load saved table-column settings: ' . $e->getMessage());
         }
     }
-    $zrx_practice_country = 'BD';
-    $zrx_help_initial_lang = 'en';
-    if (isset($pdo) && $pdo instanceof PDO && function_exists('zimrx_db_table_exists') && zimrx_db_table_exists($pdo, 'zimrx_app_config')) {
-        try {
-            $st = $pdo->prepare("SELECT config_key, config_value FROM zimrx_app_config WHERE config_key IN ('practice_country', 'help_lang', 'clinical_lang')");
-            $st->execute();
-            $configs = [];
-            while ($row = $st->fetch(PDO::FETCH_ASSOC)) {
-                $configs[$row['config_key']] = $row['config_value'];
-            }
-            if (!empty($configs['practice_country'])) {
-                $zrx_practice_country = strtoupper(trim((string)$configs['practice_country']));
-            }
-            if (!empty($configs['help_lang'])) {
-                $zrx_help_initial_lang = strtolower(trim((string)$configs['help_lang']));
-            } elseif (!empty($configs['clinical_lang'])) {
-                $zrx_help_initial_lang = strtolower(trim((string)$configs['clinical_lang']));
-            } else {
-                $zrx_help_initial_lang = ($zrx_practice_country === 'BD') ? 'bn' : 'en';
-            }
-        } catch (Throwable $e) {
-            $zrx_help_initial_lang = ($zrx_practice_country === 'BD') ? 'bn' : 'en';
-        }
-    } else {
-        $zrx_help_initial_lang = ($zrx_practice_country === 'BD') ? 'bn' : 'en';
-    }
-    $zrx_clinical_lang = function_exists('zimrx_clinical_language')
-        ? zimrx_clinical_language($pdo ?? null, current_user_doctor_id())
-        : (!empty($configs['clinical_lang']) ? strtolower(trim((string)$configs['clinical_lang'])) : (($zrx_practice_country === 'BD') ? 'bn' : 'en'));
-
-    $zrx_initial_guidelines = [];
-    require_once ZIMRX_BASE_DIR . '/lib/Services/LocaleService.php';
-    try {
-        $zrx_initial_guidelines = \ZimRx\Services\LocaleService::default()->catalog($zrx_help_initial_lang, 'help_guidelines');
-    } catch (Throwable $e) {}
     ?>
     <script>
     window.ZimRxIconsMap = <?= json_encode(ZimRxIcon::getAll(), JSON_UNESCAPED_SLASHES) ?>;
@@ -142,6 +164,7 @@ if (empty($zrx_dd_bg) || $zrx_dd_bg === '#ebedf0' || $zrx_dd_bg === '#edf2f7' ||
     window.ZimRxCsrfToken = <?= json_encode(function_exists('zimrx_csrf_token') ? zimrx_csrf_token() : '') ?>;
     window.ZimRxPracticeCountry = <?= json_encode($zrx_practice_country, JSON_UNESCAPED_SLASHES) ?>;
     window.ZimRxClinicalLang = <?= json_encode($zrx_clinical_lang) ?>;
+    window.ZimRxInterfaceLang = <?= json_encode($zrx_interface_lang) ?>;
     window.ZimRxHelpInitialLang = <?= json_encode($zrx_help_initial_lang) ?>;
     window.ZimRxHelpGuidelinesCatalogs = {
         <?= json_encode($zrx_help_initial_lang) ?>: <?= json_encode($zrx_initial_guidelines, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
@@ -194,39 +217,39 @@ if (empty($zrx_dd_bg) || $zrx_dd_bg === '#ebedf0' || $zrx_dd_bg === '#edf2f7' ||
 <body<?= $body_class !== '' ? ' class="' . htmlspecialchars($body_class, ENT_QUOTES, 'UTF-8') . '"' : '' ?>>
 
     <header class="app-header">
-        <a class="brand-logo" href="<?= htmlspecialchars($home_page) ?>" aria-label="ZimRx home">
+        <a class="brand-logo" href="<?= htmlspecialchars($home_page) ?>" aria-label="<?= $th('brand_home_aria') ?>">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
             </svg>
             <span>ZimRx</span>
         </a>
         <div class="top-nav-wrapper" id="top-nav-wrapper">
-            <button type="button" class="nav-scroll-arrow nav-scroll-left" id="nav-scroll-left" aria-label="Scroll navigation left" hidden>
+            <button type="button" class="nav-scroll-arrow nav-scroll-left" id="nav-scroll-left" aria-label="<?= $th('scroll_nav_left_aria') ?>" hidden>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
             <nav class="top-nav" id="app-top-nav">
                 <?php if ($user_role === 'admin'): ?>
-                <a href="admin.php" class="nav-link <?= $current_page == 'admin.php' ? 'active' : '' ?>">Dashboard</a>
-                <a href="emr.php" class="nav-link <?= $current_page == 'emr.php' ? 'active' : '' ?>">EMR</a>
-                <a href="admin_doctors.php" class="nav-link <?= $current_page == 'admin_doctors.php' ? 'active' : '' ?>">Manage Doctors</a>
-                <a href="admin_assistants.php" class="nav-link <?= $current_page == 'admin_assistants.php' ? 'active' : '' ?>">Manage Assistants</a>
-                <a href="billings.php" class="nav-link <?= $current_page == 'billings.php' ? 'active' : '' ?>">Billings</a>
-                <a href="emr_settings.php" class="nav-link <?= $current_page == 'emr_settings.php' ? 'active' : '' ?>">EMR Settings</a>
+                <a href="admin.php" class="nav-link <?= $current_page == 'admin.php' ? 'active' : '' ?>"><?= $th('nav_dashboard') ?></a>
+                <a href="emr.php" class="nav-link <?= $current_page == 'emr.php' ? 'active' : '' ?>"><?= $th('nav_emr') ?></a>
+                <a href="admin_doctors.php" class="nav-link <?= $current_page == 'admin_doctors.php' ? 'active' : '' ?>"><?= $th('nav_manage_doctors') ?></a>
+                <a href="admin_assistants.php" class="nav-link <?= $current_page == 'admin_assistants.php' ? 'active' : '' ?>"><?= $th('nav_manage_assistants') ?></a>
+                <a href="billings.php" class="nav-link <?= $current_page == 'billings.php' ? 'active' : '' ?>"><?= $th('nav_billings') ?></a>
+                <a href="emr_settings.php" class="nav-link <?= $current_page == 'emr_settings.php' ? 'active' : '' ?>"><?= $th('nav_emr_settings') ?></a>
                 <?php elseif ($user_role === 'assistant'): ?>
-                <a href="appointments.php" class="nav-link <?= $current_page == 'appointments.php' ? 'active' : '' ?>">Appointments</a>
-                <a href="emr.php" class="nav-link <?= $current_page == 'emr.php' ? 'active' : '' ?>">EMR</a>
+                <a href="appointments.php" class="nav-link <?= $current_page == 'appointments.php' ? 'active' : '' ?>"><?= $th('nav_appointments') ?></a>
+                <a href="emr.php" class="nav-link <?= $current_page == 'emr.php' ? 'active' : '' ?>"><?= $th('nav_emr') ?></a>
                 <?php else: ?>
-                <a href="prescription.php" class="nav-link <?= $current_page == 'prescription.php' ? 'active' : '' ?>">New Prescription</a>
-                <a href="appointments.php" class="nav-link <?= $current_page == 'appointments.php' ? 'active' : '' ?>">Appointments</a>
-                <a href="emr.php" class="nav-link <?= $current_page == 'emr.php' ? 'active' : '' ?>">EMR</a>
-                <a href="drug_db.php" class="nav-link <?= $current_page == 'drug_db.php' ? 'active' : '' ?>">Drug DB</a>
-                <button type="button" id="template-menu-toggle" class="nav-link nav-button <?= $template_menu_active ? 'active' : '' ?>" aria-haspopup="true" aria-expanded="false">Templates ▾</button>
-                <button type="button" id="finance-menu-toggle" class="nav-link nav-button <?= $finance_menu_active ? 'active' : '' ?>" aria-haspopup="true" aria-expanded="false">Billings &amp; Stats ▾</button>
-                <button type="button" id="setup-menu-toggle" class="nav-link nav-button <?= $setup_menu_active ? 'active' : '' ?>" aria-haspopup="true" aria-expanded="false">Settings ▾</button>
-                <button type="button" id="help-menu-toggle" class="nav-link nav-button <?= $help_menu_active ? 'active' : '' ?>" aria-haspopup="true" aria-expanded="false">Help ▾</button>
+                <a href="prescription.php" class="nav-link <?= $current_page == 'prescription.php' ? 'active' : '' ?>"><?= $th('nav_new_prescription') ?></a>
+                <a href="appointments.php" class="nav-link <?= $current_page == 'appointments.php' ? 'active' : '' ?>"><?= $th('nav_appointments') ?></a>
+                <a href="emr.php" class="nav-link <?= $current_page == 'emr.php' ? 'active' : '' ?>"><?= $th('nav_emr') ?></a>
+                <a href="drug_db.php" class="nav-link <?= $current_page == 'drug_db.php' ? 'active' : '' ?>"><?= $th('nav_drug_db') ?></a>
+                <button type="button" id="template-menu-toggle" class="nav-link nav-button <?= $template_menu_active ? 'active' : '' ?>" aria-haspopup="true" aria-expanded="false"><?= $th('nav_templates') ?></button>
+                <button type="button" id="finance-menu-toggle" class="nav-link nav-button <?= $finance_menu_active ? 'active' : '' ?>" aria-haspopup="true" aria-expanded="false"><?= $th('nav_billings_stats') ?></button>
+                <button type="button" id="setup-menu-toggle" class="nav-link nav-button <?= $setup_menu_active ? 'active' : '' ?>" aria-haspopup="true" aria-expanded="false"><?= $th('nav_settings') ?></button>
+                <button type="button" id="help-menu-toggle" class="nav-link nav-button <?= $help_menu_active ? 'active' : '' ?>" aria-haspopup="true" aria-expanded="false"><?= $th('nav_help') ?></button>
                 <?php endif; ?>
             </nav>
-            <button type="button" class="nav-scroll-arrow nav-scroll-right" id="nav-scroll-right" aria-label="Scroll navigation right" hidden>
+            <button type="button" class="nav-scroll-arrow nav-scroll-right" id="nav-scroll-right" aria-label="<?= $th('scroll_nav_right_aria') ?>" hidden>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
         </div>
@@ -234,52 +257,52 @@ if (empty($zrx_dd_bg) || $zrx_dd_bg === '#ebedf0' || $zrx_dd_bg === '#edf2f7' ||
         <?php if ($user_role === 'doctor'): ?>
         <!-- Templates Menu Panel -->
         <div id="template-menu-panel" class="floating-nav-menu" hidden>
-            <div class="floating-nav-subtitle">Presets &amp; Templates</div>
-            <a href="instruction_template.php" class="nav-link <?= $current_page == 'instruction_template.php' ? 'active' : '' ?>">Instruction Presets</a>
-            <a href="dose_template.php" class="nav-link <?= $current_page == 'dose_template.php' ? 'active' : '' ?>">Dose Presets</a>
-            <a href="duration_template.php" class="nav-link <?= $current_page == 'duration_template.php' ? 'active' : '' ?>">Duration Presets</a>
-            <a href="advice_template.php" class="nav-link <?= $current_page == 'advice_template.php' ? 'active' : '' ?>">Advice Templates</a>
+            <div class="floating-nav-subtitle"><?= $th('panel_presets_templates') ?></div>
+            <a href="instruction_template.php" class="nav-link <?= $current_page == 'instruction_template.php' ? 'active' : '' ?>"><?= $th('nav_instruction_presets') ?></a>
+            <a href="dose_template.php" class="nav-link <?= $current_page == 'dose_template.php' ? 'active' : '' ?>"><?= $th('nav_dose_presets') ?></a>
+            <a href="duration_template.php" class="nav-link <?= $current_page == 'duration_template.php' ? 'active' : '' ?>"><?= $th('nav_duration_presets') ?></a>
+            <a href="advice_template.php" class="nav-link <?= $current_page == 'advice_template.php' ? 'active' : '' ?>"><?= $th('nav_advice_templates') ?></a>
 
-            <div class="floating-nav-subtitle">Preferences</div>
-            <a href="manufacturer_preferences.php" class="nav-link <?= $current_page == 'manufacturer_preferences.php' ? 'active' : '' ?>">Manufacturer Preferences</a>
+            <div class="floating-nav-subtitle"><?= $th('panel_preferences') ?></div>
+            <a href="manufacturer_preferences.php" class="nav-link <?= $current_page == 'manufacturer_preferences.php' ? 'active' : '' ?>"><?= $th('nav_manufacturer_preferences') ?></a>
         </div>
 
         <!-- Billings & Stats Menu Panel -->
         <div id="finance-menu-panel" class="floating-nav-menu" hidden>
-            <div class="floating-nav-subtitle">Financials &amp; Analytics</div>
-            <a href="billings.php" class="nav-link <?= $current_page == 'billings.php' ? 'active' : '' ?>">Billings</a>
-            <a href="performance_dashboard.php" class="nav-link <?= $current_page == 'performance_dashboard.php' ? 'active' : '' ?>">Performance Dashboard</a>
+            <div class="floating-nav-subtitle"><?= $th('panel_financials_analytics') ?></div>
+            <a href="billings.php" class="nav-link <?= $current_page == 'billings.php' ? 'active' : '' ?>"><?= $th('nav_billings') ?></a>
+            <a href="performance_dashboard.php" class="nav-link <?= $current_page == 'performance_dashboard.php' ? 'active' : '' ?>"><?= $th('nav_performance_dashboard') ?></a>
         </div>
 
         <!-- Settings Menu Panel -->
         <div id="setup-menu-panel" class="floating-nav-menu" hidden>
-            <div class="floating-nav-subtitle">Layout &amp; Print</div>
-            <a href="profile_settings.php" class="nav-link <?= $current_page == 'profile_settings.php' ? 'active' : '' ?>">Profile Settings</a>
-            <a href="setup.php" class="nav-link <?= $current_page == 'setup.php' ? 'active' : '' ?>">Software Interface Setup</a>
-            <a href="page_setup.php" class="nav-link <?= $current_page == 'page_setup.php' ? 'active' : '' ?>">Page Setup</a>
-            <a href="print_setup.php" class="nav-link <?= $current_page == 'print_setup.php' ? 'active' : '' ?>">Print Setup</a>
-            <a href="header_footer_background_setup.php" class="nav-link <?= $current_page == 'header_footer_background_setup.php' ? 'active' : '' ?>">Header, Footer &amp; BG Setup</a>
+            <div class="floating-nav-subtitle"><?= $th('panel_layout_print') ?></div>
+            <a href="profile_settings.php" class="nav-link <?= $current_page == 'profile_settings.php' ? 'active' : '' ?>"><?= $th('nav_profile_settings') ?></a>
+            <a href="setup.php" class="nav-link <?= $current_page == 'setup.php' ? 'active' : '' ?>"><?= $th('nav_software_interface_setup') ?></a>
+            <a href="page_setup.php" class="nav-link <?= $current_page == 'page_setup.php' ? 'active' : '' ?>"><?= $th('nav_page_setup') ?></a>
+            <a href="print_setup.php" class="nav-link <?= $current_page == 'print_setup.php' ? 'active' : '' ?>"><?= $th('nav_print_setup') ?></a>
+            <a href="header_footer_background_setup.php" class="nav-link <?= $current_page == 'header_footer_background_setup.php' ? 'active' : '' ?>"><?= $th('nav_header_footer_background_setup') ?></a>
 
-            <div class="floating-nav-subtitle">Clinic &amp; Operations</div>
-            <a href="appointment_settings.php" class="nav-link <?= $current_page == 'appointment_settings.php' ? 'active' : '' ?>">Appointment Settings</a>
+            <div class="floating-nav-subtitle"><?= $th('panel_clinic_operations') ?></div>
+            <a href="appointment_settings.php" class="nav-link <?= $current_page == 'appointment_settings.php' ? 'active' : '' ?>"><?= $th('nav_appointment_settings') ?></a>
             <?php if (!$is_multi_doctor): ?>
-            <a href="emr_settings.php" class="nav-link <?= $current_page == 'emr_settings.php' ? 'active' : '' ?>">EMR Settings</a>
+            <a href="emr_settings.php" class="nav-link <?= $current_page == 'emr_settings.php' ? 'active' : '' ?>"><?= $th('nav_emr_settings') ?></a>
             <?php endif; ?>
 
-            <div class="floating-nav-subtitle">Administration</div>
-            <a href="doctor_assistants.php" class="nav-link <?= $current_page == 'doctor_assistants.php' ? 'active' : '' ?>">Staff Management</a>
+            <div class="floating-nav-subtitle"><?= $th('panel_administration') ?></div>
+            <a href="doctor_assistants.php" class="nav-link <?= $current_page == 'doctor_assistants.php' ? 'active' : '' ?>"><?= $th('nav_staff_management') ?></a>
         </div>
 
         <!-- Help Menu Panel -->
         <div id="help-menu-panel" class="floating-nav-menu" hidden>
-            <div class="floating-nav-subtitle">Software &amp; Support</div>
-            <button type="button" class="nav-link nav-button" onclick="zimrxOpenSupportModal()">❤️ Support ZimRx</button>
+            <div class="floating-nav-subtitle"><?= $th('panel_software_support') ?></div>
+            <button type="button" class="nav-link nav-button" onclick="zimrxOpenSupportModal()"><?= $th('btn_support_zimrx') ?></button>
         </div>
         <?php endif; ?>
         
         <?php if (is_logged_in()): ?>
         <div style="margin-left: auto; display: flex; align-items: center; gap: 14px;">
-            <button type="button" class="header-chat-btn" id="btn-header-chat" title="Internal Messages / Team Chat" aria-label="Open Team Chat">
+            <button type="button" class="header-chat-btn" id="btn-header-chat" title="<?= $th('chat_btn_title') ?>" aria-label="<?= $th('chat_btn_aria') ?>">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                 </svg>
@@ -288,7 +311,7 @@ if (empty($zrx_dd_bg) || $zrx_dd_bg === '#ebedf0' || $zrx_dd_bg === '#edf2f7' ||
             <div style="font-size: 0.85rem; color: var(--zrx-slate-300); font-weight: 500;">
                 <span style="color: var(--zrx-sky-400); font-weight: 700;"><?= htmlspecialchars(current_user_name()) ?></span>
             </div>
-            <a href="logout.php" class="nav-link" style="color: var(--zrx-red-500); background: var(--zrx-danger-bg);">Logout</a>
+            <a href="logout.php" class="nav-link" style="color: var(--zrx-red-500); background: var(--zrx-danger-bg);"><?= $th('nav_logout') ?></a>
         </div>
         <?php endif; ?>
     </header>

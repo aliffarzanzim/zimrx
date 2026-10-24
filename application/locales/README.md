@@ -4,8 +4,8 @@ Translatable text lives here, one folder per language code (`en`, `bn`, `fr`, ..
 
 ```text
 locales/
-    en/   instructions.json  doses.json  durations.json  advices.json  first_launch.json  help_guidelines.json
-    bn/   instructions.json  doses.json  durations.json  advices.json  first_launch.json  help_guidelines.json
+    en/   instructions.json  doses.json  durations.json  advices.json  first_launch.json  help_guidelines.json  header.json
+    bn/   instructions.json  doses.json  durations.json  advices.json  first_launch.json  help_guidelines.json  header.json
 ```
 
 ## Adding or Editing a Language

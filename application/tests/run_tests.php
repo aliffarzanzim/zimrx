@@ -1625,6 +1625,26 @@ class ZimRxTestSuite {
             "help_guidelines covers all 8 clinical workflow guides in English and Bengali"
         );
 
+        $hdrLangs = $locales->availableForCatalog('header');
+        $this->assert(isset($hdrLangs['en']) && isset($hdrLangs['bn']), "header catalog is available for en and bn");
+        $hdrEn = $locales->catalog('en', 'header');
+        $hdrBn = $locales->catalog('bn', 'header');
+        $this->assert(is_array($hdrEn) && is_array($hdrBn), "header catalog loads as valid array for en and bn");
+        $this->assert(
+            isset($hdrEn['nav_new_prescription'], $hdrEn['nav_dashboard'], $hdrEn['nav_logout']) &&
+            $hdrEn['nav_new_prescription'] === 'New Prescription' &&
+            $hdrBn['nav_new_prescription'] === 'নতুন প্রেসক্রিপশন',
+            "header catalog translates navigation strings in English and Bengali"
+        );
+        $headerPhpCode = (string)file_get_contents(__DIR__ . '/../public/header.php');
+        $this->assert(
+            str_contains($headerPhpCode, "\$th('nav_new_prescription')") &&
+            str_contains($headerPhpCode, "\$th('nav_logout')") &&
+            !str_contains($headerPhpCode, ">New Prescription<") &&
+            !str_contains($headerPhpCode, ">Logout<"),
+            "header.php renders all navigation links via \$th() with zero hardcoded default strings"
+        );
+
         $catalogs = ['instructions', 'doses', 'durations', 'advices'];
         $parity = true;
         foreach ($langs as $lang) {
