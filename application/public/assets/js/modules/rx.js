@@ -806,7 +806,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.querySelectorAll('.rx-dropdown').forEach((dropdown) => {
                     dropdown.remove();
                 });
-                document.querySelectorAll('.nav-dropdown[open], .rx-warning-dropdown[open]').forEach((details) => {
+                document.querySelectorAll('.rx-warning-dropdown[open]').forEach((details) => {
                     details.open = false;
                 });
                 const active = document.activeElement;
