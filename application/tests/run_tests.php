@@ -1849,6 +1849,59 @@ class ZimRxTestSuite {
             $checkedCount >= 170 && empty($failedFiles),
             "100% of application PHP files pass syntax linting without errors (checked {$checkedCount} files)"
         );
+
+        // 6. Verify end-to-end page bootstrapping and execution through init.php
+        $initBootstrapContent = (string)file_get_contents(__DIR__ . '/../public/init.php');
+        $this->assert(
+            str_contains($initBootstrapContent, "vendor/autoload.php"),
+            "init.php bootstraps Composer autoloader to resolve PSR-4 service classes in HTTP runtime"
+        );
+
+        // Subprocess simulation of authenticated prescription.php execution
+        $simScript = realpath(__DIR__ . '/../public/prescription.php');
+        $simRunner = sys_get_temp_dir() . '/zimrx_pres_sim_' . uniqid() . '.php';
+        file_put_contents($simRunner, "<?php\nsession_start();\n\$_SESSION['logged_in'] = true;\n\$_SESSION['user_id'] = 1;\n\$_SESSION['doctor_id'] = 1;\n\$_SESSION['user_role'] = 'doctor';\n\$_SESSION['username'] = 'dr_test';\nob_start();\ntry {\n    require " . var_export($simScript, true) . ";\n    ob_end_clean();\n    echo 'OK';\n} catch (Throwable \$e) {\n    ob_end_clean();\n    echo 'ERR:' . \$e->getMessage();\n}\n");
+        $simOutput = shell_exec('php ' . escapeshellarg($simRunner));
+        if (file_exists($simRunner)) {
+            @unlink($simRunner);
+        }
+        $this->assert(
+            trim((string)$simOutput) === 'OK',
+            "prescription.php renders end-to-end without uncaught fatal errors (got: " . trim((string)$simOutput) . ")"
+        );
+
+        // 7. Reusable patient demographics component architecture
+        $ppJsFile = realpath(__DIR__ . '/../public/assets/js/modules/patient_particulars.js');
+        $this->assert($ppJsFile !== false && file_exists($ppJsFile), "patient_particulars.js module file exists");
+        $ppJsContent = (string)file_get_contents($ppJsFile);
+        $this->assert(
+            str_contains($ppJsContent, 'window.PatientParticulars = {') &&
+            str_contains($ppJsContent, 'syncAgeFromDob') &&
+            str_contains($ppJsContent, 'syncDobFromAge') &&
+            str_contains($ppJsContent, 'syncPatientReferredByControl') &&
+            str_contains($ppJsContent, 'initOccupationAutocomplete') &&
+            str_contains($ppJsContent, 'attachPatientLookup'),
+            "patient_particulars.js exports PatientParticulars controller with age/dob, referral, and lookup methods"
+        );
+        $presContent = (string)file_get_contents(__DIR__ . '/../public/prescription.php');
+        $this->assert(
+            str_contains($presContent, 'assets/js/modules/patient_particulars.js'),
+            "prescription.php includes patient_particulars.js module"
+        );
+        $apptViewContent = (string)file_get_contents(__DIR__ . '/../views/appointments_view.php');
+        $this->assert(
+            str_contains($apptViewContent, 'assets/js/modules/patient_particulars.js'),
+            "appointments_view.php includes patient_particulars.js module"
+        );
+        $this->assert(
+            str_contains($apptViewContent, 'components/patient_particulars_fields.php'),
+            "appointments_view.php includes reusable components/patient_particulars_fields.php"
+        );
+        $presParticularsContent = (string)file_get_contents(__DIR__ . '/../views/modules/pres_particulars.php');
+        $this->assert(
+            str_contains($presParticularsContent, 'components/patient_particulars_fields.php'),
+            "pres_particulars.php includes reusable components/patient_particulars_fields.php"
+        );
     }
 
     private function testPatientSequenceAllocationAndConcurrency(): void {

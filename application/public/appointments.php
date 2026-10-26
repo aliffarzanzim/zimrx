@@ -63,7 +63,10 @@ $overdueCount      = $stats['overdue_count'];
 
 $page_title = "ZimRx - Appointments";
 $body_class = trim(($body_class ?? '') . ' zimrx-appointments-hold');
-$extra_css = ['assets/css/pages/appointments.css'];
+$extra_css = [
+    'assets/css/modules/pres_particulars.css',
+    'assets/css/pages/appointments.css',
+];
 
 include 'header.php';
 require ZIMRX_BASE_DIR . '/views/appointments_view.php';

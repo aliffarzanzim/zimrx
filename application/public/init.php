@@ -36,6 +36,9 @@ if (!defined('ZIMRX_PUBLIC_DIR')) {
 
 // Load Core Configuration, Authentication & Database Engine
 require_once ZIMRX_BASE_DIR . '/config/config.php';
+if (file_exists(ZIMRX_BASE_DIR . '/vendor/autoload.php')) {
+    require_once ZIMRX_BASE_DIR . '/vendor/autoload.php';
+}
 require_once ZIMRX_BASE_DIR . '/lib/auth.php';
 require_once ZIMRX_BASE_DIR . '/lib/db/db.php';
 

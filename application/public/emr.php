@@ -720,7 +720,7 @@ if ($patient && !empty($patient['id'])) {
                     <label>Blood Group</label>
                     <select name="blood_group">
                         <option value="">--</option>
-                        <?php foreach (['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'] as $bg): ?>
+                        <?php foreach (\ZimRx\Services\PatientDemographics::bloodGroups() as $bg): ?>
                         <option value="<?= $bg ?>" <?= $patient['blood_group'] === $bg ? 'selected' : '' ?>><?= $bg ?></option>
                         <?php endforeach; ?>
                     </select>

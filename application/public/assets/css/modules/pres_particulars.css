@@ -431,65 +431,31 @@ select[data-zrx-enhanced="true"] {
     color: var(--zrx-red-800);
 }
 
-/* Patient search autocomplete dropdown */
-
-.patient-lookup-list {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 1100;
-    min-width: 290px;
-    width: max-content;
-    max-width: 440px;
-    max-height: 420px;
-    margin: 0;
-    padding: 0;
-    background: var(--zrx-dropdown-bg);
-    border: 1px solid var(--zrx-dropdown-border);
-    border-radius: var(--zrx-dropdown-radius);
-    box-shadow: var(--zrx-dropdown-shadow);
-    list-style: none;
-    overflow-y: auto;
-    display: none;
-    scrollbar-width: thin;
-    scrollbar-color: var(--zrx-slate-300) transparent;
-}
-.patient-lookup-list::-webkit-scrollbar { width: 6px; }
-.patient-lookup-list::-webkit-scrollbar-track { background: transparent; }
-.patient-lookup-list::-webkit-scrollbar-thumb { background-color: var(--zrx-slate-300); border-radius: 3px; }
-.patient-lookup-list::-webkit-scrollbar-thumb:hover { background-color: var(--zrx-slate-400); }
-.patient-lookup-list.show { display: block; }
+/* Patient search autocomplete option typography */
 
 .patient-lookup-option {
     display: flex;
     flex-direction: column;
-    gap: 0;
-    padding: 5px 10px;
-    cursor: pointer;
-    font-size: 0.82rem;
-    color: var(--zrx-text-main);
-    border-bottom: 1px solid var(--zrx-dropdown-border-item);
-    transition: background-color 0.1s ease, color 0.1s ease;
-}
-.patient-lookup-option:last-child { border-bottom: none; }
-.patient-lookup-option.active { background-color: var(--zrx-dropdown-hover-bg); }
-.patient-lookup-option.active,
-.patient-lookup-option.active * {
-    color: var(--zrx-dropdown-hover-text);
+    gap: 1px;
+    padding: 6px 10px;
 }
 
 .patient-lookup-code {
     font-size: 0.75rem;
     font-weight: 700;
     color: var(--zrx-blue-600);
-    margin: 0 0 1px 0;
+    margin: 0;
     display: block;
+}
+
+.zrx-dropdown-item.active .patient-lookup-code {
+    color: var(--zrx-white);
 }
 
 .patient-lookup-name {
     font-weight: 700;
     font-size: 0.88rem;
-    color: var(--zrx-text-main);
+    color: inherit;
     display: block;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -503,55 +469,34 @@ select[data-zrx-enhanced="true"] {
     display: block;
 }
 
-.new-patient-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 7px 10px;
-    background: var(--zrx-blue-50);
-    border-top: 1px solid var(--zrx-blue-200);
-    cursor: pointer;
-    font-size: 0.82rem;
-    transition: background 0.1s ease;
+.zrx-dropdown-item.active .patient-lookup-meta {
+    color: var(--zrx-slate-100);
 }
-
-.new-patient-option:hover,
-.new-patient-option.active {
-    background: var(--zrx-blue-100);
-}
-
-.new-patient-text {
-    font-weight: 600;
-    color: var(--zrx-primary);
-    flex: 1;
-}
-
-.new-patient-hint {
-    font-size: 0.72rem;
-    color: var(--zrx-text-muted);
-}
-
-
 
 /* New patient creation option row */
 
-.patient-lookup-option.new-patient-option {
+.new-patient-option {
+    display: flex;
+    flex-direction: column;
+    padding: 6px 10px;
     background: var(--zrx-emerald-50);
     border-top: 1px solid var(--zrx-emerald-200);
 }
-.patient-lookup-option.new-patient-option strong {
+
+.new-patient-option strong {
     color: var(--zrx-emerald-700);
-    font-size: 0.90rem;
-    font-weight: 600;
+    font-size: 0.88rem;
+    font-weight: 700;
 }
-.patient-lookup-option.new-patient-option span {
+
+.new-patient-option span {
     color: var(--zrx-emerald-800);
-    font-size: 0.80rem;
+    font-size: 0.78rem;
 }
-.patient-lookup-option.new-patient-option.active,
-.patient-lookup-option.new-patient-option.active *,
-.patient-lookup-option.new-patient-option.active strong,
-.patient-lookup-option.new-patient-option.active span {
+
+.new-patient-option.active,
+.new-patient-option.active strong,
+.new-patient-option.active span {
     background-color: var(--zrx-success);
     color: var(--zrx-white);
 }

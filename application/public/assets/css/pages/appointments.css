@@ -1,5 +1,4 @@
 /* Appointments workspace layout, queue management, patient desk, and follow-ups */
-@import "../modules/pres_particulars.css";
 
 
 .appointments-page {
@@ -528,51 +527,6 @@
     font-weight: 600;
 }
 
-.appointment-lookup-list {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 1100;
-    min-width: 290px;
-    width: max-content;
-    max-width: 440px;
-    max-height: 420px;
-    margin: 0;
-    padding: 0;
-    background: var(--zrx-dropdown-bg);
-    border: 1px solid var(--zrx-dropdown-border);
-    border-radius: var(--zrx-dropdown-radius);
-    box-shadow: var(--zrx-dropdown-shadow);
-    list-style: none;
-    overflow-y: auto;
-    display: none;
-    scrollbar-width: thin;
-    scrollbar-color: var(--zrx-slate-300) transparent;
-}
-.appointment-lookup-list::-webkit-scrollbar { width: 6px; }
-.appointment-lookup-list::-webkit-scrollbar-track { background: transparent; }
-.appointment-lookup-list::-webkit-scrollbar-thumb { background-color: var(--zrx-slate-300); border-radius: 3px; }
-.appointment-lookup-list::-webkit-scrollbar-thumb:hover { background-color: var(--zrx-slate-400); }
-.appointment-lookup-list.show { display: block; }
-
-.appointment-lookup-list li {
-    padding: 8px 12px;
-    cursor: pointer;
-    border-bottom: 1px solid var(--zrx-dropdown-border-item);
-    color: var(--zrx-text-main);
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    font-size: 0.88rem;
-    transition: background-color 0.15s ease, color 0.15s ease;
-}
-.appointment-lookup-list li:last-child { border-bottom: none; }
-.appointment-lookup-list li.active { background-color: var(--zrx-dropdown-hover-bg); }
-.appointment-lookup-list li.active,
-.appointment-lookup-list li.active * {
-    color: var(--zrx-dropdown-hover-text);
-}
-
 .appointment-table th,
 .appointment-table td {
     white-space: nowrap;
@@ -968,14 +922,6 @@ td.vitals-summary {
         gap: 1.25rem;
     }
 
-    .appointment-patient-card .p-row-1 {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-
-    .appointment-patient-card .p-row-2 {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-
     .appointment-side-panel {
         width: 100%;
         min-width: 0;
@@ -1007,11 +953,6 @@ td.vitals-summary {
 }
 
 @media (max-width: 980px) {
-    .appointment-patient-card .p-row-1,
-    .appointment-patient-card .p-row-2 {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
     .appointment-side-panel {
         grid-template-columns: 1fr 1fr;
     }
@@ -1030,8 +971,6 @@ td.vitals-summary {
         width: calc(100% - 1rem);
     }
 
-    .appointment-patient-card .p-row-1,
-    .appointment-patient-card .p-row-2,
     .appointment-side-panel,
     .settings-form-grid,
     .weekday-settings,

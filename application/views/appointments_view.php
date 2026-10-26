@@ -66,7 +66,7 @@ if (!function_exists('appointment_page_dmy_to_iso')) {
             <div class="appointment-doctor-selector autocomplete-wrapper apt-desk-doctor-select-box" id="appointment-doctor-wrapper">
                 <input type="hidden" id="active-doctor-id" value="<?= $initialDoctorId ?: '' ?>">
                 <input type="text" id="appointment-doctor-search" placeholder="<?= count($appointmentDoctorOptions) > 1 ? 'Select doctor for appointment desk...' : 'Assigned doctor' ?>" value="<?= htmlspecialchars($initialDoctorName) ?>" <?= count($appointmentDoctorOptions) === 1 ? 'readonly' : '' ?>>
-                <ul class="autocomplete-list appointment-lookup-list" id="appointment-doctor-list"></ul>
+                <ul class="zrx-dropdown" id="appointment-doctor-list"></ul>
             </div>
         </div>
     </div>
@@ -80,174 +80,11 @@ if (!function_exists('appointment_page_dmy_to_iso')) {
         <input type="hidden" id="patient-id">
 
         <div class="patient-info">
-            <div class="p-row p-row-1">
-                <div class="p-field">
-                    <label><?= zrx_icon('user', 12) ?>Patient Name</label>
-                    <input type="text" id="patient-name" placeholder="Full Patient Name" required>
-                </div>
-
-                <div class="p-field">
-                    <label><?= zrx_icon('clock', 12) ?>Age</label>
-                    <div class="input-group">
-                        <input type="text" id="patient-age" placeholder="Age">
-                        <select id="patient-age-unit">
-                            <option>Years</option>
-                            <option>Months</option>
-                            <option>Weeks</option>
-                            <option>Days</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="p-field">
-                    <label>
-                        <?= zrx_icon('calendar', 12) ?>DOB
-                        <span role="button" tabindex="0" class="zrx-help-icon-btn" data-help-type="dob" title="জন্মতারিখ (DOB) নির্দেশিকা" aria-label="DOB Help">
-                            <?= zrx_icon('help-circle', 13) ?>
-                        </span>
-                    </label>
-                    <input type="text" class="custom-date-picker" id="patient-dob" placeholder="DD/MM/YYYY">
-                </div>
-
-                <div class="p-field">
-                    <label><?= zrx_icon('users', 12) ?>Sex</label>
-                    <select id="patient-gender">
-                        <option value="" selected>--</option>
-                        <option>Male</option>
-                        <option>Female</option>
-                        <option>Others</option>
-                    </select>
-                </div>
-
-                <div class="p-field">
-                    <label><?= zrx_icon('droplet', 12) ?>BG</label>
-                    <select id="patient-blood-group">
-                        <option value="" selected>--</option>
-                        <option>A+</option>
-                        <option>A-</option>
-                        <option>B+</option>
-                        <option>B-</option>
-                        <option>O+</option>
-                        <option>O-</option>
-                        <option>AB+</option>
-                        <option>AB-</option>
-                    </select>
-                </div>
-
-                <div class="p-field">
-                    <label><?= zrx_icon('calendar', 12) ?>Date</label>
-                    <input type="text" class="custom-date-picker" id="appointment-date" value="<?= appointment_page_h($initialQueueDateDisplay) ?>" placeholder="DD/MM/YYYY" required>
-                </div>
-
-                <div class="p-field vis-field">
-                    <label>
-                        <?= zrx_icon('clipboard', 12) ?>Visit ID
-                        <span role="button" tabindex="0" class="zrx-help-icon-btn" data-help-type="visit-id" title="ভিজিট আইডি (Visit ID) নির্দেশিকা" aria-label="Visit ID Help">
-                            <?= zrx_icon('help-circle', 13) ?>
-                        </span>
-                    </label>
-                    <input type="text" id="visit-code" placeholder="Auto on save" readonly>
-                </div>
-            </div>
-
-            <div class="p-row p-row-2">
-                <div class="p-field reg-field lookup-field">
-                    <label>
-                        <?= zrx_icon('hash', 12) ?>
-                        Reg No
-                        <span role="button" tabindex="0" class="zrx-help-icon-btn" data-help-type="appt-reg" title="রেজিস্ট্রেশন নম্বর নির্দেশিকা" aria-label="Reg No Help">
-                            <?= zrx_icon('help-circle', 13) ?>
-                        </span>
-                    </label>
-                    <div class="autocomplete-wrapper" id="reg-wrapper">
-                        <input type="text" id="patient-reg-no" placeholder="Auto on save or search old Reg No">
-                        <ul class="autocomplete-list appointment-lookup-list zrx-dropdown patient-lookup-list" id="reg-list"></ul>
-                    </div>
-                </div>
-
-                <div class="p-field lookup-field reg-field">
-                    <label>
-                        <?= zrx_icon('phone', 12) ?>
-                        Mobile
-                        <span role="button" tabindex="0" class="zrx-help-icon-btn" data-help-type="mobile" title="ফোন নম্বর নির্দেশিকা" aria-label="Mobile Help">
-                            <?= zrx_icon('help-circle', 13) ?>
-                        </span>
-                    </label>
-                    <div class="autocomplete-wrapper" id="mobile-wrapper">
-                        <input type="text" id="patient-mobile" placeholder="01XXX-XXXXXX">
-                        <ul class="autocomplete-list appointment-lookup-list zrx-dropdown patient-lookup-list" id="mobile-list"></ul>
-                    </div>
-                </div>
-
-                <div class="p-field">
-                    <label>
-                        <?= zrx_icon('briefcase', 12) ?>Occupation
-                        <span role="button" tabindex="0" class="zrx-help-icon-btn" data-help-type="occupation" title="পেশা (Occupation) নির্দেশিকা ও ম্যানেজমেন্ট" aria-label="Occupation Help">
-                            <?= zrx_icon('help-circle', 13) ?>
-                        </span>
-                    </label>
-                    <div class="autocomplete-wrapper" id="occ-wrapper">
-                        <input type="text" id="patient-occupation" placeholder="Occupation...">
-                        <ul class="autocomplete-list appointment-lookup-list zrx-dropdown patient-lookup-list" id="occupation-list"></ul>
-                    </div>
-                </div>
-
-                <div class="p-field">
-                    <label>
-                        <?= zrx_icon('map-pin', 12) ?>Address
-                        <span role="button" tabindex="0" class="zrx-help-icon-btn" data-help-type="address" title="ঠিকানা (Address) নির্দেশিকা ও ম্যানেজমেন্ট" aria-label="Address Help">
-                            <?= zrx_icon('help-circle', 13) ?>
-                        </span>
-                    </label>
-                    <div class="autocomplete-wrapper" id="address-wrapper">
-                        <input type="text" id="patient-address" placeholder="Village, Union, Upazila...">
-                        <ul class="autocomplete-list appointment-lookup-list zrx-dropdown patient-lookup-list" id="address-list"></ul>
-                    </div>
-                </div>
-
-                <div class="p-field">
-                    <label><?= zrx_icon('scale', 12) ?>Weight</label>
-                    <div class="input-group">
-                        <input type="text" id="patient-weight" placeholder="Wt">
-                        <select id="patient-weight-unit">
-                            <option>kg</option>
-                            <option>lb</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="p-field">
-                    <label><?= zrx_icon('ruler', 12) ?>Height</label>
-                    <div class="input-group">
-                        <input type="text" id="patient-height" placeholder="Ht">
-                        <select id="patient-height-unit">
-                            <option value="inch" selected>inch</option>
-                            <option value="feet">feet</option>
-                            <option value="cm">cm</option>
-                            <option value="meter">meter</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="p-field">
-                    <label><?= zrx_icon('users', 12) ?>Referred by</label>
-                    <div class="patient-referral-control" id="patient-referral-control">
-                        <select id="patient-ref-type">
-                            <option value="Self" selected>Self</option>
-                            <option value="Other Patient">Other Patient</option>
-                            <option value="Doctor">Doctor</option>
-                            <option value="Others">Others</option>
-                        </select>
-                        <input type="text" id="patient-ref-by" placeholder="Doctor name" autocomplete="off" list="patient-referral-list" hidden>
-                        <datalist id="patient-referral-list"></datalist>
-                    </div>
-                </div>
-
-                <div class="p-field vis-field">
-                    <label><?= zrx_icon('activity', 12) ?>Visit No</label>
-                    <input type="text" id="visit-no" placeholder="Auto on save" readonly>
-                </div>
-            </div>
+            <?php
+            $is_appointment_modal = true;
+            $prescription_prefill = ['appointment_date' => $initialQueueDateDisplay];
+            include ZIMRX_BASE_DIR . '/views/components/patient_particulars_fields.php';
+            ?>
         </div>
 
         <div class="appointment-side-panel">
@@ -860,5 +697,6 @@ if (!function_exists('appointment_page_dmy_to_iso')) {
 <script src="assets/js/layout/table_column_resizer.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/layout/table_column_resizer.js') ?>"></script>
 <script src="assets/js/layout/grid_navigation.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/layout/grid_navigation.js') ?>"></script>
 <script src="assets/js/layout/boot.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/layout/boot.js') ?>"></script>
+<script src="assets/js/modules/patient_particulars.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/modules/patient_particulars.js') ?>"></script>
 <script src="assets/js/pages/appointments.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/pages/appointments.js') ?>"></script>
 

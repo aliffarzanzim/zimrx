@@ -43,13 +43,6 @@
     let currentSettings = initialState.settings || null;
     let paymentSubmitMode = 'save';
     let discountCausesLoaded = false;
-    let mobileLookupTimer = null;
-    let regLookupTimer = null;
-    let addressLookupTimer = null;
-    let patientReferralLookupTimer = null;
-    let previousPatientReferralTimer = null;
-    let occupations = [];
-    let isSyncingAgeDob = false;
 
     const escapeHtml = (value) => String(value ?? '')
         .replace(/&/g, '&amp;')
@@ -93,209 +86,7 @@
         doctor_id: getActiveDoctorId()
     });
 
-    const referralApiUrl = (params = {}) => {
-        const search = new URLSearchParams(params);
-        const doctorId = getActiveDoctorId();
-        if (doctorId) {
-            search.set('doctor_id', doctorId);
-        }
-        return `api/patient_referrals.php?${search.toString()}`;
-    };
 
-    function patientReferralCategoryKey(value) {
-        const typeField = field('patient-ref-type');
-        if (value === undefined && typeField?.selectedOptions?.[0]?.dataset?.referralCategory) {
-            return typeField.selectedOptions[0].dataset.referralCategory;
-        }
-
-        const key = String((value ?? getValue('patient-ref-type')) || '').trim().toLowerCase().replace(/[-\s]+/g, '_');
-        if (key === 'doctor') return 'doctor';
-        if (key === 'other_patient') return 'other_patient';
-        if (key === 'others') return 'others';
-        return 'self';
-    }
-
-    const referralSelectValue = (category) => {
-        if (category === 'doctor') return 'Doctor';
-        if (category === 'other_patient') return 'Other Patient';
-        if (category === 'others') return 'Others';
-        return 'Self';
-    };
-
-    const cleanPatientReferralName = (category = patientReferralCategoryKey(), value = getValue('patient-ref-by')) => {
-        let name = String(value || '').replace(/\s+/g, ' ').trim();
-        if (category !== 'doctor' && category !== 'others') {
-            return '';
-        }
-        if (category === 'doctor') {
-            if (!name || /^dr\.?$/i.test(name)) {
-                return '';
-            }
-            if (!/^dr\.\s*/i.test(name)) {
-                name = `Dr. ${name}`;
-            }
-        }
-        return name;
-    };
-
-    const getAppointmentReferralPayload = () => {
-        const category = patientReferralCategoryKey();
-        return {
-            category,
-            name: cleanPatientReferralName(category)
-        };
-    };
-
-    const removePreviousPatientReferralOptions = () => {
-        field('patient-ref-type')?.querySelectorAll('option.patient-ref-saved-option').forEach((option) => option.remove());
-    };
-
-    const addPreviousPatientReferralOptions = (referrals) => {
-        const select = field('patient-ref-type');
-        if (!select) return;
-
-        removePreviousPatientReferralOptions();
-        referrals.forEach((referral, index) => {
-            const category = patientReferralCategoryKey(referral.category);
-            if (!['doctor', 'others'].includes(category)) return;
-            const name = String(referral.name || '').trim();
-            if (!name) return;
-
-            const option = document.createElement('option');
-            option.className = 'patient-ref-saved-option';
-            option.value = `saved:${category}:${index}`;
-            option.textContent = name;
-            option.dataset.referralCategory = category;
-            option.dataset.referralName = name;
-            select.appendChild(option);
-        });
-    };
-
-    const loadPreviousPatientReferralOptions = () => {
-        const regNo = getValue('patient-reg-no');
-        const select = field('patient-ref-type');
-        if (!select) return;
-
-        window.clearTimeout(previousPatientReferralTimer);
-        previousPatientReferralTimer = window.setTimeout(() => {
-            if (!regNo) {
-                removePreviousPatientReferralOptions();
-                return;
-            }
-
-            fetch(referralApiUrl({ action: 'recent', reg_no: regNo }))
-                .then((res) => res.json())
-                .then((data) => addPreviousPatientReferralOptions(Array.isArray(data.referrals) ? data.referrals : []))
-                .catch(removePreviousPatientReferralOptions);
-        }, 180);
-    };
-
-    const loadPatientReferralSuggestions = () => {
-        const category = patientReferralCategoryKey();
-        const textField = field('patient-ref-by');
-        const list = field('patient-referral-list');
-        if (!textField || !list) return;
-
-        if (category !== 'doctor' && category !== 'others') {
-            list.innerHTML = '';
-            return;
-        }
-
-        window.clearTimeout(patientReferralLookupTimer);
-        patientReferralLookupTimer = window.setTimeout(() => {
-            fetch(referralApiUrl({ action: 'suggestions', category, q: textField.value.trim() }))
-                .then((res) => res.json())
-                .then((data) => {
-                    const suggestions = Array.isArray(data.suggestions) ? data.suggestions : [];
-                    list.innerHTML = suggestions
-                        .map((name) => `<option value="${escapeHtml(name)}"></option>`)
-                        .join('');
-                })
-                .catch(() => {
-                    list.innerHTML = '';
-                });
-        }, 160);
-    };
-
-    const focusPatientReferralInput = () => {
-        const textField = field('patient-ref-by');
-        if (!textField || textField.hidden) return;
-        window.requestAnimationFrame(() => {
-            textField.focus();
-            const position = textField.value.length;
-            if (typeof textField.setSelectionRange === 'function') {
-                textField.setSelectionRange(position, position);
-            }
-        });
-    };
-
-    const syncPatientReferredByControl = (options = {}) => {
-        const typeField = field('patient-ref-type');
-        const textField = field('patient-ref-by');
-        const wrapper = field('patient-referral-control');
-        if (!typeField || !textField || !wrapper) return;
-
-        const savedName = typeField.selectedOptions?.[0]?.dataset?.referralName || '';
-        const category = patientReferralCategoryKey();
-        const needsText = category === 'doctor' || category === 'others';
-        wrapper.classList.toggle('has-free-text', needsText);
-        textField.hidden = !needsText;
-        textField.placeholder = category === 'doctor' ? 'Doctor name' : 'Referral details';
-
-        if (!needsText) {
-            textField.value = '';
-        } else if (savedName) {
-            textField.value = savedName;
-        } else if (category === 'doctor') {
-            const current = textField.value.trim();
-            if (!current) {
-                textField.value = 'Dr. ';
-            } else if (!/^dr\.\s*/i.test(current)) {
-                textField.value = `Dr. ${current}`;
-            }
-        } else if (/^dr\.?$/i.test(textField.value.trim())) {
-            textField.value = '';
-        }
-
-        if (needsText && options.focusInput) {
-            focusPatientReferralInput();
-        }
-        loadPatientReferralSuggestions();
-    };
-
-    const setAppointmentReferral = (referral = {}) => {
-        const typeField = field('patient-ref-type');
-        const textField = field('patient-ref-by');
-        if (!typeField || !textField) return;
-
-        const category = patientReferralCategoryKey(referral.category || referral.referral_category || referral.referralCategory);
-        const name = String(referral.name || referral.referral_name || referral.referralName || '').trim();
-        const savedOption = Array.from(typeField.options).find((option) => {
-            return option.dataset.referralCategory === category
-                && option.dataset.referralName
-                && option.dataset.referralName.toLowerCase() === name.toLowerCase();
-        });
-
-        typeField.value = savedOption ? savedOption.value : referralSelectValue(category);
-        textField.value = name;
-        syncPatientReferredByControl();
-    };
-
-    const initPatientReferredByControl = () => {
-        const typeField = field('patient-ref-type');
-        const textField = field('patient-ref-by');
-        const regNoField = field('patient-reg-no');
-        if (!typeField || !textField) return;
-
-        typeField.addEventListener('change', () => syncPatientReferredByControl({ focusInput: true }));
-        textField.addEventListener('focus', loadPatientReferralSuggestions);
-        textField.addEventListener('input', loadPatientReferralSuggestions);
-        regNoField?.addEventListener('change', loadPreviousPatientReferralOptions);
-        regNoField?.addEventListener('blur', loadPreviousPatientReferralOptions);
-        regNoField?.addEventListener('input', loadPreviousPatientReferralOptions);
-        loadPreviousPatientReferralOptions();
-        syncPatientReferredByControl();
-    };
 
     const formatDisplayDate = (dateString) => {
         const parts = String(dateString || '').split('-');
@@ -327,7 +118,7 @@
     };
 
     const values = () => {
-        const referral = getAppointmentReferralPayload();
+        const referral = window.PatientParticulars?.getReferralPayload() || { category: 'self', name: '' };
         return {
             doctor_id: getActiveDoctorId(),
             id: getValue('appointment-id'),
@@ -516,65 +307,6 @@
         return new Date(year, month - 1, day);
     };
 
-    const appointmentBaseDate = () => dateFromInput(getValue('appointment-date')) || new Date();
-
-    const syncAgeFromDob = () => {
-        if (isSyncingAgeDob) return;
-        const dob = dateFromInput(getValue('patient-dob'));
-        const base = appointmentBaseDate();
-        if (!dob || dob > base) return;
-
-        isSyncingAgeDob = true;
-        let years = base.getFullYear() - dob.getFullYear();
-        let months = base.getMonth() - dob.getMonth();
-        let days = base.getDate() - dob.getDate();
-        if (days < 0) {
-            months -= 1;
-            days += new Date(base.getFullYear(), base.getMonth(), 0).getDate();
-        }
-        if (months < 0) {
-            years -= 1;
-            months += 12;
-        }
-
-        if (years > 0) {
-            setValue('patient-age', years);
-            setValue('patient-age-unit', 'Years');
-        } else if (months > 0) {
-            setValue('patient-age', months);
-            setValue('patient-age-unit', 'Months');
-        } else if (days >= 7) {
-            setValue('patient-age', Math.floor(days / 7));
-            setValue('patient-age-unit', 'Weeks');
-        } else {
-            setValue('patient-age', Math.max(days, 0));
-            setValue('patient-age-unit', 'Days');
-        }
-        isSyncingAgeDob = false;
-    };
-
-    const syncDobFromAge = () => {
-        if (isSyncingAgeDob) return;
-        const age = Number.parseInt(getValue('patient-age'), 10);
-        if (!Number.isFinite(age) || age <= 0) return;
-
-        isSyncingAgeDob = true;
-        const unit = getValue('patient-age-unit');
-        const base = appointmentBaseDate();
-        let dob;
-        if (unit === 'Months') {
-            dob = new Date(base.getFullYear(), base.getMonth() - age, 1);
-        } else if (unit === 'Weeks') {
-            dob = new Date(base.getFullYear(), base.getMonth(), base.getDate() - (age * 7));
-        } else if (unit === 'Days') {
-            dob = new Date(base.getFullYear(), base.getMonth(), base.getDate() - age);
-        } else {
-            dob = new Date(base.getFullYear() - age, 0, 1);
-        }
-        setDisplayDate('patient-dob', `${dob.getFullYear()}-${String(dob.getMonth() + 1).padStart(2, '0')}-${String(dob.getDate()).padStart(2, '0')}`);
-        isSyncingAgeDob = false;
-    };
-
     const appointmentQuery = (item) => {
         const params = new URLSearchParams();
         params.set('appointment_id', item.id || '');
@@ -623,56 +355,15 @@
     };
 
     const fillPatient = (patient, message = 'Existing patient selected.') => {
-        clearTimeout(mobileLookupTimer);
-        clearTimeout(regLookupTimer);
         closeAllLookups();
-        setValue('patient-id', patient.id || '');
-        setValue('patient-reg-no', patient.reg_no || '');
-        setValue('patient-name', patient.patient_name || patient.full_name || '');
-        setValue('patient-age', patient.age || '');
-        setValue('patient-age-unit', patient.age_unit || 'Years');
-        setDisplayDate('patient-dob', patient.dob || '');
-        if (patient.dob && typeof syncAgeFromDob === 'function') {
-            syncAgeFromDob();
-        }
-        setValue('patient-gender', patient.gender || '');
-        setValue('patient-blood-group', patient.blood_group || '');
-        setValue('patient-mobile', patient.mobile || '');
-        setValue('patient-occupation', patient.occupation || '');
-        setValue('patient-address', patient.address || '');
-        setValue('patient-weight', patient.weight || '');
-        setValue('patient-weight-unit', patient.weight_unit || 'kg');
-        setValue('patient-height', patient.height || '');
-        setValue('patient-height-unit', patient.height_unit || 'inch');
+        window.PatientParticulars?.setValues(patient, { baseDateId: 'appointment-date' });
         setVisitIdentifiers(patient.next_visit_no || '1', patient.next_visit_id || patient.next_visit_code || '', patient.reg_no || '');
-        setAppointmentReferral({ category: 'self', name: '' });
-        loadPreviousPatientReferralOptions();
         setLookupStatus(message);
-        closeAllLookups();
     };
 
     const clearPatientFields = ({ keepMobile = false, keepName = false } = {}) => {
-        const mobile = keepMobile ? getValue('patient-mobile') : '';
-        const name = keepName ? getValue('patient-name') : '';
-
-        setValue('patient-id', '');
-        setValue('patient-reg-no', '');
-        setValue('patient-name', name);
-        setValue('patient-age', '');
-        setValue('patient-age-unit', 'Years');
-        setValue('patient-dob', '');
-        setValue('patient-gender', '');
-        setValue('patient-blood-group', '');
-        setValue('patient-mobile', mobile);
-        setValue('patient-occupation', '');
-        setValue('patient-address', '');
-        setValue('patient-weight', '');
-        setValue('patient-weight-unit', 'kg');
-        setValue('patient-height', '');
-        setValue('patient-height-unit', 'inch');
+        window.PatientParticulars?.clearValues({ keepMobile, keepName });
         setVisitIdentifiers('', '');
-        removePreviousPatientReferralOptions();
-        setAppointmentReferral({ category: 'self', name: '' });
     };
 
     const startNewPatient = (mobile, newRegNo) => {
@@ -728,136 +419,13 @@
             weight_unit: item.weight_unit || 'kg',
             height: item.height || '',
             height_unit: item.height_unit || 'inch',
+            referral_category: item.referral_category || 'self',
+            referral_name: item.referral_name || '',
             next_visit_no: item.visit_no || '1',
             next_visit_id: item.visit_id || item.visit_code || '',
             next_visit_code: item.visit_id || item.visit_code || ''
         }, `Editing appointment for ${item.reg_no || 'selected patient'}.`);
-        setAppointmentReferral({
-            category: item.referral_category || 'self',
-            name: item.referral_name || ''
-        });
         window.scrollTo({ top: form.offsetTop - 70, behavior: 'smooth' });
-    };
-
-    const renderPatientLookup = (patients, listId, wrapperId, options = {}) => {
-        const lookupList = field(listId);
-        lookupList.innerHTML = '';
-        lookupList.classList.add('zrx-dropdown', 'patient-lookup-list');
-
-        const isMobileLookup = (listId === 'mobile-list');
-
-        patients.forEach((patient, i) => {
-            const li = document.createElement('li');
-            li.className = 'patient-lookup-option zrx-dropdown-item';
-
-            const codeLabel = isMobileLookup ? (patient.mobile || options.mobile || '') : (patient.reg_no || '');
-            const subText = isMobileLookup ? (patient.reg_no || '') : (patient.mobile || 'No Phone');
-            const addressLabel = patient.address ? patient.address : 'No Address';
-            const metaText = subText ? `${subText} | ${addressLabel}` : addressLabel;
-
-            li.innerHTML = `<div class="patient-lookup-code">${escapeHtml(codeLabel)}</div><strong class="patient-lookup-name">${escapeHtml(patient.full_name || patient.patient_name || 'No Name')}</strong><span class="patient-lookup-meta">${escapeHtml(metaText)}</span>`;
-
-            li.addEventListener('mousemove', () => {
-                const allItems = lookupList.querySelectorAll('li.patient-lookup-option');
-                allItems.forEach(el => el.classList.remove('active'));
-                li.classList.add('active');
-            });
-            li.addEventListener('mouseenter', () => {
-                const allItems = lookupList.querySelectorAll('li.patient-lookup-option');
-                allItems.forEach(el => el.classList.remove('active'));
-                li.classList.add('active');
-            });
-            li.addEventListener('mousedown', (event) => {
-                event.preventDefault();
-                fillPatient(patient, `Loaded ${patient.reg_no || 'old patient'} from patient registry.`);
-                closeList(listId, wrapperId);
-            });
-            lookupList.appendChild(li);
-        });
-
-        if (options.allowNew) {
-            const li = document.createElement('li');
-            li.className = 'patient-lookup-option new-patient-option zrx-dropdown-item';
-            li.innerHTML = `<strong>+ It's a new patient</strong><span>Use ${escapeHtml(options.mobile)} with ${escapeHtml(options.newRegNo || 'new Reg No')}</span>`;
-            li.addEventListener('mousemove', () => {
-                const allItems = lookupList.querySelectorAll('li.patient-lookup-option');
-                allItems.forEach(el => el.classList.remove('active'));
-                li.classList.add('active');
-            });
-            li.addEventListener('mouseenter', () => {
-                const allItems = lookupList.querySelectorAll('li.patient-lookup-option');
-                allItems.forEach(el => el.classList.remove('active'));
-                li.classList.add('active');
-            });
-            li.addEventListener('mousedown', (event) => {
-                event.preventDefault();
-                startNewPatient(options.mobile || '', options.newRegNo || '');
-                closeList(listId, wrapperId);
-            });
-            lookupList.appendChild(li);
-        }
-
-        if (!lookupList.children.length) {
-            closeList(listId, wrapperId);
-            return;
-        }
-
-        lookupList.classList.add('show');
-        field(wrapperId)?.classList.add('open');
-    };
-
-    const lookupByMobile = () => {
-        const mobile = getValue('patient-mobile');
-        clearTimeout(mobileLookupTimer);
-
-        if (mobile.replace(/\D/g, '').length < 1) {
-            closeList('mobile-list', 'mobile-wrapper');
-            return;
-        }
-
-        mobileLookupTimer = setTimeout(() => {
-            const url = apiUrl({ action: 'patient_lookup', mobile, date: getIsoDate('appointment-date') });
-            fetch(url)
-                .then((res) => res.json())
-                .then((data) => {
-                    if (getValue('patient-mobile') !== mobile || field('patient-id')?.value) return;
-                    renderPatientLookup(data.patients || [], 'mobile-list', 'mobile-wrapper', {
-                        allowNew: true,
-                        mobile,
-                        newRegNo: data.new_reg_no || ''
-                    });
-                })
-                .catch(console.error);
-        }, 180);
-    };
-
-    const lookupByReg = (silent = false) => {
-        const regNo = getValue('patient-reg-no');
-        clearTimeout(regLookupTimer);
-
-        if (regNo.length < 1) {
-            closeList('reg-list', 'reg-wrapper');
-            return;
-        }
-
-        regLookupTimer = setTimeout(() => {
-            const url = apiUrl({ action: 'patient_lookup', reg_no: regNo, date: getIsoDate('appointment-date') });
-            fetch(url)
-                .then((res) => res.json())
-                .then((data) => {
-                    if (getValue('patient-reg-no') !== regNo) return;
-                    if (!silent && !field('patient-id')?.value) {
-                        renderPatientLookup(data.patients || [], 'reg-list', 'reg-wrapper');
-                    }
-                    const exact = (data.patients || []).find((patient) => String(patient.reg_no).toUpperCase() === regNo.toUpperCase());
-                    if (exact && !field('patient-id')?.value && document.activeElement !== field('patient-reg-no')) {
-                        fillPatient(exact, `Loaded ${exact.reg_no} from patient registry.`);
-                    } else if (silent || field('patient-id')?.value) {
-                        closeList('reg-list', 'reg-wrapper');
-                    }
-                })
-                .catch(console.error);
-        }, 180);
     };
 
     const formatPatientMeta = (item) => [
@@ -1170,132 +738,6 @@
         }).then(loadAppointments);
     };
 
-    const initOccupationLookup = () => {
-        const fetchOccs = () => {
-            fetch('api/get_occupations.php')
-                .then((res) => res.json())
-                .then((data) => {
-                    occupations = Array.isArray(data) ? data : [];
-                })
-                .catch(console.error);
-        };
-        fetchOccs();
-        window.refreshOccupations = fetchOccs;
-
-        const renderOccupationList = () => {
-            const term = getValue('patient-occupation').toLowerCase().trim();
-            const matches = occupations.filter((occ) => {
-                const name = typeof occ === 'string' ? occ : (occ.name || '');
-                return name.toLowerCase().includes(term);
-            }).slice(0, 15);
-
-            const occupationList = field('occupation-list');
-            occupationList.innerHTML = '';
-            matches.forEach((occ) => {
-                const name = typeof occ === 'string' ? occ : (occ.name || '');
-                const isPinned = typeof occ === 'object' && Number(occ.is_pinned) === 1;
-
-                const li = document.createElement('li');
-                li.className = 'zrx-dropdown-item';
-                li.style.position = 'relative';
-
-                if (isPinned) {
-                    const pin = document.createElement('img');
-                    pin.className = 'rx-dropdown-pin';
-                    pin.src = 'assets/images/pin.svg';
-                    pin.alt = 'Pinned';
-                    li.append(pin, document.createTextNode(name));
-                } else {
-                    li.textContent = name;
-                }
-
-                li.addEventListener('mouseenter', () => {
-                    const allItems = occupationList.querySelectorAll('li');
-                    const idx = Array.from(allItems).indexOf(li);
-                    updateActiveListItem(allItems, idx);
-                });
-                li.addEventListener('mousedown', (event) => {
-                    event.preventDefault();
-                    setValue('patient-occupation', name);
-                    closeList('occupation-list', 'occ-wrapper');
-                });
-                occupationList.appendChild(li);
-            });
-            if (matches.length) {
-                if (occupationList.firstElementChild) {
-                    occupationList.firstElementChild.classList.add('active');
-                }
-                occupationList.classList.add('show');
-                field('occ-wrapper').classList.add('open');
-            } else {
-                closeList('occupation-list', 'occ-wrapper');
-            }
-        };
-
-        field('patient-occupation').addEventListener('input', renderOccupationList);
-        field('patient-occupation').addEventListener('focus', renderOccupationList);
-        field('patient-occupation').addEventListener('click', renderOccupationList);
-        field('patient-occupation').addEventListener('keydown', (e) => handleListKeydown(e, 'occupation-list', 'occ-wrapper'));
-        field('patient-occupation').addEventListener('blur', () => {
-            window.setTimeout(() => closeList('occupation-list', 'occ-wrapper'), 120);
-        });
-    };
-
-    const initAddressLookup = () => {
-        field('patient-address').addEventListener('keydown', (e) => handleListKeydown(e, 'address-list', 'address-wrapper'));
-        field('patient-address').addEventListener('input', () => {
-            clearTimeout(addressLookupTimer);
-            const text = getValue('patient-address');
-            const parts = text.split(',');
-            const currentWord = parts[parts.length - 1].trim();
-            const previousWord = parts.length > 1 ? parts[parts.length - 2].trim() : '';
-            const segment = Math.max(parts.length - 1, 0);
-
-            if (currentWord.length < 1 && previousWord === '') {
-                closeList('address-list', 'address-wrapper');
-                return;
-            }
-
-            addressLookupTimer = setTimeout(() => {
-                fetch(`api/search_address.php?q=${encodeURIComponent(currentWord)}&segment=${segment}&prev=${encodeURIComponent(previousWord)}`)
-                    .then((res) => res.json())
-                    .then((suggestions) => {
-                        const addressList = field('address-list');
-                        addressList.innerHTML = '';
-                        if (!Array.isArray(suggestions) || !suggestions.length || suggestions.error) {
-                            closeList('address-list', 'address-wrapper');
-                            return;
-                        }
-
-                        suggestions.slice(0, 12).forEach((suggestion) => {
-                            const li = document.createElement('li');
-                            li.className = 'zrx-dropdown-item';
-                            li.textContent = suggestion;
-                            li.addEventListener('mouseenter', () => {
-                                const allItems = addressList.querySelectorAll('li');
-                                const idx = Array.from(allItems).indexOf(li);
-                                updateActiveListItem(allItems, idx);
-                            });
-                            li.addEventListener('mousedown', (event) => {
-                                event.preventDefault();
-                                parts[parts.length - 1] = (parts.length > 1 ? ' ' : '') + suggestion;
-                                setValue('patient-address', parts.join(','));
-                                closeList('address-list', 'address-wrapper');
-                                field('patient-address').focus();
-                            });
-                            addressList.appendChild(li);
-                        });
-
-                        if (addressList.firstElementChild) {
-                            addressList.firstElementChild.classList.add('active');
-                        }
-                        addressList.classList.add('show');
-                        field('address-wrapper').classList.add('open');
-                    })
-                    .catch(console.error);
-            }, 200);
-        });
-    };
 
     const renderDoctorOptions = () => {
         const search = field('appointment-doctor-search');
@@ -1527,29 +969,6 @@
 
     field('appointment-settings-open')?.addEventListener('click', openSettingsModal);
 
-    field('patient-mobile').addEventListener('input', () => {
-        if (field('patient-id')?.value) {
-            setValue('patient-id', '');
-        }
-        lookupByMobile();
-    });
-    field('patient-mobile').addEventListener('focus', lookupByMobile);
-    field('patient-mobile').addEventListener('keydown', (e) => handleListKeydown(e, 'mobile-list', 'mobile-wrapper'));
-    field('patient-mobile').addEventListener('blur', () => {
-        window.setTimeout(() => closeList('mobile-list', 'mobile-wrapper'), 120);
-    });
-    field('patient-reg-no').addEventListener('input', () => {
-        if (field('patient-id')?.value) {
-            setValue('patient-id', '');
-        }
-        lookupByReg(false);
-    });
-    field('patient-reg-no').addEventListener('blur', () => lookupByReg(true));
-    field('patient-reg-no').addEventListener('keydown', (e) => handleListKeydown(e, 'reg-list', 'reg-wrapper'));
-    field('patient-dob').addEventListener('change', syncAgeFromDob);
-    field('patient-age').addEventListener('input', syncDobFromAge);
-    field('patient-age-unit').addEventListener('change', syncDobFromAge);
-
     document.addEventListener('click', (event) => {
         if (!event.target.closest('.autocomplete-wrapper')) {
             closeAllLookups();
@@ -1562,7 +981,7 @@
 
     field('appointment-date').addEventListener('change', () => {
         applyQueueDate(getValue('appointment-date'));
-        syncAgeFromDob();
+        window.PatientParticulars?.syncAgeFromDob({ baseDateId: 'appointment-date' });
     });
 
     field('appointment-refresh').addEventListener('click', refreshAppointments);
@@ -1571,9 +990,20 @@
     initDatePickers();
     initDoctorSelector();
     loadSettings();
-    initOccupationLookup();
-    initAddressLookup();
-    initPatientReferredByControl();
+    window.PatientParticulars?.init({
+        baseDateId: 'appointment-date',
+        allowNewPatient: true,
+        getDate: () => getIsoDate('appointment-date'),
+        onClearId: () => {
+            if (field('patient-id')?.value) setValue('patient-id', '');
+        },
+        onPatientSelected: (patient) => {
+            fillPatient(patient, `Loaded ${patient.reg_no || 'old patient'} from patient registry.`);
+        },
+        onNewPatient: (mobile, newRegNo) => {
+            startNewPatient(mobile, newRegNo);
+        }
+    });
     setForm(null, { preserveIdentifiers: true, skipNextIdentifiers: true });
     loadAppointments();
     if (window.ZimRxDropdown && typeof window.ZimRxDropdown.autoEnhance === 'function') {
