@@ -243,10 +243,10 @@ $th = static fn (string $key): string => htmlspecialchars((string)($zrx_hdr_stri
                 <a href="appointments.php" class="nav-link <?= $current_page == 'appointments.php' ? 'active' : '' ?>"><?= $th('nav_appointments') ?></a>
                 <a href="emr.php" class="nav-link <?= $current_page == 'emr.php' ? 'active' : '' ?>"><?= $th('nav_emr') ?></a>
                 <a href="drug_db.php" class="nav-link <?= $current_page == 'drug_db.php' ? 'active' : '' ?>"><?= $th('nav_drug_db') ?></a>
-                <button type="button" id="template-menu-toggle" class="nav-link nav-button <?= $template_menu_active ? 'active' : '' ?>" aria-haspopup="true" aria-expanded="false"><?= $th('nav_templates') ?></button>
-                <button type="button" id="finance-menu-toggle" class="nav-link nav-button <?= $finance_menu_active ? 'active' : '' ?>" aria-haspopup="true" aria-expanded="false"><?= $th('nav_billings_stats') ?></button>
-                <button type="button" id="setup-menu-toggle" class="nav-link nav-button <?= $setup_menu_active ? 'active' : '' ?>" aria-haspopup="true" aria-expanded="false"><?= $th('nav_settings') ?></button>
-                <button type="button" id="help-menu-toggle" class="nav-link nav-button <?= $help_menu_active ? 'active' : '' ?>" aria-haspopup="true" aria-expanded="false"><?= $th('nav_help') ?></button>
+                <button type="button" id="template-menu-toggle" class="nav-link nav-button <?= $template_menu_active ? 'active' : '' ?>" aria-haspopup="true" aria-expanded="false"><?= $th('nav_templates') ?> <?= zrx_icon('chevron-down', 11) ?></button>
+                <button type="button" id="finance-menu-toggle" class="nav-link nav-button <?= $finance_menu_active ? 'active' : '' ?>" aria-haspopup="true" aria-expanded="false"><?= $th('nav_billings_stats') ?> <?= zrx_icon('chevron-down', 11) ?></button>
+                <button type="button" id="setup-menu-toggle" class="nav-link nav-button <?= $setup_menu_active ? 'active' : '' ?>" aria-haspopup="true" aria-expanded="false"><?= $th('nav_settings') ?> <?= zrx_icon('chevron-down', 11) ?></button>
+                <button type="button" id="help-menu-toggle" class="nav-link nav-button <?= $help_menu_active ? 'active' : '' ?>" aria-haspopup="true" aria-expanded="false"><?= $th('nav_help') ?> <?= zrx_icon('chevron-down', 11) ?></button>
                 <?php endif; ?>
             </nav>
             <button type="button" class="nav-scroll-arrow nav-scroll-right" id="nav-scroll-right" aria-label="<?= $th('scroll_nav_right_aria') ?>" hidden>
