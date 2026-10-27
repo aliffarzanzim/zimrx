@@ -1,9 +1,6 @@
 /* Patient particulars card layout, two-row demographic fields, and quick action bar */
 .patient-particulars {
-
     background-color: var(--zrx-bg-card);
-    margin-top: 1.25rem;
-    margin-bottom: 1.25rem;
     border-radius: var(--zrx-border-radius);
     box-shadow: var(--zrx-shadow-sm);
     border: 1px solid var(--zrx-border);

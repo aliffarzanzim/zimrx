@@ -172,6 +172,7 @@
 
     --zrx-page-max-width: 1680px;
     --zrx-page-width: calc(100% - 2.5rem);
+    --zrx-page-margin: 1.25rem auto;
 }
 
 /* Base reset and global typography */
@@ -360,8 +361,7 @@ body.zimrx-appointments-hold.zimrx-appointments-ready { opacity: 1; }
 .zrx-page-container {
     max-width: var(--zrx-page-max-width, 1680px);
     width: var(--zrx-page-width, calc(100% - 2.5rem));
-    margin-left: auto;
-    margin-right: auto;
+    margin: var(--zrx-page-margin, 1.25rem auto);
     box-sizing: border-box;
 }
 
