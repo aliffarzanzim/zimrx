@@ -1777,12 +1777,15 @@ class ZimRxTestSuite {
             "header catalog translates navigation strings in English and Bengali"
         );
         $headerPhpCode = (string)file_get_contents(__DIR__ . '/../public/header.php');
+        $headerNavigationCode = (string)file_get_contents(__DIR__ . '/../lib/app_navigation.php');
         $this->assert(
-            str_contains($headerPhpCode, "\$th('nav_new_prescription')") &&
             str_contains($headerPhpCode, "\$th('nav_logout')") &&
+            str_contains($headerPhpCode, "zimrx_header_menu_label(\$menuItem, \$zrx_hdr_strings)") &&
+            str_contains($headerPhpCode, "zimrx_header_menu_label(\$child, \$zrx_hdr_strings)") &&
+            str_contains($headerNavigationCode, "'translation' => 'nav_new_prescription'") &&
             !str_contains($headerPhpCode, ">New Prescription<") &&
             !str_contains($headerPhpCode, ">Logout<"),
-            "header.php renders all navigation links via \$th() with zero hardcoded default strings"
+            "header navigation uses translated catalog labels and has no hardcoded default strings"
         );
 
         $catalogs = ['instructions', 'doses', 'durations', 'advices'];
