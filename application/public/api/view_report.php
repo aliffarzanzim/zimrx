@@ -22,7 +22,13 @@ if ($rawFile === '') {
 }
 
 // Sanitize filename against directory traversal
-$fileName = basename(urldecode($rawFile));
+$fileName = basename($rawFile);
+if (!preg_match('/^report-(\d+)-\d+-[a-f0-9]{8,32}\.(jpg|jpeg|png|gif|webp|pdf)$/i', $fileName, $fileMatches)) {
+    http_response_code(404);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['error' => 'Report file not found.']);
+    exit();
+}
 
 $configuredReportsDir = defined('ZIMRX_UPLOADS_DIR')
     ? (ZIMRX_UPLOADS_DIR . '/reports')
@@ -41,7 +47,8 @@ if (!$reportsDir) {
 $targetPath = $reportsDir . DIRECTORY_SEPARATOR . $fileName;
 $realFilePath = realpath($targetPath);
 
-if (!$realFilePath || !file_exists($realFilePath) || !str_starts_with($realFilePath, $reportsDir)) {
+if (!$realFilePath || !is_file($realFilePath)
+    || !str_starts_with($realFilePath, $reportsDir . DIRECTORY_SEPARATOR)) {
     http_response_code(404);
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode(['error' => 'Report file not found.']);
@@ -49,8 +56,14 @@ if (!$realFilePath || !file_exists($realFilePath) || !str_starts_with($realFileP
 }
 
 // Verify doctor ownership or assistant permission
-$ownerDoctorId = zimrx_parse_report_doctor_id($fileName);
-if ($ownerDoctorId > 0 && $ownerDoctorId !== $doctorId) {
+$ownerDoctorId = (int)$fileMatches[1];
+if ($ownerDoctorId <= 0) {
+    http_response_code(404);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['error' => 'Report file not found.']);
+    exit();
+}
+if ($ownerDoctorId !== $doctorId) {
         $hasPermission = false;
         try {
             $pdo = DbConnections::userdata();
@@ -79,6 +92,7 @@ $ext = strtolower(pathinfo($realFilePath, PATHINFO_EXTENSION));
 $mimeTypes = [
     'pdf'  => 'application/pdf',
     'png'  => 'image/png',
+    'gif'  => 'image/gif',
     'jpg'  => 'image/jpeg',
     'jpeg' => 'image/jpeg',
     'webp' => 'image/webp',
@@ -89,7 +103,7 @@ header('Content-Type: ' . $contentType);
 header('Content-Length: ' . (string)filesize($realFilePath));
 header('X-Content-Type-Options: nosniff');
 header('Content-Disposition: inline; filename="' . rawurlencode($fileName) . '"');
-header('Cache-Control: private, no-transform, max-age=3600');
+header('Cache-Control: private, no-store, no-transform');
 
 readfile($realFilePath);
 exit();

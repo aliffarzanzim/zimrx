@@ -29,6 +29,11 @@ try {
         throw new RuntimeException('Upload failed.');
     }
 
+    $fileSize = (int)($file['size'] ?? 0);
+    if ($fileSize < 1 || $fileSize > 15 * 1024 * 1024) {
+        throw new RuntimeException('Report files must be between 1 byte and 15 MB.');
+    }
+
     $tmpPath = (string)($file['tmp_name'] ?? '');
     if ($tmpPath === '' || !is_uploaded_file($tmpPath)) {
         throw new RuntimeException('Invalid upload.');
