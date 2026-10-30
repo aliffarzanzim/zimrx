@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace ZimRx\Services;
 
 use PDO;
+use InvalidArgumentException;
 
 // Consultation invoicing, receipt generation, payment status reconciliation, and financial reports.
 final class BillingService
@@ -11,19 +12,22 @@ final class BillingService
     public function __construct(private readonly PDO $pdo) {}
 
     // Backfill missing payment ledger entries for booked appointments with fees or payments
-    public function reconcileMissingAppointmentPayments(int $doctorId): int
+    public function reconcileMissingAppointmentPayments(int $doctorId, int $profileId): int
     {
-        $doctorId = max(1, $doctorId);
+        if ($doctorId <= 0 || $profileId <= 0) {
+            throw new InvalidArgumentException('An active doctor practice profile is required.');
+        }
 
         $stmt = $this->pdo->prepare(
-            "SELECT a.id, a.patient_id, a.doctor_id, a.visit_fee, a.discount, a.discount_note, a.paid_amount, a.appointment_date
+            "SELECT a.id, a.patient_id, a.doctor_id, a.profile_id, a.visit_fee, a.discount, a.discount_note, a.paid_amount, a.appointment_date
              FROM zimrx_appointments a
              LEFT JOIN zimrx_payments p ON p.appointment_id = a.id
              WHERE p.id IS NULL 
                AND a.doctor_id = :doc
+               AND a.profile_id = :profile_id
                AND (a.visit_fee > 0 OR a.paid_amount > 0)"
         );
-        $stmt->execute(['doc' => $doctorId]);
+        $stmt->execute(['doc' => $doctorId, 'profile_id' => $profileId]);
         $unbilled = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if (empty($unbilled)) {
@@ -36,8 +40,8 @@ final class BillingService
         try {
             $insertStmt = $this->pdo->prepare(
                 "INSERT OR IGNORE INTO zimrx_payments 
-                 (appointment_id, patient_id, doctor_id, visit_fee, discount, discount_note, paid_amount, payment_method, payment_status, service_type, created_at, updated_at)
-                 VALUES (:aid, :pid, :doc, :fee, :disc, :dnote, :paid, 'Cash', :status, 'Consultation', :c_at, :u_at)"
+                 (appointment_id, patient_id, doctor_id, profile_id, visit_fee, discount, discount_note, paid_amount, payment_method, payment_status, service_type, created_at, updated_at)
+                 VALUES (:aid, :pid, :doc, :profile_id, :fee, :disc, :dnote, :paid, 'Cash', :status, 'Consultation', :c_at, :u_at)"
             );
 
             $updateReceiptStmt = $this->pdo->prepare(
@@ -58,6 +62,7 @@ final class BillingService
                     'aid'    => (int)$row['id'],
                     'pid'    => (int)$row['patient_id'],
                     'doc'    => (int)($row['doctor_id'] ?: $doctorId),
+                    'profile_id' => (int)($row['profile_id'] ?? $profileId),
                     'fee'    => $fee,
                     'disc'   => $discount,
                     'dnote'  => (string)($row['discount_note'] ?? ''),
@@ -123,8 +128,11 @@ final class BillingService
     }
 
     // Key financial metrics: today's collection, monthly totals, and outstanding dues
-    public function getSummaryMetrics(int $doctorId): array
+    public function getSummaryMetrics(int $doctorId, int $profileId): array
     {
+        if ($doctorId <= 0 || $profileId <= 0) {
+            throw new InvalidArgumentException('An active doctor practice profile is required.');
+        }
         $today = date('Y-m-d');
 
         $todayStmt = $this->pdo->prepare(
@@ -134,9 +142,9 @@ final class BillingService
                 COALESCE(SUM(discount), 0) AS today_discount,
                 COUNT(*) AS today_count
              FROM zimrx_payments 
-             WHERE doctor_id = :doc AND date(created_at) = :today"
+             WHERE doctor_id = :doc AND profile_id = :profile_id AND date(created_at) = :today"
         );
-        $todayStmt->execute(['doc' => $doctorId, 'today' => $today]);
+        $todayStmt->execute(['doc' => $doctorId, 'profile_id' => $profileId, 'today' => $today]);
         $todayMetrics = $todayStmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
         $monthStmt = $this->pdo->prepare(
@@ -146,12 +154,13 @@ final class BillingService
                 COALESCE(SUM(discount), 0) AS month_discount,
                 COUNT(*) AS month_count
              FROM zimrx_payments 
-             WHERE doctor_id = :doc AND date(created_at) >= :m_start AND date(created_at) <= :m_end"
+             WHERE doctor_id = :doc AND profile_id = :profile_id AND date(created_at) >= :m_start AND date(created_at) <= :m_end"
         );
         $monthStmt->execute([
             'doc' => $doctorId,
+            'profile_id' => $profileId,
             'm_start' => date('Y-m-01'),
-            'm_end' => $today
+            'm_end' => $today,
         ]);
         $monthMetrics = $monthStmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
@@ -160,9 +169,9 @@ final class BillingService
                 COALESCE(SUM(MAX(0, (visit_fee - discount) - paid_amount)), 0) AS total_due,
                 COUNT(CASE WHEN (visit_fee - discount) > paid_amount THEN 1 END) AS due_count
              FROM zimrx_payments 
-             WHERE doctor_id = :doc"
+             WHERE doctor_id = :doc AND profile_id = :profile_id"
         );
-        $dueStmt->execute(['doc' => $doctorId]);
+        $dueStmt->execute(['doc' => $doctorId, 'profile_id' => $profileId]);
         $dueMetrics = $dueStmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
         return [
@@ -173,10 +182,13 @@ final class BillingService
     }
 
     // Filter transactions by date range, payment status, payment method, or search query
-    public function getFilteredTransactions(int $doctorId, array $criteria): array
+    public function getFilteredTransactions(int $doctorId, array $criteria, int $profileId): array
     {
-        $where = ["p.doctor_id = :doc"];
-        $params = ['doc' => $doctorId];
+        if ($doctorId <= 0 || $profileId <= 0) {
+            throw new InvalidArgumentException('An active doctor practice profile is required.');
+        }
+        $where = ["p.doctor_id = :doc", "p.profile_id = :profile_id"];
+        $params = ['doc' => $doctorId, 'profile_id' => $profileId];
 
         $from = trim((string)($criteria['from'] ?? ''));
         $to = trim((string)($criteria['to'] ?? ''));

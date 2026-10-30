@@ -10,6 +10,12 @@ header('Content-Type: application/json');
 try {
     $pdo_static = DbConnections::staticDb();
     $pdo_user = DbConnections::userdata();
+    $doctorId = current_user_doctor_id();
+    if ($doctorId <= 0) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'error' => 'An active doctor account is required.']);
+        exit;
+    }
 
     $query = isset($_GET['q']) ? trim($_GET['q']) : '';
     $segment = isset($_GET['segment']) ? (int)$_GET['segment'] : 0;
@@ -99,11 +105,10 @@ try {
     }
 
     // Load doctor's preferred districts filter if set
-    $doctorId = (int)($_SESSION['doctor_id'] ?? 1);
     $preferredDistricts = [];
     $stmtPref = $pdo_user->prepare("
         SELECT setting_value FROM zimrx_interface_settings 
-        WHERE (doctor_id = :doc OR doctor_id = 1) AND setting_scope = 'prescription' AND setting_key = 'preferred_districts' 
+        WHERE doctor_id = :doc AND setting_scope = 'prescription' AND setting_key = 'preferred_districts'
         LIMIT 1
     ");
     $stmtPref->execute(['doc' => $doctorId]);
@@ -177,12 +182,12 @@ try {
         }
 
         // Search custom user address database (userdata)
-        $doctor_id = (int)($_SESSION['doctor_id'] ?? 1);
+        $doctor_id = $doctorId;
         $sql_user = "
             SELECT * FROM (
                 SELECT 'custom' as type, name, usage_count, is_pinned 
                 FROM zimrx_user_address 
-                WHERE (doctor_id = :doc OR doctor_id = 1) AND is_hidden = 0 AND name LIKE :p 
+                WHERE doctor_id = :doc AND is_hidden = 0 AND name LIKE :p
                 ORDER BY is_pinned DESC, usage_count DESC 
                 LIMIT 20
             )
@@ -190,7 +195,7 @@ try {
             SELECT * FROM (
                 SELECT 'custom' as type, name, usage_count, is_pinned 
                 FROM zimrx_user_address 
-                WHERE (doctor_id = :doc OR doctor_id = 1) AND is_hidden = 0 AND name LIKE :c AND name NOT LIKE :p 
+                WHERE doctor_id = :doc AND is_hidden = 0 AND name LIKE :c AND name NOT LIKE :p
                 ORDER BY is_pinned DESC, usage_count DESC 
                 LIMIT 10
             )

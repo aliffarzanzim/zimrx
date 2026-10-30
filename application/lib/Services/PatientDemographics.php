@@ -56,6 +56,36 @@ final class PatientDemographics
         'Others',
     ];
 
+    /** @var list<string> */
+    public const MARITAL_STATUSES = [
+        'Single',
+        'Married',
+        'Divorced',
+        'Widowed',
+        'Separated',
+        'Others',
+    ];
+
+    /** @var list<string> */
+    public const EMERGENCY_RELATIONS = [
+        'Father',
+        'Mother',
+        'Spouse',
+        'Brother',
+        'Sister',
+        'Son',
+        'Daughter',
+        'Friend',
+        'Guardian',
+        'Other',
+    ];
+
+    /** @var list<string> */
+    public const DOB_TYPES = [
+        'exact',
+        'estimated',
+    ];
+
     /**
      * @return list<string>
      */
@@ -102,5 +132,29 @@ final class PatientDemographics
     public static function referralTypes(): array
     {
         return self::REFERRAL_TYPES;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function maritalStatuses(): array
+    {
+        return self::MARITAL_STATUSES;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function emergencyRelations(): array
+    {
+        return self::EMERGENCY_RELATIONS;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function dobTypes(): array
+    {
+        return self::DOB_TYPES;
     }
 }

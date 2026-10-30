@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/init.php';
 require_login();
+require_once ZIMRX_BASE_DIR . '/lib/print_setup_lib.php';
 
 header('Content-Type: application/json');
 
@@ -24,17 +25,34 @@ try {
     $filename = basename(trim((string)($_POST['filename'] ?? '')));
     if ($filename === '') throw new RuntimeException('No filename provided.');
 
-    // Only allow filenames that belong to the current doctor
-    $doctorId = current_user_doctor_id();
-    $prefix   = 'doctor-' . $doctorId . '-';
-    if (!str_starts_with($filename, $prefix)) {
-        throw new RuntimeException('Not authorized to delete this file.');
+    $profile = (new \ZimRx\Services\PracticeProfileService($pdo))->activeForCurrentUser();
+    $profileId = (int)($profile['id'] ?? 0);
+    if ($profileId <= 0) {
+        throw new RuntimeException('An active practice profile is required.');
+    }
+    $header = zimrx_print_load_header_settings($pdo, $profileId);
+    $configuredPath = trim((string)($header['logo_path'] ?? ''));
+    if (basename((string)(parse_url($configuredPath, PHP_URL_PATH) ?? '')) !== $filename ||
+        !str_starts_with((string)(parse_url($configuredPath, PHP_URL_PATH) ?? ''), '/uploads/header-logos/')) {
+        throw new RuntimeException('The requested logo is not assigned to this practice profile.');
     }
 
-    $targetPath = ZIMRX_UPLOADS_DIR . '/header-logos/' . $filename;
-    if (!file_exists($targetPath)) throw new RuntimeException('File not found.');
-
-    if (!unlink($targetPath)) throw new RuntimeException('Could not delete file.');
+    zimrx_print_save_setup($pdo, $profileId, ['logo_path' => '']);
+    $references = $pdo->prepare(
+        'SELECT COUNT(*) FROM zimrx_doctor_profiles
+         WHERE id <> :profile_id AND is_deleted = 0 AND settings_json LIKE :path'
+    );
+    $references->execute([
+        'profile_id' => $profileId,
+        'path' => '%' . $configuredPath . '%',
+    ]);
+    if ((int)$references->fetchColumn() === 0) {
+        $root = realpath(ZIMRX_USERDATA_DIR);
+        $target = realpath(ZIMRX_UPLOADS_DIR . '/header-logos/' . $filename);
+        if ($root !== false && $target !== false && str_starts_with($target, $root . DIRECTORY_SEPARATOR) && is_file($target)) {
+            @unlink($target);
+        }
+    }
 
     echo json_encode(['ok' => true]);
 } catch (Throwable $e) {

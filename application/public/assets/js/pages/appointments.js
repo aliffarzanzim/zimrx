@@ -4,8 +4,6 @@
     if (bootstrapEl) {
         try {
             const data = JSON.parse(bootstrapEl.textContent || '{}');
-            if (data.role !== undefined) window.ZIMRX_APPOINTMENT_ROLE = data.role;
-            if (data.doctors !== undefined) window.ZIMRX_APPOINTMENT_DOCTORS = data.doctors;
             if (data.initial !== undefined) window.ZIMRX_APPOINTMENT_INITIAL = data.initial;
         } catch (e) {
             console.error('Failed to parse appointment bootstrap data', e);
@@ -25,9 +23,6 @@
     const lookupStatus = field('patient-lookup-status');
 
     const api = 'api/appointments.php';
-    const role = String(window.ZIMRX_APPOINTMENT_ROLE || '').toLowerCase();
-    const isAssistant = role === 'assistant';
-    const appointmentDoctors = Array.isArray(window.ZIMRX_APPOINTMENT_DOCTORS) ? window.ZIMRX_APPOINTMENT_DOCTORS : [];
     const initialState = window.ZIMRX_APPOINTMENT_INITIAL && typeof window.ZIMRX_APPOINTMENT_INITIAL === 'object'
         ? window.ZIMRX_APPOINTMENT_INITIAL
         : {};
@@ -67,24 +62,13 @@
 
     const getValue = (id) => (field(id)?.value || '').trim();
 
-    const getActiveDoctorId = () => getValue('active-doctor-id');
-
-    const needsDoctorSelection = () => isAssistant && appointmentDoctors.length > 1 && getActiveDoctorId() === '';
-
     const apiUrl = (params = {}) => {
         const search = new URLSearchParams(params);
-        const doctorId = getActiveDoctorId();
-        if (doctorId) {
-            search.set('doctor_id', doctorId);
-        }
         const query = search.toString();
         return query ? `${api}?${query}` : api;
     };
 
-    const apiPayload = (payload = {}) => ({
-        ...payload,
-        doctor_id: getActiveDoctorId()
-    });
+    const apiPayload = (payload = {}) => ({ ...payload });
 
 
 
@@ -120,7 +104,6 @@
     const values = () => {
         const referral = window.PatientParticulars?.getReferralPayload() || { category: 'self', name: '' };
         return {
-            doctor_id: getActiveDoctorId(),
             id: getValue('appointment-id'),
             patient_id: getValue('patient-id'),
             appointment_no: getValue('appointment-no'),
@@ -131,11 +114,17 @@
             age: getValue('patient-age'),
             age_unit: getValue('patient-age-unit'),
             dob: getIsoDate('patient-dob'),
+            dob_type: getValue('patient-dob-type') || 'exact',
             gender: getValue('patient-gender'),
             blood_group: getValue('patient-blood-group'),
+            marital_status: getValue('patient-marital-status'),
             mobile: getValue('patient-mobile'),
+            email: getValue('patient-email'),
+            nid_no: getValue('patient-nid-no'),
+            passport_no: getValue('patient-passport-no'),
             occupation: getValue('patient-occupation'),
             address: getValue('patient-address'),
+            extra_demographics: window.PatientParticulars?.getExtraDemographics?.() || {},
             weight: getValue('patient-weight'),
             weight_unit: getValue('patient-weight-unit'),
             height: getValue('patient-height'),
@@ -164,7 +153,6 @@
         closeList('reg-list', 'reg-wrapper');
         closeList('occupation-list', 'occ-wrapper');
         closeList('address-list', 'address-wrapper');
-        closeList('appointment-doctor-list', 'appointment-doctor-wrapper');
     };
 
     const updateActiveListItem = (items, index) => {
@@ -207,10 +195,6 @@
     };
 
     const requestNextIdentifiers = () => {
-        if (needsDoctorSelection()) {
-            setLookupStatus('Select a doctor first.');
-            return Promise.resolve();
-        }
         const date = getIsoDate('appointment-date') || getIsoDate('appointment-date-filter');
         return fetch(apiUrl({ action: 'next_reg', date }))
             .then((res) => res.json())
@@ -285,7 +269,11 @@
         input.dataset.dateTriggerReady = '1';
     };
 
-    const initDatePickers = () => {
+    const initDatePickers = (root = document) => {
+        if (window.ZimRxDatePicker) {
+            window.ZimRxDatePicker.init(root);
+            return;
+        }
         document.querySelectorAll('.custom-date-picker').forEach((input) => {
             if (typeof flatpickr !== 'function' || input._flatpickr) return;
             flatpickr(input, {
@@ -294,6 +282,7 @@
                 disableMobile: true,
                 onChange: (_dates, dateStr) => {
                     input.value = dateStr;
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
                     input.dispatchEvent(new Event('change', { bubbles: true }));
                 }
             });
@@ -544,7 +533,6 @@
     };
 
     const loadSettings = () => {
-        if (needsDoctorSelection()) return Promise.resolve();
         return fetch(apiUrl({ action: 'settings' }))
         .then((res) => res.json())
         .then((data) => {
@@ -647,12 +635,6 @@
         updateQueueDateLabel();
         count.textContent = `${items.length} appointment${items.length === 1 ? '' : 's'}`;
 
-        if (needsDoctorSelection()) {
-            count.textContent = 'Select doctor';
-            list.innerHTML = '<tr><td colspan="12" class="empty-appointments">Select a doctor to load appointments.</td></tr>';
-            return;
-        }
-
         if (!items.length) {
             list.innerHTML = '<tr><td colspan="12" class="empty-appointments">No appointments for this date.</td></tr>';
             return;
@@ -700,17 +682,9 @@
     };
 
     const loadAppointments = () => {
-        if (needsDoctorSelection()) {
-            renderRows([]);
-            return Promise.resolve();
-        }
         return fetch(apiUrl({ date: getIsoDate('appointment-date-filter') }))
         .then((res) => res.json())
         .then((data) => {
-            if (data.needs_doctor) {
-                renderRows([]);
-                return;
-            }
             currentSettings = data.settings || currentSettings;
             renderRows(data.appointments || []);
             if (!getValue('appointment-id') && !getValue('appointment-no')) {
@@ -737,65 +711,6 @@
             body: JSON.stringify(apiPayload({ action: 'delete', id }))
         }).then(loadAppointments);
     };
-
-
-    const renderDoctorOptions = () => {
-        const search = field('appointment-doctor-search');
-        const doctorList = field('appointment-doctor-list');
-        if (!search || !doctorList) return;
-        const term = search.value.trim().toLowerCase();
-        doctorList.innerHTML = '';
-        appointmentDoctors
-            .filter((doctor) => String(doctor.display_name || '').toLowerCase().includes(term))
-            .slice(0, 20)
-            .forEach((doctor) => {
-                const li = document.createElement('li');
-                li.className = 'patient-lookup-option';
-                li.innerHTML = `<strong>${escapeHtml(doctor.display_name || '')}</strong><span>${escapeHtml(doctor.doctor_code || '')}${doctor.specialty ? ' | ' + escapeHtml(doctor.specialty) : ''}</span>`;
-                li.addEventListener('mousedown', (event) => {
-                    event.preventDefault();
-                    setValue('active-doctor-id', doctor.id || '');
-                    setValue('appointment-doctor-search', doctor.display_name || '');
-                    closeList('appointment-doctor-list', 'appointment-doctor-wrapper');
-                    discountCausesLoaded = false;
-                    setForm();
-                    loadSettings();
-                    loadAppointments();
-                });
-                doctorList.appendChild(li);
-            });
-        if (doctorList.children.length) {
-            if (doctorList.firstElementChild) {
-                doctorList.firstElementChild.classList.add('active');
-            }
-            doctorList.classList.add('show');
-            field('appointment-doctor-wrapper')?.classList.add('open');
-        } else {
-            closeList('appointment-doctor-list', 'appointment-doctor-wrapper');
-        }
-    };
-
-    const initDoctorSelector = () => {
-        const search = field('appointment-doctor-search');
-        if (!search) return;
-        if (appointmentDoctors.length === 1) {
-            setValue('active-doctor-id', appointmentDoctors[0].id || '');
-            setValue('appointment-doctor-search', appointmentDoctors[0].display_name || '');
-            return;
-        }
-        search.addEventListener('input', () => {
-            setValue('active-doctor-id', '');
-            renderDoctorOptions();
-            renderRows([]);
-        });
-        search.addEventListener('focus', renderDoctorOptions);
-        search.addEventListener('click', renderDoctorOptions);
-        search.addEventListener('keydown', (e) => handleListKeydown(e, 'appointment-doctor-list', 'appointment-doctor-wrapper'));
-        search.addEventListener('blur', () => {
-            window.setTimeout(() => closeList('appointment-doctor-list', 'appointment-doctor-wrapper'), 120);
-        });
-    };
-
     const refreshAppointments = () => {
         const button = field('appointment-refresh');
         button?.classList.add('appointment-refreshing');
@@ -814,15 +729,6 @@
                 zrxShowFieldValidation(field('patient-name'), 'Please fill out this field.');
             } else {
                 field('patient-name')?.focus();
-            }
-            return;
-        }
-        if (needsDoctorSelection()) {
-            if (typeof zrxShowFieldValidation === 'function' && field('appointment-doctor-search')) {
-                zrxShowFieldValidation(field('appointment-doctor-search'), 'Please select a doctor first.');
-            } else {
-                alert('Please select a doctor first.');
-                field('appointment-doctor-search')?.focus();
             }
             return;
         }
@@ -988,7 +894,6 @@
     field('appointment-reset').addEventListener('click', () => setForm());
 
     initDatePickers();
-    initDoctorSelector();
     loadSettings();
     window.PatientParticulars?.init({
         baseDateId: 'appointment-date',
@@ -1034,105 +939,32 @@
         }
     })();
 
-function switchAppointmentTab(tab) {
-    const isQueue = tab === 'queue';
-    const btnQueue = document.getElementById('btn-tab-queue');
-    const btnFollowup = document.getElementById('btn-tab-followup');
-    const panelQueue = document.getElementById('panel-tab-queue');
-    const panelFollowup = document.getElementById('panel-tab-followup');
-
-    if (btnQueue) {
-        btnQueue.classList.toggle('active', isQueue);
-        btnQueue.setAttribute('aria-selected', isQueue ? 'true' : 'false');
-    }
-    if (btnFollowup) {
-        btnFollowup.classList.toggle('active', !isQueue);
-        btnFollowup.setAttribute('aria-selected', !isQueue ? 'true' : 'false');
-    }
-    if (panelQueue) panelQueue.hidden = !isQueue;
-    if (panelFollowup) panelFollowup.hidden = isQueue;
-
-    try {
-        if (history.replaceState) {
-            history.replaceState(null, null, isQueue ? '#appointments' : '#followups');
-        }
-    } catch (e) {}
-}
-
-function getCurrentFollowupFilter() {
-    const activeChip = document.querySelector('.followup-chip-btn.active');
-    return activeChip ? (activeChip.getAttribute('data-filter') || 'all') : 'all';
-}
-
-function filterFollowupStatus(status, btn) {
-    if (btn) {
-        document.querySelectorAll('.followup-chip-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-    }
-    const targetFilter = status || getCurrentFollowupFilter();
-
-    const rows = document.querySelectorAll('#followup-table-body tr.followup-row');
-    const query = (document.getElementById('followup-search-input')?.value || '').toLowerCase().trim();
-    let visibleCount = 0;
-
-    rows.forEach(row => {
-        const rowStatus = row.getAttribute('data-status') || '';
-        const rowText = row.textContent.toLowerCase();
-        const matchesStatus = (targetFilter === 'all' || rowStatus === targetFilter);
-        const matchesQuery = !query || rowText.includes(query);
-        const show = matchesStatus && matchesQuery;
-        row.style.display = show ? '' : 'none';
-        if (show) visibleCount++;
-    });
-
-    const countLabel = document.getElementById('followup-count-label');
-    if (countLabel) {
-        countLabel.textContent = `${visibleCount} scheduled follow-up${visibleCount === 1 ? '' : 's'}`;
-    }
-}
-
-function quickQueueFollowup(p) {
-    switchAppointmentTab('queue');
-    if (!p) return;
-
-    if (p.reg_no) {
-        const regInput = document.getElementById('patient-reg-no');
-        if (regInput) {
-            regInput.value = p.reg_no;
-            regInput.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-    }
-    if (p.patient_name) {
-        const nameInput = document.getElementById('patient-name');
-        if (nameInput) nameInput.value = p.patient_name;
-    }
-    if (p.mobile) {
-        const mobInput = document.getElementById('patient-mobile');
-        if (mobInput) mobInput.value = p.mobile;
-    }
-    if (p.age) {
-        const ageInput = document.getElementById('patient-age');
-        if (ageInput) ageInput.value = p.age;
-    }
-    if (p.gender) {
-        const genderSelect = document.getElementById('patient-gender');
-        if (genderSelect) genderSelect.value = p.gender;
-    }
-    if (p.address) {
-        const addrInput = document.getElementById('patient-address');
-        if (addrInput) addrInput.value = p.address;
-    }
-
-    const formCard = document.getElementById('appointment-form');
-    if (formCard) {
-        formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        formCard.style.outline = '3px solid #2563eb';
-        setTimeout(() => { formCard.style.outline = ''; }, 1800);
-    }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
-    if (window.location.hash === '#followups' || window.location.hash === '#followup') {
-        switchAppointmentTab('followup');
-    }
+    const patient = window.ZIMRX_APPOINTMENT_INITIAL?.queue_followup;
+    const form = document.getElementById('appointment-form');
+    if (!patient || !form) return;
+
+    const setValue = (id, value) => {
+        const field = document.getElementById(id);
+        if (!field || value === undefined || value === null) return;
+        field.value = value;
+        if (field.tagName === 'SELECT' && field.dataset.zrxEnhanced === 'true') {
+            const label = document.getElementById(`zrx-wrap-${id}`)?.querySelector('.zrx-select-label');
+            if (label) label.textContent = field.selectedOptions[0]?.text || '--';
+        }
+        field.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+
+    setValue('patient-reg-no', patient.reg_no);
+    document.getElementById('patient-reg-no')?.dispatchEvent(new Event('input', { bubbles: true }));
+    setValue('patient-name', patient.patient_name);
+    setValue('patient-mobile', patient.mobile);
+    setValue('patient-age', patient.age);
+    setValue('patient-gender', patient.gender);
+    setValue('patient-address', patient.address);
+    setValue('patient-id', patient.patient_id);
+
+    form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    form.style.outline = '3px solid #2563eb';
+    window.setTimeout(() => { form.style.outline = ''; }, 1800);
 });

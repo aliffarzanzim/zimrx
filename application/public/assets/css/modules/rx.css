@@ -83,16 +83,6 @@
     border-color: var(--zrx-blue-300);
     color: var(--zrx-blue-800);
 }
-body.rx-warnings-disabled .rx-info-bar {
-    height: 38px;
-    min-height: 38px;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    overflow: hidden;
-}
-body.rx-warnings-disabled .rx-info-empty {
-    min-height: 100%;
-}
 .rx-symbol { font-size: 1.8rem; font-weight: 700; font-family: serif; color: var(--zrx-text-main); line-height: 1; padding-right: 0.2rem; text-shadow: 0 1px 1px rgba(255,255,255,0.5); }
 .rx-search-group { display: flex; gap: 0.75rem; flex: 1; margin-left: 1rem; }
 .rx-search-box { position: relative; flex: 1; }

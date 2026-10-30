@@ -36,12 +36,22 @@ final class PatientIpsExportService
         return null;
     }
 
-    public function exportPatientIps(int $patientId, int $doctorId = 1, ?int $visitId = null): array
+    public function exportPatientIps(int $patientId, int $doctorId, int $profileId, ?int $visitId = null): array
     {
+        if ($patientId <= 0 || $doctorId <= 0 || $profileId <= 0) {
+            throw new RuntimeException('A valid patient, doctor, and active profile are required.');
+        }
         $stmt = $this->userdataDb->prepare(
-            'SELECT * FROM zimrx_patients WHERE id = :id AND doctor_id = :doctor_id LIMIT 1'
+            'SELECT * FROM zimrx_patients p
+             WHERE p.id = :id AND p.doctor_id = :doctor_id
+               AND (p.profile_id = :profile_id OR p.profile_id IN (
+                   SELECT source_profile.id FROM zimrx_doctor_profiles source_profile
+                   WHERE source_profile.doctor_id = :share_doctor_id
+                     AND source_profile.is_active = 1 AND source_profile.is_deleted = 0
+                     AND source_profile.share_patient_particulars = 1
+               )) LIMIT 1'
         );
-        $stmt->execute(['id' => $patientId, 'doctor_id' => $doctorId]);
+        $stmt->execute(['id' => $patientId, 'doctor_id' => $doctorId, 'profile_id' => $profileId, 'share_doctor_id' => $doctorId]);
         $patient = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$patient) {
@@ -49,16 +59,16 @@ final class PatientIpsExportService
         }
 
         $doctor = $this->fetchDoctor($doctorId);
-        $medications = $this->fetchPrescribedDrugs($patientId, $doctorId, $visitId);
-        $diagnoses = $this->fetchClinicalDiagnoses($patientId, $doctorId, $visitId);
-        $vitals = $this->fetchVisitVitals($patientId, $doctorId, $visitId);
+        $medications = $this->fetchPrescribedDrugs($patientId, $doctorId, $visitId, $profileId);
+        $diagnoses = $this->fetchClinicalDiagnoses($patientId, $doctorId, $visitId, $profileId);
+        $vitals = $this->fetchVisitVitals($patientId, $doctorId, $visitId, $profileId);
 
         return $this->assembleIpsBundle($patient, $doctor, $medications, $diagnoses, $vitals);
     }
 
-    public function exportPatientIpsJson(int $patientId, int $doctorId = 1, ?int $visitId = null, bool $pretty = true): string
+    public function exportPatientIpsJson(int $patientId, int $doctorId, int $profileId, ?int $visitId = null, bool $pretty = true): string
     {
-        $bundle = $this->exportPatientIps($patientId, $doctorId, $visitId);
+        $bundle = $this->exportPatientIps($patientId, $doctorId, $profileId, $visitId);
         $flags = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
         if ($pretty) {
             $flags |= JSON_PRETTY_PRINT;
@@ -68,44 +78,38 @@ final class PatientIpsExportService
 
     private function fetchDoctor(int $doctorId): array
     {
-        try {
-            $stmt = $this->userdataDb->prepare('SELECT * FROM zimrx_doctors WHERE id = :id LIMIT 1');
-            $stmt->execute(['id' => $doctorId]);
-            $doc = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($doc) {
-                return $doc;
-            }
-        } catch (Throwable) {
+        $stmt = $this->userdataDb->prepare('SELECT * FROM zimrx_doctors WHERE id = :id LIMIT 1');
+        $stmt->execute(['id' => $doctorId]);
+        $doctor = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$doctor) {
+            throw new RuntimeException("Doctor ID {$doctorId} was not found.");
         }
-
-        return [
-            'id' => $doctorId,
-            'doctor_name' => 'Attending Physician',
-            'degrees' => 'MBBS',
-            'specialty' => 'General Medicine',
-            'license_no' => ''
-        ];
+        return $doctor;
     }
 
-    private function fetchPrescribedDrugs(int $patientId, int $doctorId, ?int $visitId): array
+    private function fetchPrescribedDrugs(int $patientId, int $doctorId, ?int $visitId, int $profileId): array
     {
-        $sql = 'SELECT * FROM zimrx_prescription_drugs WHERE patient_id = :patient_id AND doctor_id = :doctor_id';
-        $params = ['patient_id' => $patientId, 'doctor_id' => $doctorId];
+        $sql = 'SELECT pd.* FROM zimrx_prescription_drugs pd
+                INNER JOIN zimrx_visits v ON v.id = pd.visit_id AND v.doctor_id = pd.doctor_id
+                WHERE pd.patient_id = :patient_id AND pd.doctor_id = :doctor_id
+                  AND (v.profile_id = :profile_id OR v.profile_id IN (
+                      SELECT source_profile.id FROM zimrx_doctor_profiles source_profile
+                      WHERE source_profile.doctor_id = :share_doctor_id
+                        AND source_profile.is_active = 1 AND source_profile.is_deleted = 0
+                        AND source_profile.share_prescriptions = 1
+                  ))';
+        $params = ['patient_id' => $patientId, 'doctor_id' => $doctorId, 'profile_id' => $profileId, 'share_doctor_id' => $doctorId];
 
         if ($visitId !== null && $visitId > 0) {
-            $sql .= ' AND visit_id = :visit_id';
+            $sql .= ' AND pd.visit_id = :visit_id';
             $params['visit_id'] = $visitId;
         }
 
-        $sql .= ' ORDER BY id DESC';
+        $sql .= ' ORDER BY pd.id DESC';
 
-        try {
-            $stmt = $this->userdataDb->prepare($sql);
-            $stmt->execute($params);
-            $drugs = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-        } catch (Throwable) {
-            $drugs = [];
-        }
+        $stmt = $this->userdataDb->prepare($sql);
+        $stmt->execute($params);
+        $drugs = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
         $drugDb = $this->getDrugDb();
         if ($drugDb !== null && !empty($drugs)) {
@@ -164,51 +168,66 @@ final class PatientIpsExportService
         return $drugs;
     }
 
-    private function fetchClinicalDiagnoses(int $patientId, int $doctorId, ?int $visitId): array
+    private function fetchClinicalDiagnoses(int $patientId, int $doctorId, ?int $visitId, int $profileId): array
     {
-        $findings = [];
-        try {
-            $sql = 'SELECT * FROM zimrx_prescription_clinical_findings 
-                    WHERE doctor_id = :doctor_id AND category IN (\'dx\', \'diagnosis\')';
-            $params = ['doctor_id' => $doctorId];
+        $sql = 'SELECT * FROM zimrx_prescription_clinical_findings
+            WHERE doctor_id = :doctor_id AND category IN (\'dx\', \'diagnosis\')
+              AND visit_id IN (
+                  SELECT v.id FROM zimrx_visits v
+                  WHERE v.doctor_id = :visit_doctor_id AND v.patient_id = :patient_id
+                    AND (v.profile_id = :profile_id OR v.profile_id IN (
+                        SELECT source_profile.id FROM zimrx_doctor_profiles source_profile
+                        WHERE source_profile.doctor_id = :share_doctor_id
+                          AND source_profile.is_active = 1 AND source_profile.is_deleted = 0
+                          AND source_profile.share_prescriptions = 1
+                    ))';
+        $params = [
+            'doctor_id' => $doctorId,
+            'visit_doctor_id' => $doctorId,
+            'patient_id' => $patientId,
+            'profile_id' => $profileId,
+            'share_doctor_id' => $doctorId,
+        ];
+        $sql .= ')';
 
             if ($visitId !== null && $visitId > 0) {
-                $sql .= ' AND visit_id = :visit_id';
+                $sql .= ' AND zimrx_prescription_clinical_findings.visit_id = :visit_id';
                 $params['visit_id'] = $visitId;
             }
 
-            $sql .= ' ORDER BY id DESC';
-            $stmt = $this->userdataDb->prepare($sql);
-            $stmt->execute($params);
-            $findings = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-        } catch (Throwable) {
-            $findings = [];
-        }
-
-        return $findings;
+        $sql .= ' ORDER BY id DESC';
+        $stmt = $this->userdataDb->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
-    private function fetchVisitVitals(int $patientId, int $doctorId, ?int $visitId): array
+    private function fetchVisitVitals(int $patientId, int $doctorId, ?int $visitId, int $profileId): array
     {
-        $vitals = [];
-        try {
-            $sql = 'SELECT * FROM zimrx_visit_vitals WHERE patient_id = :patient_id AND doctor_id = :doctor_id';
-            $params = ['patient_id' => $patientId, 'doctor_id' => $doctorId];
+        $sql = 'SELECT vv.* FROM zimrx_visit_vitals vv
+            INNER JOIN zimrx_visits v ON v.id = vv.visit_id AND v.doctor_id = vv.doctor_id
+            WHERE vv.patient_id = :patient_id AND vv.doctor_id = :doctor_id
+              AND (v.profile_id = :profile_id OR v.profile_id IN (
+                  SELECT source_profile.id FROM zimrx_doctor_profiles source_profile
+                  WHERE source_profile.doctor_id = :share_doctor_id
+                    AND source_profile.is_active = 1 AND source_profile.is_deleted = 0
+                    AND source_profile.share_prescriptions = 1
+              ))';
+        $params = [
+            'patient_id' => $patientId,
+            'doctor_id' => $doctorId,
+            'profile_id' => $profileId,
+            'share_doctor_id' => $doctorId,
+        ];
 
             if ($visitId !== null && $visitId > 0) {
-                $sql .= ' AND visit_id = :visit_id';
+                $sql .= ' AND vv.visit_id = :visit_id';
                 $params['visit_id'] = $visitId;
             }
 
-            $sql .= ' ORDER BY id DESC LIMIT 1';
-            $stmt = $this->userdataDb->prepare($sql);
-            $stmt->execute($params);
-            $vitals = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
-        } catch (Throwable) {
-            $vitals = [];
-        }
-
-        return $vitals;
+        $sql .= ' ORDER BY vv.id DESC LIMIT 1';
+        $stmt = $this->userdataDb->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
     }
 
     private function assembleIpsBundle(
@@ -248,15 +267,47 @@ final class PatientIpsExportService
             }
         }
 
+        $identifiers = [
+            [
+                'system' => 'urn:oid:zimrx.patient.reg_no',
+                'value' => (string)($patient['reg_no'] ?? $patient['id'])
+            ]
+        ];
+
+        if (!empty($patient['nid_no'])) {
+            $nidIdentifier = ['value' => (string)$patient['nid_no']];
+            $nidTypeCode = $this->getNationalIdentifierTypeCode();
+            if ($nidTypeCode !== null) {
+                $nidIdentifier['type'] = [
+                    'coding' => [[
+                        'system' => 'http://terminology.hl7.org/CodeSystem/v2-0203',
+                        'code' => $nidTypeCode,
+                        'display' => 'National Person Identifier'
+                    ]]
+                ];
+            }
+            $identifiers[] = $nidIdentifier;
+        }
+
+        if (!empty($patient['passport_no'])) {
+            $identifiers[] = [
+                'type' => [
+                    'coding' => [
+                        [
+                            'system' => 'http://terminology.hl7.org/CodeSystem/v2-0203',
+                            'code' => 'PPN',
+                            'display' => 'Passport Number'
+                        ]
+                    ]
+                ],
+                'value' => (string)$patient['passport_no']
+            ];
+        }
+
         $patientResource = [
             'resourceType' => 'Patient',
             'id' => $patientUuid,
-            'identifier' => [
-                [
-                    'system' => 'urn:oid:zimrx.patient.reg_no',
-                    'value' => (string)($patient['reg_no'] ?? $patient['id'])
-                ]
-            ],
+            'identifier' => $identifiers,
             'name' => [
                 [
                     'text' => (string)$patient['full_name'],
@@ -267,20 +318,114 @@ final class PatientIpsExportService
             'gender' => $gender,
         ];
 
+        $isEstimatedDob = (($patient['dob_type'] ?? '') === 'estimated') || (empty($patient['dob']) && !empty($patient['age']));
         if ($birthDate !== null) {
             $patientResource['birthDate'] = $birthDate;
+            if ($isEstimatedDob) {
+                $patientResource['_birthDate'] = [
+                    'extension' => [
+                        [
+                            'url' => 'http://hl7.org/fhir/StructureDefinition/patient-birthTime-estimated',
+                            'valueBoolean' => true
+                        ]
+                    ]
+                ];
+            }
         }
 
+        $telecom = [];
         if (!empty($patient['mobile'])) {
-            $patientResource['telecom'] = [
-                ['system' => 'phone', 'value' => (string)$patient['mobile']]
-            ];
+            $telecom[] = ['system' => 'phone', 'value' => (string)$patient['mobile'], 'use' => 'mobile'];
+        }
+        if (!empty($patient['email'])) {
+            $telecom[] = ['system' => 'email', 'value' => (string)$patient['email'], 'use' => 'home'];
+        }
+        if (!empty($telecom)) {
+            $patientResource['telecom'] = $telecom;
         }
 
         if (!empty($patient['address'])) {
             $patientResource['address'] = [
                 ['text' => (string)$patient['address']]
             ];
+        }
+
+        if (!empty($patient['marital_status'])) {
+            $msRaw = strtolower(trim((string)$patient['marital_status']));
+            $maritalCoding = match ($msRaw) {
+                'married' => ['system' => 'http://terminology.hl7.org/CodeSystem/v3-MaritalStatus', 'code' => 'M'],
+                'unmarried', 'single' => ['system' => 'http://terminology.hl7.org/CodeSystem/v3-MaritalStatus', 'code' => 'U'],
+                'divorced' => ['system' => 'http://terminology.hl7.org/CodeSystem/v3-MaritalStatus', 'code' => 'D'],
+                'widowed' => ['system' => 'http://terminology.hl7.org/CodeSystem/v3-MaritalStatus', 'code' => 'W'],
+                'separated' => ['system' => 'http://terminology.hl7.org/CodeSystem/v3-MaritalStatus', 'code' => 'L'],
+                'other', 'others' => ['system' => 'http://terminology.hl7.org/CodeSystem/v3-NullFlavor', 'code' => 'OTH'],
+                default => null
+            };
+            $patientResource['maritalStatus'] = ['text' => (string)$patient['marital_status']];
+            if ($maritalCoding !== null) {
+                $patientResource['maritalStatus']['coding'] = [[
+                    ...$maritalCoding,
+                    'display' => ucfirst($msRaw)
+                ]];
+            }
+        }
+
+        $extraJson = $patient['extra_demographics_json'] ?? null;
+        $extra = is_string($extraJson) ? json_decode($extraJson, true) : (is_array($extraJson) ? $extraJson : []);
+        $contacts = [];
+
+        $ec = $extra['emergency_contact'] ?? null;
+        if (is_array($ec) && (!empty($ec['name']) || !empty($ec['mobile']))) {
+            $ecContact = [
+                'relationship' => [
+                    [
+                        'coding' => [
+                            [
+                                'system' => 'http://terminology.hl7.org/CodeSystem/v2-0131',
+                                'code' => 'C',
+                                'display' => 'Emergency Contact'
+                            ]
+                        ],
+                        'text' => (string)(($ec['relation'] ?? '') ?: 'Emergency Contact')
+                    ]
+                ]
+            ];
+            if (!empty($ec['name'])) {
+                $ecContact['name'] = ['text' => (string)$ec['name']];
+            }
+            $ecTelecom = [];
+            if (!empty($ec['mobile'])) {
+                $ecTelecom[] = ['system' => 'phone', 'value' => (string)$ec['mobile'], 'use' => 'mobile'];
+            }
+            if (!empty($ecTelecom)) {
+                $ecContact['telecom'] = $ecTelecom;
+            }
+            if (!empty($ec['address'])) {
+                $ecContact['address'] = ['text' => (string)$ec['address']];
+            }
+            $contacts[] = $ecContact;
+        }
+
+        if (!empty($extra['spouse_name'])) {
+            $contacts[] = [
+                'relationship' => [
+                    [
+                        'coding' => [
+                            [
+                                'system' => 'http://terminology.hl7.org/CodeSystem/v3-RoleCode',
+                                'code' => 'SPS',
+                                'display' => 'Spouse'
+                            ]
+                        ],
+                        'text' => 'Spouse'
+                    ]
+                ],
+                'name' => ['text' => (string)$extra['spouse_name']]
+            ];
+        }
+
+        if (!empty($contacts)) {
+            $patientResource['contact'] = $contacts;
         }
 
         $practitionerResource = [
@@ -719,6 +864,30 @@ final class PatientIpsExportService
             'timestamp' => $nowIso,
             'entry' => $entries
         ];
+    }
+
+    private function getNationalIdentifierTypeCode(): ?string
+    {
+        try {
+            $stmt = $this->userdataDb->prepare(
+                "SELECT config_value FROM zimrx_app_config WHERE config_key = :config_key LIMIT 1"
+            );
+            $stmt->execute(['config_key' => 'practice_country']);
+            $countryCode = strtoupper(trim((string)$stmt->fetchColumn()));
+        } catch (Throwable) {
+            return null;
+        }
+
+        if (!preg_match('/^[A-Z]{2}$/D', $countryCode)) {
+            return null;
+        }
+
+        $iso3 = CountryService::getIso3($countryCode);
+        if (!preg_match('/^[A-Z]{3}$/D', $iso3) || in_array($iso3, ['XUN', 'ZZZ'], true)) {
+            return null;
+        }
+
+        return 'NN' . $iso3;
     }
 
     private function generateUuid(): string

@@ -13,10 +13,11 @@ function checked_attr(string $current, string $target): string {
 
 $page_title = 'ZimRx - Header, Footer & Background Setup';
 $extra_css = ['assets/css/pages/header_footer_background_setup.css'];
-$doctorId = current_user_doctor_id();
+$activeProfile = (new \ZimRx\Services\PracticeProfileService($pdo))->activeForCurrentUser();
+$profileId = (int)($activeProfile['id'] ?? 0);
 
-$header = zimrx_print_load_header_settings($pdo, $doctorId);
-$options = zimrx_print_load_options($pdo, $doctorId);
+$header = zimrx_print_load_header_settings($pdo, $profileId);
+$options = zimrx_print_load_options($pdo, $profileId);
 $hasOnboarded = (int)($options['has_onboarded'] ?? 0);
 
 // Existing doctor check: if not onboarded in settings, but already has a custom header, auto-onboard them
@@ -28,8 +29,7 @@ if ($hasOnboarded === 0 && (trim((string)($header['left_block_html'] ?? '')) !==
             $advancedData = [];
         }
         $advancedData['has_onboarded'] = 1;
-        $pdo->prepare("UPDATE zimrx_prescription_print_layout_settings SET print_settings_json = :json WHERE doctor_id = :doctor_id")
-            ->execute(['json' => json_encode($advancedData), 'doctor_id' => $doctorId]);
+        zimrx_print_save_setup($pdo, $profileId, ['has_onboarded' => '1']);
     } catch (Throwable $e) {
         // Ignore
     }
@@ -73,17 +73,12 @@ include 'header.php';
 ?>
 
 <main class="header-editor-page zrx-page-container">
-    <div class="zps-heading-card">
+    <div class="zps-heading-card zrx-settings-page-hero">
         <div class="zps-heading">
-            <div>
+            <div class="zrx-settings-page-hero-copy">
+                <a class="zrx-settings-page-back" href="settings.php">Settings</a>
                 <h1>Header, Footer &amp; Background Setup</h1>
                 <p>Customize your prescription header text/image, footer, background watermark, and stamp.</p>
-            </div>
-            <div class="header-editor-heading-actions hfb-flex-gap8">
-                <a href="prescription_preview.php" target="_blank" class="btn btn-outline">Full Preview</a>
-                <a href="page_setup.php" class="btn btn-outline">Page Setup</a>
-                <a href="print_setup.php" class="btn btn-outline">Print Setup</a>
-                <button type="submit" form="zimrx-header-form" class="btn btn-primary">Save Settings</button>
             </div>
         </div>
     </div>
@@ -455,6 +450,15 @@ include 'header.php';
         </div><!-- end .zrx-lower-layout -->
 
     </form>
+
+    <div class="zrx-settings-page-actions-footer">
+        <div>
+            <a href="prescription_preview.php" target="_blank" class="btn btn-outline">Full Preview</a>
+            <a href="page_setup.php" class="btn btn-outline">Page Setup</a>
+            <a href="print_setup.php" class="btn btn-outline">Print Setup</a>
+            <button type="submit" form="zimrx-header-form" class="btn btn-primary">Save Settings</button>
+        </div>
+    </div>
 
     <!-- Background Image Gallery Modal -->
     <div class="zrx-gallery-overlay is-hidden" id="zrx-gallery-overlay">

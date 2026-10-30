@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-// Help guidelines catalog endpoint: delivers locale-aware workflow guidelines and UI strings.
+// Help guidelines catalog endpoint: delivers locale-aware workflow guidance.
 
 require_once dirname(__DIR__) . '/init.php';
 require_login();

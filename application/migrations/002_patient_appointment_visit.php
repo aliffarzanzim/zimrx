@@ -12,10 +12,15 @@ class Migration002PatientAppointmentVisit {
                 reg_no TEXT,
                 full_name TEXT NOT NULL,
                 dob TEXT,
+                dob_type TEXT DEFAULT 'exact',
                 gender TEXT,
                 blood_group TEXT,
+                marital_status TEXT,
+                email TEXT,
                 address TEXT,
                 mobile TEXT,
+                nid_no TEXT,
+                passport_no TEXT,
                 occupation TEXT,
                 age TEXT,
                 age_unit TEXT,
@@ -26,11 +31,15 @@ class Migration002PatientAppointmentVisit {
                 doctor_id " . DbSql::intType() . ",
                 created_at " . DbSql::timestampColumn() . ",
                 updated_at " . DbSql::timestampColumn() . ",
+                extra_demographics_json TEXT DEFAULT '{}',
                 tracked_metrics_json TEXT DEFAULT '[\"weight\"]'
             )"
         );
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_zimrx_patients_reg_no ON zimrx_patients(reg_no)");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_zimrx_patients_mobile ON zimrx_patients(mobile)");
+        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_zimrx_patients_nid ON zimrx_patients(nid_no)");
+        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_zimrx_patients_passport ON zimrx_patients(passport_no)");
+        $pdo->exec("CREATE INDEX IF NOT EXISTS idx_zimrx_patients_email ON zimrx_patients(email)");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_zimrx_patients_doctor ON zimrx_patients(doctor_id, full_name, mobile)");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_zimrx_patients_doctor_reg ON zimrx_patients(doctor_id, reg_no)");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_patients_reg_no ON zimrx_patients(reg_no)");
@@ -129,11 +138,17 @@ class Migration002PatientAppointmentVisit {
                 age TEXT,
                 age_unit TEXT,
                 dob TEXT,
+                dob_type TEXT DEFAULT 'exact',
                 gender TEXT,
                 blood_group TEXT,
+                marital_status TEXT,
+                email TEXT,
                 mobile TEXT,
+                nid_no TEXT,
+                passport_no TEXT,
                 address TEXT,
                 occupation TEXT,
+                extra_demographics_json TEXT DEFAULT '{}',
                 weight TEXT,
                 weight_unit TEXT,
                 height TEXT,
@@ -237,6 +252,9 @@ class Migration002PatientAppointmentVisit {
                 next_visit TEXT,
                 referred_by TEXT,
                 age_at_visit TEXT,
+                age_unit_at_visit TEXT DEFAULT 'Years',
+                dob_at_visit TEXT,
+                dob_type_at_visit TEXT DEFAULT 'exact',
                 height_at_visit TEXT,
                 height_unit_at_visit TEXT,
                 weight_at_visit TEXT,

@@ -6,13 +6,18 @@ declare(strict_types=1);
 require_once __DIR__ . '/init.php';
 require_login();
 require_once ZIMRX_BASE_DIR . '/lib/print_setup_lib.php';
+require_once ZIMRX_BASE_DIR . '/lib/Services/PrescriptionDrugRenderer.php';
+require_once ZIMRX_BASE_DIR . '/lib/Services/PracticeProfileService.php';
 
 $serverSnapshotJson = 'null';
+$prescriptionRecordFound = false;
 $revisionId  = (int)($_GET['revision_id'] ?? 0);
 $visitParam  = trim((string)($_GET['visit_id'] ?? $_GET['visit_record_id'] ?? ''));
 
-$doctorId = current_user_doctor_id();
-if ($doctorId <= 0) {
+$activePracticeProfile = (new \ZimRx\Services\PracticeProfileService($pdo))->activeForCurrentUser();
+$doctorId = (int)($activePracticeProfile['doctor_id'] ?? 0);
+$profileId = (int)($activePracticeProfile['id'] ?? 0);
+if ($doctorId <= 0 || $profileId <= 0) {
     http_response_code(403);
     exit;
 }
@@ -25,10 +30,17 @@ if ($revisionId > 0) {
              FROM zimrx_visit_revisions r
              INNER JOIN zimrx_visits v ON v.id = r.visit_record_id AND v.doctor_id = :doctor_id
              WHERE r.id = :id
+               AND (v.profile_id = :profile_id OR v.profile_id IN (
+                   SELECT source_profile.id FROM zimrx_doctor_profiles source_profile
+                   WHERE source_profile.doctor_id = :source_doctor_id AND source_profile.is_active = 1
+                     AND source_profile.is_deleted = 0
+                     AND source_profile.share_prescriptions = 1
+               ))
              LIMIT 1'
         );
-        $stmtR->execute(['id' => $revisionId, 'doctor_id' => $doctorId]);
+        $stmtR->execute(['id' => $revisionId, 'doctor_id' => $doctorId, 'profile_id' => $profileId, 'source_doctor_id' => $doctorId]);
         $revRow = $stmtR->fetch(PDO::FETCH_ASSOC);
+        $prescriptionRecordFound = $revRow !== false;
         if ($revRow && !empty($revRow['clinical_snapshot_json'])) {
             $serverSnapshotJson = json_encode(json_decode($revRow['clinical_snapshot_json'], true), JSON_UNESCAPED_UNICODE);
         }
@@ -37,11 +49,19 @@ if ($revisionId > 0) {
     }
 } elseif ($visitParam !== '') {
     try {
-        $stmtS = is_numeric($visitParam)
-            ? $pdo->prepare('SELECT clinical_snapshot_json, prescription_html FROM zimrx_visits WHERE id = :id AND doctor_id = :doctor_id LIMIT 1')
-            : $pdo->prepare('SELECT clinical_snapshot_json, prescription_html FROM zimrx_visits WHERE visit_id = :id AND doctor_id = :doctor_id LIMIT 1');
-        $stmtS->execute(['id' => $visitParam, 'doctor_id' => $doctorId]);
+        $visitSelector = is_numeric($visitParam) ? 'id = :id' : 'visit_id = :id';
+        $stmtS = $pdo->prepare(
+            'SELECT clinical_snapshot_json, prescription_html FROM zimrx_visits
+             WHERE ' . $visitSelector . ' AND doctor_id = :doctor_id
+               AND (profile_id = :profile_id OR profile_id IN (
+                   SELECT source_profile.id FROM zimrx_doctor_profiles source_profile
+                   WHERE source_profile.doctor_id = :source_doctor_id AND source_profile.is_active = 1
+                     AND source_profile.share_prescriptions = 1
+               )) LIMIT 1'
+        );
+        $stmtS->execute(['id' => $visitParam, 'doctor_id' => $doctorId, 'profile_id' => $profileId, 'source_doctor_id' => $doctorId]);
         $visitRow = $stmtS->fetch(PDO::FETCH_ASSOC);
+        $prescriptionRecordFound = $visitRow !== false;
         if ($visitRow && !empty($visitRow['clinical_snapshot_json'])) {
             $serverSnapshotJson = json_encode(json_decode($visitRow['clinical_snapshot_json'], true), JSON_UNESCAPED_UNICODE);
         }
@@ -50,19 +70,9 @@ if ($revisionId > 0) {
     }
 }
 
-function zrx_trim_text(mixed $value): string {
-    if (is_array($value)) {
-        $parts = [];
-        foreach ($value as $item) {
-            $text = zrx_trim_text($item);
-            if ($text !== '') {
-                $parts[] = $text;
-            }
-        }
-        return trim(implode(' ', $parts));
-    }
-
-    return trim(preg_replace('/\s+/u', ' ', (string)$value));
+if (($revisionId > 0 || $visitParam !== '') && !$prescriptionRecordFound) {
+    http_response_code(404);
+    exit('Prescription record not found.');
 }
 
 function zrx_non_empty(mixed $value): bool {
@@ -695,187 +705,6 @@ function zrx_render_left_sections(array $clinical, array $options): string {
     return $html;
 }
 
-function zrx_drug_print_value(array $drug, array $keys, string $fallback = ''): string {
-    foreach ($keys as $key) {
-        $value = zrx_trim_text($drug[$key] ?? '');
-        if ($value !== '') {
-            return $value;
-        }
-    }
-
-    return zrx_trim_text($fallback);
-}
-
-function zrx_drug_brand_for_print(array $drug, array $options): string {
-    $isShort = (string)($options['suffix_prefix_usage'] ?? 'full') === 'short';
-    $keys = $isShort
-        ? ['pres_new_upper', 'prescribe_brand_short', 'full_form_brand_name', 'prescribe_brand_full', 'brand_name', 'brand']
-        : ['full_form_brand_name', 'prescribe_brand_full', 'pres_new_upper', 'prescribe_brand_short', 'brand_name', 'brand'];
-
-    return zrx_drug_print_value($drug, $keys, $drug['brand'] ?? '');
-}
-
-function zrx_drug_generic_for_print(array $drug, array $options): string {
-    $format = (string)($options['print_generic_name_format'] ?? 'plain');
-    $isShort = (string)($options['suffix_prefix_usage'] ?? 'full') === 'short';
-    $plain = zrx_drug_print_value($drug, ['generic_name', 'generic'], $drug['generic'] ?? '');
-
-    if ($format === 'prescribe') {
-        $keys = $isShort
-            ? ['prescribe_generic_short', 'prescribe_generic_full', 'generic_name', 'generic']
-            : ['prescribe_generic_full', 'prescribe_generic_short', 'generic_name', 'generic'];
-        return zrx_drug_print_value($drug, $keys, $plain);
-    }
-
-    if ($format === 'labelled') {
-        $keys = $isShort
-            ? ['labelled_generic_short', 'labelled_generic_full', 'generic_name', 'generic']
-            : ['labelled_generic_full', 'labelled_generic_short', 'generic_name', 'generic'];
-        return zrx_drug_print_value($drug, $keys, $plain);
-    }
-
-    return $plain;
-}
-
-function zrx_drug_number_label(int $number, array $options): string {
-    return match ((string)($options['drug_no_style'] ?? 'period')) {
-        'round_brackets' => '(' . $number . ')',
-        'closing_bracket' => $number . ')',
-        'square_brackets' => '[' . $number . ']',
-        default => $number . '.',
-    };
-}
-
-function zrx_drug_language_value(array $drug, string $field, array $options): string {
-    $language = (string)($options[$field . '_language'] ?? 'bengali');
-    $preferred = zrx_trim_text($drug[$field . '_' . $language] ?? '');
-    return $preferred !== '' ? $preferred : zrx_trim_text($drug[$field] ?? '');
-}
-
-function zrx_render_drug_rows(array $drugs, array $options): string {
-    $displayDrugNo = ($options['display_drug_no'] ?? 'yes') !== 'no';
-    $showGeneric = ($options['disp_generic'] ?? 'yes') === 'yes';
-    $drugBullet = zrx_trim_text($options['drug_bullet'] ?? '');
-    if ($drugBullet === '' || $drugBullet === 'â€¢') {
-        $drugBullet = '•';
-    }
-
-    $html = '';
-    $counter = 1;
-    $isFirstDrug = true;
-    foreach ($drugs as $drug) {
-        if (!is_array($drug)) {
-            continue;
-        }
-
-        $brand = zrx_drug_brand_for_print($drug, $options);
-        $generic = zrx_drug_generic_for_print($drug, $options);
-        $drugRowFormat = (string)($options['drug_row_format'] ?? 'standard');
-
-        $dose = zrx_drug_language_value($drug, 'dose', $options);
-        $instruction = zrx_drug_language_value($drug + ['instruction' => $drug['food'] ?? ''], 'instruction', $options);
-        $duration = zrx_drug_language_value($drug, 'duration', $options);
-
-        if ($brand === '' && $generic === '' && $dose === '' && $instruction === '' && $duration === '') {
-            continue;
-        }
-
-        $isContinuation = ($brand === '' && $generic === '');
-
-        if (!$isContinuation) {
-            if (!$isFirstDrug) {
-                $html .= '<tr class="zrx-drug-gap-row"><td colspan="4" class="zrx-drug-gap">&nbsp;</td></tr>';
-            }
-            $isFirstDrug = false;
-        }
-
-        $drugName = $brand !== '' ? $brand : $generic;
-
-        if (!$isContinuation) {
-            if ($displayDrugNo) {
-                $numberHtml = '<td class="zrx-drug-number">' . preview_escape(zrx_drug_number_label($counter, $options)) . '</td>';
-            } else {
-                $numberHtml = '<td class="zrx-drug-number zrx-drug-bullet">' . preview_escape($drugBullet) . '</td>';
-            }
-        } else {
-            $numberHtml = '<td class="zrx-drug-number"></td>';
-        }
-
-        $isGenericMode = (($options['prescribing_mode'] ?? '') === 'generic') || !empty($drug['is_generic_mode']);
-        $alreadyHasGeneric = ($generic !== '' && stripos($drugName, $generic) !== false);
-        $canShowGenericSubtitle = $showGeneric && $generic !== '' && $generic !== $drugName && !$isGenericMode && !$alreadyHasGeneric;
-
-        if ($drugRowFormat === 'labelled') {
-            $brandFontSize = preview_escape((string)($options['right_font_size'] ?? '11')) . 'pt';
-            $lblGeneric = (string)($options['lbl_generic'] ?? 'Generic Name:');
-            if (trim($lblGeneric) === '') $lblGeneric = 'Generic Name:';
-            $lblBrand = (string)($options['lbl_brand'] ?? 'Brand Name Recommendation:');
-            if (trim($lblBrand) === '') $lblBrand = 'Brand Name Recommendation:';
-            $lblInstruction = (string)($options['lbl_instruction'] ?? 'Instruction:');
-            if (trim($lblInstruction) === '') $lblInstruction = 'Instruction:';
-
-            $html .= '<tr class="zrx-drug-name-row">' . $numberHtml . '<td colspan="3" class="zrx-drug-name-cell">';
-            if ($generic !== '') {
-                $html .= '<div class="zrx-drug-subrow"><span class="zrx-lbl-generic">' . preview_escape($lblGeneric) . ' </span><span class="zrx-drug-generic" data-generic="' . preview_escape($generic) . '" style="font-size: ' . $brandFontSize . '; ' . ($showGeneric ? 'display: inline-block;' : 'display: none;') . '">' . preview_escape($generic) . '</span></div>';
-            }
-            if ($brand !== '' && !$isGenericMode && $brand !== $generic && !$alreadyHasGeneric) {
-                $html .= '<div class="zrx-drug-subrow"><span class="zrx-lbl-brand">' . preview_escape($lblBrand) . ' </span><span class="zrx-drug-brand">' . preview_escape($brand) . '</span></div>';
-            }
-            if ($instruction !== '' || $dose !== '' || $duration !== '') {
-                $visClass = $isContinuation ? ' zrx-vis-hidden' : '';
-                $html .= '<div><span class="zrx-lbl-instruction' . $visClass . '">' . preview_escape($lblInstruction) . ' </span><span class="zrx-drug-dose">' . preview_escape($dose) . '</span><span class="zrx-drug-instruction">' . ($instruction !== '' ? '- ' . preview_escape($instruction) : '') . '</span><span class="zrx-drug-duration">' . ($duration !== '' ? '- ' . preview_escape($duration) : '') . '</span></div>';
-            }
-            $html .= '</td></tr>';
-        } else {
-            if (!$isContinuation) {
-                $html .= '<tr class="zrx-drug-name-row">' . $numberHtml;
-                $html .= '<td colspan="3" class="zrx-drug-name-cell"><span class="zrx-drug-brand">' . preview_escape($drugName) . '</span>';
-                if ($canShowGenericSubtitle) {
-                    $gWrapper = (string)($options['generic_wrapper'] ?? 'none');
-                    $gFormatted = $generic;
-                    if ($gWrapper === 'parentheses') $gFormatted = '(' . $generic . ')';
-                    elseif ($gWrapper === 'brackets') $gFormatted = '[' . $generic . ']';
-                    elseif ($gWrapper === 'hyphen') $gFormatted = '- ' . $generic;
-                    $isBelow = (($options['generic_position'] ?? 'below') === 'below');
-                    $html .= ' <span class="zrx-drug-generic" data-generic="' . preview_escape($generic) . '" style="display: ' . ($isBelow ? 'block' : 'inline-block') . ';">' . preview_escape($gFormatted) . '</span>';
-                }
-                $html .= '</td></tr>';
-            }
-
-            if ($dose !== '' || $instruction !== '' || $duration !== '') {
-                $html .= '<tr class="zrx-drug-detail-row"><td class="zrx-drug-detail-pad"></td><td class="zrx-drug-dose">' . preview_escape($dose) . '</td><td class="zrx-drug-instruction">' . ($instruction !== '' ? '- ' . preview_escape($instruction) : '') . '</td><td class="zrx-drug-duration">' . ($duration !== '' ? '- ' . preview_escape($duration) : '') . '</td></tr>';
-            }
-        }
-
-        if (!$isContinuation) {
-            $counter++;
-        }
-    }
-
-    return $html;
-}
-
-function zrx_render_advice_table(array $items, array $options): string {
-    $rows = [];
-    $language = (string)($options['advice_language'] ?? 'bengali');
-    foreach ($items as $item) {
-        if (is_array($item)) {
-            $item = $item[$language] ?? ($item['value'] ?? '');
-        }
-        $item = zrx_trim_text($item);
-        if ($item === '') {
-            continue;
-        }
-        $rows[] = '<tr><td class="zrx-advice-bullet">▪</td><td>' . preview_escape($item) . '</td></tr>';
-    }
-
-    if (!$rows) {
-        return '';
-    }
-
-    return '<table class="zrx-advice-table"><tbody id="preview-advice-rows"><tr><td colspan="2"><u><b>&#x0989;&#x09AA;&#x09A6;&#x09C7;&#x09B6;&#x0983;</b></u></td></tr>' . implode('', $rows) . '</tbody></table>';
-}
-
 function zrx_render_advice(array $items, array $options): string {
     $table = zrx_render_advice_table($items, $options);
     if ($table === '') {
@@ -885,11 +714,19 @@ function zrx_render_advice(array $items, array $options): string {
     return '<div id="preview-advice-wrap" class="zrx-advice-section">' . $table . '</div>';
 }
 
-$doctorId = current_user_doctor_id();
 global $pdo;
 $pdo = (isset($pdo) && $pdo instanceof PDO) ? $pdo : DbConnections::userdata();
-$header = zimrx_print_load_header_settings($pdo, $doctorId);
-$options = zimrx_print_load_options($pdo, $doctorId);
+$header = zimrx_print_load_header_settings($pdo, $profileId);
+$options = zimrx_print_load_options($pdo, $profileId);
+if (trim((string)($activePracticeProfile['prescription_footer_note'] ?? '')) !== '') {
+    $header['footer_html'] = nl2br(htmlspecialchars((string)$activePracticeProfile['prescription_footer_note'], ENT_QUOTES, 'UTF-8'));
+}
+$storedSnapshot = json_decode($serverSnapshotJson, true);
+[$header, $options] = zimrx_print_restore_saved_snapshot(
+    is_array($storedSnapshot) ? $storedSnapshot : [],
+    $header,
+    $options
+);
 $sampleData = zimrx_print_sample_preview_data($header);
 $headerPayload = zimrx_print_header_preview_payload($header);
 
@@ -1006,7 +843,7 @@ $revisit = trim((string)($clinical['revisit'] ?? ''));
             width: <?= preview_escape((string)($options['header_width'] ?? $pageWidth)) ?>cm;
             border-bottom: <?= ($options['dec_line_top_1'] ?? 'yes') === 'yes' ? '1px solid #000' : 'none' ?>;
             background: <?= $isImageBody ? 'transparent' : '#' . preview_escape((string)$options['bgcolor']) ?>;
-            display: block;
+            display: <?= $showHeader ? 'block' : 'none' ?>;
         }
 
         .zrx-header-layout {
@@ -1175,6 +1012,9 @@ $revisit = trim((string)($clinical['revisit'] ?? ''));
     </style>
 </head>
 <body>
+<div id="patient-layout-warning" class="zrx-print-layout-warning" role="alert" hidden>
+    Patient details exceed the available page area. Increase Patient Info height in Print Setup or reduce the selected printed fields.
+</div>
 <div class="zrx-print-page">
     <div id="preview-watermark-layer" class="zrx-watermark-layer" style="<?= ($bgImagePath !== '' && !$isImageBody) ? "background-image: url('" . preview_escape($bgImagePath) . "'); opacity: " . $bgImageOpacity . "; transform: translate(" . $bgImageOffsetX . "px, " . $bgImageOffsetY . "px) rotate(" . $bgImageAngle . "deg) scale(" . $bgImageScale . ");" : 'display:none;' ?>"></div>
     <?php

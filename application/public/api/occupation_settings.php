@@ -49,13 +49,15 @@ try {
 
         // Load static occupations map
         $staticMap = [];
-        $stmtStatic = $pdo_static->query("SELECT id, name FROM zimrx_static_occupations ORDER BY name ASC");
-        $staticRows = $stmtStatic->fetchAll(PDO::FETCH_ASSOC) ?: [];
-        foreach ($staticRows as $sr) {
-            $staticMap[strtolower(trim((string)$sr['name']))] = [
-                'static_id' => (int)$sr['id'],
-                'name' => trim((string)$sr['name']),
-            ];
+        if (DbSchema::tableExists($pdo_static, 'zimrx_static_occupations')) {
+            $stmtStatic = $pdo_static->query("SELECT id, name FROM zimrx_static_occupations ORDER BY name ASC");
+            $staticRows = $stmtStatic->fetchAll(PDO::FETCH_ASSOC) ?: [];
+            foreach ($staticRows as $sr) {
+                $staticMap[strtolower(trim((string)$sr['name']))] = [
+                    'static_id' => (int)$sr['id'],
+                    'name' => trim((string)$sr['name']),
+                ];
+            }
         }
 
         // Load user occupation records for this doctor
@@ -137,14 +139,26 @@ try {
                     sort_order = :sort_order,
                     updated_at = CURRENT_TIMESTAMP
             ");
-            foreach ($orderedNames as $idx => $n) {
-                $n = trim((string)$n);
-                if ($n === '') continue;
-                $stmt->execute([
-                    'doctor_id' => $doctorId,
-                    'name' => $n,
-                    'sort_order' => $idx + 1
-                ]);
+            $pdo_user->beginTransaction();
+            try {
+                foreach ($orderedNames as $idx => $n) {
+                    if (!is_string($n)) {
+                        throw new InvalidArgumentException('Invalid occupation ordering payload.');
+                    }
+                    $n = trim($n);
+                    if ($n === '') continue;
+                    $stmt->execute([
+                        'doctor_id' => $doctorId,
+                        'name' => $n,
+                        'sort_order' => $idx + 1
+                    ]);
+                }
+                $pdo_user->commit();
+            } catch (Throwable $e) {
+                if ($pdo_user->inTransaction()) {
+                    $pdo_user->rollBack();
+                }
+                throw $e;
             }
         }
         respond(['status' => 'success']);
@@ -214,9 +228,12 @@ try {
         if ($name === '') respond(['status' => 'error', 'message' => 'Invalid name.']);
 
         // Check if it's a static system occupation
-        $checkStatic = $pdo_static->prepare("SELECT id FROM zimrx_static_occupations WHERE LOWER(name) = LOWER(:name) LIMIT 1");
-        $checkStatic->execute(['name' => $name]);
-        $isStatic = (bool)$checkStatic->fetchColumn();
+        $isStatic = false;
+        if (DbSchema::tableExists($pdo_static, 'zimrx_static_occupations')) {
+            $checkStatic = $pdo_static->prepare("SELECT id FROM zimrx_static_occupations WHERE LOWER(name) = LOWER(:name) LIMIT 1");
+            $checkStatic->execute(['name' => $name]);
+            $isStatic = (bool)$checkStatic->fetchColumn();
+        }
 
         if ($isStatic) {
             // Mark as hidden for system occupation

@@ -289,7 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
         frame.contentWindow.postMessage(message, window.location.origin);
     };
 
-    const syncPreviewPatientLabels = () => {
+    const syncPreviewPatientLabels = layout => {
         if (!frame || !frame.contentWindow) return;
 
         const labels = {};
@@ -298,10 +298,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         labels.info_row = textValue('info_row', '2');
         labels.pc_format = textValue('pc_format', 'parentheses');
+        labels.display_pt_info = textValue('display_pt_info', 'yes');
         ['name', 'age', 'sex', 'address', 'mobile', 'weight', 'reg_no', 'date'].forEach(field => {
             labels[`display_${field}`] = textValue(`display_${field}`, 'yes');
             labels[`display_${field}_t`] = textValue(`display_${field}_t`, 'yes');
         });
+        labels.patient_custom_fields_print = Array.from(form.querySelectorAll('[name="patient_custom_fields_print[]"]:checked'))
+            .map(field => field.value);
+        labels.print_layout = layout;
 
         // Sync clinical slot order and module headers
         for (let i = 1; i <= 14; i++) {
@@ -356,13 +360,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const doc = frame ? frame.contentDocument : null;
         if (!doc || !doc.body) return;
         syncPreviewDrugFormat();
-        syncPreviewPatientLabels();
 
         const headerVisible = textValue('preview_header_type', 'with_header') !== 'without_header';
         const footerVisible = textValue('display_footer', 'yes') !== 'no';
         const showRx = textValue('disp_rx', 'yes') === 'yes';
 
         const bodyHeight = Math.max(0, pageHeight - (headerVisible ? headerHeight : 0) - ptInfoHeight - (footerVisible ? footerHeight : 0));
+        syncPreviewPatientLabels({
+            page_height: pageHeight,
+            header_height: headerVisible ? headerHeight : 0,
+            patient_height: ptInfoHeight,
+            footer_height: footerVisible ? footerHeight : 0,
+            left_height: bodyHeight,
+            right_height: bodyHeight
+        });
 
         setPreviewStyle('.zrx-print-page', 'width', `${pageWidth}cm`);
         setPreviewStyle('.zrx-print-page', 'minHeight', `${pageHeight}cm`);
@@ -424,7 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setPreviewStyle('.zrx-header-layout', 'visibility', displayHeader ? 'visible' : 'hidden');
 
         const displayPtInfo = textValue('display_pt_info', 'yes') === 'yes';
-        setPreviewStyle('.zrx-patient-table', 'visibility', displayPtInfo ? 'visible' : 'hidden');
+        setPreviewStyle('.zrx-patient-table, .zrx-patient-custom-fields', 'visibility', displayPtInfo ? 'visible' : 'hidden');
 
         const showBarcode = textValue('display_barcode', 'yes') === 'yes';
         setPreviewStyle('#preview-barcode-wrap', 'display', showBarcode ? 'block' : 'none');

@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "font_format",
+    "aliases":  [
+
+                ],
+    "panel":  "right",
+    "name":  "Font Format",
+    "view":  "font_format.php",
+    "enabled_by_default": true,
+    "default_order":  8
+}

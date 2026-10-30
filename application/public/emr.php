@@ -7,6 +7,7 @@ require_once __DIR__ . '/init.php';
 require_login();
 require_once ZIMRX_BASE_DIR . '/lib/emr_identity_lib.php';
 require_once ZIMRX_BASE_DIR . '/lib/particulars_audit_lib.php';
+require_once ZIMRX_BASE_DIR . '/lib/Services/PracticeProfileService.php';
 
 $page_title = 'EMR - Electronic Medical Records | ZimRx';
 $current_page = 'emr.php';
@@ -57,8 +58,10 @@ function zimrx_calculate_current_age(?string $dob, ?string $fallbackAge, ?string
 
 $userRole = current_user_role();
 $isNonClinical = ($userRole === 'assistant' || $userRole === 'admin');
-$currentDoctorId = current_user_doctor_id();
-if ($currentDoctorId <= 0) {
+$activePracticeProfile = (new \ZimRx\Services\PracticeProfileService($pdo))->activeForCurrentUser();
+$currentProfileId = (int)($activePracticeProfile['id'] ?? 0);
+$currentDoctorId = (int)($activePracticeProfile['doctor_id'] ?? 0);
+if ($currentDoctorId <= 0 || $currentProfileId <= 0) {
     http_response_code(403);
     exit('A doctor scope is required to access the EMR.');
 }
@@ -80,11 +83,11 @@ if ($requestedVisit !== '' || $requestedVisitRecordId > 0) {
     // Active EMR encounter mode
     $viewMode = 'ACTIVE';
     if ($requestedVisitRecordId > 0) {
-        $stmtV = $pdo->prepare("SELECT * FROM zimrx_visits WHERE id = :id AND doctor_id = :did LIMIT 1");
-        $stmtV->execute(['id' => $requestedVisitRecordId, 'did' => $currentDoctorId]);
+        $stmtV = $pdo->prepare("SELECT * FROM zimrx_visits WHERE id = :id AND doctor_id = :did AND profile_id = :profile_id LIMIT 1");
+        $stmtV->execute(['id' => $requestedVisitRecordId, 'did' => $currentDoctorId, 'profile_id' => $currentProfileId]);
     } else {
-        $stmtV = $pdo->prepare("SELECT * FROM zimrx_visits WHERE visit_id = :vid AND doctor_id = :did LIMIT 1");
-        $stmtV->execute(['vid' => $requestedVisit, 'did' => $currentDoctorId]);
+        $stmtV = $pdo->prepare("SELECT * FROM zimrx_visits WHERE visit_id = :vid AND doctor_id = :did AND profile_id = :profile_id LIMIT 1");
+        $stmtV->execute(['vid' => $requestedVisit, 'did' => $currentDoctorId, 'profile_id' => $currentProfileId]);
     }
     $activeVisit = $stmtV->fetch(PDO::FETCH_ASSOC);
 
@@ -95,18 +98,18 @@ if ($requestedVisit !== '' || $requestedVisitRecordId > 0) {
             exit;
         }
 
-        $stmtP = $pdo->prepare("SELECT * FROM zimrx_patients WHERE id = :id AND doctor_id = :did LIMIT 1");
-        $stmtP->execute(['id' => (int)$activeVisit['patient_id'], 'did' => $currentDoctorId]);
+        $stmtP = $pdo->prepare("SELECT * FROM zimrx_patients WHERE id = :id AND doctor_id = :did AND profile_id = :profile_id LIMIT 1");
+        $stmtP->execute(['id' => (int)$activeVisit['patient_id'], 'did' => $currentDoctorId, 'profile_id' => $currentProfileId]);
         $patient = $stmtP->fetch(PDO::FETCH_ASSOC);
 
         // Fetch previous visits for the Past Rx Reference Drawer
         $stmtPast = $pdo->prepare(
             "SELECT v.id, v.visit_id, v.visit_no, v.visit_date
              FROM zimrx_visits v
-             WHERE v.patient_id = :pid AND v.id != :curr_id AND v.doctor_id = :did
+             WHERE v.patient_id = :pid AND v.id != :curr_id AND v.doctor_id = :did AND v.profile_id = :profile_id
              ORDER BY v.visit_date DESC, v.id DESC LIMIT 15"
         );
-        $stmtPast->execute(['pid' => (int)$activeVisit['patient_id'], 'curr_id' => (int)$activeVisit['id'], 'did' => $currentDoctorId]);
+        $stmtPast->execute(['pid' => (int)$activeVisit['patient_id'], 'curr_id' => (int)$activeVisit['id'], 'did' => $currentDoctorId, 'profile_id' => $currentProfileId]);
         $pastVisitsForDrawer = $stmtPast->fetchAll(PDO::FETCH_ASSOC);
     } elseif ($isNonClinical) {
         header('Location: emr.php');
@@ -116,11 +119,27 @@ if ($requestedVisit !== '' || $requestedVisitRecordId > 0) {
     // Patient master profile mode
     $viewMode = 'MASTER';
     if ($requestedPatientId > 0) {
-        $stmtP = $pdo->prepare("SELECT * FROM zimrx_patients WHERE id = :id AND doctor_id = :did LIMIT 1");
-        $stmtP->execute(['id' => $requestedPatientId, 'did' => $currentDoctorId]);
+        $stmtP = $pdo->prepare(
+            "SELECT p.* FROM zimrx_patients p
+             WHERE p.id = :id AND p.doctor_id = :did
+               AND (p.profile_id = :profile_id OR p.profile_id IN (
+                   SELECT source_profile.id FROM zimrx_doctor_profiles source_profile
+                   WHERE source_profile.doctor_id = :source_doctor_id AND source_profile.is_active = 1
+                     AND source_profile.share_patient_particulars = 1
+               )) LIMIT 1"
+        );
+        $stmtP->execute(['id' => $requestedPatientId, 'did' => $currentDoctorId, 'profile_id' => $currentProfileId, 'source_doctor_id' => $currentDoctorId]);
     } else {
-        $stmtP = $pdo->prepare("SELECT * FROM zimrx_patients WHERE reg_no = :reg AND doctor_id = :did LIMIT 1");
-        $stmtP->execute(['reg' => $requestedReg, 'did' => $currentDoctorId]);
+        $stmtP = $pdo->prepare(
+            "SELECT p.* FROM zimrx_patients p
+             WHERE p.reg_no = :reg AND p.doctor_id = :did
+               AND (p.profile_id = :profile_id OR p.profile_id IN (
+                   SELECT source_profile.id FROM zimrx_doctor_profiles source_profile
+                   WHERE source_profile.doctor_id = :source_doctor_id AND source_profile.is_active = 1
+                     AND source_profile.share_patient_particulars = 1
+               )) LIMIT 1"
+        );
+        $stmtP->execute(['reg' => $requestedReg, 'did' => $currentDoctorId, 'profile_id' => $currentProfileId, 'source_doctor_id' => $currentDoctorId]);
     }
     $patient = $stmtP->fetch(PDO::FETCH_ASSOC);
 
@@ -134,9 +153,14 @@ if ($requestedVisit !== '' || $requestedVisitRecordId > 0) {
                     v.id as prescription_id, v.clinical_snapshot_json
              FROM zimrx_visits v
              WHERE v.patient_id = :pid AND v.doctor_id = :did
+               AND (v.profile_id = :profile_id OR v.profile_id IN (
+                   SELECT source_profile.id FROM zimrx_doctor_profiles source_profile
+                   WHERE source_profile.doctor_id = :source_doctor_id AND source_profile.is_active = 1
+                     AND source_profile.share_emr = 1
+               ))
              ORDER BY v.visit_date DESC, v.id DESC"
         );
-        $stmtVisits->execute(['pid' => $patientId, 'did' => $currentDoctorId]);
+        $stmtVisits->execute(['pid' => $patientId, 'did' => $currentDoctorId, 'profile_id' => $currentProfileId, 'source_doctor_id' => $currentDoctorId]);
         $timeline = [];
         while ($v = $stmtVisits->fetch(PDO::FETCH_ASSOC)) {
             $ccList = [];
@@ -171,10 +195,22 @@ if ($requestedVisit !== '' || $requestedVisitRecordId > 0) {
         $stmtAllergies = $pdo->prepare(
             "SELECT DISTINCT pd.generic_name
              FROM zimrx_prescription_drugs pd
-             INNER JOIN zimrx_patients p ON p.id = pd.patient_id AND p.doctor_id = :did
+             INNER JOIN zimrx_visits v ON v.id = pd.visit_id AND v.doctor_id = :visit_doctor_id
+               AND (v.profile_id = :visit_profile_id OR v.profile_id IN (
+                   SELECT source_profile.id FROM zimrx_doctor_profiles source_profile
+                   WHERE source_profile.doctor_id = :visit_source_doctor_id AND source_profile.is_active = 1
+                     AND source_profile.share_prescriptions = 1
+               ))
+             INNER JOIN zimrx_patients p ON p.id = pd.patient_id AND p.doctor_id = :patient_doctor_id
              WHERE pd.patient_id = :pid AND pd.is_history = 1"
         );
-        $stmtAllergies->execute(['pid' => $patientId, 'did' => $currentDoctorId]);
+        $stmtAllergies->execute([
+            'pid' => $patientId,
+            'visit_doctor_id' => $currentDoctorId,
+            'visit_profile_id' => $currentProfileId,
+            'visit_source_doctor_id' => $currentDoctorId,
+            'patient_doctor_id' => $currentDoctorId,
+        ]);
         while ($rowA = $stmtAllergies->fetch(PDO::FETCH_ASSOC)) {
             if (!empty($rowA['generic_name'])) $allergies[] = $rowA['generic_name'];
         }
@@ -185,12 +221,22 @@ if ($requestedVisit !== '' || $requestedVisitRecordId > 0) {
 $recentPatients = [];
 if ($viewMode === 'HUB') {
     $stmtRecent = $pdo->prepare(
-        "SELECT id, reg_no, full_name, mobile, gender, age, age_unit, blood_group, address, updated_at
-         FROM zimrx_patients
-         WHERE doctor_id = :did
-         ORDER BY id DESC LIMIT 12"
+        "SELECT p.id, p.reg_no, p.full_name, p.mobile, p.gender, p.age, p.age_unit, p.blood_group, p.address, p.updated_at
+         FROM zimrx_patients p
+         WHERE p.doctor_id = :did
+           AND (p.profile_id = :profile_id OR p.profile_id IN (
+               SELECT source_profile.id FROM zimrx_doctor_profiles source_profile
+               WHERE source_profile.doctor_id = :source_doctor_id AND source_profile.is_active = 1
+                 AND source_profile.share_patient_particulars = 1
+           ))
+         ORDER BY CASE WHEN p.profile_id = :sort_profile_id THEN 0 ELSE 1 END, p.id DESC LIMIT 12"
     );
-    $stmtRecent->execute(['did' => $currentDoctorId]);
+    $stmtRecent->execute([
+        'did' => $currentDoctorId,
+        'profile_id' => $currentProfileId,
+        'source_doctor_id' => $currentDoctorId,
+        'sort_profile_id' => $currentProfileId,
+    ]);
     $recentPatients = $stmtRecent->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -604,18 +650,14 @@ if ($patient && !empty($patient['id'])) {
         <!-- EMR Hub View -->
 
         <div class="emr-hub-hero">
-            <h2>Electronic Medical Record (EMR) Hub</h2>
-            <p>Scan a patient PVC card, barcode, or search by Master ID (<code>P...</code>), Visit Token (<code>V...</code>), Name, or Mobile number.</p>
+            <h2>Electronic Medical Record</h2>
+            <p>Scan a card, barcode, or search by Reg ID, Visit ID, Name, or Phone number.</p>
             
             <div class="emr-omni-searchbox-wrap">
                 <svg class="emr-omni-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 <input type="text" class="emr-omni-input" id="emr-omni-input" placeholder="Scan Barcode or type Name, Phone, P2610001, V260827001..." autofocus>
             </div>
 
-            <div class="emr-scanner-indicator">
-                <span class="emr-scanner-dot"></span>
-                <span>Hardware Barcode Scanner Ready</span>
-            </div>
         </div>
 
         <div class="emr-timeline-card">

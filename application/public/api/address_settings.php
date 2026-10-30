@@ -255,20 +255,27 @@ try {
     }
 
     if ($action === 'reset') {
-        // Reset preferred districts
-        $stmtDelPref = $pdo_user->prepare("
-            DELETE FROM zimrx_interface_settings 
-            WHERE doctor_id = :doc AND setting_scope = 'prescription' AND setting_key = 'preferred_districts'
-        ");
-        $stmtDelPref->execute(['doc' => $doctorId]);
+        $pdo_user->beginTransaction();
+        try {
+            $stmtDelPref = $pdo_user->prepare("
+                DELETE FROM zimrx_interface_settings
+                WHERE doctor_id = :doc AND setting_scope = 'prescription' AND setting_key = 'preferred_districts'
+            ");
+            $stmtDelPref->execute(['doc' => $doctorId]);
 
-        // Unhide all custom addresses
-        $stmtResetAddr = $pdo_user->prepare("
-            UPDATE zimrx_user_address 
-            SET is_pinned = 0, is_hidden = 0 
-            WHERE doctor_id = :doc
-        ");
-        $stmtResetAddr->execute(['doc' => $doctorId]);
+            $stmtResetAddr = $pdo_user->prepare("
+                UPDATE zimrx_user_address
+                SET is_pinned = 0, is_hidden = 0
+                WHERE doctor_id = :doc
+            ");
+            $stmtResetAddr->execute(['doc' => $doctorId]);
+            $pdo_user->commit();
+        } catch (Throwable $e) {
+            if ($pdo_user->inTransaction()) {
+                $pdo_user->rollBack();
+            }
+            throw $e;
+        }
 
         respond(['ok' => true]);
     }

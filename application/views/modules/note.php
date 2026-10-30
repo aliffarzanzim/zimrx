@@ -64,4 +64,4 @@ declare(strict_types=1);
     </template>
 </div>
 
-<script src="assets/js/modules/note.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/modules/note.js') ?>"></script>
+<script src="assets/js/modules/note.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/modules/note.js') ?>" defer></script>

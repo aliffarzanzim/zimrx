@@ -80,6 +80,7 @@ class ZimRxTestSuite {
         $this->testEmrTimelineBlobOptimizationAndMemoryScaling();
         $this->testPrescriptionPreviewRenderParity();
         $this->testDefaultModuleLayoutSettings();
+        $this->testExtendedPatientDemographicsAndDobSnapshot();
 
         echo "\n--------------------------------------------------------\n";
         echo "Test Results: {$this->passed} passed, {$this->failed} failed\n";
@@ -251,6 +252,23 @@ class ZimRxTestSuite {
         $this->assert(
             DbSchema::tableExists($testPdo, 'zimrx_patient_sequences'),
             "Migration 016 provisions zimrx_patient_sequences table"
+        );
+
+        $this->assert(
+            DbSchema::columnExists($testPdo, 'zimrx_patients', 'dob_type') &&
+            DbSchema::columnExists($testPdo, 'zimrx_patients', 'marital_status') &&
+            DbSchema::columnExists($testPdo, 'zimrx_patients', 'email') &&
+            DbSchema::columnExists($testPdo, 'zimrx_patients', 'nid_no') &&
+            DbSchema::columnExists($testPdo, 'zimrx_patients', 'passport_no') &&
+            DbSchema::columnExists($testPdo, 'zimrx_patients', 'extra_demographics_json'),
+            "Migration 017 provisions extended demographics columns on zimrx_patients"
+        );
+
+        $this->assert(
+            DbSchema::columnExists($testPdo, 'zimrx_visits', 'age_unit_at_visit') &&
+            DbSchema::columnExists($testPdo, 'zimrx_visits', 'dob_at_visit') &&
+            DbSchema::columnExists($testPdo, 'zimrx_visits', 'dob_type_at_visit'),
+            "Migration 017 provisions visit-level age/DOB snapshot columns on zimrx_visits"
         );
 
         require_once __DIR__ . '/../lib/print_setup_lib.php';
@@ -727,6 +745,7 @@ class ZimRxTestSuite {
         $pdo->exec("INSERT INTO zimrx_doctors (id, doctor_code, display_name, full_name_en) VALUES (2, 'D002', 'Dr Beta',  'Dr Beta')");
         $pdo->exec("INSERT OR IGNORE INTO zimrx_patients (id, doctor_id, full_name, reg_no) VALUES (10, 1, 'Patient Alpha', 'PA001')");
         $pdo->exec("INSERT OR IGNORE INTO zimrx_patients (id, doctor_id, full_name, reg_no) VALUES (20, 2, 'Patient Beta',  'PB001')");
+        $pdo->exec("INSERT OR IGNORE INTO zimrx_patients (id, doctor_id, full_name, reg_no) VALUES (30, 0, 'Unassigned Patient', 'PX001')");
         $pdo->exec("INSERT OR IGNORE INTO zimrx_visits (id, doctor_id, patient_id, visit_no) VALUES (100, 1, 10, 1)");
         $pdo->exec("INSERT OR IGNORE INTO zimrx_visits (id, doctor_id, patient_id, visit_no) VALUES (200, 2, 20, 1)");
 
@@ -741,6 +760,7 @@ class ZimRxTestSuite {
 
         // Doctor 1 CANNOT claim Doctor 2's patient (20) even without a visit
         $this->assert(!zimrx_verify_patient_ownership($pdo, 1, 20, 0), 'Forged patient_id belonging to another doctor is rejected');
+        $this->assert(!zimrx_verify_patient_ownership($pdo, 1, 30, 0), 'Unassigned patient ownership is never silently mapped to Doctor 1');
 
         // Doctor 2 legitimately owns patient 20 + visit 200
         $this->assert(zimrx_verify_patient_ownership($pdo, 2, 20, 200), 'Doctor 2 can set active context to their own patient+visit');
@@ -885,7 +905,8 @@ class ZimRxTestSuite {
                 $untypedApis[] = $base;
             }
             if (!in_array($base, $authWhitelist, true)) {
-                $hasAuth = str_contains($content, 'require_login()') 
+                $hasAuth = str_contains($content, 'require_login()')
+                    || str_contains($content, 'is_logged_in()')
                     || str_contains($content, 'current_user_doctor_id()')
                     || str_contains($content, 'require_assistant_or_doctor()');
                 if (!$hasAuth) {
@@ -956,15 +977,38 @@ class ZimRxTestSuite {
 
         // 1. Seed patient, appointment
         $memPdo->exec("INSERT OR IGNORE INTO zimrx_doctors (id, display_name, full_name_en) VALUES (1, 'Dr. Tester', 'Dr. Tester')");
-        $memPdo->exec("INSERT INTO zimrx_patients (id, doctor_id, reg_no, full_name) VALUES (10, 1, 'P-001', 'Test Patient')");
-        $today = date('Y-m-d');
-        $memPdo->exec(
-            "INSERT INTO zimrx_appointments (id, doctor_id, patient_id, appointment_no, appointment_date, patient_name, visit_fee, discount, paid_amount)
-             VALUES (100, 1, 10, 'A-01', '{$today}', 'Test Patient', 500, 50, 450)"
+        $profileId = (int)$memPdo->query('SELECT id FROM zimrx_doctor_profiles WHERE doctor_id = 1 AND is_default = 1')->fetchColumn();
+        $patientInsert = $memPdo->prepare(
+            'INSERT INTO zimrx_patients (id, doctor_id, profile_id, reg_no, full_name)
+             VALUES (:id, :doctor_id, :profile_id, :reg_no, :full_name)'
         );
+        $patientInsert->execute([
+            'id' => 10,
+            'doctor_id' => 1,
+            'profile_id' => $profileId,
+            'reg_no' => 'P-001',
+            'full_name' => 'Test Patient',
+        ]);
+        $today = date('Y-m-d');
+        $appointmentInsert = $memPdo->prepare(
+            'INSERT INTO zimrx_appointments (id, doctor_id, profile_id, patient_id, appointment_no, appointment_date, patient_name, visit_fee, discount, paid_amount)
+             VALUES (:id, :doctor_id, :profile_id, :patient_id, :appointment_no, :appointment_date, :patient_name, :visit_fee, :discount, :paid_amount)'
+        );
+        $appointmentInsert->execute([
+            'id' => 100,
+            'doctor_id' => 1,
+            'profile_id' => $profileId,
+            'patient_id' => 10,
+            'appointment_no' => 'A-01',
+            'appointment_date' => $today,
+            'patient_name' => 'Test Patient',
+            'visit_fee' => 500,
+            'discount' => 50,
+            'paid_amount' => 450,
+        ]);
 
         // 2. Reconcile missing payment atomically
-        $synced = $billingService->reconcileMissingAppointmentPayments(1);
+        $synced = $billingService->reconcileMissingAppointmentPayments(1, $profileId);
         $this->assert($synced === 1, 'BillingService atomically reconciles 1 unbilled paid appointment');
 
         // 3. Verify ledger payment entry created with generated receipt
@@ -977,7 +1021,7 @@ class ZimRxTestSuite {
         $this->assert(!empty($payment['receipt_no']) && str_starts_with($payment['receipt_no'], 'INV-'), 'Receipt number automatically generated');
 
         // 4. Test idempotency (calling again must not duplicate or re-insert)
-        $syncedAgain = $billingService->reconcileMissingAppointmentPayments(1);
+        $syncedAgain = $billingService->reconcileMissingAppointmentPayments(1, $profileId);
         $this->assert($syncedAgain === 0, 'Reconciliation is idempotent (0 records synced on re-run)');
 
         // 5. Test Date Range Presets
@@ -988,7 +1032,7 @@ class ZimRxTestSuite {
         $this->assert($rangeMonth['from'] === date('Y-m-01') && $rangeMonth['to'] === date('Y-m-d'), 'Date range resolver handles this_month preset');
 
         // 6. Test filtered queries and aggregates
-        $result = $billingService->getFilteredTransactions(1, ['from' => date('Y-m-d'), 'to' => date('Y-m-d'), 'status' => 'all']);
+        $result = $billingService->getFilteredTransactions(1, ['from' => date('Y-m-d'), 'to' => date('Y-m-d'), 'status' => 'all'], $profileId);
         $this->assert(count($result['transactions']) === 1, 'Filtered transaction query retrieves seeded transaction');
         $this->assert($result['aggregates']['collected'] === 450.0, 'Filtered aggregates calculate collected revenue accurately');
         $this->assert($result['aggregates']['invoiced'] === 500.0, 'Filtered aggregates calculate invoiced total accurately');
@@ -1081,8 +1125,19 @@ class ZimRxTestSuite {
             \ZimRx\Services\AppointmentService::isoToDmy('2026-09-28') === '28/09/2026',
             "AppointmentService handles bidirectional ISO and DMY date transformations"
         );
-        $apptService = new \ZimRx\Services\AppointmentService(new PDO('sqlite::memory:'));
-        $defaultSettings = $apptService->getSettings(0);
+        $appointmentPdo = new PDO('sqlite::memory:');
+        $appointmentPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $appointmentPdo->exec('CREATE TABLE zimrx_doctor_profiles (id INTEGER, doctor_id INTEGER, is_active INTEGER, is_deleted INTEGER, settings_json TEXT)');
+        $appointmentPdo->exec("INSERT INTO zimrx_doctor_profiles VALUES (11, 1, 1, 0, '{}')");
+        $apptService = new \ZimRx\Services\AppointmentService($appointmentPdo);
+        $invalidProfileRejected = false;
+        try {
+            $apptService->getSettings(0, 0);
+        } catch (InvalidArgumentException) {
+            $invalidProfileRejected = true;
+        }
+        $this->assert($invalidProfileRejected, 'AppointmentService rejects missing profile scope');
+        $defaultSettings = $apptService->getSettings(1, 11);
         $this->assert(
             ($defaultSettings['default_start_time'] ?? '') === '14:00' && ($defaultSettings['minutes_per_patient'] ?? 0) === 5,
             "AppointmentService resolves default 14:00 clinic start time with 5 min slots"
@@ -1161,6 +1216,8 @@ class ZimRxTestSuite {
         // 1. Dual / Brand Mode
         $memDbDual = new PDO('sqlite::memory:');
         $memDbDual->exec("CREATE TABLE zimrx_app_config (config_key TEXT PRIMARY KEY, config_value TEXT)");
+        $memDbDual->exec("CREATE TABLE zimrx_doctor_profiles (id INTEGER PRIMARY KEY, doctor_id INTEGER, profile_name TEXT, address TEXT, phone TEXT, settings_json TEXT, is_active INTEGER, is_deleted INTEGER)");
+        $memDbDual->exec("INSERT INTO zimrx_doctor_profiles VALUES (1, 1, 'Test Practice', '', '', '{}', 1, 0)");
         $memDbDual->exec("INSERT INTO zimrx_app_config VALUES ('prescribing_mode', 'brand')");
         $dualHtml = $renderRx($memDbDual);
         $this->assert(
@@ -1174,6 +1231,8 @@ class ZimRxTestSuite {
         // 2. Single Generic Mode
         $memDbGeneric = new PDO('sqlite::memory:');
         $memDbGeneric->exec("CREATE TABLE zimrx_app_config (config_key TEXT PRIMARY KEY, config_value TEXT)");
+        $memDbGeneric->exec("CREATE TABLE zimrx_doctor_profiles (id INTEGER PRIMARY KEY, doctor_id INTEGER, profile_name TEXT, address TEXT, phone TEXT, settings_json TEXT, is_active INTEGER, is_deleted INTEGER)");
+        $memDbGeneric->exec("INSERT INTO zimrx_doctor_profiles VALUES (1, 1, 'Test Practice', '', '', '{}', 1, 0)");
         $memDbGeneric->exec("INSERT INTO zimrx_app_config VALUES ('prescribing_mode', 'generic')");
         $genericHtml = $renderRx($memDbGeneric);
         $this->assert(
@@ -1191,11 +1250,7 @@ class ZimRxTestSuite {
         $optionsGeneric = zimrx_print_load_options($memDbGeneric, 1);
         $this->assert(($optionsGeneric['prescribing_mode'] ?? '') === 'generic', "zimrx_print_load_options loads generic prescribing_mode");
 
-        $_SESSION['user_id'] = 1;
-        $_SESSION['doctor_id'] = 1;
-        ob_start();
-        include_once __DIR__ . '/../public/prescription_preview.php';
-        ob_end_clean();
+        require_once __DIR__ . '/../lib/Services/PrescriptionDrugRenderer.php';
 
         // 1. Dual Mode with commercial brand: prints (Paracetamol) in brackets
         $htmlDual = zrx_render_drug_rows([
@@ -1448,7 +1503,23 @@ class ZimRxTestSuite {
                 age_unit TEXT,
                 weight TEXT,
                 height TEXT,
-                doctor_id INTEGER
+                doctor_id INTEGER,
+                profile_id INTEGER
+            );
+            CREATE TABLE zimrx_doctor_profiles (
+                id INTEGER PRIMARY KEY,
+                doctor_id INTEGER,
+                is_active INTEGER,
+                is_deleted INTEGER,
+                share_patient_particulars INTEGER,
+                share_prescriptions INTEGER
+            );
+            CREATE TABLE zimrx_visits (
+                id INTEGER PRIMARY KEY,
+                patient_id INTEGER,
+                doctor_id INTEGER,
+                profile_id INTEGER,
+                visit_date TEXT
             );
             CREATE TABLE zimrx_doctors (
                 id INTEGER PRIMARY KEY,
@@ -1497,7 +1568,9 @@ class ZimRxTestSuite {
         ");
 
         $memUserDb->exec("INSERT INTO zimrx_doctors VALUES (1, 'Dr. Alif Farzan', 'MBBS, Clinical Informatics', 'General Practice', 'A-89421')");
-        $memUserDb->exec("INSERT INTO zimrx_patients VALUES (101, 'ZR-2026-001', 'Karim Rahman', '1982-05-14', 'Male', 'B+', 'Dhanmondi, Dhaka', '+8801711000000', 'Engineer', '44', 'years', '72', '175', 1)");
+        $memUserDb->exec("INSERT INTO zimrx_doctor_profiles VALUES (11, 1, 1, 0, 1, 1)");
+        $memUserDb->exec("INSERT INTO zimrx_patients VALUES (101, 'ZR-2026-001', 'Karim Rahman', '1982-05-14', 'Male', 'B+', 'Dhanmondi, Dhaka', '+8801711000000', 'Engineer', '44', 'years', '72', '175', 1, 11)");
+        $memUserDb->exec("INSERT INTO zimrx_visits VALUES (1, 101, 1, 11, '2026-10-30')");
         $memUserDb->exec("INSERT INTO zimrx_prescription_drugs VALUES (1, 1, 1, 101, 1, 1230, 'TAB. METMIN XR 500 mg', 'Metmin XR', 'Metformin Hydrochloride', '500 mg', 'Tablet', '1+0+1', '14 days', 'After meals')");
         $memUserDb->exec("INSERT INTO zimrx_prescription_clinical_findings VALUES (1, 1, 1, 1, 'dx', 'Type 2 Diabetes Mellitus', 'E11.9', '')");
         $memUserDb->exec("INSERT INTO zimrx_visit_vitals VALUES (1, 1, 101, 1, '120/80', '72', '98.4', '98', '16')");
@@ -1506,7 +1579,7 @@ class ZimRxTestSuite {
         $service = new \ZimRx\Services\PatientIpsExportService($memUserDb, $drugDb);
 
         // Export IPS bundle
-        $bundle = $service->exportPatientIps(101, 1);
+        $bundle = $service->exportPatientIps(101, 1, 11);
 
         $this->assert($bundle['resourceType'] === 'Bundle', "IPS export root is standard FHIR Bundle resourceType");
         $this->assert($bundle['type'] === 'document', "IPS export Bundle type is document");
@@ -1573,14 +1646,81 @@ class ZimRxTestSuite {
         // Tenant security check
         $accessBlocked = false;
         try {
-            $service->exportPatientIps(101, 2);
+            $service->exportPatientIps(101, 2, 11);
         } catch (RuntimeException $e) {
             $accessBlocked = true;
         }
         $this->assert($accessBlocked, "PatientIpsExportService enforces doctor tenant scoping (Doctor 2 cannot export Doctor 1's patient)");
 
+        $memUserDb->exec("INSERT INTO zimrx_doctor_profiles VALUES (12, 1, 1, 0, 1, 0)");
+        $memUserDb->exec("INSERT INTO zimrx_visits VALUES (2, 101, 1, 12, '2026-10-28')");
+        $memUserDb->exec("INSERT INTO zimrx_prescription_drugs VALUES (2, 2, 2, 101, 1, 999, 'Other Profile Drug', 'Other Brand', 'Other Generic', '10 mg', 'Tablet', '1 daily', '7 days', 'With water')");
+        $privateProfileBundle = $service->exportPatientIps(101, 1, 11);
+        $privateProfileMedicationCount = count(array_filter(
+            $privateProfileBundle['entry'],
+            static fn(array $entry): bool => ($entry['resource']['resourceType'] ?? '') === 'MedicationStatement'
+        ));
+        $this->assert($privateProfileMedicationCount === 1, 'IPS export excludes another profile prescription when sharing is disabled');
+        $memUserDb->exec('UPDATE zimrx_doctor_profiles SET share_prescriptions = 1 WHERE id = 12');
+        $sharedProfileBundle = $service->exportPatientIps(101, 1, 11);
+        $sharedProfileMedicationCount = count(array_filter(
+            $sharedProfileBundle['entry'],
+            static fn(array $entry): bool => ($entry['resource']['resourceType'] ?? '') === 'MedicationStatement'
+        ));
+        $this->assert($sharedProfileMedicationCount === 2, 'IPS export includes another profile prescription when prescription sharing is enabled');
+
+        // Extended demographics verification in IPS export
+        $memUserDb->exec("ALTER TABLE zimrx_patients ADD COLUMN dob_type TEXT DEFAULT 'exact'");
+        $memUserDb->exec("ALTER TABLE zimrx_patients ADD COLUMN marital_status TEXT DEFAULT ''");
+        $memUserDb->exec("ALTER TABLE zimrx_patients ADD COLUMN email TEXT DEFAULT ''");
+        $memUserDb->exec("ALTER TABLE zimrx_patients ADD COLUMN nid_no TEXT DEFAULT ''");
+        $memUserDb->exec("ALTER TABLE zimrx_patients ADD COLUMN passport_no TEXT DEFAULT ''");
+        $memUserDb->exec("ALTER TABLE zimrx_patients ADD COLUMN extra_demographics_json TEXT DEFAULT '{}'");
+
+        $memUserDb->exec("UPDATE zimrx_patients SET
+            dob_type = 'estimated',
+            marital_status = 'Married',
+            email = 'karim@example.com',
+            nid_no = '19821234567890',
+            passport_no = 'A01234567',
+            extra_demographics_json = '{\"emergency_contact\":{\"name\":\"Nasrin Karim\",\"mobile\":\"+8801722000000\",\"relation\":\"Spouse\",\"address\":\"Dhaka\"},\"spouse_name\":\"Nasrin Karim\"}'
+            WHERE id = 101");
+
+        $bundleWithExtra = $service->exportPatientIps(101, 1, 11);
+        $patientResWithExtra = null;
+        foreach ($bundleWithExtra['entry'] as $e) {
+            if (($e['resource']['resourceType'] ?? '') === 'Patient') {
+                $patientResWithExtra = $e['resource'];
+                break;
+            }
+        }
+
+        $idVals = array_column($patientResWithExtra['identifier'] ?? [], 'value');
+        $this->assert(
+            in_array('19821234567890', $idVals, true) && in_array('A01234567', $idVals, true),
+            "IPS Patient resource exports NID and Passport numbers in identifiers"
+        );
+        $this->assert(
+            ($patientResWithExtra['maritalStatus']['coding'][0]['code'] ?? '') === 'M',
+            "IPS Patient resource exports HL7 v3 MaritalStatus coding 'M' for Married"
+        );
+        $telecomVals = array_column($patientResWithExtra['telecom'] ?? [], 'value');
+        $this->assert(
+            in_array('karim@example.com', $telecomVals, true) && in_array('+8801711000000', $telecomVals, true),
+            "IPS Patient resource exports both mobile and email telecom channels"
+        );
+        $this->assert(
+            !empty($patientResWithExtra['_birthDate']['extension'][0]['valueBoolean']),
+            "IPS Patient resource attaches patient-birthTime-estimated extension when dob_type is estimated"
+        );
+        $contactNames = array_map(fn($c) => $c['name']['text'] ?? '', $patientResWithExtra['contact'] ?? []);
+        $this->assert(
+            in_array('Nasrin Karim', $contactNames, true),
+            "IPS Patient resource maps emergency contact and spouse into contact elements"
+        );
+
         // JSON serialization
-        $json = $service->exportPatientIpsJson(101, 1);
+        $json = $service->exportPatientIpsJson(101, 1, 11);
         $decoded = json_decode($json, true);
         $this->assert(strlen($json) > 1000 && $decoded !== null, "PatientIpsExportService serializes valid, parseable JSON output");
     }
@@ -1774,10 +1914,14 @@ class ZimRxTestSuite {
         );
 
         // Verify print options harmonization with clinical language
-        $userDb->exec("UPDATE zimrx_app_config SET config_value = 'en' WHERE config_key = 'clinical_lang'");
-        $userDb->exec("DELETE FROM zimrx_interface_settings WHERE setting_key = 'clinical_lang' AND doctor_id = 99");
-        $userDb->exec("DELETE FROM zimrx_prescription_print_layout_settings WHERE doctor_id = 99");
-        $enPrintOpts = zimrx_print_load_options($userDb, 99);
+        $printLangDb = new PDO('sqlite::memory:');
+        $printLangDb->exec("CREATE TABLE zimrx_doctor_profiles (id INTEGER PRIMARY KEY, doctor_id INTEGER, profile_name TEXT, address TEXT, phone TEXT, settings_json TEXT, is_active INTEGER, is_deleted INTEGER)");
+        $printLangDb->exec("INSERT INTO zimrx_doctor_profiles VALUES (99, 1, 'Language Test', '', '', '{}', 1, 0)");
+        $printLangDb->exec("CREATE TABLE zimrx_app_config (config_key TEXT PRIMARY KEY, config_value TEXT)");
+        $printLangDb->exec("INSERT INTO zimrx_app_config VALUES ('clinical_lang', 'en')");
+        $_GET['clinical_lang'] = 'en';
+        $enPrintOpts = zimrx_print_load_options($printLangDb, 99);
+        unset($_GET['clinical_lang']);
         $this->assert(
             ($enPrintOpts['dose_language'] ?? '') === 'english'
             && ($enPrintOpts['duration_language'] ?? '') === 'english'
@@ -2117,11 +2261,8 @@ class ZimRxTestSuite {
     private function testPrescriptionPreviewRenderParity(): void {
         echo "\n[29/29] Testing Prescription Live Preview vs. Print Render Engine Parity...\n";
 
-        $_SESSION['user_id'] = 1;
-        $_SESSION['doctor_id'] = 1;
-        ob_start();
-        include_once __DIR__ . '/../public/prescription_preview.php';
-        ob_end_clean();
+        require_once __DIR__ . '/../lib/print_setup_lib.php';
+        require_once __DIR__ . '/../lib/Services/PrescriptionDrugRenderer.php';
 
         // 1. PHP zrx_render_advice_table emits canonical table structure
         $adviceItems = [
@@ -2267,70 +2408,90 @@ NODE;
     private function testDefaultModuleLayoutSettings(): void {
         echo "\n[30/30] Testing Clinical Dashboard Default Layout Configuration & Module Enablement...\n";
 
-        // 1. Verify setup.php defaults and available options
-        $setupContent = (string)file_get_contents(__DIR__ . '/../public/setup.php');
+        // 1. Verify dashboard module discovery, ordering, and safe view resolution
+        $dashboardModules = new \ZimRx\Services\DashboardModules(
+            __DIR__ . '/../views/modules'
+        );
+        $leftOptions = $dashboardModules->availableNames('left');
+        $rightOptions = $dashboardModules->availableNames('right');
+        $sortedLeftOptions = $leftOptions;
+        $sortedRightOptions = $rightOptions;
+        usort($sortedLeftOptions, static fn(string $left, string $right): int => strnatcasecmp($left, $right) ?: strcmp($left, $right));
+        usort($sortedRightOptions, static fn(string $left, string $right): int => strnatcasecmp($left, $right) ?: strcmp($left, $right));
         $this->assert(
-            str_contains($setupContent, '"Note"') && str_contains($setupContent, '"Paediatric History"'),
-            "setup.php maintains Note and Paediatric History in available left elements"
+            in_array('Note', $leftOptions, true) && in_array('Paediatric History', $leftOptions, true)
+            && in_array('Drug Summary & Interaction', $rightOptions, true),
+            "Dashboard manifests expose all supported modules, including modules disabled by default"
         );
         $this->assert(
-            str_contains($setupContent, '"Drug Summary & Interaction"'),
-            "setup.php maintains Drug Summary & Interaction in available right elements"
+            $leftOptions === $sortedLeftOptions && $rightOptions === $sortedRightOptions,
+            "Dashboard module choices are sorted alphabetically"
+        );
+        $clientOptions = $dashboardModules->clientConfig()['available'];
+        $this->assert(
+            $clientOptions['left'][0] === '' && $clientOptions['right'][0] === '',
+            "Dashboard module dropdowns place the none option first"
         );
         $this->assert(
-            preg_match('/\$defaultLeftLayout\s*=\s*\[([^\]]+)\];/', $setupContent, $leftMatches) === 1
-            && !str_contains($leftMatches[1], '"Note"')
-            && !str_contains($leftMatches[1], '"Paediatric History"'),
-            "setup.php default left layout turns off Note and Paediatric History by default"
+            !in_array('Note', $dashboardModules->defaultLayout('left'), true)
+            && !in_array('Paediatric History', $dashboardModules->defaultLayout('left'), true)
+            && !in_array('Drug Summary & Interaction', $dashboardModules->defaultLayout('right'), true),
+            "Dashboard manifest defaults preserve optional modules as disabled"
         );
         $this->assert(
-            preg_match('/\$defaultRightLayout\s*=\s*\[([^\]]+)\];/', $setupContent, $rightMatches) === 1
-            && !str_contains($rightMatches[1], '"Drug Summary & Interaction"'),
-            "setup.php default right layout turns off Drug Summary & Interaction by default"
+            $dashboardModules->canonicalName('O/E') === 'P/E'
+            && $dashboardModules->supportsPanel('P/E', 'left')
+            && $dashboardModules->viewPathFor('P/E') === realpath(__DIR__ . '/../views/modules/pe.php'),
+            "Dashboard manifest aliases resolve only to validated built-in views"
         );
 
-        // 2. Verify prescription.php defaults and file mappings
+        // 2. Verify page consumers use the shared module registry
+        $interfaceSettingsContent = (string)file_get_contents(__DIR__ . '/../public/interface_settings.php');
+        $this->assert(
+            str_contains($interfaceSettingsContent, "new \\ZimRx\\Services\\DashboardModules")
+            && str_contains($interfaceSettingsContent, 'dashboard-module-config'),
+            "interface_settings.php renders module options and client configuration from the registry"
+        );
         $prescriptionContent = (string)file_get_contents(__DIR__ . '/../public/prescription.php');
         $this->assert(
-            preg_match('/\$default_left_layout\s*=\s*\[([^\]]+)\];/s', $prescriptionContent, $pLeftMatches) === 1
-            && !str_contains($pLeftMatches[1], '"Note"')
-            && !str_contains($pLeftMatches[1], '"Paediatric History"'),
-            "prescription.php default left layout turns off Note and Paediatric History by default"
-        );
-        $this->assert(
-            preg_match('/\$default_right_layout\s*=\s*\[([^\]]+)\];/s', $prescriptionContent, $pRightMatches) === 1
-            && !str_contains($pRightMatches[1], '"Drug Summary & Interaction"'),
-            "prescription.php default right layout turns off Drug Summary & Interaction by default"
+            str_contains($prescriptionContent, 'defaultLayout(')
+            && str_contains($prescriptionContent, 'viewPathFor($module_name)'),
+            "prescription.php obtains module defaults and view mappings from manifests"
         );
         $this->assert(
             !str_contains($prescriptionContent, "array_splice(\$right_layout, \$rxIndex + 1, 0, ['Drug Summary & Interaction'])"),
             "prescription.php does not force-inject Drug Summary & Interaction when not enabled"
         );
         $this->assert(
-            str_contains($prescriptionContent, '"Note" => "note.php"')
-            && str_contains($prescriptionContent, '"Paediatric History" => "paediatric.php"')
-            && str_contains($prescriptionContent, '"Drug Summary & Interaction" => "drug_summary.php"'),
-            "prescription.php maintains module file mappings so modules render when enabled from setup.php"
+            !str_contains($prescriptionContent, '$module_file_map = ['),
+            "prescription.php has no duplicate dashboard module file map"
         );
 
-        // 3. Verify JavaScript config.js and dashboard.js
+        // 3. Verify JavaScript config.js receives module data from server-rendered manifests
         $configJsContent = (string)file_get_contents(__DIR__ . '/../public/assets/js/layout/config.js');
         $this->assert(
-            preg_match('/const defaultLeftLayout\s*=\s*\[([^\]]+)\];/s', $configJsContent, $jsLeftMatches) === 1
-            && !str_contains($jsLeftMatches[1], '"Note"')
-            && !str_contains($jsLeftMatches[1], '"Paediatric History"'),
-            "config.js defaultLeftLayout turns off Note and Paediatric History by default"
-        );
-        $this->assert(
-            preg_match('/const defaultRightLayout\s*=\s*\[([^\]]+)\];/s', $configJsContent, $jsRightMatches) === 1
-            && !str_contains($jsRightMatches[1], '"Drug Summary & Interaction"'),
-            "config.js defaultRightLayout turns off Drug Summary & Interaction by default"
+            str_contains($configJsContent, "getElementById('dashboard-module-config')")
+            && !str_contains($configJsContent, 'const availableLeftModules = ['),
+            "config.js contains no duplicated dashboard module lists"
         );
 
         $dashboardJsContent = (string)file_get_contents(__DIR__ . '/../public/assets/js/layout/dashboard.js');
         $this->assert(
             !str_contains($dashboardJsContent, 'next.splice(next.indexOf("Rx") + 1, 0, "Drug Summary & Interaction")'),
             "dashboard.js normalizeRightLayout does not force-inject Drug Summary & Interaction"
+        );
+        $saveLayoutContent = (string)file_get_contents(__DIR__ . '/../public/api/save_interface_layout.php');
+        $this->assert(
+            !str_contains($interfaceSettingsContent, '(20 Max)')
+            && !str_contains($dashboardJsContent, '>= 20')
+            && !str_contains($dashboardJsContent, 'of 20 orders')
+            && !str_contains($saveLayoutContent, 'count($payload[$layoutKey]) > 20'),
+            "dashboard module layouts do not impose a fixed 20-order limit"
+        );
+        $this->assert(
+            str_contains($dashboardJsContent, 'refreshModuleOrderOptions(side)')
+            && str_contains($saveLayoutContent, 'A dashboard module can appear only once per panel'),
+            "dashboard panel selections stay unique and duplicate saves are rejected"
         );
 
         // 4. Verify defensive element guards in note.js and paediatric.js
@@ -2344,6 +2505,103 @@ NODE;
         $this->assert(
             str_contains($paediatricJsContent, "if (!document.getElementById('ph-module-wrapper'))"),
             "paediatric.js guards against missing ph-module-wrapper when disabled by default"
+        );
+    }
+
+    private function testExtendedPatientDemographicsAndDobSnapshot(): void {
+        echo "\n[31/31] Testing Extended Patient Demographics & Medico-Legal DOB/Age Tracking...\n";
+
+        // 1. PatientDemographics service catalog validations
+        $this->assert(
+            class_exists(\ZimRx\Services\PatientDemographics::class),
+            "PatientDemographics service class loads via PSR-4 namespace"
+        );
+        $statuses = \ZimRx\Services\PatientDemographics::maritalStatuses();
+        $this->assert(
+            in_array('Married', $statuses, true) && in_array('Single', $statuses, true),
+            "PatientDemographics provides standard clinical marital status catalog"
+        );
+        $relations = \ZimRx\Services\PatientDemographics::emergencyRelations();
+        $this->assert(
+            in_array('Spouse', $relations, true) && in_array('Father', $relations, true) && in_array('Mother', $relations, true),
+            "PatientDemographics provides emergency contact relationships catalog"
+        );
+        $dobTypes = \ZimRx\Services\PatientDemographics::dobTypes();
+        $this->assert(
+            in_array('exact', $dobTypes, true) && in_array('estimated', $dobTypes, true),
+            "PatientDemographics defines exact and estimated DOB tracking types"
+        );
+
+        // 2. Test patient registration with extended demographics on isolated memory DB
+        $db = new PDO('sqlite::memory:', null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        (new DbMigrator(__DIR__ . '/../migrations'))->run($db);
+
+        $demoJson = json_encode([
+            'spouse_name' => 'Fatema Begum',
+            'father_name' => 'Abdul Kader',
+            'mother_name' => 'Rokeya Begum',
+            'emergency_contact' => [
+                'name' => 'Fatema Begum',
+                'mobile' => '01711223344',
+                'relation' => 'Spouse',
+                'address' => 'Mirpur-10, Dhaka'
+            ],
+            'nationality' => 'Bangladeshi',
+            'company_name' => 'ACME Corporation',
+            'company_address' => 'Tejgaon I/A, Dhaka'
+        ], JSON_UNESCAPED_UNICODE);
+
+        $stmt = $db->prepare("
+            INSERT INTO zimrx_patients (
+                doctor_id, reg_no, full_name, age, age_unit, dob, dob_type, gender, blood_group, marital_status,
+                address, mobile, email, nid_no, passport_no, occupation, extra_demographics_json
+            ) VALUES (
+                1, 'P2600001', 'Anisul Haque', '42', 'Years', '1984-06-15', 'estimated', 'Male', 'O+', 'Married',
+                'Mirpur-10, Dhaka', '01711000111', 'anisul@example.com', '19841234567890123', 'B00987654', 'Architect', :extra
+            )
+        ");
+        $stmt->execute(['extra' => $demoJson]);
+        $patientId = (int)$db->lastInsertId();
+
+        $fetchStmt = $db->prepare("SELECT * FROM zimrx_patients WHERE id = :id");
+        $fetchStmt->execute(['id' => $patientId]);
+        $loaded = $fetchStmt->fetch(PDO::FETCH_ASSOC);
+
+        $this->assert($loaded['dob_type'] === 'estimated', "zimrx_patients correctly stores estimated dob_type indicator");
+        $this->assert($loaded['marital_status'] === 'Married', "zimrx_patients correctly stores marital_status");
+        $this->assert($loaded['email'] === 'anisul@example.com', "zimrx_patients correctly stores patient email");
+        $this->assert($loaded['nid_no'] === '19841234567890123', "zimrx_patients correctly stores National ID");
+        $this->assert($loaded['passport_no'] === 'B00987654', "zimrx_patients correctly stores Passport number");
+
+        $extraDecoded = json_decode((string)$loaded['extra_demographics_json'], true);
+        $this->assert(
+            ($extraDecoded['emergency_contact']['name'] ?? '') === 'Fatema Begum'
+            && ($extraDecoded['company_name'] ?? '') === 'ACME Corporation',
+            "zimrx_patients preserves extended demographics JSON fidelity (family, emergency, corporate)"
+        );
+
+        // 3. Test visit insertion with age/DOB snapshot for medico-legal defense
+        $visitStmt = $db->prepare("
+            INSERT INTO zimrx_visits (
+                doctor_id, patient_id, patient_reg_no, patient_name, visit_no, visit_id,
+                visit_date, age_at_visit, age_unit_at_visit, dob_at_visit, dob_type_at_visit,
+                billing_json, rich_text_json, revision, sync_id
+            ) VALUES (
+                1, :pid, 'P2600001', 'Anisul Haque', 1, 'V-2026-0001',
+                CURRENT_TIMESTAMP, '42', 'Years', '1984-06-15', 'estimated',
+                '{}', '{}', 1, 'dummy-uuid-001'
+            )
+        ");
+        $visitStmt->execute(['pid' => $patientId]);
+        $visitId = (int)$db->lastInsertId();
+
+        $visitFetch = $db->prepare("SELECT age_at_visit, age_unit_at_visit, dob_at_visit, dob_type_at_visit FROM zimrx_visits WHERE id = :id");
+        $visitFetch->execute(['id' => $visitId]);
+        $vRow = $visitFetch->fetch(PDO::FETCH_ASSOC);
+
+        $this->assert(
+            $vRow['dob_type_at_visit'] === 'estimated' && $vRow['age_at_visit'] === '42' && $vRow['age_unit_at_visit'] === 'Years',
+            "zimrx_visits captures immutable clinical snapshot with dob_type_at_visit ('estimated') for medico-legal protection"
         );
     }
 }

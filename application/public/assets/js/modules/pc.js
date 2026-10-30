@@ -27,6 +27,7 @@ function initPcAutocomplete() {
   };
 
   const getSettingsModal = () => document.getElementById('pc-settings-modal');
+  const isSettingsPage = () => getSettingsModal()?.dataset.settingsPage === 'true';
 
   // Delegates to ZimRxDropdown shared utilities (defined in zrx_dropdown.js).
   const renderIcon = (name, size = 14, attrs = {}) => ZimRxDropdown.renderIcon(name, size, attrs);
@@ -734,7 +735,9 @@ function initPcAutocomplete() {
 
     const hasInitialData = applyInitialSettingsData();
     modal.hidden = false;
-    document.body.style.overflow = 'hidden';
+    if (!isSettingsPage()) {
+      document.body.style.overflow = 'hidden';
+    }
 
     // Default to the first tab (Settings)
     modal.querySelectorAll('.pc-settings-tab-btn').forEach((btn) => {
@@ -781,6 +784,7 @@ function initPcAutocomplete() {
   const closeSettings = () => {
     const modal = getSettingsModal();
     if (!modal) return;
+    if (isSettingsPage()) return;
     modal.hidden = true;
     document.body.style.overflow = '';
   };
@@ -1013,13 +1017,6 @@ function initPcAutocomplete() {
         alert(error.message || 'Could not unhide all terms.');
         loadSettingsData().catch(() => {});
       }
-      return;
-    }
-
-    const settingsButton = event.target.closest('.pc-settings-btn');
-    if (settingsButton) {
-      event.preventDefault();
-      openSettings();
       return;
     }
 
@@ -1542,19 +1539,13 @@ function initPcAutocomplete() {
 
   window.addEventListener('resize', close);
 
-  // Prefetch all blank-term PC suggestions in one call after page settles
-  setTimeout(() => {
-    ensureAtLeastOnePcRow();
-  }, 400);
+  if (isSettingsPage()) {
+    openSettings();
+  } else {
+    // Prefetch all blank-term P/C suggestions after the prescription form settles.
+    setTimeout(() => {
+      ensureAtLeastOnePcRow();
+    }, 400);
 
-  setTimeout(() => {
-    fetch('api/pc_suggestions.php?field=bulk&term=')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.complaint && !suggestCache['complaint::']) suggestCache['complaint::'] = data.complaint;
-        if (data.duration && !suggestCache['duration::'])   suggestCache['duration::'] = data.duration;
-        if (data.unit && !suggestCache['unit::'])           suggestCache['unit::'] = data.unit;
-      })
-      .catch(() => {});
-  }, 3000);
+  }
 }

@@ -69,6 +69,7 @@
             let timer = null;
             let isKeyboardNav = false;
             let keyboardNavTimer = null;
+            let queryGeneration = 0;
 
             function updateFloatingPosition() {
                 if (!floating || !list.classList.contains('show')) return;
@@ -89,6 +90,7 @@
             }
 
             function close() {
+                queryGeneration += 1;
                 if (floating) {
                     window.removeEventListener('scroll', updateFloatingPosition);
                     window.removeEventListener('resize', updateFloatingPosition);
@@ -131,7 +133,9 @@
 
                 if (typeof fetcher !== 'function') return;
 
+                const generation = ++queryGeneration;
                 const results = await fetcher(val);
+                if (generation !== queryGeneration || input.value.trim() !== val) return;
                 list.innerHTML = '';
 
                 if (!results || !Array.isArray(results) || results.length === 0) {
@@ -262,7 +266,7 @@
         },
 
         enhanceSelect(select) {
-            if (!select || select.dataset.zrxEnhanced === 'true') return;
+            if (!select || select.tagName !== 'SELECT' || select.dataset.zrxEnhanced === 'true') return;
             select.dataset.zrxEnhanced = 'true';
 
             // Hide original select completely from layout while preserving DOM value & events
@@ -270,8 +274,11 @@
             select.setAttribute('aria-hidden', 'true');
             select.setAttribute('tabindex', '-1');
 
-            const wrapper = document.createElement('div');
-            wrapper.className = 'zrx-custom-select autocomplete-wrapper';
+            let wrapper = select.nextElementSibling;
+            const isPreRendered = Boolean(wrapper && wrapper.classList.contains('zrx-custom-select'));
+            if (!isPreRendered) {
+                wrapper = document.createElement('div');
+                wrapper.className = 'zrx-custom-select autocomplete-wrapper';
             if (select.id) wrapper.id = `zrx-wrap-${select.id}`;
 
             const trigger = document.createElement('div');
@@ -297,6 +304,16 @@
             wrapper.appendChild(list);
 
             select.parentNode.insertBefore(wrapper, select.nextSibling);
+            }
+
+            const trigger = wrapper.querySelector('.zrx-select-trigger');
+            const labelSpan = wrapper.querySelector('.zrx-select-label');
+            const list = wrapper.querySelector('.autocomplete-list');
+            if (!trigger || !labelSpan || !list) {
+                select.dataset.zrxEnhanced = 'false';
+                select.style.display = '';
+                return;
+            }
 
             let activeIdx = -1;
             let isKeyboardNav = false;
@@ -557,10 +574,12 @@
         },
 
         autoEnhance() {
-            const selector = '#patient-gender, #patient-blood-group, #patient-age-unit, #patient-weight-unit, #patient-height-unit, #patient-ref-type, select.zrx-select';
+            const selector = '#patient-gender, #patient-blood-group, #patient-marital-status, #patient-weight-unit, #patient-height-unit, #patient-ref-type, select.zrx-select';
             document.querySelectorAll(selector).forEach(sel => {
                 window.ZimRxDropdown.enhanceSelect(sel);
             });
+
+            document.body?.classList.remove('zimrx-interface-settings-hold');
         }
     };
 

@@ -95,4 +95,4 @@ declare(strict_types=1);
     </div>
 </div>
 
-<script src="assets/js/modules/drug_summary.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/modules/drug_summary.js') ?>"></script>
+<script src="assets/js/modules/drug_summary.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/modules/drug_summary.js') ?>" defer></script>

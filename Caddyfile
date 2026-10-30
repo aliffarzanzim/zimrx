@@ -28,33 +28,43 @@
 		root * ./application/userdata/uploads/full-body-headers
 		file_server
 	}
+	handle_path /uploads/app-branding/* {
+		root * ./application/userdata/uploads/app-branding
+		file_server
+	}
 
 
-	# 2. Block direct HTTP access to confidential clinical reports.
-	# Patient medical records and imaging must be streamed via authenticated api/view_report.php
+	# Clinical reports are streamed only through the authenticated report endpoint.
 	@clinicalReports path /userdata/uploads/reports/* /uploads/reports/*
-	respond @clinicalReports 404
+	handle @clinicalReports {
+		respond 404
+	}
 
-	# 3. Never expose local data stores, private uploads, or internal engine directories.
+	# Keep private application data and files out of the static and PHP routes.
 	@privateData path /userdata/* /systemdata/* /uploads/* /obsolete/* /migrations/* /tests/* /lib/* /db/* /modules/* /views/*
-	respond @privateData 404
+	handle @privateData {
+		respond 404
+	}
 
-	# 3b. Block direct HTTP invocation of internal framework scripts and manifests
 	@privateFiles path /config.php /auth.php /db.php /header.php /footer.php /composer.json /composer.lock
-	respond @privateFiles 404
+	handle @privateFiles {
+		respond 404
+	}
 
-	# 4. Block sensitive database and configuration files
 	@databaseFiles path *.db *.db3 *.sqlite *.sqlite3 *.sql *.mdb *.accdb *.db-wal *.db-shm *.sqlite-wal *.sqlite-shm
-	respond @databaseFiles 404
+	handle @databaseFiles {
+		respond 404
+	}
 
-	# 5. Composer dependencies live in application/vendor for portability.
-	# Only the manually bundled NicEdit browser asset is public.
+	# Only the manually bundled browser assets are public from application/vendor.
 	@privateVendor {
 		path /vendor/*
 		not path /vendor/nicedit/*
 		not path /vendor/flatpickr/*
 	}
-	respond @privateVendor 404
+	handle @privateVendor {
+		respond 404
+	}
 
 	# 6. Global security headers
 	header {
@@ -67,6 +77,8 @@
 	}
 
 	encode gzip
-	php_server
+	handle {
+		php_server
+	}
 }
 

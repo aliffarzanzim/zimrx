@@ -6,28 +6,14 @@ if (defined('ZIMRX_SUPPORT_MODAL_LOADED')) return;
 define('ZIMRX_SUPPORT_MODAL_LOADED', true);
 ?>
 
-<!-- ZimRx Support & Doctor Appreciation Modal -->
-<div id="support-modal-backdrop" class="support-backdrop" style="display: none;" onclick="zimrxCloseSupportModal()">
-    <div class="support-dialog" onclick="event.stopPropagation()">
+<?php ob_start(); ?>
         
-        <div class="support-titlebar">
-            <div class="support-titlebar-title">
-                <span class="support-heart-icon">❤️</span>
-                <span>Support ZimRx</span>
-            </div>
-            <button type="button" class="support-close-btn" onclick="zimrxCloseSupportModal()" aria-label="Close">
-                <?= zrx_icon('x', 18) ?>
-            </button>
-        </div>
-
-        <div class="support-scroll-area" id="support-scroll-area" onscroll="zimrxCheckSupportScroll()">
-            
             <div class="support-body">
                 
                 <!-- Introduction Text Block -->
                 <div class="support-intro-block">
                     <p>
-                        ZimRx is an open-source clinical initiative developed by Alif Farzan Zim (Dhaka Medical College) to provide practicing clinicians with a fast, reliable, and doctor-friendly prescription engine, completely free.
+                        ZimRx is an open-source medical and healthcare suite developed by Alif Farzan Zim (Dhaka Medical College) to provide practicing clinicians with a fast, reliable, and doctor-friendly prescription engine, completely free.
                     </p>
                     <p>
                         It is distributed under the open-source AGPL-3.0 license, without subscriptions, commercial advertisements, or corporate pharmaceutical sponsorship.
@@ -120,24 +106,23 @@ define('ZIMRX_SUPPORT_MODAL_LOADED', true);
                     </div>
                 </div>
 
-                <!-- Prayer / Blessing -->
-                <div class="support-blessing-box">
-                    <div class="blessing-icon">🤲</div>
-                    <div class="blessing-text">
-                        Above all, please keep me and my family in your prayers. Thank you for your support and for the invaluable service you provide to society every single day.
-                    </div>
-                </div>
+                <p class="support-blessing-note">
+                    Above all, please keep me and my family in your prayers. Thank you for your support and for the invaluable service you provide to society every single day.
+                </p>
 
             </div>
-        </div>
-
-        <div class="support-modal-footer">
-            <span>Alif Farzan Zim &bull; Dhaka Medical College</span>
-            <span class="support-license-tag">AGPL-3.0 Open Source</span>
-        </div>
-
-    </div>
-</div>
-
+<?php
+$support_body_html = ob_get_clean();
+$zrx_modal_config = [
+    'id' => 'support-modal-backdrop',
+    'title' => 'Support ZimRx',
+    'dialog_class' => 'support-dialog',
+    'body_class' => 'support-scroll-area',
+    'body_html' => $support_body_html,
+    'footer_html' => '<button type="button" class="btn btn-primary btn-sm" data-zrx-modal-close>Done</button>',
+];
+include __DIR__ . '/../components/zrx_modal.php';
+unset($zrx_modal_config, $support_body_html);
+?>
 <link rel="stylesheet" href="assets/css/modules/support_modal.css?v=<?= file_exists(ZIMRX_PUBLIC_DIR . '/assets/css/modules/support_modal.css') ? filemtime(ZIMRX_PUBLIC_DIR . '/assets/css/modules/support_modal.css') : '1' ?>">
 <script src="assets/js/layout/support_modal.js?v=<?= file_exists(ZIMRX_PUBLIC_DIR . '/assets/js/layout/support_modal.js') ? filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/layout/support_modal.js') : '1' ?>" defer></script>

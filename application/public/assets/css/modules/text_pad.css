@@ -114,6 +114,7 @@
 
 .tp-editor-container {
     width: 100%;
+    min-height: 328px;
     background: var(--zrx-bg-card);
 }
 

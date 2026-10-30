@@ -60,12 +60,13 @@ include 'header.php';
 <div class="layout-editor-page zrx-page-container">
 
     <!-- Header -->
-    <div class="layout-editor-heading">
-        <div>
+    <div class="layout-editor-heading zrx-settings-page-hero">
+        <div class="zrx-settings-page-hero-copy">
+            <a class="zrx-settings-page-back" href="settings.php">Settings</a>
             <h1>EMR Settings</h1>
             <p>Configure patient registration numbering, daily encounter IDs, and traffic capacity rules.</p>
         </div>
-        <div class="layout-editor-heading-actions">
+        <div class="layout-editor-heading-actions zrx-settings-page-hero-actions">
             <span class="dimension-chip emr-dimension-chip">
                 <?= $isMultiDoctor ? '🏢 Multi-Doctor Setup' : '🩺 Solo Doctor Setup' ?>
             </span>

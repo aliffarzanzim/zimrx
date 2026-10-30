@@ -5,9 +5,11 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/init.php';
 require_login();
+require_once ZIMRX_BASE_DIR . '/lib/Services/PatientCustomFields.php';
 require_once ZIMRX_BASE_DIR . '/lib/emr_identity_lib.php';
 require_once ZIMRX_BASE_DIR . '/lib/particulars_audit_lib.php';
 require_once ZIMRX_BASE_DIR . '/lib/Services/SyncJournalService.php';
+require_once ZIMRX_BASE_DIR . '/lib/Services/PracticeProfileService.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -36,20 +38,53 @@ try {
 
 $action = trim((string)($_GET['action'] ?? $_POST['action'] ?? ''));
 $userRole = current_user_role();
-$currentDoctorId = current_user_doctor_id();
-if ($currentDoctorId <= 0) {
+$activePracticeProfile = (new \ZimRx\Services\PracticeProfileService($pdo))->activeForCurrentUser();
+$currentProfileId = (int)($activePracticeProfile['id'] ?? 0);
+$currentDoctorId = (int)($activePracticeProfile['doctor_id'] ?? 0);
+if ($currentDoctorId <= 0 || $currentProfileId <= 0) {
     emr_json_response(['success' => false, 'message' => 'Doctor scope is required.'], 403);
+}
+
+function emr_profile_scope_sql(string $alias, string $sharingColumn, string $prefix = 'profile'): string
+{
+    if (!preg_match('/^[a-z][a-z0-9_]*$/i', $alias)
+        || !preg_match('/^[a-z][a-z0-9_]*$/i', $prefix)
+        || !in_array($sharingColumn, ['share_patient_particulars', 'share_emr', 'share_prescriptions'], true)) {
+        throw new InvalidArgumentException('Invalid EMR profile scope.');
+    }
+
+    return "($alias.profile_id = :{$prefix}_active_profile_id OR EXISTS (
+        SELECT 1 FROM zimrx_doctor_profiles shared_profile
+        WHERE shared_profile.id = $alias.profile_id
+          AND shared_profile.doctor_id = :{$prefix}_doctor_id
+          AND shared_profile.is_active = 1
+          AND shared_profile.is_deleted = 0
+          AND shared_profile.$sharingColumn = 1
+    ))";
+}
+
+function emr_profile_scope_params(int $profileId, int $doctorId, string $prefix = 'profile'): array
+{
+    return [
+        $prefix . '_active_profile_id' => $profileId,
+        $prefix . '_doctor_id' => $doctorId,
+    ];
 }
 
 function emr_require_patient(PDO $pdo, int $patientId, int $doctorId): array
 {
+    $profileId = (int)($GLOBALS['currentProfileId'] ?? 0);
     $stmt = $pdo->prepare(
-        'SELECT *
-         FROM zimrx_patients
-         WHERE id = :id AND doctor_id = :doctor_id
+        'SELECT p.*
+         FROM zimrx_patients p
+         WHERE p.id = :id AND p.doctor_id = :doctor_id
+           AND ' . emr_profile_scope_sql('p', 'share_patient_particulars', 'patient') . '
          LIMIT 1'
     );
-    $stmt->execute(['id' => $patientId, 'doctor_id' => $doctorId]);
+    $stmt->execute(array_merge(
+        ['id' => $patientId, 'doctor_id' => $doctorId],
+        emr_profile_scope_params($profileId, $doctorId, 'patient')
+    ));
     $patient = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($patient === false) {
@@ -75,13 +110,17 @@ switch ($action) {
             "SELECT id, reg_no, full_name, mobile, gender, age, age_unit, blood_group, address
              FROM zimrx_patients
              WHERE doctor_id = :doctor_id
-               AND (reg_no LIKE :q_exact OR full_name LIKE :q_like OR mobile LIKE :q_like)
+               AND " . emr_profile_scope_sql('zimrx_patients', 'share_patient_particulars', 'patient') . "
+               AND (reg_no LIKE :q_exact OR full_name LIKE :q_name OR mobile LIKE :q_mobile)
              ORDER BY id DESC LIMIT 20"
         );
         $stmtP->execute([
             'doctor_id' => $currentDoctorId,
+            'patient_active_profile_id' => $currentProfileId,
+            'patient_doctor_id' => $currentDoctorId,
             'q_exact' => $q,
-            'q_like' => '%' . $q . '%'
+            'q_name' => '%' . $q . '%',
+            'q_mobile' => '%' . $q . '%'
         ]);
         $patients = $stmtP->fetchAll(PDO::FETCH_ASSOC);
 
@@ -89,14 +128,23 @@ switch ($action) {
         $stmtV = $pdo->prepare(
             "SELECT v.id, v.visit_id, v.visit_no, v.visit_date, v.patient_id, p.full_name as patient_name, p.reg_no, p.mobile
              FROM zimrx_visits v
-             INNER JOIN zimrx_patients p ON v.patient_id = p.id AND p.doctor_id = :doctor_id
+             INNER JOIN zimrx_patients p ON v.patient_id = p.id AND p.doctor_id = :patient_owner_doctor_id
              WHERE v.doctor_id = :doctor_id
-               AND (v.visit_id LIKE :q_like OR p.reg_no LIKE :q_like OR p.full_name LIKE :q_like)
+               AND " . emr_profile_scope_sql('v', 'share_prescriptions', 'visit') . "
+               AND " . emr_profile_scope_sql('p', 'share_patient_particulars', 'patient') . "
+               AND (v.visit_id LIKE :visit_query OR p.reg_no LIKE :patient_reg_query OR p.full_name LIKE :patient_name_query)
              ORDER BY v.id DESC LIMIT 15"
         );
         $stmtV->execute([
             'doctor_id' => $currentDoctorId,
-            'q_like' => '%' . $q . '%'
+            'patient_owner_doctor_id' => $currentDoctorId,
+            'visit_active_profile_id' => $currentProfileId,
+            'visit_doctor_id' => $currentDoctorId,
+            'patient_active_profile_id' => $currentProfileId,
+            'patient_doctor_id' => $currentDoctorId,
+            'visit_query' => '%' . $q . '%',
+            'patient_reg_query' => '%' . $q . '%',
+            'patient_name_query' => '%' . $q . '%'
         ]);
         $visits = $stmtV->fetchAll(PDO::FETCH_ASSOC);
 
@@ -121,8 +169,16 @@ switch ($action) {
         if ($patientId > 0) {
             $patient = emr_require_patient($pdo, $patientId, $currentDoctorId);
         } else {
-            $stmt = $pdo->prepare("SELECT * FROM zimrx_patients WHERE reg_no = :reg AND doctor_id = :doctor_id LIMIT 1");
-            $stmt->execute(['reg' => $regNo, 'doctor_id' => $currentDoctorId]);
+            $stmt = $pdo->prepare(
+                'SELECT p.* FROM zimrx_patients p
+                 WHERE p.reg_no = :reg AND p.doctor_id = :doctor_id
+                   AND ' . emr_profile_scope_sql('p', 'share_patient_particulars', 'patient') . '
+                 LIMIT 1'
+            );
+            $stmt->execute(array_merge(
+                ['reg' => $regNo, 'doctor_id' => $currentDoctorId],
+                emr_profile_scope_params($currentProfileId, $currentDoctorId, 'patient')
+            ));
             $patient = $stmt->fetch(PDO::FETCH_ASSOC);
             if (!$patient) {
                 emr_json_response(['success' => false, 'message' => 'Patient not found'], 404);
@@ -130,8 +186,16 @@ switch ($action) {
         }
 
         $patientId = (int)$patient['id'];
+        $rawExtraDemo = json_decode((string)($patient['extra_demographics_json'] ?? '{}'), true);
+        $patient['extra_demographics_json'] = json_encode(
+            \ZimRx\Services\PatientCustomFields::projectForDoctor(
+                is_array($rawExtraDemo) ? $rawExtraDemo : [],
+                $currentDoctorId
+            ),
+            JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
+        );
 
-        // Get all historical visits for this patient scoped to doctor (lightweight projection)
+        // Get current-profile history and histories explicitly shared by their source profiles.
         $stmtVisits = $pdo->prepare(
             "SELECT v.id as visit_record_id, v.visit_id, v.visit_no, v.visit_date, v.next_visit,
                     v.age_at_visit, v.weight_at_visit, v.weight_unit_at_visit, v.height_at_visit, v.height_unit_at_visit,
@@ -139,9 +203,13 @@ switch ($action) {
                     v.id as prescription_id, v.created_at as rx_created_at
              FROM zimrx_visits v
              WHERE v.patient_id = :patient_id AND v.doctor_id = :doctor_id
+               AND " . emr_profile_scope_sql('v', 'share_emr', 'visit') . "
              ORDER BY v.visit_date DESC, v.id DESC"
         );
-        $stmtVisits->execute(['patient_id' => $patientId, 'doctor_id' => $currentDoctorId]);
+        $stmtVisits->execute(array_merge(
+            ['patient_id' => $patientId, 'doctor_id' => $currentDoctorId],
+            emr_profile_scope_params($currentProfileId, $currentDoctorId, 'visit')
+        ));
         $rawVisits = $stmtVisits->fetchAll(PDO::FETCH_ASSOC);
 
         $timeline = [];
@@ -236,9 +304,13 @@ switch ($action) {
             "SELECT DISTINCT pd.generic_name
              FROM zimrx_prescription_drugs pd
              INNER JOIN zimrx_visits v ON pd.visit_id = v.id AND v.doctor_id = :doctor_id
+               AND " . emr_profile_scope_sql('v', 'share_prescriptions') . "
              WHERE pd.patient_id = :patient_id AND pd.is_history = 1"
         );
-        $stmtAllergies->execute(['patient_id' => $patientId, 'doctor_id' => $currentDoctorId]);
+        $stmtAllergies->execute(array_merge(
+            ['patient_id' => $patientId, 'doctor_id' => $currentDoctorId],
+            emr_profile_scope_params($currentProfileId, $currentDoctorId)
+        ));
         while ($rowA = $stmtAllergies->fetch(PDO::FETCH_ASSOC)) {
             if (!empty($rowA['generic_name'])) $allergies[] = $rowA['generic_name'];
         }
@@ -273,13 +345,17 @@ switch ($action) {
             emr_json_response(['success' => false, 'message' => 'Missing visit identifier'], 400);
         }
 
-        if ($visitRecordId > 0) {
-            $stmtV = $pdo->prepare("SELECT * FROM zimrx_visits WHERE id = :id AND doctor_id = :doctor_id LIMIT 1");
-            $stmtV->execute(['id' => $visitRecordId, 'doctor_id' => $currentDoctorId]);
-        } else {
-            $stmtV = $pdo->prepare("SELECT * FROM zimrx_visits WHERE visit_id = :vid AND doctor_id = :doctor_id LIMIT 1");
-            $stmtV->execute(['vid' => $visitId, 'doctor_id' => $currentDoctorId]);
-        }
+        $visitIdentifier = $visitRecordId > 0 ? 'v.id = :visit_identifier' : 'v.visit_id = :visit_identifier';
+        $stmtV = $pdo->prepare(
+            'SELECT v.* FROM zimrx_visits v
+             WHERE ' . $visitIdentifier . ' AND v.doctor_id = :doctor_id
+               AND ' . emr_profile_scope_sql('v', 'share_prescriptions') . '
+             LIMIT 1'
+        );
+        $stmtV->execute(array_merge(
+            ['visit_identifier' => $visitRecordId > 0 ? $visitRecordId : $visitId, 'doctor_id' => $currentDoctorId],
+            emr_profile_scope_params($currentProfileId, $currentDoctorId)
+        ));
         $visit = $stmtV->fetch(PDO::FETCH_ASSOC);
 
         if (!$visit) {
@@ -318,9 +394,13 @@ switch ($action) {
                  FROM zimrx_visit_revisions r
                  INNER JOIN zimrx_visits v ON r.visit_record_id = v.id AND v.doctor_id = :doctor_id
                  WHERE r.visit_record_id = :vid
+                   AND " . emr_profile_scope_sql('v', 'share_prescriptions') . "
                  ORDER BY r.revision_no DESC"
             );
-            $stmtRevs->execute(['vid' => $visitRecordId, 'doctor_id' => $currentDoctorId]);
+            $stmtRevs->execute(array_merge(
+                ['vid' => $visitRecordId, 'doctor_id' => $currentDoctorId],
+                emr_profile_scope_params($currentProfileId, $currentDoctorId)
+            ));
             $revisions = $stmtRevs->fetchAll(PDO::FETCH_ASSOC);
         }
 
@@ -344,9 +424,13 @@ switch ($action) {
              FROM zimrx_visit_revisions r
              INNER JOIN zimrx_visits v ON r.visit_record_id = v.id AND v.doctor_id = :doctor_id
              WHERE r.id = :id
+               AND " . emr_profile_scope_sql('v', 'share_prescriptions') . "
              LIMIT 1"
         );
-        $stmtRev->execute(['id' => $revisionId, 'doctor_id' => $currentDoctorId]);
+        $stmtRev->execute(array_merge(
+            ['id' => $revisionId, 'doctor_id' => $currentDoctorId],
+            emr_profile_scope_params($currentProfileId, $currentDoctorId)
+        ));
         $revision = $stmtRev->fetch(PDO::FETCH_ASSOC);
         if (!$revision) {
             emr_json_response(['success' => false, 'message' => 'Revision not found'], 404);
@@ -363,8 +447,16 @@ switch ($action) {
         $regNo = trim((string)($_POST['reg_no'] ?? ''));
 
         if ($patientId <= 0 && $regNo !== '') {
-            $stmtP = $pdo->prepare("SELECT id FROM zimrx_patients WHERE reg_no = :reg AND doctor_id = :doctor_id LIMIT 1");
-            $stmtP->execute(['reg' => $regNo, 'doctor_id' => $currentDoctorId]);
+            $stmtP = $pdo->prepare(
+                'SELECT p.id FROM zimrx_patients p
+                 WHERE p.reg_no = :reg AND p.doctor_id = :doctor_id
+                   AND ' . emr_profile_scope_sql('p', 'share_patient_particulars') . '
+                 LIMIT 1'
+            );
+            $stmtP->execute(array_merge(
+                ['reg' => $regNo, 'doctor_id' => $currentDoctorId],
+                emr_profile_scope_params($currentProfileId, $currentDoctorId)
+            ));
             $patientId = (int)$stmtP->fetchColumn();
         }
 
@@ -380,9 +472,9 @@ switch ($action) {
             $stmtNext = $pdo->prepare(
                 "SELECT COALESCE(MAX(visit_no), 0) + 1
                  FROM zimrx_visits
-                 WHERE patient_id = :pid AND doctor_id = :did"
+                 WHERE patient_id = :pid AND doctor_id = :did AND profile_id = :profile_id"
             );
-            $stmtNext->execute(['pid' => $patientId, 'did' => $currentDoctorId]);
+            $stmtNext->execute(['pid' => $patientId, 'did' => $currentDoctorId, 'profile_id' => $currentProfileId]);
             $nextVisitNo = max(1, (int)$stmtNext->fetchColumn());
 
             // Generate visit ID
@@ -390,12 +482,13 @@ switch ($action) {
 
             // Create visit entry
             $stmtInsert = $pdo->prepare(
-                "INSERT INTO zimrx_visits (patient_id, doctor_id, visit_no, visit_id, visit_date, revision, created_at, updated_at)
-                 VALUES (:patient_id, :doctor_id, :visit_no, :visit_id, CURRENT_DATE, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
+                "INSERT INTO zimrx_visits (patient_id, doctor_id, profile_id, visit_no, visit_id, visit_date, revision, created_at, updated_at)
+                 VALUES (:patient_id, :doctor_id, :profile_id, :visit_no, :visit_id, CURRENT_DATE, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
             );
             $stmtInsert->execute([
                 'patient_id' => $patientId,
                 'doctor_id' => $currentDoctorId,
+                'profile_id' => $currentProfileId,
                 'visit_no' => $nextVisitNo,
                 'visit_id' => $newVisitId
             ]);
@@ -424,6 +517,15 @@ switch ($action) {
         }
 
         $oldPatient = emr_require_patient($pdo, $patientId, $currentDoctorId);
+        $optionalText = static function (string $key, string $fallback): string {
+            if (!array_key_exists($key, $_POST)) {
+                return $fallback;
+            }
+            if (!is_string($_POST[$key])) {
+                emr_json_response(['success' => false, 'message' => 'Invalid patient field value'], 422);
+            }
+            return trim($_POST[$key]);
+        };
 
         $fullName = trim((string)($_POST['full_name'] ?? ''));
         $mobile = trim((string)($_POST['mobile'] ?? ''));
@@ -431,9 +533,42 @@ switch ($action) {
         $age = trim((string)($_POST['age'] ?? ''));
         $ageUnit = trim((string)($_POST['age_unit'] ?? 'Years'));
         $dob = trim((string)($_POST['dob'] ?? ''));
+        $dobType = $optionalText('dob_type', (string)($oldPatient['dob_type'] ?? 'exact')) ?: 'exact';
+        if (!in_array($dobType, \ZimRx\Services\PatientDemographics::dobTypes(), true)) {
+            emr_json_response(['success' => false, 'message' => 'Invalid date of birth type'], 422);
+        }
         $bloodGroup = trim((string)($_POST['blood_group'] ?? ''));
+        $maritalStatus = $optionalText('marital_status', (string)($oldPatient['marital_status'] ?? ''));
+        $email = $optionalText('email', (string)($oldPatient['email'] ?? ''));
+        $nidNo = $optionalText('nid_no', (string)($oldPatient['nid_no'] ?? ''));
+        $passportNo = $optionalText('passport_no', (string)($oldPatient['passport_no'] ?? ''));
         $occupation = trim((string)($_POST['occupation'] ?? ''));
         $address = trim((string)($_POST['address'] ?? ''));
+
+        if (array_key_exists('extra_demographics', $_POST)) {
+            if (!is_array($_POST['extra_demographics'])) {
+                emr_json_response(['success' => false, 'message' => 'Invalid extended demographics'], 422);
+            }
+            $extraDemo = $_POST['extra_demographics'];
+        } else {
+            $decodedExtraDemo = json_decode((string)($oldPatient['extra_demographics_json'] ?? '{}'), true);
+            $extraDemo = is_array($decodedExtraDemo) ? $decodedExtraDemo : [];
+        }
+        $decodedOldExtra = json_decode((string)($oldPatient['extra_demographics_json'] ?? '{}'), true);
+        try {
+            $customDefinitions = \ZimRx\Services\PatientCustomFields::loadForDoctor($pdo, $currentDoctorId);
+            $extraDemo = \ZimRx\Services\PatientCustomFields::normalizeExtraValues(
+                $extraDemo,
+                $customDefinitions,
+                is_array($decodedOldExtra) ? $decodedOldExtra : [],
+                $currentDoctorId
+            );
+            $extraDemoJson = json_encode($extraDemo, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+        } catch (\InvalidArgumentException $e) {
+            emr_json_response(['success' => false, 'message' => $e->getMessage()], 422);
+        } catch (\JsonException) {
+            emr_json_response(['success' => false, 'message' => 'Invalid extended demographics'], 422);
+        }
 
         if ($fullName === '') {
             emr_json_response(['success' => false, 'message' => 'Patient name is required'], 422);
@@ -443,28 +578,47 @@ switch ($action) {
             "UPDATE zimrx_patients
              SET full_name = :full_name,
                  mobile = :mobile,
+                 email = :email,
                  gender = :gender,
                  age = :age,
                  age_unit = :age_unit,
                  dob = :dob,
+                 dob_type = :dob_type,
                  blood_group = :blood_group,
+                 marital_status = :marital_status,
+                 nid_no = :nid_no,
+                 passport_no = :passport_no,
                  occupation = :occupation,
                  address = :address,
+                 extra_demographics_json = :extra_demographics_json,
                  updated_at = CURRENT_TIMESTAMP
-             WHERE id = :id AND doctor_id = :doctor_id"
+             WHERE id = :id AND doctor_id = :doctor_id
+               AND (profile_id = :patient_active_profile_id OR profile_id IN (
+                   SELECT source_profile.id FROM zimrx_doctor_profiles source_profile
+                   WHERE source_profile.doctor_id = :patient_profile_doctor_id
+                     AND source_profile.is_active = 1 AND source_profile.share_patient_particulars = 1
+               ))"
         );
         $stmtUpdate->execute([
             'full_name' => $fullName,
             'mobile' => $mobile,
+            'email' => $email,
             'gender' => $gender,
             'age' => $age,
             'age_unit' => $ageUnit,
             'dob' => $dob,
+            'dob_type' => $dobType,
             'blood_group' => $bloodGroup,
+            'marital_status' => $maritalStatus,
+            'nid_no' => $nidNo,
+            'passport_no' => $passportNo,
             'occupation' => $occupation,
             'address' => $address,
+            'extra_demographics_json' => $extraDemoJson,
             'id' => $patientId,
-            'doctor_id' => $currentDoctorId
+            'doctor_id' => $currentDoctorId,
+            'patient_active_profile_id' => $currentProfileId,
+            'patient_profile_doctor_id' => $currentDoctorId
         ]);
 
         log_patient_particulars_audit($pdo, $patientId, (string)($oldPatient['reg_no'] ?? ''), $oldPatient, $_POST, 'emr');
@@ -494,8 +648,15 @@ switch ($action) {
         $patient = emr_require_patient($pdo, $patientId, $currentDoctorId);
 
         // Get patient tracked metrics list
-        $stmtP = $pdo->prepare("SELECT tracked_metrics_json FROM zimrx_patients WHERE id = :id AND doctor_id = :did LIMIT 1");
-        $stmtP->execute(['id' => $patientId, 'did' => $currentDoctorId]);
+        $stmtP = $pdo->prepare(
+            'SELECT p.tracked_metrics_json FROM zimrx_patients p
+             WHERE p.id = :id AND p.doctor_id = :did
+               AND ' . emr_profile_scope_sql('p', 'share_patient_particulars') . ' LIMIT 1'
+        );
+        $stmtP->execute(array_merge(
+            ['id' => $patientId, 'did' => $currentDoctorId],
+            emr_profile_scope_params($currentProfileId, $currentDoctorId)
+        ));
         $jsonStr = $stmtP->fetchColumn();
         $tracked = json_decode((string)$jsonStr, true);
         if (!is_array($tracked) || empty($tracked)) {
@@ -539,9 +700,13 @@ switch ($action) {
             "SELECT id, visit_id, visit_no, visit_date, weight_at_visit, weight_unit_at_visit, height_at_visit, height_unit_at_visit, metrics_json, clinical_snapshot_json
              FROM zimrx_visits
              WHERE patient_id = :pid AND doctor_id = :did
+               AND " . emr_profile_scope_sql('zimrx_visits', 'share_emr') . "
              ORDER BY visit_date ASC, id ASC"
         );
-        $stmtV->execute(['pid' => $patientId, 'did' => $currentDoctorId]);
+        $stmtV->execute(array_merge(
+            ['pid' => $patientId, 'did' => $currentDoctorId],
+            emr_profile_scope_params($currentProfileId, $currentDoctorId)
+        ));
         $visits = $stmtV->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($visits as $v) {
@@ -640,14 +805,20 @@ switch ($action) {
         $stmtR = $pdo->prepare(
             "SELECT r.id, r.metric_type, r.reading_value, r.secondary_value, r.reading_date, r.reading_time, r.source, r.notes
              FROM zimrx_patient_metric_readings r
-             WHERE r.patient_id = :pid
+             WHERE r.patient_id = :reading_patient_id
                AND r.deleted_at IS NULL
+               AND " . emr_profile_scope_sql('r', 'share_emr') . "
                AND EXISTS (
-                   SELECT 1 FROM zimrx_patients p WHERE p.id = :pid AND p.doctor_id = :did
+                   SELECT 1 FROM zimrx_patients p WHERE p.id = :patient_identity_id AND p.doctor_id = :did
+                     AND " . emr_profile_scope_sql('p', 'share_patient_particulars', 'patient') . "
                )
              ORDER BY r.reading_date ASC, r.reading_time ASC, r.id ASC"
         );
-        $stmtR->execute(['pid' => $patientId, 'did' => $currentDoctorId]);
+        $stmtR->execute(array_merge(
+            ['reading_patient_id' => $patientId, 'patient_identity_id' => $patientId, 'did' => $currentDoctorId],
+            emr_profile_scope_params($currentProfileId, $currentDoctorId),
+            emr_profile_scope_params($currentProfileId, $currentDoctorId, 'patient')
+        ));
         $readings = $stmtR->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($readings as $r) {
@@ -762,14 +933,15 @@ switch ($action) {
         try {
             $stmtIns = $pdo->prepare(
                 "INSERT INTO zimrx_patient_metric_readings (
-                    patient_id, metric_type, reading_value, secondary_value,
+                    patient_id, profile_id, metric_type, reading_value, secondary_value,
                     reading_date, reading_time, source, notes, created_by
                 ) VALUES (
-                    :pid, :mtype, :rval, :sval, :rdate, :rtime, :source, :notes, :uid
+                    :pid, :profile_id, :mtype, :rval, :sval, :rdate, :rtime, :source, :notes, :uid
                 )"
             );
             $stmtIns->execute([
                 'pid' => $patientId,
+                'profile_id' => $currentProfileId,
                 'mtype' => $metricType,
                 'rval' => $readingValue,
                 'sval' => $secondaryValue,
@@ -781,14 +953,26 @@ switch ($action) {
             ]);
 
             // Auto-ensure metricType is added to tracked_metrics_json
-            $stmtP = $pdo->prepare("SELECT tracked_metrics_json FROM zimrx_patients WHERE id = :id AND doctor_id = :did LIMIT 1");
-            $stmtP->execute(['id' => $patientId, 'did' => $currentDoctorId]);
+            $stmtP = $pdo->prepare(
+                'SELECT p.tracked_metrics_json FROM zimrx_patients p
+                 WHERE p.id = :id AND p.doctor_id = :did
+                   AND ' . emr_profile_scope_sql('p', 'share_patient_particulars') . ' LIMIT 1'
+            );
+            $patientScope = emr_profile_scope_params($currentProfileId, $currentDoctorId);
+            $stmtP->execute(array_merge(['id' => $patientId, 'did' => $currentDoctorId], $patientScope));
             $tracked = json_decode((string)$stmtP->fetchColumn(), true);
             if (!is_array($tracked)) $tracked = ['weight'];
             if (!in_array($metricType, $tracked, true)) {
                 $tracked[] = $metricType;
-                $stmtUp = $pdo->prepare("UPDATE zimrx_patients SET tracked_metrics_json = :tm, updated_at = CURRENT_TIMESTAMP WHERE id = :id AND doctor_id = :did");
-                $stmtUp->execute(['tm' => json_encode($tracked), 'id' => $patientId, 'did' => $currentDoctorId]);
+                $stmtUp = $pdo->prepare(
+                    'UPDATE zimrx_patients SET tracked_metrics_json = :tm, updated_at = CURRENT_TIMESTAMP
+                     WHERE id = :id AND doctor_id = :did
+                       AND ' . emr_profile_scope_sql('zimrx_patients', 'share_patient_particulars')
+                );
+                $stmtUp->execute(array_merge(
+                    ['tm' => json_encode($tracked), 'id' => $patientId, 'did' => $currentDoctorId],
+                    $patientScope
+                ));
             }
 
             $readingId = (int)$pdo->lastInsertId();
@@ -833,18 +1017,24 @@ switch ($action) {
                 "SELECT sync_id, revision
                  FROM zimrx_patient_metric_readings
                  WHERE id = :reading_id
-                   AND patient_id = :patient_id
+                   AND patient_id = :reading_patient_id
+                   AND profile_id = :reading_profile_id
                    AND deleted_at IS NULL
                    AND EXISTS (
                        SELECT 1 FROM zimrx_patients p
-                       WHERE p.id = :patient_id AND p.doctor_id = :doctor_id
+                       WHERE p.id = :patient_identity_id AND p.doctor_id = :doctor_id
+                         AND " . emr_profile_scope_sql('p', 'share_patient_particulars', 'patient') . "
                    )
                  LIMIT 1"
             );
             $stmtFetch->execute([
                 'reading_id' => $readingId,
-                'patient_id' => $patientId,
+                'reading_patient_id' => $patientId,
+                'patient_identity_id' => $patientId,
+                'reading_profile_id' => $currentProfileId,
                 'doctor_id'  => $currentDoctorId,
+                'patient_active_profile_id' => $currentProfileId,
+                'patient_doctor_id' => $currentDoctorId,
             ]);
             $delRow = $stmtFetch->fetch(PDO::FETCH_ASSOC);
 
@@ -860,19 +1050,20 @@ switch ($action) {
             $delSyncId = (string)($delRow['sync_id'] ?? '');
             if ($delSyncId === '') {
                 $delSyncId = SyncJournalService::generateUuid();
-                $pdo->prepare("UPDATE zimrx_patient_metric_readings SET sync_id = :sid WHERE id = :id")
-                    ->execute(['sid' => $delSyncId, 'id' => $readingId]);
+                $pdo->prepare("UPDATE zimrx_patient_metric_readings SET sync_id = :sid WHERE id = :id AND profile_id = :profile_id")
+                    ->execute(['sid' => $delSyncId, 'id' => $readingId, 'profile_id' => $currentProfileId]);
             }
 
             // Soft-delete: mark deleted_at and advance revision.
             $pdo->prepare(
                 "UPDATE zimrx_patient_metric_readings
                  SET deleted_at = CURRENT_TIMESTAMP, revision = :rev
-                 WHERE id = :reading_id AND patient_id = :patient_id"
+                 WHERE id = :reading_id AND patient_id = :patient_id AND profile_id = :profile_id"
             )->execute([
                 'rev'        => $newRevision,
                 'reading_id' => $readingId,
                 'patient_id' => $patientId,
+                'profile_id' => $currentProfileId,
             ]);
 
             // Write tombstone to sync journal so offline peers can reconcile.
@@ -914,8 +1105,15 @@ switch ($action) {
             $metrics = ['weight'];
         }
 
-        $stmtUp = $pdo->prepare("UPDATE zimrx_patients SET tracked_metrics_json = :tm, updated_at = CURRENT_TIMESTAMP WHERE id = :id AND doctor_id = :did");
-        $stmtUp->execute(['tm' => json_encode(array_values($metrics)), 'id' => $patientId, 'did' => $currentDoctorId]);
+        $stmtUp = $pdo->prepare(
+            'UPDATE zimrx_patients SET tracked_metrics_json = :tm, updated_at = CURRENT_TIMESTAMP
+             WHERE id = :id AND doctor_id = :did
+               AND ' . emr_profile_scope_sql('zimrx_patients', 'share_patient_particulars')
+        );
+        $stmtUp->execute(array_merge(
+            ['tm' => json_encode(array_values($metrics)), 'id' => $patientId, 'did' => $currentDoctorId],
+            emr_profile_scope_params($currentProfileId, $currentDoctorId)
+        ));
         emr_json_response(['success' => true, 'message' => 'Tracked trajectories updated']);
         break;
 

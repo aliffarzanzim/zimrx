@@ -4,6 +4,9 @@ declare(strict_types=1);
 // User login gateway: handles credential verification, rate-limited lockouts, and role redirection.
 
 require_once __DIR__ . '/init.php';
+require_once ZIMRX_BASE_DIR . '/lib/app_name_logo.php';
+require_once __DIR__ . '/api/zrx_icons.php';
+$zrxAppNameLogo = zimrx_app_name_logo_settings($pdo);
 
 // First-launch gate
 if (zimrx_db_table_exists($pdo, 'zimrx_app_config')) {
@@ -111,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZimRx - Physician Login</title>
+    <title><?= htmlspecialchars(zimrx_format_page_title('Sign in', $zrxAppNameLogo['browser_tab_title']), ENT_QUOTES, 'UTF-8') ?></title>
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
     <link rel="stylesheet" href="assets/css/layout/global.css">
     <link rel="stylesheet" href="assets/css/layout/login.css?v=<?= filemtime(__DIR__ . '/assets/css/layout/login.css') ?>">
@@ -120,10 +123,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     <div class="login-card">
         <div class="login-header">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-            </svg>
-            <h1>ZimRx Login</h1>
+            <?php if ($zrxAppNameLogo['app_logo'] !== ''): ?>
+                <img class="login-app-logo" src="<?= htmlspecialchars($zrxAppNameLogo['app_logo'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($zrxAppNameLogo['display_name'], ENT_QUOTES, 'UTF-8') ?>">
+            <?php else: ?>
+                <?= zrx_icon('activity', 48) ?>
+            <?php endif; ?>
+            <h1><?= htmlspecialchars($zrxAppNameLogo['display_name'], ENT_QUOTES, 'UTF-8') ?> Login</h1>
             <p>Please enter your credentials</p>
         </div>
 

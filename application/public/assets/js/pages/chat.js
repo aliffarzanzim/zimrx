@@ -969,7 +969,7 @@
                             playNotificationChime();
                         }
 
-                        if (!activeConversationId) {
+                        if (!activeConversationId && isWidgetOpen) {
                             fetchConversations();
                         }
                     }

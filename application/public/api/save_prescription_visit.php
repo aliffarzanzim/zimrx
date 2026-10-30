@@ -5,6 +5,9 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/init.php';
 require_login();
 require_once ZIMRX_BASE_DIR . '/lib/emr_identity_lib.php';
+require_once ZIMRX_BASE_DIR . '/lib/Services/VisitFormModules.php';
+require_once ZIMRX_BASE_DIR . '/lib/Services/PracticeProfileService.php';
+require_once ZIMRX_BASE_DIR . '/lib/print_setup_lib.php';
 
 header('Content-Type: application/json');
 
@@ -73,22 +76,24 @@ function archive_visit_revision_if_changed(PDO $pdo, array $existingVisit, ?stri
     }
 
     $visitRecordId = (int)$existingVisit['id'];
-    $stmtCount = $pdo->prepare("SELECT COALESCE(MAX(revision_no), 0) + 1 FROM zimrx_visit_revisions WHERE visit_record_id = :id AND doctor_id = :doctor_id");
-    $stmtCount->execute(['id' => $visitRecordId, 'doctor_id' => $doctorId]);
+    $profileId = (int)($existingVisit['profile_id'] ?? 0);
+    $stmtCount = $pdo->prepare("SELECT COALESCE(MAX(revision_no), 0) + 1 FROM zimrx_visit_revisions WHERE visit_record_id = :id AND doctor_id = :doctor_id AND profile_id = :profile_id");
+    $stmtCount->execute(['id' => $visitRecordId, 'doctor_id' => $doctorId, 'profile_id' => $profileId]);
     $nextRevNo = max(1, (int)$stmtCount->fetchColumn());
 
     $stmtInsertRev = $pdo->prepare(
         "INSERT INTO zimrx_visit_revisions (
-            visit_record_id, doctor_id, revision_no, patient_id, patient_reg_no, visit_no, visit_id,
+            visit_record_id, doctor_id, profile_id, revision_no, patient_id, patient_reg_no, visit_no, visit_id,
             clinical_snapshot_json, prescription_html, rich_text_json, billing_json, created_by, created_at
         ) VALUES (
-            :visit_record_id, :doctor_id, :revision_no, :patient_id, :patient_reg_no, :visit_no, :visit_id,
+            :visit_record_id, :doctor_id, :profile_id, :revision_no, :patient_id, :patient_reg_no, :visit_no, :visit_id,
             :clinical_snapshot_json, :prescription_html, :rich_text_json, :billing_json, :created_by, :created_at
         )"
     );
     $stmtInsertRev->execute([
         'visit_record_id' => $visitRecordId,
         'doctor_id' => $doctorId,
+        'profile_id' => $profileId,
         'revision_no' => $nextRevNo,
         'patient_id' => (int)($existingVisit['patient_id'] ?? 0),
         'patient_reg_no' => (string)($existingVisit['patient_reg_no'] ?? ''),
@@ -156,7 +161,7 @@ function payload_referral(array $payload): array {
     ];
 }
 
-function save_patient_referral(PDO $pdo, int $doctorId, string $regNo, int $visitRecordId, string $visitId, array $payload): void {
+function save_patient_referral(PDO $pdo, int $doctorId, int $profileId, string $regNo, int $visitRecordId, string $visitId, array $payload): void {
     if ($visitRecordId <= 0) {
         return;
     }
@@ -164,6 +169,7 @@ function save_patient_referral(PDO $pdo, int $doctorId, string $regNo, int $visi
     $referral = payload_referral($payload);
     $params = [
         'doctor_id' => $doctorId,
+        'profile_id' => $profileId,
         'patient_reg_no' => $regNo,
         'visit_record_id' => $visitRecordId,
         'visit_id' => $visitId,
@@ -180,9 +186,12 @@ function save_patient_referral(PDO $pdo, int $doctorId, string $regNo, int $visi
              referral_name = :referral_name,
              normalized_name = :normalized_name,
              updated_at = CURRENT_TIMESTAMP
-         WHERE doctor_id = :doctor_id AND visit_record_id = :visit_record_id"
+         WHERE doctor_id = :doctor_id AND visit_record_id = :visit_record_id
+           AND visit_record_id IN (
+               SELECT id FROM zimrx_visits WHERE doctor_id = :visit_doctor_id AND profile_id = :profile_id
+           )"
     );
-    $stmt->execute($params);
+    $stmt->execute($params + ['visit_doctor_id' => $doctorId]);
 
     if ($stmt->rowCount() > 0) {
         return;
@@ -197,10 +206,17 @@ function save_patient_referral(PDO $pdo, int $doctorId, string $regNo, int $visi
             :referral_name, :normalized_name, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )"
     );
-    $stmt->execute($params);
+    $visitStmt = $pdo->prepare('SELECT 1 FROM zimrx_visits WHERE id = :visit_id AND doctor_id = :doctor_id AND profile_id = :profile_id');
+    $visitStmt->execute(['visit_id' => $visitRecordId, 'doctor_id' => $doctorId, 'profile_id' => $profileId]);
+    if ($visitStmt->fetchColumn() === false) {
+        throw new RuntimeException('Referral visit is outside the active practice profile.');
+    }
+    $insertParams = $params;
+    unset($insertParams['profile_id']);
+    $stmt->execute($insertParams);
 }
 
-function load_appointment(PDO $pdo, int $appointmentId, int $doctorId): ?array {
+function load_appointment(PDO $pdo, int $appointmentId, int $doctorId, int $profileId): ?array {
     if ($appointmentId <= 0) {
         return null;
     }
@@ -210,21 +226,24 @@ function load_appointment(PDO $pdo, int $appointmentId, int $doctorId): ?array {
             coalesce(nullif(a.reg_no, ''), p.reg_no, '') AS resolved_reg_no,
             coalesce(nullif(a.patient_name, ''), p.full_name, '') AS resolved_patient_name,
             coalesce(nullif(a.age, ''), p.age, '') AS resolved_age,
+            coalesce(nullif(a.age_unit, ''), p.age_unit, 'Years') AS resolved_age_unit,
+            coalesce(nullif(a.dob, ''), p.dob, '') AS resolved_dob,
+            coalesce(nullif(a.dob_type, ''), p.dob_type, 'exact') AS resolved_dob_type,
             coalesce(nullif(a.weight, ''), p.weight, '') AS resolved_weight,
             coalesce(nullif(a.weight_unit, ''), p.weight_unit, 'kg') AS resolved_weight_unit,
             coalesce(nullif(a.height, ''), p.height, '') AS resolved_height,
             coalesce(nullif(a.height_unit, ''), p.height_unit, 'inch') AS resolved_height_unit
          FROM zimrx_appointments a
          LEFT JOIN zimrx_patients p ON p.id = a.patient_id
-         WHERE a.id = :id AND a.doctor_id = :doctor_id
+         WHERE a.id = :id AND a.doctor_id = :doctor_id AND a.profile_id = :profile_id
          LIMIT 1"
     );
-    $stmt->execute(['id' => $appointmentId, 'doctor_id' => $doctorId]);
+    $stmt->execute(['id' => $appointmentId, 'doctor_id' => $doctorId, 'profile_id' => $profileId]);
     $row = $stmt->fetch();
     return $row ?: null;
 }
 
-function load_patient(PDO $pdo, int $patientId, int $doctorId): ?array {
+function load_patient(PDO $pdo, int $patientId, int $doctorId, int $profileId): ?array {
     if ($patientId <= 0) {
         return null;
     }
@@ -233,18 +252,27 @@ function load_patient(PDO $pdo, int $patientId, int $doctorId): ?array {
          FROM zimrx_patients p
          WHERE p.id = :id
            AND (
-                COALESCE(NULLIF(p.doctor_id, 0), 1) = :doctor_id
-                OR EXISTS (
-                    SELECT 1
-                    FROM zimrx_patient_doctor_access pda
-                    WHERE pda.patient_id = p.id
-                      AND pda.doctor_id = :doctor_id
-                      AND pda.can_view = 1
-                )
+               (p.doctor_id = :doctor_id AND (p.profile_id = :profile_id OR EXISTS (
+                    SELECT 1 FROM zimrx_doctor_profiles source_profile
+                    WHERE source_profile.id = p.profile_id
+                      AND source_profile.doctor_id = :profile_doctor_id
+                      AND source_profile.is_active = 1 AND source_profile.is_deleted = 0
+                      AND source_profile.share_patient_particulars = 1
+               )))
+               OR EXISTS (
+                    SELECT 1 FROM zimrx_patient_doctor_access pda
+                    WHERE pda.patient_id = p.id AND pda.doctor_id = :access_doctor_id AND pda.can_view = 1
+               )
            )
          LIMIT 1"
     );
-    $stmt->execute(['id' => $patientId, 'doctor_id' => $doctorId]);
+    $stmt->execute([
+        'id' => $patientId,
+        'doctor_id' => $doctorId,
+        'access_doctor_id' => $doctorId,
+        'profile_id' => $profileId,
+        'profile_doctor_id' => $doctorId,
+    ]);
     $row = $stmt->fetch();
     return $row ?: null;
 }
@@ -266,18 +294,57 @@ if (!zimrx_verify_csrf(is_string($csrfToken) ? $csrfToken : null)) {
 }
 
 try {
-    $doctorId = current_user_doctor_id();
+    $activePracticeProfile = (new \ZimRx\Services\PracticeProfileService($pdo))->activeForCurrentUser();
+    $doctorId = (int)($activePracticeProfile['doctor_id'] ?? 0);
+    $profileId = (int)($activePracticeProfile['id'] ?? 0);
+    if ($doctorId <= 0 || $profileId <= 0) {
+        http_response_code(403);
+        respond(['ok' => false, 'error' => 'An active practice profile is required.']);
+    }
     $userId = current_user_id();
     $doctorCode = doctor_code_for_visit($pdo, $doctorId);
+    $clinicalSnapshot = $payload['clinical_snapshot'] ?? null;
+    if (is_string($clinicalSnapshot)) {
+        $decodedSnapshot = json_decode($clinicalSnapshot, true);
+        $clinicalSnapshot = is_array($decodedSnapshot) ? $decodedSnapshot : null;
+    }
+    if (is_array($clinicalSnapshot)) {
+        $clinical = $clinicalSnapshot['clinical'] ?? [];
+        if (!is_array($clinical)) {
+            throw new InvalidArgumentException('Invalid clinical snapshot.');
+        }
+        $submittedFormValues = $clinical['visit_form_values'] ?? [];
+        if (!is_array($submittedFormValues)) {
+            throw new InvalidArgumentException('Invalid visit form values.');
+        }
+        $formDefinitions = \ZimRx\Services\VisitFormModules::loadForDoctor($pdo, $doctorId);
+        $clinical['visit_form_modules'] = \ZimRx\Services\VisitFormModules::normalizeResponses($submittedFormValues, $formDefinitions);
+        unset($clinical['visit_form_values']);
+        $clinicalSnapshot['clinical'] = $clinical;
+    }
 
     $rxDrugs = $payload['drugs'] ?? [];
     $richTextJson = json_encode(['rx_drugs' => is_array($rxDrugs) ? $rxDrugs : []], JSON_UNESCAPED_UNICODE);
-    $prescriptionHtml = trim((string)($payload['prescription_html'] ?? $payload['html'] ?? ''));
-    $clinicalSnapshot = $payload['clinical_snapshot'] ?? $payload['snapshot'] ?? null;
-    $clinicalSnapshotJson = is_array($clinicalSnapshot) ? json_encode($clinicalSnapshot, JSON_UNESCAPED_UNICODE) : (is_string($clinicalSnapshot) ? $clinicalSnapshot : null);
+    $prescriptionHtml = trim((string)($payload['prescription_html'] ?? ''));
+    $printHeader = zimrx_print_load_header_settings($pdo, $profileId);
+    $printOptions = zimrx_print_load_options($pdo, $profileId);
+    $printHeader['chamber_name'] = (string)($activePracticeProfile['profile_name'] ?? '');
+    $printHeader['chamber_address'] = (string)($activePracticeProfile['address'] ?? '');
+    $printHeader['chamber_phone'] = (string)($activePracticeProfile['phone'] ?? '');
+    $footerNote = trim((string)($activePracticeProfile['prescription_footer_note'] ?? ''));
+    if ($footerNote !== '') {
+        $printHeader['footer_html'] = nl2br(htmlspecialchars($footerNote, ENT_QUOTES, 'UTF-8'));
+    }
+    $clinicalSnapshot = is_array($clinicalSnapshot) ? $clinicalSnapshot : [];
+    $clinicalSnapshot['_zimrx_print_snapshot'] = [
+        'profile_id' => $profileId,
+        'header' => $printHeader,
+        'options' => $printOptions,
+    ];
+    $clinicalSnapshotJson = json_encode($clinicalSnapshot, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
 
     $appointmentId = (int)value($payload, 'appointment_id');
-    $appointment = load_appointment($pdo, $appointmentId, $doctorId);
+    $appointment = load_appointment($pdo, $appointmentId, $doctorId, $profileId);
     $expectedRevision = isset($payload['revision']) ? (int)$payload['revision'] : 0;
 
     require_once ZIMRX_BASE_DIR . '/lib/Services/SyncJournalService.php';
@@ -288,8 +355,8 @@ try {
 
         $pdo->beginTransaction();
 
-        $stmtEx = $pdo->prepare("SELECT * FROM zimrx_visits WHERE id = :id AND doctor_id = :doctor_id LIMIT 1");
-        $stmtEx->execute(['id' => $visitRecordId, 'doctor_id' => $doctorId]);
+        $stmtEx = $pdo->prepare("SELECT * FROM zimrx_visits WHERE id = :id AND doctor_id = :doctor_id AND profile_id = :profile_id LIMIT 1");
+        $stmtEx->execute(['id' => $visitRecordId, 'doctor_id' => $doctorId, 'profile_id' => $profileId]);
         $currentVisitRow = $stmtEx->fetch();
         if ($currentVisitRow) {
             $currentRevision = (int)($currentVisitRow['revision'] ?? 1);
@@ -304,7 +371,7 @@ try {
 
             // Update snapshots if provided
             $updateFields = ["revision = revision + 1", "updated_at = CURRENT_TIMESTAMP"];
-            $updateParams = ['id' => $visitRecordId, 'doctor_id' => $doctorId];
+            $updateParams = ['id' => $visitRecordId, 'doctor_id' => $doctorId, 'profile_id' => $profileId];
             if ($prescriptionHtml !== '') {
                 $updateFields[] = "prescription_html = :prescription_html";
                 $updateParams['prescription_html'] = $prescriptionHtml;
@@ -318,7 +385,7 @@ try {
                 $updateParams['rich_text_json'] = $richTextJson;
             }
 
-            $whereSql = "WHERE id = :id AND doctor_id = :doctor_id";
+            $whereSql = "WHERE id = :id AND doctor_id = :doctor_id AND profile_id = :profile_id";
             if ($expectedRevision > 0) {
                 $whereSql .= " AND revision = :expected_revision";
                 $updateParams['expected_revision'] = $expectedRevision;
@@ -364,8 +431,8 @@ try {
     if ($appointmentId > 0) {
         $pdo->beginTransaction();
 
-        $stmt = $pdo->prepare("SELECT * FROM zimrx_visits WHERE appointment_id = :appointment_id AND doctor_id = :doctor_id LIMIT 1");
-        $stmt->execute(['appointment_id' => $appointmentId, 'doctor_id' => $doctorId]);
+        $stmt = $pdo->prepare("SELECT * FROM zimrx_visits WHERE appointment_id = :appointment_id AND doctor_id = :doctor_id AND profile_id = :profile_id LIMIT 1");
+        $stmt->execute(['appointment_id' => $appointmentId, 'doctor_id' => $doctorId, 'profile_id' => $profileId]);
         $existingVisit = $stmt->fetch();
         if ($existingVisit) {
             $visitRecordId = (int)$existingVisit['id'];
@@ -380,7 +447,7 @@ try {
             archive_visit_revision_if_changed($pdo, $existingVisit, $clinicalSnapshotJson, $prescriptionHtml, $richTextJson, $doctorId, $userId);
 
             $updateFields = ["revision = revision + 1", "updated_at = CURRENT_TIMESTAMP"];
-            $updateParams = ['id' => $visitRecordId, 'doctor_id' => $doctorId];
+            $updateParams = ['id' => $visitRecordId, 'doctor_id' => $doctorId, 'profile_id' => $profileId];
             if ($prescriptionHtml !== '') {
                 $updateFields[] = "prescription_html = :prescription_html";
                 $updateParams['prescription_html'] = $prescriptionHtml;
@@ -394,7 +461,7 @@ try {
                 $updateParams['rich_text_json'] = $richTextJson;
             }
 
-            $whereSql = "WHERE id = :id AND doctor_id = :doctor_id";
+            $whereSql = "WHERE id = :id AND doctor_id = :doctor_id AND profile_id = :profile_id";
             if ($expectedRevision > 0) {
                 $whereSql .= " AND revision = :expected_revision";
                 $updateParams['expected_revision'] = $expectedRevision;
@@ -419,8 +486,8 @@ try {
                 'visit_no' => (int)($existingVisit['visit_no'] ?? 0),
             ]);
 
-            $pdo->prepare("UPDATE zimrx_appointments SET visit_record_id = :visit_record_id WHERE id = :id AND doctor_id = :doctor_id")
-                ->execute(['visit_record_id' => $visitRecordId, 'id' => $appointmentId, 'doctor_id' => $doctorId]);
+            $pdo->prepare("UPDATE zimrx_appointments SET visit_record_id = :visit_record_id WHERE id = :id AND doctor_id = :doctor_id AND profile_id = :profile_id")
+                ->execute(['visit_record_id' => $visitRecordId, 'id' => $appointmentId, 'doctor_id' => $doctorId, 'profile_id' => $profileId]);
             $publicVisitId = (string)($existingVisit['visit_id'] ?? '');
 
             $pdo->commit();
@@ -442,7 +509,7 @@ try {
     }
 
     $patientId = $appointment ? (int)$appointment['patient_id'] : (int)value($payload, 'patient_id');
-    $patient = load_patient($pdo, $patientId, $doctorId);
+    $patient = load_patient($pdo, $patientId, $doctorId, $profileId);
     if (!$patient && !$appointment) {
         respond(['error' => 'A patient or appointment is required to save a visit.']);
     }
@@ -494,21 +561,22 @@ try {
     $pdo->beginTransaction();
     $stmt = $pdo->prepare(
         "INSERT INTO zimrx_visits (
-            doctor_id, appointment_id, patient_id, patient_reg_no, patient_name, visit_no, visit_id,
+            doctor_id, profile_id, appointment_id, patient_id, patient_reg_no, patient_name, visit_no, visit_id,
             referral_category, referral_name, referred_by,
-            visit_date, age_at_visit, height_at_visit, height_unit_at_visit,
+            visit_date, age_at_visit, age_unit_at_visit, dob_at_visit, dob_type_at_visit, height_at_visit, height_unit_at_visit,
             weight_at_visit, weight_unit_at_visit, billing_json, rich_text_json,
             prescription_html, clinical_snapshot_json, revision, sync_id
         ) VALUES (
-            :doctor_id, :appointment_id, :patient_id, :patient_reg_no, :patient_name, :visit_no, :visit_id,
+            :doctor_id, :profile_id, :appointment_id, :patient_id, :patient_reg_no, :patient_name, :visit_no, :visit_id,
             :referral_category, :referral_name, :referred_by,
-            :visit_date, :age_at_visit, :height_at_visit, :height_unit_at_visit,
+            :visit_date, :age_at_visit, :age_unit_at_visit, :dob_at_visit, :dob_type_at_visit, :height_at_visit, :height_unit_at_visit,
             :weight_at_visit, :weight_unit_at_visit, :billing_json, :rich_text_json,
             :prescription_html, :clinical_snapshot_json, 1, :sync_id
         )"
     );
     $stmt->execute([
         'doctor_id' => $doctorId,
+        'profile_id' => $profileId,
         'appointment_id' => $appointmentId ?: null,
         'patient_id' => $patientId,
         'patient_reg_no' => $regNo,
@@ -520,6 +588,9 @@ try {
         'referred_by' => $visitReferral['name'],
         'visit_date' => $visitDate,
         'age_at_visit' => $appointment['resolved_age'] ?? $patient['age'] ?? '',
+        'age_unit_at_visit' => $appointment['resolved_age_unit'] ?? $patient['age_unit'] ?? (value($payload, 'age_unit') ?: 'Years'),
+        'dob_at_visit' => $appointment['resolved_dob'] ?? $patient['dob'] ?? (value($payload, 'dob') ?: null),
+        'dob_type_at_visit' => $appointment['resolved_dob_type'] ?? $patient['dob_type'] ?? (value($payload, 'dob_type') ?: 'exact'),
         'height_at_visit' => $appointment['resolved_height'] ?? $patient['height'] ?? '',
         'height_unit_at_visit' => $appointment['resolved_height_unit'] ?? $patient['height_unit'] ?? '',
         'weight_at_visit' => $appointment['resolved_weight'] ?? $patient['weight'] ?? '',
@@ -540,7 +611,7 @@ try {
                  visit_id = :visit_id,
                  status = 'Done',
                  updated_at = CURRENT_TIMESTAMP
-             WHERE id = :id AND doctor_id = :doctor_id"
+             WHERE id = :id AND doctor_id = :doctor_id AND profile_id = :profile_id"
         );
         $stmt->execute([
             'visit_record_id' => $visitRecordId,
@@ -548,10 +619,11 @@ try {
             'visit_id' => $publicVisitId,
             'id' => $appointmentId,
             'doctor_id' => $doctorId,
+            'profile_id' => $profileId,
         ]);
     }
 
-    save_patient_referral($pdo, $doctorId, $regNo, $visitRecordId, $publicVisitId, $payload);
+    save_patient_referral($pdo, $doctorId, $profileId, $regNo, $visitRecordId, $publicVisitId, $payload);
 
     $snapshotArr = is_array($clinicalSnapshot) ? $clinicalSnapshot : json_decode((string)$clinicalSnapshotJson, true);
     $savedOccupation = trim((string)($snapshotArr['patient_particulars']['occupation'] ?? $payload['occupation'] ?? ''));
@@ -575,6 +647,14 @@ try {
         'visit_code' => $publicVisitId,
         'revision' => 1,
     ]);
+} catch (InvalidArgumentException $e) {
+    if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
+        try {
+            $pdo->rollBack();
+        } catch (Throwable) {}
+    }
+    http_response_code(422);
+    respond(['error' => $e->getMessage()]);
 } catch (Throwable $e) {
     if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
         try {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/init.php';
 require_login();
+require_once ZIMRX_BASE_DIR . '/lib/print_setup_lib.php';
 
 header('Content-Type: application/json');
 
@@ -67,56 +68,28 @@ try {
         }
     }
 
-    $doctorId = current_user_doctor_id();
+    $profile = (new \ZimRx\Services\PracticeProfileService($pdo))->activeForCurrentUser();
+    $profileId = (int)($profile['id'] ?? 0);
+    $doctorId = (int)($profile['doctor_id'] ?? 0);
+    if ($profileId <= 0 || $doctorId <= 0) {
+        throw new RuntimeException('An active practice profile is required.');
+    }
     $targetDir = ZIMRX_UPLOADS_DIR . '/full-body-headers';
     if (!is_dir($targetDir) && !mkdir($targetDir, 0750, true) && !is_dir($targetDir)) {
         throw new RuntimeException('Unable to create full body header upload directory.');
     }
 
-    $filename = sprintf('doctor-%d-%d-%s.%s', $doctorId, time(), bin2hex(random_bytes(8)), $allowedExts[$ext]);
+    $filename = sprintf('profile-%d-%d-%s.%s', $profileId, time(), bin2hex(random_bytes(8)), $allowedExts[$ext]);
     $targetPath = $targetDir . '/' . $filename;
     if (!move_uploaded_file($tmpPath, $targetPath)) {
         throw new RuntimeException('Could not save uploaded image.');
     }
 
     $publicPath = '/uploads/full-body-headers/' . $filename;
-    $chkStmt = $pdo->prepare("SELECT COUNT(*) FROM zimrx_prescription_header_settings WHERE doctor_id = :doctor_id");
-    $chkStmt->execute(['doctor_id' => $doctorId]);
-    $exists = (int)$chkStmt->fetchColumn() > 0;
-
-    if (!$exists) {
-        try {
-            $pdo->prepare(
-                "INSERT INTO zimrx_prescription_header_settings (doctor_id, doctor_name) VALUES (:doctor_id, :doctor_name)"
-            )->execute(['doctor_id' => $doctorId, 'doctor_name' => current_user_name()]);
-        } catch (PDOException $e) {
-            // Ignore if inserted concurrently
-        }
-    }
-
-    $stmt = $pdo->prepare(
-        "UPDATE zimrx_prescription_header_settings
-         SET full_body_header_path = :full_body_header_path,
-             header_type = 'image',
-             updated_at = CURRENT_TIMESTAMP
-         WHERE doctor_id = :doctor_id"
-    );
-    $stmt->execute([
+    zimrx_print_save_setup($pdo, $profileId, [
         'full_body_header_path' => $publicPath,
-        'doctor_id' => $doctorId,
+        'header_type' => 'image',
     ]);
-
-    // Also sync header_type in print_settings_json if present
-    $layoutStmt = $pdo->prepare("SELECT print_settings_json FROM zimrx_prescription_print_layout_settings WHERE doctor_id = :doctor_id LIMIT 1");
-    $layoutStmt->execute(['doctor_id' => $doctorId]);
-    $advJson = $layoutStmt->fetchColumn();
-    $advData = json_decode((string)($advJson ?: '{}'), true);
-    if (!is_array($advData)) {
-        $advData = [];
-    }
-    $advData['header_type'] = 'image';
-    $pdo->prepare("UPDATE zimrx_prescription_print_layout_settings SET print_settings_json = :json WHERE doctor_id = :doctor_id")
-        ->execute(['json' => json_encode($advData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 'doctor_id' => $doctorId]);
 
     echo json_encode([
         'ok' => true,

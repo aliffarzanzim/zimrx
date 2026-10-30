@@ -285,4 +285,4 @@ declare(strict_types=1);
     </div>
 </div>
 
-<script src="assets/js/modules/calculators.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/modules/calculators.js') ?>"></script>
+<script src="assets/js/modules/calculators.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/modules/calculators.js') ?>" defer></script>

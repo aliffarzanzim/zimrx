@@ -17,7 +17,6 @@ $app_version = '1.0.0';
     <span>Version <?= htmlspecialchars($app_version) ?></span>
     <span class="app-footer-sep">|</span>
     <button type="button" class="app-footer-support" onclick="zimrxOpenSupportModal()">
-        <span class="support-icon">❤️</span>
         <span class="support-label">Support ZimRx</span>
     </button>
 </footer>

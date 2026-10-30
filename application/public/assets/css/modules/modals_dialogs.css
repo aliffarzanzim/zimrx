@@ -4,8 +4,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     padding: 0;
     margin-left: 4px;
     border: none;
@@ -24,150 +24,31 @@
 }
 
 .zrx-help-icon-btn svg {
-    width: 13px;
-    height: 13px;
+    width: 16px;
+    height: 16px;
     display: block;
     pointer-events: none;
     color: inherit;
     transition: color 0.15s ease;
 }
 
-/* Help guide modal overlay, cards, and step instructions */
+/* Help guide content and occupation or address management */
 
-.zrx-help-modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.45);
-    backdrop-filter: blur(3px);
-    z-index: 99999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.2s ease, visibility 0.2s ease;
+.zrx-help-modal-dialog {
+    width: min(600px, 100%);
+    max-height: calc(100vh - 3rem);
 }
-.zrx-help-modal-overlay.active {
-    opacity: 1;
-    visibility: visible;
+.zrx-help-modal-dialog.zrx-help-modal-wide {
+    width: min(1120px, 100%);
+    height: calc(100vh - 3rem);
+    max-height: calc(100vh - 3rem);
 }
-.zrx-help-modal-card {
-    background: var(--zrx-bg-card);
-    border-radius: 12px;
-    box-shadow: var(--zrx-shadow-modal);
-    width: 100%;
-    max-width: 520px;
-    max-height: 88vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    transform: scale(0.95) translateY(10px);
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+.zrx-help-language-picker {
+    width: 170px;
 }
-.zrx-help-modal-overlay.active .zrx-help-modal-card {
-    transform: scale(1) translateY(0);
-}
-.zrx-help-modal-card.zrx-help-modal-wide {
-    max-width: 840px;
-    width: 95vw;
-    height: 88vh;
-    max-height: 88vh;
-}
-.zrx-help-modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.9rem 1.25rem;
-    background: var(--zrx-bg-subtle);
-    border-bottom: 1px solid var(--zrx-border-subtle);
-    flex-shrink: 0;
-}
-.zrx-help-modal-title-wrap {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.zrx-help-modal-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    background: var(--zrx-primary-light, var(--zrx-blue-50));
-    color: var(--zrx-primary);
-    border: 1px solid var(--zrx-primary-border, var(--zrx-blue-200));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-.zrx-help-modal-title-wrap h3 {
-    margin: 0;
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--zrx-text-main);
-}
-.zrx-help-modal-badge {
-    display: inline-block;
-    font-size: 0.70rem;
-    font-weight: 600;
-    color: var(--zrx-primary);
-    background: var(--zrx-primary-light, var(--zrx-blue-50));
-    border: 1px solid var(--zrx-primary-border, var(--zrx-blue-200));
-    padding: 1px 6px;
-    border-radius: 4px;
-    margin-top: 2px;
-}
-.zrx-help-modal-close {
-    background: transparent;
-    border: none;
-    color: var(--zrx-border-divider);
-    font-size: 1.1rem;
-    cursor: pointer;
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s ease;
-}
-.zrx-help-modal-close:hover {
-    background: var(--zrx-border-subtle);
-    color: var(--zrx-text-main);
-}
-.zrx-help-modal-header-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.zrx-help-lang-toggle {
-    display: inline-flex;
-    align-items: center;
-    background: var(--zrx-bg-card, #ffffff);
-    border: 1px solid var(--zrx-border-subtle, #cbd5e1);
-    border-radius: 6px;
-    padding: 2px;
-    gap: 2px;
-}
-.zrx-help-lang-btn {
-    border: none;
-    background: transparent;
-    color: var(--zrx-text-muted, #64748b);
-    font-size: 0.72rem;
-    font-weight: 600;
-    padding: 2px 7px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    line-height: 1.2;
-}
-.zrx-help-lang-btn:hover {
-    color: var(--zrx-text-main, #0f172a);
-}
-.zrx-help-lang-btn.active {
-    background: var(--zrx-primary, #2563eb);
-    color: #ffffff;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+.zrx-help-language-picker.is-saving .zrx-select-trigger {
+    pointer-events: none;
+    opacity: 0.65;
 }
 
 .zrx-help-modal-body {
@@ -182,6 +63,11 @@
     scrollbar-gutter: stable;
     flex: 1 1 auto;
     min-height: 0;
+}
+.zrx-help-modal-body > #zrx-help-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 .zrx-help-step {
     display: flex;
@@ -212,29 +98,6 @@
 .zrx-help-step-text strong {
     color: var(--zrx-text-main);
 }
-.zrx-help-modal-footer {
-    padding: 0.75rem 1.25rem;
-    background: var(--zrx-bg-subtle);
-    border-top: 1px solid var(--zrx-border-subtle);
-    display: flex;
-    justify-content: flex-end;
-    flex-shrink: 0;
-}
-.zrx-help-modal-btn {
-    background: var(--zrx-primary);
-    color: var(--zrx-white);
-    border: none;
-    padding: 6px 18px;
-    border-radius: 6px;
-    font-size: 0.88rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-}
-.zrx-help-modal-btn:hover {
-    background: var(--zrx-primary-hover);
-}
-
 /* Help table listings and occupation management table */
 
 .zrx-help-list { margin: 6px 0 0 16px; padding: 0; line-height: 1.6; }

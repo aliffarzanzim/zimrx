@@ -7,15 +7,14 @@ declare(strict_types=1);
 
 <div class="billings-container zrx-page-container">
     <!-- Page Header -->
-    <div class="billings-header">
-        <div class="billings-title-wrap">
+    <header class="billings-header zrx-page-hero">
+        <div class="billings-title-wrap zrx-page-hero-copy">
             <h1>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" color="#2563eb"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                 <span>Billings &amp; Financials</span>
             </h1>
             <p>Track patient consultation fees, payments, discounts, outstanding dues, and print invoices.</p>
         </div>
-        <div class="billings-header-actions no-print">
+        <div class="billings-header-actions zrx-page-hero-actions no-print">
             <button type="button" class="btn-billing-outline" id="btn-export-csv" title="Export transactions to CSV spreadsheet">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                 <span>Export CSV</span>
@@ -25,20 +24,17 @@ declare(strict_types=1);
                 <span>Print Report</span>
             </button>
             <button type="button" class="btn-billing-primary" id="btn-new-billing">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                <span>+ New Transaction</span>
+                <?= zrx_icon('plus', 15) ?>
+                <span>New Transaction</span>
             </button>
         </div>
-    </div>
+    </header>
 
     <!-- KPI Summary Cards -->
     <div class="billing-kpi-grid">
         <div class="billing-kpi-card">
             <div class="billing-kpi-head">
                 <span class="billing-kpi-label">Today's Collection</span>
-                <div class="billing-kpi-icon kpi-icon-green">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </div>
             </div>
             <div class="billing-kpi-value text-money-paid">৳<?= number_format((float)($todayMetrics['today_collected'] ?? 0), 0) ?></div>
             <div class="billing-kpi-sub">
@@ -51,9 +47,6 @@ declare(strict_types=1);
         <div class="billing-kpi-card">
             <div class="billing-kpi-head">
                 <span class="billing-kpi-label">This Month Collection</span>
-                <div class="billing-kpi-icon kpi-icon-blue">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                </div>
             </div>
             <div class="billing-kpi-value">৳<?= number_format((float)($monthMetrics['month_collected'] ?? 0), 0) ?></div>
             <div class="billing-kpi-sub">
@@ -66,9 +59,6 @@ declare(strict_types=1);
         <div class="billing-kpi-card">
             <div class="billing-kpi-head">
                 <span class="billing-kpi-label">Total Outstanding Due</span>
-                <div class="billing-kpi-icon kpi-icon-amber">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                </div>
             </div>
             <div class="billing-kpi-value text-money-due">৳<?= number_format((float)($dueMetrics['total_due'] ?? 0), 0) ?></div>
             <div class="billing-kpi-sub">
@@ -81,9 +71,6 @@ declare(strict_types=1);
         <div class="billing-kpi-card">
             <div class="billing-kpi-head">
                 <span class="billing-kpi-label">Filtered Net Revenue</span>
-                <div class="billing-kpi-icon kpi-icon-purple">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                </div>
             </div>
             <div class="billing-kpi-value">৳<?= number_format($filteredCollected, 0) ?></div>
             <div class="billing-kpi-sub">

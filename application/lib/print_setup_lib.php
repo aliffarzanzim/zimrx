@@ -5,6 +5,45 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/db/db.php';
+require_once __DIR__ . '/Services/PatientCustomFields.php';
+require_once __DIR__ . '/Services/PracticeProfileService.php';
+
+function zimrx_print_profile_context(PDO $pdo, int $profileId): array {
+    if ($profileId <= 0) {
+        throw new RuntimeException('An active practice profile is required for prescription printing.');
+    }
+    $stmt = $pdo->prepare(
+        'SELECT id, doctor_id, profile_name, address, phone, settings_json FROM zimrx_doctor_profiles
+         WHERE id = :profile_id AND is_active = 1 AND is_deleted = 0 LIMIT 1'
+    );
+    $stmt->execute(['profile_id' => $profileId]);
+    $profile = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$profile) {
+        throw new RuntimeException('The active practice profile could not be found.');
+    }
+    $settings = json_decode((string)($profile['settings_json'] ?? '{}'), true);
+    if (!is_array($settings)) {
+        throw new RuntimeException('Practice profile settings are invalid.');
+    }
+    $print = is_array($settings['prescription_print'] ?? null) ? $settings['prescription_print'] : [];
+    $header = is_array($print['header_settings'] ?? null) ? $print['header_settings'] : [];
+    foreach ([
+        'chamber_name' => 'profile_name',
+        'chamber_address' => 'address',
+        'chamber_phone' => 'phone',
+    ] as $headerKey => $profileKey) {
+        if (trim((string)($header[$headerKey] ?? '')) === '') {
+            $header[$headerKey] = (string)$profile[$profileKey];
+        }
+    }
+    $print['header_settings'] = $header;
+    return [
+        'profile_id' => (int)$profile['id'],
+        'doctor_id' => (int)$profile['doctor_id'],
+        'all' => $settings,
+        'print' => $print,
+    ];
+}
 
 function zimrx_print_normalize_header_line(string $value): string {
     return trim(preg_replace('/\s+/', ' ', $value));
@@ -250,68 +289,28 @@ function zimrx_print_visual_block_html(array $header, string $side, array $lines
     return implode('', $chunks);
 }
 
-function zimrx_print_load_header_settings(PDO $pdo, int $doctorId): array {
+function zimrx_print_load_header_settings(PDO $pdo, int $profileId): array {
     $onboardDefaults = zimrx_onboarding_defaults();
     $defaultFooter = (string)($onboardDefaults['footer_html'] ?? '');
-
-    if (!zimrx_db_table_exists($pdo, 'zimrx_prescription_header_settings')) {
-        return [
-            'doctor_name' => function_exists('current_user_name') ? current_user_name() : 'Doctor',
-            'footer_html' => $defaultFooter,
-        ];
-    }
-
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM zimrx_prescription_header_settings WHERE doctor_id = :doctor_id");
-    $stmt->execute(['doctor_id' => $doctorId]);
-    $exists = (int)$stmt->fetchColumn() > 0;
-
-    if (!$exists) {
-        try {
-            $pdo->prepare(
-                "INSERT INTO zimrx_prescription_header_settings (doctor_id, doctor_name, footer_html) VALUES (:doctor_id, :doctor_name, :footer_html)"
-            )->execute([
-                'doctor_id' => $doctorId,
-                'doctor_name' => current_user_name(),
-                'footer_html' => $defaultFooter,
-            ]);
-        } catch (Throwable) {
-            // Ignore if already inserted concurrently
-        }
-    }
-
-    $stmt = $pdo->prepare("SELECT * FROM zimrx_prescription_header_settings WHERE doctor_id = :doctor_id LIMIT 1");
-    $stmt->execute(['doctor_id' => $doctorId]);
-    $header = $stmt->fetch() ?: [];
+    $context = zimrx_print_profile_context($pdo, $profileId);
+    $header = is_array($context['print']['header_settings'] ?? null) ? $context['print']['header_settings'] : [];
 
     if (trim((string)($header['doctor_name'] ?? '')) === '') {
         $header['doctor_name'] = current_user_name();
     }
 
-    if (trim((string)($header['footer_html'] ?? '')) === '' && $defaultFooter !== '') {
+    if (!array_key_exists('footer_html', $header) && $defaultFooter !== '') {
         $header['footer_html'] = $defaultFooter;
-        try {
-            $pdo->prepare("UPDATE zimrx_prescription_header_settings SET footer_html = :footer WHERE doctor_id = :doctor_id AND (footer_html IS NULL OR trim(footer_html) = '')")
-                ->execute(['footer' => $defaultFooter, 'doctor_id' => $doctorId]);
-        } catch (Throwable) {
-            // Non-blocking fallback update
-        }
     }
 
     return $header;
 }
 
-function zimrx_print_load_options(PDO $pdo, int $doctorId): array {
+function zimrx_print_load_options(PDO $pdo, int $profileId): array {
     $defaults = zimrx_print_default_options();
-
-    $layout = [];
-    if (zimrx_db_table_exists($pdo, 'zimrx_prescription_print_layout_settings')) {
-        $pdo->prepare(DbSql::insertIgnore('zimrx_prescription_print_layout_settings', 'doctor_id', ':doctor_id'))
-            ->execute(['doctor_id' => $doctorId]);
-
-        $stmt = $pdo->prepare("SELECT * FROM zimrx_prescription_print_layout_settings WHERE doctor_id = :doctor_id LIMIT 1");
-        $stmt->execute(['doctor_id' => $doctorId]);
-        $layout = $stmt->fetch() ?: [];
-    }
+    $context = zimrx_print_profile_context($pdo, $profileId);
+    $doctorId = (int)$context['doctor_id'];
+    $layout = is_array($context['print']['layout_settings'] ?? null) ? $context['print']['layout_settings'] : [];
 
     $advanced = json_decode((string)($layout['print_settings_json'] ?? '{}'), true);
     if (!is_array($advanced)) {
@@ -319,6 +318,14 @@ function zimrx_print_load_options(PDO $pdo, int $doctorId): array {
     }
 
     $options = $defaults;
+    try {
+        $customPatientFields = \ZimRx\Services\PatientCustomFields::loadForDoctor($pdo, $doctorId);
+    } catch (Throwable $e) {
+        error_log('[ZimRx] Unable to load custom patient fields for print settings: ' . $e->getMessage());
+        $customPatientFields = [];
+    }
+    $options['patient_custom_fields'] = $customPatientFields;
+    $options['patient_custom_fields_print'] = [];
 
     if (isset($layout['page_width_cm']) && $layout['page_width_cm'] !== null && $layout['page_width_cm'] !== '') {
         $options['page_width'] = (string)$layout['page_width_cm'];
@@ -386,6 +393,14 @@ function zimrx_print_load_options(PDO $pdo, int $doctorId): array {
         if (array_key_exists($field, $advanced) && ($advanced[$field] !== '' || str_starts_with($field, 'patient_label_'))) {
             $options[$field] = (string)$advanced[$field];
         }
+    }
+    $savedCustomPatientFields = $advanced['patient_custom_fields_print'] ?? [];
+    if (is_array($savedCustomPatientFields)) {
+        $validCustomKeys = array_column($customPatientFields, 'key');
+        $options['patient_custom_fields_print'] = array_values(array_intersect(
+            array_filter($savedCustomPatientFields, 'is_string'),
+            $validCustomKeys
+        ));
     }
 
     // Harmonize default dose, duration, instruction, and advice print languages with clinical language
@@ -482,6 +497,22 @@ function zimrx_print_load_options(PDO $pdo, int $doctorId): array {
     return $options;
 }
 
+function zimrx_print_restore_saved_snapshot(array $storedSnapshot, array $header, array $options): array {
+    $snapshot = $storedSnapshot['_zimrx_print_snapshot'] ?? null;
+    if (!is_array($snapshot)) {
+        return [$header, $options];
+    }
+
+    if (is_array($snapshot['header'] ?? null)) {
+        $header = array_merge($header, $snapshot['header']);
+    }
+    if (is_array($snapshot['options'] ?? null)) {
+        $options = array_merge($options, $snapshot['options']);
+    }
+
+    return [$header, $options];
+}
+
 function zimrx_print_form_to_payload(array $input): array {
     $payload = [];
 
@@ -536,6 +567,11 @@ function zimrx_print_form_to_payload(array $input): array {
             $payload[$field] = trim((string)$input[$field]);
         }
     }
+    if (array_key_exists('patient_custom_fields_print_present', $input)) {
+        $payload['patient_custom_fields_print'] = is_array($input['patient_custom_fields_print'] ?? null)
+            ? array_values(array_filter($input['patient_custom_fields_print'], 'is_string'))
+            : [];
+    }
 
     // =========================================================================
     // One-Time Schema Migration Boundary: Inbound Form Control Normalization
@@ -573,6 +609,11 @@ function zimrx_print_form_to_payload(array $input): array {
 }
 
 function zimrx_print_save_setup(PDO $pdo, int $doctorId, array $data): void {
+    $context = zimrx_print_profile_context($pdo, $doctorId);
+    $profileSettings = $context['print'];
+    $layout = is_array($profileSettings['layout_settings'] ?? null) ? $profileSettings['layout_settings'] : [];
+    $header = is_array($profileSettings['header_settings'] ?? null) ? $profileSettings['header_settings'] : [];
+    $ownerDoctorId = (int)$context['doctor_id'];
     $layoutFields = [
         'page_width_cm', 'page_height_cm', 'header_height_cm', 'patient_info_height_cm',
         'left_width_cm', 'footer_height_cm', 'body_font_size_pt', 'rx_font_size_pt',
@@ -626,22 +667,14 @@ function zimrx_print_save_setup(PDO $pdo, int $doctorId, array $data): void {
         'right_line_6', 'right_line_7', 'right_line_8', 'right_line_9', 'right_line_10'
     ];
 
-    $pdo->prepare(DbSql::insertIgnore('zimrx_prescription_print_layout_settings', 'doctor_id', ':doctor_id'))
-        ->execute(['doctor_id' => $doctorId]);
-
-    $existingLayoutStmt = $pdo->prepare("SELECT print_settings_json FROM zimrx_prescription_print_layout_settings WHERE doctor_id = :doctor_id LIMIT 1");
-    $existingLayoutStmt->execute(['doctor_id' => $doctorId]);
-    $existingAdvanced = json_decode((string)($existingLayoutStmt->fetchColumn() ?: '{}'), true);
+    $existingAdvanced = json_decode((string)($layout['print_settings_json'] ?? '{}'), true);
     if (!is_array($existingAdvanced)) {
         $existingAdvanced = [];
     }
 
-    $layoutSql = [];
-    $layoutParams = ['doctor_id' => $doctorId];
     foreach ($layoutFields as $field) {
         if (array_key_exists($field, $data)) {
-            $layoutSql[] = "{$field} = :{$field}";
-            $layoutParams[$field] = trim((string)$data[$field]);
+            $layout[$field] = trim((string)$data[$field]);
         }
     }
 
@@ -650,6 +683,15 @@ function zimrx_print_save_setup(PDO $pdo, int $doctorId, array $data): void {
         if (array_key_exists($field, $data)) {
             $advancedData[$field] = trim((string)$data[$field]);
         }
+    }
+    if (array_key_exists('patient_custom_fields_print', $data)) {
+        $customPatientFields = \ZimRx\Services\PatientCustomFields::loadForDoctor($pdo, $ownerDoctorId);
+        $validCustomKeys = array_column($customPatientFields, 'key');
+        $selectedCustomKeys = array_values(array_unique(array_intersect(
+            array_filter($data['patient_custom_fields_print'], 'is_string'),
+            $validCustomKeys
+        )));
+        $advancedData['patient_custom_fields_print'] = $selectedCustomKeys;
     }
 
     $advancedToCore = [
@@ -660,70 +702,42 @@ function zimrx_print_save_setup(PDO $pdo, int $doctorId, array $data): void {
     ];
     foreach ($advancedToCore as $advancedField => $layoutField) {
         if (array_key_exists($advancedField, $advancedData) && $advancedData[$advancedField] !== '') {
-            $layoutSql[] = "{$layoutField} = :{$layoutField}";
-            $layoutParams[$layoutField] = trim((string)$advancedData[$advancedField]);
+            $layout[$layoutField] = trim((string)$advancedData[$advancedField]);
         }
     }
 
     if (isset($advancedData['display_footer'])) {
-        $layoutSql[] = "show_footer = :show_footer";
-        $layoutParams['show_footer'] = strtolower((string)$advancedData['display_footer']) === 'no' ? '0' : '1';
+        $layout['show_footer'] = strtolower((string)$advancedData['display_footer']) === 'no' ? '0' : '1';
     }
 
     if (isset($advancedData['preview_header_type'])) {
-        $layoutSql[] = "show_header = :show_header";
-        $layoutParams['show_header'] = strtolower((string)$advancedData['preview_header_type']) === 'without_header' ? '0' : '1';
+        $layout['show_header'] = strtolower((string)$advancedData['preview_header_type']) === 'without_header' ? '0' : '1';
     }
 
     if ($advancedData !== $existingAdvanced) {
-        $layoutSql[] = "print_settings_json = :print_settings_json";
-        $layoutParams['print_settings_json'] = json_encode($advancedData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $layout['print_settings_json'] = json_encode($advancedData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
     }
-
-    if ($layoutSql) {
-        $layoutSql[] = "updated_at = CURRENT_TIMESTAMP";
-        $stmt = $pdo->prepare("UPDATE zimrx_prescription_print_layout_settings SET " . implode(', ', $layoutSql) . " WHERE doctor_id = :doctor_id");
-        $stmt->execute($layoutParams);
-    }
-
-    if (zimrx_db_table_exists($pdo, 'zimrx_prescription_header_settings')) {
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM zimrx_prescription_header_settings WHERE doctor_id = :doctor_id");
-        $stmt->execute(['doctor_id' => $doctorId]);
-        $exists = (int)$stmt->fetchColumn() > 0;
-
-        if (!$exists) {
-            try {
-                $pdo->prepare(
-                    "INSERT INTO zimrx_prescription_header_settings (doctor_id, doctor_name) VALUES (:doctor_id, :doctor_name)"
-                )->execute([
-                    'doctor_id' => $doctorId,
-                    'doctor_name' => current_user_name(),
-                ]);
-            } catch (Throwable) {
-                // Ignore if already inserted concurrently
+    foreach ($headerFields as $field) {
+        if (array_key_exists($field, $data)) {
+            $value = (string)$data[$field];
+            if ($field === 'bg_color') {
+                $value = strtoupper(ltrim(trim($value), '#'));
+            } elseif (!in_array($field, ['footer_html', 'left_block_html', 'right_block_html'], true)) {
+                $value = trim($value);
             }
-        }
-
-        $headerSql = [];
-        $headerParams = ['doctor_id' => $doctorId];
-        foreach ($headerFields as $field) {
-            if (array_key_exists($field, $data)) {
-                $headerSql[] = "{$field} = :{$field}";
-                $value = (string)$data[$field];
-                if ($field === 'bg_color') {
-                    $value = strtoupper(ltrim(trim($value), '#'));
-                } elseif (!in_array($field, ['footer_html', 'left_block_html', 'right_block_html'], true)) {
-                    $value = trim($value);
-                }
-                $headerParams[$field] = $value;
-            }
-        }
-        if ($headerSql) {
-            $headerSql[] = "updated_at = CURRENT_TIMESTAMP";
-            $stmt = $pdo->prepare("UPDATE zimrx_prescription_header_settings SET " . implode(', ', $headerSql) . " WHERE doctor_id = :doctor_id");
-            $stmt->execute($headerParams);
+            $header[$field] = $value;
         }
     }
+    $layout['updated_at'] = gmdate('Y-m-d H:i:s');
+    $header['updated_at'] = gmdate('Y-m-d H:i:s');
+    $profileSettings['layout_settings'] = $layout;
+    $profileSettings['header_settings'] = $header;
+    (new \ZimRx\Services\PracticeProfileService($pdo))->saveSettings(
+        (int)$context['profile_id'],
+        $ownerDoctorId,
+        'prescription_print',
+        $profileSettings
+    );
 }
 
 function zimrx_print_reset_setup(PDO $pdo, int $doctorId): void {

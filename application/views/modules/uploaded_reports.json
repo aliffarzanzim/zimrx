@@ -1,0 +1,12 @@
+{
+    "id":  "uploaded_reports",
+    "name":  "Upload Reports \u0026 Documents",
+    "schema_version":  1,
+    "aliases":  [
+                    "Uploaded Reports"
+                ],
+    "panel":  "right",
+    "enabled_by_default": true,
+    "default_order":  4,
+    "view":  "uploaded_reports.php"
+}

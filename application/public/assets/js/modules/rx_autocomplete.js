@@ -55,10 +55,6 @@ function initRxAutocomplete() {
             .catch(() => []);
     };
 
-    const prewarmRxSearch = () => {
-        fetchRxSearchJson('drug-search:default', 'api/search_drug.php?q=').catch(() => []);
-    };
-
     const getRxDrugModalElements = () => ({
         modal: document.getElementById('rx-drug-modal'),
         frame: document.getElementById('rx-drug-modal-frame'),
@@ -238,7 +234,6 @@ function initRxAutocomplete() {
 
     const applyRxSettingsToUi = (refreshBrands = false) => {
         document.body.classList.toggle('rx-auto-row-size-enabled', rxSettings.autoRowSize);
-        document.body.classList.toggle('rx-warnings-disabled', !rxSettings.showWarnings);
         syncRxSettingsControls();
         syncRxWrapMode();
 
@@ -1307,11 +1302,6 @@ function initRxAutocomplete() {
     loadRxSettings();
     renumberRxRows();
     applyRxSettingsToUi();
-    if (typeof window.requestIdleCallback === 'function') {
-        window.requestIdleCallback(prewarmRxSearch, { timeout: 1200 });
-    } else {
-        window.setTimeout(prewarmRxSearch, 300);
-    }
     window.addEventListener('zimrx:clear-prescription-ui', cancelRxLookups);
     window.addEventListener('resize', closeRxDropdown);
 }

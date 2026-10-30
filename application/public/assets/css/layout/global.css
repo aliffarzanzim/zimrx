@@ -146,6 +146,15 @@
     --zrx-dropdown-hover-text: var(--zrx-white);
     --zrx-dropdown-border-item: var(--zrx-slate-300);
 
+    /* Shared interaction states */
+    --zrx-interaction-hover-bg: var(--zrx-primary-light);
+    --zrx-interaction-hover-border: var(--zrx-primary-border);
+    --zrx-interaction-hover-text: var(--zrx-text-main);
+    --zrx-interaction-focus-border: var(--zrx-primary);
+    --zrx-interaction-focus-ring: var(--zrx-shadow-focus-ring);
+    --zrx-interaction-option-bg: var(--zrx-dropdown-hover-bg);
+    --zrx-interaction-option-text: var(--zrx-dropdown-hover-text);
+
     /* Shadows */
     --zrx-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
     --zrx-shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
@@ -167,12 +176,83 @@
     --zrx-shadow-amber-glow: 0 8px 18px -3px rgba(245, 158, 11, 0.4);
     --zrx-shadow-amber-card: 0 2px 8px rgba(245, 158, 11, 0.04);
 
-    --font-family: "Arimo", "SolaimanLipi", sans-serif;
+    --font-family: Arial, "SolaimanLipi", sans-serif;
     --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --zrx-space-1: 0.25rem;
+    --zrx-space-2: 0.5rem;
+    --zrx-space-3: 0.75rem;
+    --zrx-space-4: 1rem;
+    --zrx-space-5: 1.25rem;
+    --zrx-space-6: 1.5rem;
 
     --zrx-page-max-width: 1680px;
     --zrx-page-width: calc(100% - 2.5rem);
     --zrx-page-margin: 1.25rem auto;
+}
+
+.zrx-section-nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 1.25rem;
+}
+
+.zrx-section-nav-list {
+    display: inline-flex;
+    max-width: 100%;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    background: var(--zrx-slate-100);
+    border: 1px solid var(--zrx-border);
+    border-radius: 8px;
+    box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.zrx-section-nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 1.25rem;
+    color: var(--zrx-text-muted);
+    font-size: 0.92rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    border-radius: 6px;
+    transition: color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.zrx-section-nav-link:hover:not(.is-active) {
+    color: var(--zrx-text-main);
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.zrx-section-nav-link.is-active {
+    color: var(--zrx-text-main);
+    background: var(--zrx-bg-card);
+    font-weight: 700;
+    box-shadow: var(--zrx-shadow-sm);
+}
+
+.zrx-section-nav-count {
+    display: inline-flex;
+    min-width: 20px;
+    height: 20px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    color: var(--zrx-slate-600);
+    background: var(--zrx-border-subtle);
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
+.zrx-section-nav-link.is-active .zrx-section-nav-count {
+    color: var(--zrx-white);
+    background: var(--zrx-primary);
 }
 
 /* Base reset and global typography */
@@ -191,11 +271,11 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* Anti-flicker hold classes */
-body.zimrx-prescription-hold { opacity: 0; }
-body.zimrx-prescription-hold.zimrx-prescription-ready { opacity: 1; }
+/* Keep the appointments page hidden until its controls are initialized. */
 body.zimrx-appointments-hold { opacity: 0; }
 body.zimrx-appointments-hold.zimrx-appointments-ready { opacity: 1; }
+body.zimrx-interface-settings-hold .interface-settings-page .zrx-select,
+body.zimrx-interface-settings-hold .interface-settings-page .zrx-custom-select { visibility: hidden; }
 
 /* Scrollbars */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -224,6 +304,54 @@ body.zimrx-appointments-hold.zimrx-appointments-ready { opacity: 1; }
     z-index: 40;
 }
 
+.header-practice-profile {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex: 0 0 auto;
+    color: var(--zrx-slate-300);
+    font-size: 0.8rem;
+}
+
+.header-practice-profile select.zrx-select {
+    display: none;
+}
+
+.header-practice-profile .zrx-custom-select {
+    width: auto;
+    min-width: 9rem;
+    max-width: 13rem;
+}
+
+.header-practice-profile .zrx-custom-select .zrx-select-trigger {
+    height: 34px;
+    padding-left: 0.6rem;
+    color: var(--zrx-text-white);
+    background-color: var(--zrx-bg-inverse-subtle);
+    border-color: var(--zrx-border-inverse-subtle);
+}
+
+.header-practice-profile .zrx-custom-select .zrx-select-trigger:hover:not(:focus) {
+    background-color: var(--zrx-bg-inverse-hover);
+    border-color: var(--zrx-border-inverse);
+}
+
+.header-practice-profile .zrx-custom-select .dropdown-arrow {
+    color: var(--zrx-slate-300);
+}
+
+.header-practice-profile .zrx-custom-select .zrx-dropdown {
+    background: var(--zrx-slate-800);
+    border-color: var(--zrx-border-inverse);
+    box-shadow: var(--zrx-shadow-xl);
+    scrollbar-color: var(--zrx-slate-500) transparent;
+}
+
+.header-practice-profile .zrx-custom-select .zrx-dropdown-item {
+    color: var(--zrx-text-white);
+    border-bottom-color: var(--zrx-border-inverse-subtle);
+}
+
 @media (min-width: 1200px) {
     .app-header {
         padding: 0 2rem;
@@ -231,7 +359,14 @@ body.zimrx-appointments-hold.zimrx-appointments-ready { opacity: 1; }
     }
 }
 
-.brand-logo {
+@media (max-width: 980px) {
+    .header-practice-profile .zrx-custom-select {
+        min-width: 7rem;
+        max-width: 9rem;
+    }
+}
+
+.app-logo {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -244,7 +379,7 @@ body.zimrx-appointments-hold.zimrx-appointments-ready { opacity: 1; }
     flex-shrink: 0;
 }
 
-.brand-logo:hover {
+.app-logo:hover {
     color: var(--zrx-white);
     text-decoration: none;
 }
@@ -344,6 +479,10 @@ body.zimrx-appointments-hold.zimrx-appointments-ready { opacity: 1; }
 .nav-scroll-right { right: 2px; }
 
 .nav-link { text-decoration: none; font-size: 0.85rem; font-weight: 500; color: var(--zrx-slate-400); padding: 0.4rem 0.8rem; border-radius: 6px; transition: var(--transition); white-space: nowrap; }
+.top-nav [data-nav-width] { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; overflow: hidden; text-overflow: ellipsis; }
+.top-nav [data-nav-width="compact"] { min-width: 0; }
+.top-nav [data-nav-width="standard"] { min-width: 8rem; }
+.top-nav [data-nav-width="wide"] { min-width: 11rem; }
 .nav-link:hover, .nav-link.active { color: var(--zrx-slate-200); background-color: var(--zrx-bg-inverse-subtle); }
 .nav-button { border: 0; background: transparent; cursor: pointer; font-family: inherit; font-size: 0.85rem; font-weight: 500; line-height: 1.2; color: var(--zrx-slate-400); appearance: none; -webkit-appearance: none; display: inline-flex; align-items: center; gap: 0.35rem; }
 .nav-button svg { opacity: 0.7; transition: transform var(--transition); }
@@ -365,7 +504,154 @@ body.zimrx-appointments-hold.zimrx-appointments-ready { opacity: 1; }
     box-sizing: border-box;
 }
 
+.zrx-page-hero,
+.zrx-settings-page-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--zrx-space-6);
+    min-width: 0;
+    padding: var(--zrx-space-4) var(--zrx-space-5);
+    border: 1px solid var(--zrx-border-subtle);
+    border-radius: var(--zrx-border-radius);
+    background: var(--zrx-bg-card);
+}
+
+.zrx-page-hero-copy,
+.zrx-settings-page-hero-copy {
+    display: grid;
+    gap: var(--zrx-space-1);
+    min-width: 0;
+}
+
+.zrx-page-hero h1,
+.zrx-settings-page-hero h1 {
+    margin: 0;
+    color: var(--zrx-text-main);
+    font-size: 1.5rem;
+    line-height: 1.3;
+}
+
+.zrx-page-hero p,
+.zrx-settings-page-hero p {
+    margin: 0;
+    color: var(--zrx-text-muted);
+    font-size: 0.9375rem;
+}
+
+.zrx-settings-page-back {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--zrx-space-1);
+    width: fit-content;
+    color: var(--zrx-text-muted);
+    font-size: 0.8125rem;
+    text-decoration: none;
+}
+
+.zrx-settings-page-back::after {
+    color: var(--zrx-text-subtle);
+    content: "›";
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.zrx-settings-page-back:hover {
+    color: var(--zrx-text-body);
+    text-decoration: none;
+}
+
+.zrx-settings-page-back:focus-visible {
+    border-radius: 2px;
+    outline: 2px solid var(--zrx-primary);
+    outline-offset: 2px;
+}
+
+.zrx-page-hero-actions,
+.zrx-settings-page-hero-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: var(--zrx-space-2);
+}
+
+.zrx-settings-page-actions-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--zrx-space-2);
+    margin-top: var(--zrx-space-5);
+    padding-top: var(--zrx-space-3);
+    border-top: 1px solid var(--zrx-border-subtle);
+}
+
+.zrx-settings-page-actions-footer > div {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: var(--zrx-space-2);
+}
+
+@media (max-width: 720px) {
+    .zrx-page-hero,
+    .zrx-settings-page-hero {
+        align-items: stretch;
+        flex-direction: column;
+        gap: var(--zrx-space-3);
+    }
+
+    .zrx-page-hero-actions,
+    .zrx-settings-page-hero-actions {
+        justify-content: flex-start;
+    }
+
+    .zrx-settings-page-actions-footer,
+    .zrx-settings-page-actions-footer > div {
+        justify-content: flex-start;
+    }
+}
+
 /* Shared form controls, buttons, and input styles */
+
+/* Keep native selects visually aligned until the shared dropdown enhancer replaces them. */
+.zrx-select:not([data-zrx-enhanced="true"]) {
+    width: 100%;
+    min-width: 0;
+    height: 36px;
+    box-sizing: border-box;
+    padding: 0 2rem 0 var(--zrx-space-3);
+    border: 1px solid var(--zrx-border);
+    border-radius: 6px;
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--zrx-bg-card);
+    background-image:
+        linear-gradient(45deg, transparent 50%, var(--zrx-text-muted) 50%),
+        linear-gradient(135deg, var(--zrx-text-muted) 50%, transparent 50%);
+    background-position:
+        calc(100% - 11px) 50%,
+        calc(100% - 7px) 50%;
+    background-size: 4px 4px;
+    background-repeat: no-repeat;
+    color: var(--zrx-text-main);
+    font-family: inherit;
+    font-size: 0.85rem;
+}
+
+.zrx-select-native {
+    display: none;
+}
+
+.zrx-select:not([data-zrx-enhanced="true"]):hover:not(:focus) {
+    border-color: var(--zrx-interaction-hover-border);
+}
+
+.zrx-select:not([data-zrx-enhanced="true"]):focus {
+    border-color: var(--zrx-interaction-focus-border);
+    outline: none;
+    box-shadow: var(--zrx-interaction-focus-ring);
+}
 
 .zrx-custom-select {
     position: relative;
@@ -375,8 +661,8 @@ body.zimrx-appointments-hold.zimrx-appointments-ready { opacity: 1; }
 
 .zrx-custom-select .zrx-select-trigger {
     position: relative;
-    height: 34px;
-    padding: 0 1.5rem 0 0.5rem;
+    height: 36px;
+    padding: 0 2rem 0 var(--zrx-space-3);
     border: 1px solid var(--zrx-border);
     border-radius: 6px;
     font-size: 0.85rem;
@@ -394,15 +680,19 @@ body.zimrx-appointments-hold.zimrx-appointments-ready { opacity: 1; }
 }
 
 .zrx-custom-select .zrx-select-trigger:focus {
-    border-color: var(--zrx-primary);
-    box-shadow: var(--zrx-shadow-focus);
+    border-color: var(--zrx-interaction-focus-border);
+    box-shadow: var(--zrx-interaction-focus-ring);
+}
+
+.zrx-custom-select .zrx-select-trigger:hover:not(:focus) {
+    border-color: var(--zrx-interaction-hover-border);
 }
 
 .zrx-custom-select.open .zrx-select-trigger {
-    border-color: var(--zrx-dropdown-border);
+    border-color: var(--zrx-interaction-focus-border);
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
-    box-shadow: none;
+    box-shadow: var(--zrx-interaction-focus-ring);
 }
 
 .zrx-custom-select .zrx-select-label {
@@ -415,7 +705,7 @@ body.zimrx-appointments-hold.zimrx-appointments-ready { opacity: 1; }
 
 .zrx-custom-select .dropdown-arrow {
     position: absolute;
-    right: 8px;
+    right: 3px;
     top: 50%;
     transform: translateY(-50%);
     color: var(--zrx-text-muted);
@@ -479,9 +769,14 @@ body.zimrx-appointments-hold.zimrx-appointments-ready { opacity: 1; }
 }
 .zrx-input:focus,
 .zrx-form-control:focus {
-    border-color: var(--zrx-primary);
-    box-shadow: var(--zrx-shadow-focus-ring);
+    border-color: var(--zrx-interaction-focus-border);
+    box-shadow: var(--zrx-interaction-focus-ring);
     outline: none;
+}
+.zrx-input:hover:not(:disabled):not(:focus),
+.zrx-form-control:hover:not(:disabled):not(:focus),
+.module-input:hover:not(:disabled):not(:focus) {
+    border-color: var(--zrx-interaction-hover-border);
 }
 .zrx-input:disabled,
 .zrx-form-control:disabled {
@@ -510,7 +805,7 @@ body.zimrx-appointments-hold.zimrx-appointments-ready { opacity: 1; }
 
 /* Workspace layout grid and module card styling */
 
-.app-container { display: grid; grid-template-columns: 450px minmax(0, 1fr); gap: 1.5rem; padding: 0 0 1.5rem; }
+.app-container { display: grid; grid-template-columns: 450px minmax(0, 1fr); gap: var(--zrx-space-4); padding: 0 0 1.5rem; }
 .sidebar, .main-side { display: flex; flex-direction: column; gap: 1.25rem; }
 .sidebar { grid-column: 1; grid-row: 1; }
 .main-side { grid-column: 2; grid-row: 1; }
@@ -560,7 +855,11 @@ body.zimrx-appointments-hold.zimrx-appointments-ready { opacity: 1; }
 .module-header span:last-child { font-size: 0.7rem; font-weight: 500; color: var(--zrx-text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
 .module-body { padding: 1rem; font-size: 0.85rem; }
 .module-input { width: 100%; padding: 6px 10px; border: 1px solid var(--zrx-border); border-radius: 4px; font-size: 0.85rem; transition: var(--transition); }
-.module-input:focus { border-color: var(--zrx-primary); outline: none; }
+.module-input:focus {
+    border-color: var(--zrx-interaction-focus-border);
+    box-shadow: var(--zrx-interaction-focus-ring);
+    outline: none;
+}
 
 /* Flatpickr theme */
 .flatpickr-calendar { background: var(--zrx-bg-card) !important; border: 1px solid var(--zrx-slate-300) !important; box-shadow: var(--zrx-shadow-xl) !important; border-radius: 8px !important; font-family: var(--font-family) !important; padding: 5px !important; width: auto !important; }
@@ -660,15 +959,19 @@ body.zrx-suppress-dropdowns .autocomplete-list {
     border-bottom: none;
 }
 
+.zrx-dropdown-item:hover,
 .zrx-dropdown-item.active,
+.autocomplete-list li:hover,
 .autocomplete-list li.active {
-    background-color: var(--zrx-dropdown-hover-bg, #868e96);
-    color: var(--zrx-dropdown-hover-text, #ffffff);
+    background-color: var(--zrx-interaction-option-bg);
+    color: var(--zrx-interaction-option-text);
 }
 
+.zrx-dropdown-item:hover *,
 .zrx-dropdown-item.active *,
+.autocomplete-list li:hover *,
 .autocomplete-list li.active * {
-    color: var(--zrx-dropdown-hover-text, #ffffff);
+    color: var(--zrx-interaction-option-text);
 }
 
 .autocomplete-wrapper {
@@ -694,10 +997,10 @@ body.zrx-suppress-dropdowns .autocomplete-list {
 }
 
 .autocomplete-wrapper.open input {
-    border-color: var(--zrx-dropdown-border) !important;
-    border-bottom-left-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
-    box-shadow: none !important;
+    border-color: var(--zrx-dropdown-border);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    box-shadow: none;
 }
 
 .autocomplete-wrapper .zrx-dropdown,
@@ -742,6 +1045,29 @@ body.zrx-suppress-dropdowns .autocomplete-list {
 .zrx-table .zrx-drag-handle:active {
     cursor: grabbing;
 }
+.pc-row-move-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 36px;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    color: inherit;
+    cursor: grab;
+}
+.pc-row-move-btn:hover {
+    background: var(--zrx-border-subtle);
+    color: var(--zrx-text-main);
+}
+.pc-row-move-btn:active {
+    cursor: grabbing;
+}
 .zrx-table .zrx-row-del {
     color: var(--zrx-danger);
     background: none;
@@ -777,13 +1103,14 @@ body.zrx-suppress-dropdowns .autocomplete-list {
 .zrx-modal-backdrop.open,
 .zrx-modal-backdrop.active,
 .zrx-modal-overlay.open,
-.zrx-modal-overlay.active {
+.zrx-modal-overlay.active,
+.zrx-modal-overlay:not([hidden]) {
     display: flex;
 }
 .zrx-modal-dialog {
     position: relative;
     background: var(--zrx-bg-card);
-    border-radius: var(--zrx-border-radius, 8px);
+    border-radius: 12px;
     border: 1px solid var(--zrx-border-subtle);
     box-shadow: var(--zrx-shadow-modal);
     display: flex;
@@ -799,8 +1126,31 @@ body.zrx-suppress-dropdowns .autocomplete-list {
     align-items: center;
     justify-content: space-between;
     padding: 1rem 1.25rem;
+    background: var(--zrx-bg-subtle);
     border-bottom: 1px solid var(--zrx-border-subtle);
+    flex-shrink: 0;
 }
+.zrx-modal-heading,
+.zrx-modal-header-actions {
+    display: flex;
+    align-items: center;
+}
+.zrx-modal-heading {
+    gap: 0.5rem;
+    min-width: 0;
+}
+.zrx-modal-title-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+    min-width: 0;
+}
+.zrx-modal-header-actions {
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+.zrx-modal-header h2,
 .zrx-modal-header h3 {
     margin: 0;
     font-size: 1.1rem;
@@ -810,6 +1160,7 @@ body.zrx-suppress-dropdowns .autocomplete-list {
 .zrx-modal-body {
     padding: 1.25rem;
     overflow-y: auto;
+    min-height: 0;
 }
 .zrx-modal-footer {
     display: flex;
@@ -817,15 +1168,22 @@ body.zrx-suppress-dropdowns .autocomplete-list {
     justify-content: flex-end;
     gap: 0.75rem;
     padding: 1rem 1.25rem;
+    background: var(--zrx-bg-subtle);
     border-top: 1px solid var(--zrx-border-subtle);
+    flex-shrink: 0;
+}
+.zrx-modal-footer-spread {
+    justify-content: space-between;
 }
 .zrx-modal-close {
-    background: transparent;
-    border: none;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border-subtle);
     color: var(--zrx-text-muted);
     cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
+    border-radius: 6px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -834,6 +1192,10 @@ body.zrx-suppress-dropdowns .autocomplete-list {
 .zrx-modal-close:hover {
     color: var(--zrx-text-main);
     background: var(--zrx-bg-hover);
+}
+.zrx-modal-close:focus-visible {
+    outline: 2px solid var(--zrx-primary);
+    outline-offset: 2px;
 }
 
 .zrx-alert-modal-overlay {
@@ -1058,37 +1420,13 @@ textarea.zrx-input-invalid,
     margin: 0;
     cursor: pointer;
     font-family: inherit;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: #e11d48;
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
     display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
     position: relative;
     transition: color 0.2s ease;
 }
-.app-footer-support .support-icon {
-    display: inline-block;
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.app-footer-support .support-label {
-    position: relative;
-}
-.app-footer-support .support-label::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0%;
-    height: 1.5px;
-    background: #e11d48;
-    border-radius: 1px;
-    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.app-footer-support:hover { color: #be123c; }
-.app-footer-support:hover .support-label::after { width: 100%; }
-.app-footer-support:hover .support-icon { transform: scale(1.25); }
-.app-footer-support:active .support-icon { transform: scale(1.05); }
 
 /* Global SVG Icons & Spin animation */
 .zrx-icon {

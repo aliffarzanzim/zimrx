@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/init.php';
 require_login();
+require_once ZIMRX_BASE_DIR . '/lib/Services/PracticeProfileService.php';
 
 $userRole = current_user_role();
 if ($userRole === 'assistant') {
@@ -12,16 +13,13 @@ if ($userRole === 'assistant') {
     exit;
 }
 
-$isMultiDoctor = zimrx_is_multi_doctor($pdo);
-$currentDoctorId = current_user_doctor_id();
-$doctors = zimrx_doctor_options_for_user($pdo, current_user_id(), $userRole, $currentDoctorId);
+$activePracticeProfile = (new \ZimRx\Services\PracticeProfileService($pdo))->activeForCurrentUser();
+$activeProfileId = (int)($activePracticeProfile['id'] ?? 0);
 
-$selectedDoctorId = isset($_GET['doctor_id']) ? (int)$_GET['doctor_id'] : $currentDoctorId;
-if ($selectedDoctorId <= 0 && !empty($doctors)) {
-    $selectedDoctorId = (int)$doctors[0]['id'];
-}
-if ($selectedDoctorId <= 0) {
-    $selectedDoctorId = 1;
+$selectedDoctorId = (int)($activePracticeProfile['doctor_id'] ?? 0);
+if ($selectedDoctorId <= 0 || $activeProfileId <= 0) {
+    http_response_code(403);
+    exit('An active practice profile is required to manage appointment settings.');
 }
 
 $flashMessage = '';
@@ -94,15 +92,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'token_fields' => $tokenFields,
         ];
 
-        $stmt = $pdo->prepare(
-            "INSERT INTO zimrx_appointment_settings (doctor_id, settings_json, updated_at)
-             VALUES (:doctor_id, :settings_json, " . DbSql::now() . ")
-             " . DbSql::upsert('doctor_id', ['settings_json', 'updated_at'], ['updated_at' => DbSql::now()])
-        );
-        $stmt->execute([
-            'doctor_id' => $selectedDoctorId,
-            'settings_json' => json_encode($savePayload, JSON_UNESCAPED_UNICODE),
-        ]);
+        if ($activeProfileId <= 0 || $selectedDoctorId <= 0) {
+            throw new RuntimeException('Select an active practice profile before changing appointment settings.');
+        }
+        (new \ZimRx\Services\PracticeProfileService($pdo))->saveSettings($activeProfileId, $selectedDoctorId, 'appointment', $savePayload);
 
         $flashMessage = 'Appointment settings saved successfully!';
     } catch (PDOException $e) {
@@ -118,13 +111,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Fetch Current Settings
 $currentSettings = $defaultSettings;
 try {
-    $stmt = $pdo->prepare(
-        "SELECT settings_json FROM zimrx_appointment_settings WHERE doctor_id = :doctor_id LIMIT 1"
-    );
-    $stmt->execute(['doctor_id' => $selectedDoctorId]);
-    $stored = json_decode((string)($stmt->fetchColumn() ?: ''), true);
-    if (is_array($stored)) {
-        $currentSettings = array_merge($defaultSettings, $stored);
+    if ($activeProfileId > 0 && $selectedDoctorId > 0) {
+        $profileSettings = (new \ZimRx\Services\PracticeProfileService($pdo))->settings($activeProfileId, $selectedDoctorId, 'appointment');
+        if (is_array($profileSettings)) {
+            $currentSettings = array_merge($currentSettings, $profileSettings);
+        }
     }
 } catch (Throwable $e) {
     error_log('[ZimRx] Unable to load appointment settings: ' . $e->getMessage());
@@ -140,20 +131,15 @@ include 'header.php';
 <div class="layout-editor-page zrx-page-container">
 
     <!-- Heading Box -->
-    <div class="layout-editor-heading">
-        <div>
+    <div class="layout-editor-heading zrx-settings-page-hero">
+        <div class="zrx-settings-page-hero-copy">
+            <a class="zrx-settings-page-back" href="settings.php">Settings</a>
             <h1>Appointment Settings</h1>
             <p>Configure chamber start timing, pacing, safety slots, consultation fees, and token print preferences.</p>
         </div>
-        <div class="layout-editor-heading-actions">
-            <?php if (!empty($doctors) && count($doctors) > 1): ?>
-            <select class="doctor-select-heading" onchange="location.href='appointment_settings.php?doctor_id=' + this.value">
-                <?php foreach ($doctors as $doc): ?>
-                    <option value="<?= (int)$doc['id'] ?>" <?= $selectedDoctorId === (int)$doc['id'] ? 'selected' : '' ?>>
-                        Dr. <?= htmlspecialchars($doc['display_name']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
+        <div class="layout-editor-heading-actions zrx-settings-page-hero-actions">
+            <?php if ($activePracticeProfile !== null): ?>
+                <span class="doctor-select-heading"><?= htmlspecialchars((string)$activePracticeProfile['profile_name'], ENT_QUOTES, 'UTF-8') ?></span>
             <?php endif; ?>
             <a href="appointments.php" class="btn btn-outline">Back to Queue</a>
             <button type="button" class="btn btn-outline" id="factory-reset-btn">Reset to Defaults</button>
@@ -184,7 +170,7 @@ include 'header.php';
     </div>
 
     <!-- Settings Form -->
-    <form method="POST" id="appointment-settings-form" class="apt-settings-form-body" action="appointment_settings.php<?= $selectedDoctorId ? '?doctor_id=' . $selectedDoctorId : '' ?>">
+    <form method="POST" id="appointment-settings-form" class="apt-settings-form-body" action="appointment_settings.php">
         <?= zimrx_csrf_field() ?>
 
         <div class="apt-layout-grid">

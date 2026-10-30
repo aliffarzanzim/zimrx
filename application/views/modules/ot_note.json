@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "ot_note",
+    "aliases":  [
+
+                ],
+    "panel":  "right",
+    "name":  "OT Note",
+    "view":  "ot_note.php",
+    "enabled_by_default": true,
+    "default_order":  7
+}

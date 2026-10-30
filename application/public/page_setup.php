@@ -9,10 +9,11 @@ require_once ZIMRX_BASE_DIR . '/lib/print_setup_lib.php';
 
 $page_title = 'ZimRx - Page Setup';
 $extra_css = ['assets/css/pages/page_setup.css'];
-$doctorId = current_user_doctor_id();
-$options = zimrx_print_load_options($pdo, $doctorId);
+$activeProfile = (new \ZimRx\Services\PracticeProfileService($pdo))->activeForCurrentUser();
+$profileId = (int)($activeProfile['id'] ?? 0);
+$options = zimrx_print_load_options($pdo, $profileId);
 
-$header = zimrx_print_load_header_settings($pdo, $doctorId);
+$header = zimrx_print_load_header_settings($pdo, $profileId);
 $headerPayload = zimrx_print_header_preview_payload($header);
 $displayLogo = strtolower((string)($header['display_logo'] ?? (!empty($header['logo_path']) ? 'yes' : 'yes'))) === 'no' ? 'no' : 'yes';
 $headerLogoUrl = trim((string)($header['logo_path'] ?? ''));
@@ -101,18 +102,12 @@ include 'header.php';
 ?>
 
 <div class="zps-page zrx-page-container">
-    <div class="zps-heading-card">
+    <div class="zps-heading-card zrx-settings-page-hero">
         <div class="zps-heading">
-            <div>
+            <div class="zrx-settings-page-hero-copy">
+                <a class="zrx-settings-page-back" href="settings.php">Settings</a>
                 <h1>Page Setup</h1>
                 <p>Set the printed pad size by measuring each prescription part in centimeters.</p>
-            </div>
-            <div class="zps-heading-actions">
-                <a href="prescription_preview.php" target="_blank" class="btn btn-outline">Full Preview</a>
-                <a href="print_setup.php" class="btn btn-outline">Print Setup</a>
-                <a href="header_footer_background_setup.php" class="btn btn-outline">Header/Footer/BG Setup</a>
-                <button type="button" id="zps-factory-reset" class="btn btn-outline print-setup-reset-btn">Reset to Defaults</button>
-                <button type="submit" form="page-setup-form" class="btn btn-primary">Save Settings</button>
             </div>
         </div>
     </div>
@@ -241,6 +236,16 @@ include 'header.php';
             </table>
         </div>
     </form>
+
+    <div class="zrx-settings-page-actions-footer">
+        <div>
+            <a href="prescription_preview.php" target="_blank" class="btn btn-outline">Full Preview</a>
+            <a href="print_setup.php" class="btn btn-outline">Print Setup</a>
+            <a href="header_footer_background_setup.php" class="btn btn-outline">Header/Footer/BG Setup</a>
+            <button type="button" id="zps-factory-reset" class="btn btn-outline print-setup-reset-btn">Reset to Defaults</button>
+            <button type="submit" form="page-setup-form" class="btn btn-primary">Save Settings</button>
+        </div>
+    </div>
 </div>
 
 

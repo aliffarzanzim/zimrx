@@ -82,7 +82,8 @@
     function initPhysicalExamSettings() {
         const settingsBtn = document.getElementById('pe-settings-btn');
         const modal = document.getElementById('pe-settings-modal');
-        if (!settingsBtn || !modal) return;
+        const isSettingsPage = modal?.classList.contains('pe-settings-page-modal') === true;
+        if ((!settingsBtn && !isSettingsPage) || !modal) return;
 
         const searchInput = document.getElementById('pe-settings-search');
         const sysListContainer = document.getElementById('pe-settings-sys-list');
@@ -251,17 +252,28 @@
             }).join('');
         }
 
-        // Open Modal
-        settingsBtn.addEventListener('click', () => {
-            modal.hidden = false;
-            modal.removeAttribute('hidden');
-            modal.style.display = 'flex';
+        if (isSettingsPage) {
             renderSystems();
             renderTableRows();
-        });
+        }
+
+        // Open Modal
+        if (settingsBtn) {
+            settingsBtn.addEventListener('click', () => {
+                modal.hidden = false;
+                modal.removeAttribute('hidden');
+                modal.style.display = 'flex';
+                renderSystems();
+                renderTableRows();
+            });
+        }
 
         // Close Modal
         function closeModal() {
+            if (isSettingsPage) {
+                window.location.assign('settings.php');
+                return;
+            }
             modal.hidden = true;
             modal.setAttribute('hidden', '');
             modal.style.display = 'none';
@@ -417,13 +429,12 @@
         // Toggle Add Form
         if (toggleAddBtn && addCard) {
             toggleAddBtn.addEventListener('click', () => {
-                const isHidden = addCard.style.display === 'none';
-                addCard.style.display = isHidden ? 'block' : 'none';
+                addCard.hidden = !addCard.hidden;
             });
         }
         if (addCardClose && addCard) {
             addCardClose.addEventListener('click', () => {
-                addCard.style.display = 'none';
+                addCard.hidden = true;
             });
         }
 
@@ -477,7 +488,7 @@
                 if (labelInput) labelInput.value = '';
                 if (unitInput) unitInput.value = '';
                 if (wordsInput) wordsInput.value = '';
-                if (addCard) addCard.style.display = 'none';
+                if (addCard) addCard.hidden = true;
 
                 renderSystems();
                 renderTableRows();
@@ -504,7 +515,11 @@
                     if (result.success && result.data) {
                         currentConfig = result.data;
                         rebuildPeTable(currentConfig.active_items || []);
-                        closeModal();
+                        if (isSettingsPage) {
+                            document.getElementById('pe-settings-status').textContent = 'Settings saved.';
+                        } else {
+                            closeModal();
+                        }
                     } else {
                         alert('Error saving physical examination settings: ' + (result.error || 'Unknown error'));
                     }
@@ -541,7 +556,11 @@
                         renderSystems();
                         renderTableRows();
                         rebuildPeTable(currentConfig.active_items || []);
-                        closeModal();
+                        if (isSettingsPage) {
+                            document.getElementById('pe-settings-status').textContent = 'Defaults restored.';
+                        } else {
+                            closeModal();
+                        }
                     } else {
                         alert('Error resetting settings: ' + (result.error || 'Unknown error'));
                     }

@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "neurology",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "Neurology",
+    "view":  "exam_neurology.php",
+    "enabled_by_default": false,
+    "default_order":  null
+}

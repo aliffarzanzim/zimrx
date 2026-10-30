@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "medical_history",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "M/H",
+    "view":  "m_h.php",
+    "enabled_by_default": true,
+    "default_order":  9
+}

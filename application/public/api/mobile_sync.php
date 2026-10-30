@@ -152,7 +152,7 @@ try {
         // Prove supplied IDs belong to the signed-in doctor before persisting them.
         // Walk-in mode (both IDs = 0) is always permitted.
         if ($patientId > 0 || $visitRecordId > 0) {
-            $pdo = db();
+            $pdo = DbConnections::userdata();
             if (!zimrx_verify_patient_ownership($pdo, $doctorId, $patientId, $visitRecordId)) {
                 http_response_code(403);
                 echo json_encode(['ok' => false, 'error' => 'Visit or patient does not belong to your account.']);
@@ -160,7 +160,7 @@ try {
             }
         }
 
-        $pdo = db();
+        $pdo = DbConnections::userdata();
         zimrx_assert_mobile_context_table($pdo);
 
         $pdo->beginTransaction();
@@ -245,7 +245,7 @@ try {
 
     // Fetch active patient context on mobile device
     if ($action === 'get_active_patient') {
-        $pdo = db();
+        $pdo = DbConnections::userdata();
         zimrx_assert_mobile_context_table($pdo);
         $stmt = $pdo->prepare('SELECT * FROM zimrx_mobile_active_context WHERE doctor_id = :doctor_id LIMIT 1');
         $stmt->execute(['doctor_id' => $doctorId]);
@@ -353,7 +353,7 @@ try {
         // Validate active patient state before moving file
         // If the phone's context is stale we must reject here; once the file is on
         // disk an early-exit would leave an orphaned file with no queue record.
-        $pdo = db();
+        $pdo = DbConnections::userdata();
         zimrx_assert_mobile_context_table($pdo);
         $stmtCtx = $pdo->prepare('SELECT patient_id, visit_record_id, active_revision FROM zimrx_mobile_active_context WHERE doctor_id = :doctor_id LIMIT 1');
         $stmtCtx->execute(['doctor_id' => $doctorId]);
@@ -395,7 +395,7 @@ try {
         // Insert queue record
         try {
             $uploadId = 'up_' . bin2hex(random_bytes(8));
-            $pdo = db();
+            $pdo = DbConnections::userdata();
             $stmt = $pdo->prepare(
                 "INSERT INTO zimrx_mobile_upload_queue (
                     id, doctor_id, patient_id, visit_record_id, active_revision,
@@ -461,7 +461,7 @@ try {
         $patientId = (int)($_POST['patient_id'] ?? 0);
         $visitRecordId = (int)($_POST['visit_record_id'] ?? 0);
 
-        $pdo = db();
+        $pdo = DbConnections::userdata();
         $pdo->beginTransaction();
 
         $whereClauses = ['doctor_id = :doctor_id', 'claimed_at IS NULL'];

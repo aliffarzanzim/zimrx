@@ -40,6 +40,11 @@ function initOhModule() {
   const isInsideOhOnlyNumpad = (target) => Boolean(target?.closest?.('.oh-virtual-numpad'));
 
   const ensureDatePickers = (root = document) => {
+    if (window.ZimRxDatePicker) {
+      window.ZimRxDatePicker.init(root);
+      return;
+    }
+
     if (typeof flatpickr !== 'function') {
       return;
     }
@@ -51,7 +56,12 @@ function initOhModule() {
 
       flatpickr(input, {
         dateFormat: 'd/m/Y',
-        allowInput: true
+        allowInput: true,
+        disableMobile: true,
+        onChange: (_, __, instance) => {
+          instance.input.dispatchEvent(new Event('input', { bubbles: true }));
+          instance.input.dispatchEvent(new Event('change', { bubbles: true }));
+        }
       });
     });
   };

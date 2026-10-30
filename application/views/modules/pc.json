@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "pc",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "P/C",
+    "view":  "pc.php",
+    "enabled_by_default": true,
+    "default_order":  1
+}

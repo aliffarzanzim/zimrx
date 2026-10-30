@@ -39,7 +39,4 @@ declare(strict_types=1);
     </div>
 </div>
 
-<!-- Load NicEditor & Initialize -->
-<script src="assets/vendor/nicedit/nicEdit-latest.js"></script>
-<script src="assets/vendor/nicedit/nicEdit-zimrx-custom.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/vendor/nicedit/nicEdit-zimrx-custom.js') ?>"></script>
-<script src="assets/js/modules/text_pad.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/modules/text_pad.js') ?>"></script>
+<script src="assets/js/modules/text_pad.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/modules/text_pad.js') ?>" defer></script>

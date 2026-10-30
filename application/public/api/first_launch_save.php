@@ -252,40 +252,48 @@ try {
         ")->execute(['doc_id' => $sessionDoctorId, 'clang' => $clinicalLang]);
     }
 
-    if ($sessionDoctorId > 0 && zimrx_db_table_exists($pdo, 'zimrx_prescription_print_layout_settings')) {
+    if ($sessionDoctorId > 0) {
+        $profileStmt = $pdo->prepare('SELECT id, settings_json FROM zimrx_doctor_profiles WHERE doctor_id = :doctor_id AND is_active = 1 AND is_deleted = 0 ORDER BY is_default DESC, id ASC LIMIT 1');
+        $profileStmt->execute(['doctor_id' => $sessionDoctorId]);
+        $profile = $profileStmt->fetch(PDO::FETCH_ASSOC);
+        if (!$profile) {
+            throw new RuntimeException('The doctor practice profile is missing during first launch setup.');
+        }
+        $settings = json_decode((string)($profile['settings_json'] ?? '{}'), true);
+        if (!is_array($settings)) {
+            throw new RuntimeException('Practice profile settings are invalid.');
+        }
+        $printSettings = is_array($settings['prescription_print'] ?? null) ? $settings['prescription_print'] : [];
+        $layout = is_array($printSettings['layout_settings'] ?? null) ? $printSettings['layout_settings'] : [];
+        $advanced = json_decode((string)($layout['print_settings_json'] ?? '{}'), true);
+        if (!is_array($advanced)) {
+            $advanced = [];
+        }
         $printLang = ($clinicalLang === 'bn') ? 'bengali' : 'english';
-        $stPrint = $pdo->prepare("SELECT print_settings_json FROM zimrx_prescription_print_layout_settings WHERE doctor_id = :did LIMIT 1");
-        $stPrint->execute(['did' => $sessionDoctorId]);
-        $existingJson = (string)($stPrint->fetchColumn() ?: '');
-        $adv = json_decode($existingJson, true) ?: [];
-        $adv['dose_language'] = $printLang;
-        $adv['duration_language'] = $printLang;
-        $adv['instruction_language'] = $printLang;
-        $adv['advice_language'] = $printLang;
-        $newJson = json_encode($adv, JSON_UNESCAPED_UNICODE);
-        $pdo->prepare("
-            INSERT INTO zimrx_prescription_print_layout_settings (doctor_id, print_settings_json, updated_at)
-            VALUES (:did, :json, CURRENT_TIMESTAMP)
-            ON CONFLICT(doctor_id) DO UPDATE SET
-                print_settings_json = :json, updated_at = CURRENT_TIMESTAMP
-        ")->execute(['did' => $sessionDoctorId, 'json' => $newJson]);
-    }
-
-    if ($sessionDoctorId > 0 && zimrx_db_table_exists($pdo, 'zimrx_prescription_header_settings')) {
+        foreach (['dose_language', 'duration_language', 'instruction_language', 'advice_language'] as $key) {
+            $advanced[$key] = $printLang;
+        }
+        $layout['print_settings_json'] = json_encode($advanced, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        $printSettings['layout_settings'] = $layout;
         $onboardPath = ZIMRX_BASE_DIR . '/config/onboarding_defaults.php';
         $allDefs = is_file($onboardPath) ? require $onboardPath : [];
         $onboardDefs = ($country !== '' && isset($allDefs[$country]))
             ? $allDefs[$country]
             : ($allDefs['INT'] ?? ($allDefs['BD'] ?? []));
         $defaultFooter = (string)($onboardDefs['footer_html'] ?? '');
-        if ($defaultFooter !== '') {
-            $pdo->prepare("
-                INSERT INTO zimrx_prescription_header_settings (doctor_id, doctor_name, footer_html)
-                VALUES (:doc_id, :dname, :footer)
-                ON CONFLICT(doctor_id) DO UPDATE SET
-                    footer_html = CASE WHEN footer_html IS NULL OR trim(footer_html) = '' THEN :footer ELSE footer_html END
-            ")->execute(['doc_id' => $sessionDoctorId, 'dname' => $displayName, 'footer' => $defaultFooter]);
+        $header = is_array($printSettings['header_settings'] ?? null) ? $printSettings['header_settings'] : [];
+        $header['doctor_name'] = (string)$displayName;
+        if ($defaultFooter !== '' && !array_key_exists('footer_html', $header)) {
+            $header['footer_html'] = $defaultFooter;
         }
+        $printSettings['header_settings'] = $header;
+        $settings['prescription_print'] = $printSettings;
+        $pdo->prepare('UPDATE zimrx_doctor_profiles SET settings_json = :settings_json, updated_at = CURRENT_TIMESTAMP WHERE id = :id AND doctor_id = :doctor_id')
+            ->execute([
+                'settings_json' => json_encode($settings, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR),
+                'id' => (int)$profile['id'],
+                'doctor_id' => $sessionDoctorId,
+            ]);
     }
 
     $pdo->commit();

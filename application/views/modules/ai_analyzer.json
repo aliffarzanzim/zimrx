@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "ai_analyzer",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "AI Analyzer",
+    "view":  "ai_analyzer.php",
+    "enabled_by_default": false,
+    "default_order":  null
+}

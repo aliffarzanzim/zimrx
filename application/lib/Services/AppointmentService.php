@@ -31,7 +31,7 @@ final class AppointmentService
     }
 
     // Load doctor's appointment settings with fallback defaults for timings, fees, and slot duration
-    public function getSettings(int $doctorId): array
+    public function getSettings(int $doctorId, int $profileId): array
     {
         $defaults = [
             'default_start_time'   => '14:00',
@@ -43,27 +43,15 @@ final class AppointmentService
             'weekday_overrides'    => [],
         ];
 
-        if ($doctorId <= 0) {
-            return $defaults;
+        if ($doctorId <= 0 || $profileId <= 0) {
+            throw new \InvalidArgumentException('An active practice profile is required to load appointment settings.');
         }
 
-        try {
-            $stmt = $this->pdo->prepare(
-                "SELECT settings_json
-                 FROM zimrx_appointment_settings
-                 WHERE doctor_id = :doctor_id
-                 LIMIT 1"
-            );
-            $stmt->execute(['doctor_id' => $doctorId]);
-            $raw = $stmt->fetchColumn();
-            if (is_string($raw) && $raw !== '') {
-                $stored = json_decode($raw, true);
-                if (is_array($stored)) {
-                    $defaults = array_merge($defaults, $stored);
-                }
-            }
-        } catch (Throwable $e) {
-            error_log("AppointmentService::getSettings warning: " . $e->getMessage());
+        $this->assertActiveProfile($doctorId, $profileId);
+
+        $profileSettings = (new PracticeProfileService($this->pdo))->settings($profileId, $doctorId, 'appointment');
+        if (is_array($profileSettings)) {
+            $defaults = array_merge($defaults, $profileSettings);
         }
 
         $defaults['minutes_per_patient']   = max(1, (int)($defaults['minutes_per_patient'] ?? 5));
@@ -116,18 +104,16 @@ final class AppointmentService
     }
 
     // Next serial number in sequence, respecting doctor's reserved buffer slots
-    public function getNextAppointmentNo(int $doctorId, string $date, array $settings): int
+    public function getNextAppointmentNo(int $doctorId, string $date, array $settings, int $profileId): int
     {
-        if ($doctorId <= 0) {
-            return 1;
-        }
+        $this->assertActiveProfile($doctorId, $profileId);
 
         $stmt = $this->pdo->prepare(
             "SELECT COALESCE(MAX(appointment_no), 0) + 1
              FROM zimrx_appointments
-             WHERE doctor_id = :doctor_id AND appointment_date = :date"
+             WHERE doctor_id = :doctor_id AND profile_id = :profile_id AND appointment_date = :date"
         );
-        $stmt->execute(['doctor_id' => $doctorId, 'date' => $date]);
+        $stmt->execute(['doctor_id' => $doctorId, 'profile_id' => $profileId, 'date' => $date]);
         return max((int)$stmt->fetchColumn(), (int)($settings['blank_slots'] ?? 0) + 1, 1);
     }
 
@@ -175,11 +161,9 @@ final class AppointmentService
     }
 
     // Daily appointment list with joined patient demographics and last visit history
-    public function getDailyQueue(int $doctorId, string $date, array $settings): array
+    public function getDailyQueue(int $doctorId, string $date, array $settings, int $profileId): array
     {
-        if ($doctorId <= 0) {
-            return [];
-        }
+        $this->assertActiveProfile($doctorId, $profileId);
 
         $stmt = $this->pdo->prepare(
             "SELECT
@@ -214,15 +198,23 @@ final class AppointmentService
                     FROM zimrx_visits v
                     WHERE v.patient_id = a.patient_id
                       AND v.doctor_id = a.doctor_id
+                      AND v.profile_id = a.profile_id
                       AND date(v.visit_date) < date(a.appointment_date)
                 ) AS last_visit_date
              FROM zimrx_appointments a
              LEFT JOIN zimrx_patients p ON p.id = a.patient_id
+                AND (p.profile_id = a.profile_id OR EXISTS (
+                    SELECT 1 FROM zimrx_doctor_profiles shared_profile
+                    WHERE shared_profile.id = p.profile_id AND shared_profile.doctor_id = a.doctor_id
+                      AND shared_profile.is_active = 1 AND shared_profile.is_deleted = 0
+                      AND shared_profile.share_patient_particulars = 1
+                ))
              WHERE a.doctor_id = :doctor_id
+               AND a.profile_id = :profile_id
                AND a.appointment_date = :date
              ORDER BY a.appointment_no ASC, a.id ASC"
         );
-        $stmt->execute(['doctor_id' => $doctorId, 'date' => $date]);
+        $stmt->execute(['doctor_id' => $doctorId, 'date' => $date, 'profile_id' => $profileId]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
         foreach ($rows as &$row) {
@@ -240,11 +232,9 @@ final class AppointmentService
     }
 
     // Patients with scheduled future follow-up dates
-    public function getFollowupPatients(int $doctorId): array
+    public function getFollowupPatients(int $doctorId, int $profileId): array
     {
-        if ($doctorId <= 0) {
-            return [];
-        }
+        $this->assertActiveProfile($doctorId, $profileId);
 
         $stmt = $this->pdo->prepare(
             "SELECT
@@ -260,13 +250,36 @@ final class AppointmentService
                 coalesce(nullif(p.address, ''), '') AS address
              FROM zimrx_visits v
              LEFT JOIN zimrx_patients p ON p.id = v.patient_id
+                AND (p.profile_id = v.profile_id OR EXISTS (
+                    SELECT 1 FROM zimrx_doctor_profiles shared_profile
+                    WHERE shared_profile.id = p.profile_id AND shared_profile.doctor_id = v.doctor_id
+                      AND shared_profile.is_active = 1 AND shared_profile.is_deleted = 0
+                      AND shared_profile.share_patient_particulars = 1
+                ))
              WHERE v.doctor_id = :doctor_id
+               AND v.profile_id = :profile_id
                AND v.next_visit IS NOT NULL
                AND trim(v.next_visit) != ''
              ORDER BY v.next_visit ASC, v.id DESC"
         );
-        $stmt->execute(['doctor_id' => $doctorId]);
+        $stmt->execute(['doctor_id' => $doctorId, 'profile_id' => $profileId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
+    private function assertActiveProfile(int $doctorId, int $profileId): void
+    {
+        if ($doctorId <= 0 || $profileId <= 0) {
+            throw new \InvalidArgumentException('An active practice profile is required for appointment operations.');
+        }
+
+        $stmt = $this->pdo->prepare(
+            'SELECT 1 FROM zimrx_doctor_profiles
+             WHERE id = :profile_id AND doctor_id = :doctor_id AND is_active = 1 AND is_deleted = 0 LIMIT 1'
+        );
+        $stmt->execute(['profile_id' => $profileId, 'doctor_id' => $doctorId]);
+        if ($stmt->fetchColumn() === false) {
+            throw new \RuntimeException('The active practice profile was not found.');
+        }
     }
 
     // Tally attendance, revenue, and pending follow-ups for queue badges

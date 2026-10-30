@@ -3,14 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let currentVisitRevision = parseInt(document.getElementById('visit-revision')?.value || '1', 10) || 1;
 
             // Datepicker initialization
-            flatpickr(".custom-date-picker", {
-                dateFormat: "d/m/Y",
-                allowInput: true,
-                onChange: function(_, __, instance) {
-                    instance.input.dispatchEvent(new Event('input', { bubbles: true }));
-                    instance.input.dispatchEvent(new Event('change', { bubbles: true }));
-                }
-            });
+            window.ZimRxDatePicker?.init();
 
             function setInputValue(field, value) {
                 if (!field) return;
@@ -20,8 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
             function setSelectValue(field, value) {
                 if (!field) return;
                 const normalized = String(value ?? '');
-                const match = Array.from(field.options).find((option) => option.value === normalized);
-                if (match || normalized === '') {
+                if (field.tagName === 'SELECT' && field.options) {
+                    const match = Array.from(field.options).find((option) => option.value === normalized);
+                    if (match || normalized === '') {
+                        field.value = normalized;
+                    }
+                } else {
                     field.value = normalized;
                 }
             }
@@ -66,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         window.open(`emr.php?patient_id=${encodeURIComponent(patientId)}`, '_blank');
                     }
                 });
+
             }
 
             syncPatientProfileButton();
@@ -95,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 fillInput('reg_no', 'patient-reg-no');
                 fillInput('patient_name', 'patient-name');
                 fillInput('age', 'patient-age');
-                fillSelect('age_unit', 'patient-age-unit', 'Years');
+                fillInput('age_unit', 'patient-age-unit');
                 fillDate('dob', 'patient-dob');
                 fillSelect('gender', 'patient-gender');
                 fillSelect('blood_group', 'patient-blood-group');
@@ -196,11 +194,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     age: document.getElementById('patient-age').value,
                     age_unit: document.getElementById('patient-age-unit').value,
                     dob: document.getElementById('patient-dob').value,
+                    dob_type: document.getElementById('patient-dob-type')?.value || 'exact',
                     gender: document.getElementById('patient-gender').value,
                     blood_group: document.getElementById('patient-blood-group').value,
+                    marital_status: document.getElementById('patient-marital-status')?.value || '',
                     mobile: document.getElementById('patient-mobile').value,
+                    email: document.getElementById('patient-email')?.value || '',
+                    nid_no: document.getElementById('patient-nid-no')?.value || '',
+                    passport_no: document.getElementById('patient-passport-no')?.value || '',
                     occupation: document.getElementById('patient-occupation').value,
                     address: document.getElementById('patient-address').value,
+                    extra_demographics: window.PatientParticulars?.getExtraDemographics?.() || {},
                     weight: document.getElementById('patient-weight').value,
                     weight_unit: document.getElementById('patient-weight-unit').value,
                     height: document.getElementById('patient-height').value,
@@ -533,28 +537,4 @@ document.addEventListener('DOMContentLoaded', () => {
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') closeClearMenu();
             });
-
         });
-
-// Prescription page reveal guard
-(function () {
-    let revealed = false;
-
-    function revealPrescriptionPage() {
-        if (revealed || !document.body) {
-            return;
-        }
-
-        revealed = true;
-        requestAnimationFrame(function () {
-            document.body.classList.add('zimrx-prescription-ready');
-        });
-    }
-
-    if (document.readyState === 'complete') {
-        revealPrescriptionPage();
-    } else {
-        window.addEventListener('load', revealPrescriptionPage, { once: true });
-        window.setTimeout(revealPrescriptionPage, 2500);
-    }
-})();

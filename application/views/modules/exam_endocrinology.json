@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "endocrinology",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "Endocrinology",
+    "view":  "exam_endocrinology.php",
+    "enabled_by_default": false,
+    "default_order":  null
+}

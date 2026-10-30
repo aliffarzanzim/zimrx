@@ -1,0 +1,57 @@
+.zrx-history-settings-page {
+    display: grid;
+    gap: 1rem;
+    color: var(--zrx-text-main);
+}
+
+.zrx-history-settings-page h1,
+.zrx-history-settings-page h2,
+.zrx-history-settings-page h3,
+.zrx-history-settings-page p {
+    margin: 0;
+}
+
+.history-med-settings-page {
+    min-width: 0;
+}
+
+.history-med-settings-page .history-med-settings-panel {
+    position: static;
+    width: 100%;
+    height: min(740px, calc(100vh - 260px));
+    min-height: 460px;
+    margin: 0;
+    border-radius: var(--zrx-border-radius);
+    box-shadow: var(--zrx-shadow-sm);
+}
+
+.history-med-settings-page .history-med-settings-header {
+    background: var(--zrx-bg-subtle);
+}
+
+.history-med-settings-page .history-med-add-card {
+    display: none;
+    max-height: calc(100% - 2rem);
+}
+
+.history-med-settings-page .history-med-btn-cancel {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+#med-settings-status {
+    color: var(--zrx-text-muted);
+    font-size: 0.82rem;
+}
+
+@media (max-width: 760px) {
+    .history-med-settings-page .history-med-settings-panel {
+        height: calc(100vh - 230px);
+        min-height: 380px;
+    }
+
+    .history-med-settings-page .history-med-settings-grid {
+        grid-template-columns: 170px minmax(0, 1fr);
+    }
+}

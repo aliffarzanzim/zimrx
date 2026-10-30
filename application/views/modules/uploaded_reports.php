@@ -139,4 +139,4 @@ declare(strict_types=1);
     </div>
 </div>
 
-<script src="assets/js/modules/uploaded_reports.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/modules/uploaded_reports.js') ?>"></script>
+<script src="assets/js/modules/uploaded_reports.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/modules/uploaded_reports.js') ?>" defer></script>

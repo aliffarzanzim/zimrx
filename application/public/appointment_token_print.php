@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/init.php';
 require_login();
+require_once ZIMRX_BASE_DIR . '/lib/Services/PracticeProfileService.php';
 
 $id = (int)($_GET['id'] ?? 0);
 if ($id <= 0) {
@@ -13,21 +14,12 @@ if ($id <= 0) {
     exit;
 }
 
-function token_settings(PDO $pdo, int $doctorId): array {
+function token_settings(PDO $pdo, int $profileId, int $doctorId): array {
     $defaults = [
         'token_fields' => ['name', 'age', 'sex', 'reg', 'visit_no', 'visit_id', 'visit_fee', 'discount', 'paid'],
     ];
-    $stmt = $pdo->prepare("SELECT settings_json FROM zimrx_appointment_settings WHERE doctor_id = :doctor_id LIMIT 1");
-    $stmt->execute(['doctor_id' => $doctorId]);
-    $row = $stmt ? $stmt->fetch() : null;
-    if (!$row) {
-        return $defaults;
-    }
-    $settings = json_decode((string)$row['settings_json'], true);
-    if (!is_array($settings)) {
-        return $defaults;
-    }
-    return array_merge($defaults, $settings);
+    $settings = (new \ZimRx\Services\PracticeProfileService($pdo))->settings($profileId, $doctorId, 'appointment');
+    return array_merge($defaults, is_array($settings) ? $settings : []);
 }
 
 function money_text($value): string {
@@ -43,19 +35,33 @@ function token_date(?string $date, ?string $time): string {
     return $dt ? $dt->format('d-M-Y h:i A') : '';
 }
 
-$requestedDoctorId = (int)($_GET['doctor_id'] ?? 0);
-$allowedDoctors = zimrx_doctor_options_for_user($pdo, current_user_id(), current_user_role(), current_user_doctor_id());
-$allowedDoctorIds = array_map(fn($row) => (int)$row['id'], $allowedDoctors);
-$doctorId = in_array($requestedDoctorId, $allowedDoctorIds, true)
-    ? $requestedDoctorId
-    : (count($allowedDoctorIds) === 1 ? $allowedDoctorIds[0] : current_user_doctor_id());
+$activePracticeProfile = (new \ZimRx\Services\PracticeProfileService($pdo))->activeForCurrentUser();
+$profileId = (int)($activePracticeProfile['id'] ?? 0);
+$doctorId = (int)($activePracticeProfile['doctor_id'] ?? 0);
+if ($profileId <= 0 || $doctorId <= 0) {
+    http_response_code(409);
+    echo 'Select an active practice profile before printing an appointment token.';
+    exit;
+}
 $stmt = $pdo->prepare(
     "SELECT a.*, p.full_name, p.reg_no AS patient_reg_no
      FROM zimrx_appointments a
      LEFT JOIN zimrx_patients p ON p.id = a.patient_id
-     WHERE a.id = :id AND a.doctor_id = :doctor_id"
+        AND (p.profile_id = :patient_profile_id OR p.profile_id IN (
+            SELECT source_profile.id FROM zimrx_doctor_profiles source_profile
+            WHERE source_profile.doctor_id = :patient_profile_doctor
+              AND source_profile.is_active = 1 AND source_profile.is_deleted = 0
+              AND source_profile.share_patient_particulars = 1
+        ))
+     WHERE a.id = :id AND a.doctor_id = :doctor_id AND a.profile_id = :profile_id"
 );
-$stmt->execute(['id' => $id, 'doctor_id' => $doctorId]);
+$stmt->execute([
+    'id' => $id,
+    'doctor_id' => $doctorId,
+    'profile_id' => $profileId,
+    'patient_profile_id' => $profileId,
+    'patient_profile_doctor' => $doctorId,
+]);
 $appointment = $stmt->fetch();
 if (!$appointment) {
     http_response_code(404);
@@ -63,7 +69,7 @@ if (!$appointment) {
     exit;
 }
 
-$settings = token_settings($pdo, (int)($appointment['doctor_id'] ?? $doctorId));
+$settings = token_settings($pdo, $profileId, (int)($appointment['doctor_id'] ?? $doctorId));
 $fields = array_flip($settings['token_fields'] ?? []);
 $doctorStmt = $pdo->prepare("SELECT display_name FROM zimrx_doctors WHERE id = :doctor_id LIMIT 1");
 $doctorStmt->execute(['doctor_id' => (int)($appointment['doctor_id'] ?? $doctorId)]);

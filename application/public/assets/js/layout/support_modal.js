@@ -1,24 +1,14 @@
-// ZimRx Support & Doctor Appreciation modal controller: scroll management and payment copying.
+// ZimRx Support modal delegation and payment copying.
 declare_strict = 1;
 
 function zimrxOpenSupportModal() {
     const modal = document.getElementById('support-modal-backdrop');
-    if (!modal) return;
-    modal.style.display = 'flex';
-    modal.classList.add('open');
-    document.body.style.overflow = 'hidden';
+    if (modal && window.ZimRxModal) window.ZimRxModal.open(modal);
 }
 
 function zimrxCloseSupportModal() {
     const modal = document.getElementById('support-modal-backdrop');
-    if (!modal) return;
-    modal.classList.remove('open');
-    modal.style.display = 'none';
-    document.body.style.overflow = '';
-}
-
-function zimrxCheckSupportScroll() {
-    // Scroll area check if needed
+    if (modal && window.ZimRxModal) window.ZimRxModal.close(modal);
 }
 
 function zimrxCopyPayment(text, btn) {
@@ -57,7 +47,3 @@ function zimrxFallbackCopy(text, cb) {
     } catch (e) {}
     document.body.removeChild(ta);
 }
-
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') zimrxCloseSupportModal();
-});

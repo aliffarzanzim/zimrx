@@ -18,13 +18,15 @@ try {
 
     // Static default occupations
     $staticMap = [];
-    $stmtStatic = $pdo_static->query("SELECT id, name FROM zimrx_static_occupations ORDER BY name ASC");
-    $staticRows = $stmtStatic->fetchAll(PDO::FETCH_ASSOC) ?: [];
-    foreach ($staticRows as $sr) {
-        $staticMap[strtolower(trim((string)$sr['name']))] = [
-            'id' => (int)$sr['id'],
-            'name' => trim((string)$sr['name']),
-        ];
+    if (DbSchema::tableExists($pdo_static, 'zimrx_static_occupations')) {
+        $stmtStatic = $pdo_static->query("SELECT id, name FROM zimrx_static_occupations ORDER BY name ASC");
+        $staticRows = $stmtStatic->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        foreach ($staticRows as $sr) {
+            $staticMap[strtolower(trim((string)$sr['name']))] = [
+                'id' => (int)$sr['id'],
+                'name' => trim((string)$sr['name']),
+            ];
+        }
     }
 
     // Custom or learned occupations for active doctor

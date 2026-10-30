@@ -107,7 +107,8 @@ try {
         $payload['stamp_color_enable'] = trim((string)$_POST['stamp_color_enable']);
     }
 
-    zimrx_print_save_setup($pdo, current_user_doctor_id(), $payload);
+    $profile = (new \ZimRx\Services\PracticeProfileService($pdo))->activeForCurrentUser();
+    zimrx_print_save_setup($pdo, (int)($profile['id'] ?? 0), $payload);
     echo '1';
 } catch (Throwable $e) {
     error_log('[ZimRx] header_edit_ajax error: ' . $e->getMessage());

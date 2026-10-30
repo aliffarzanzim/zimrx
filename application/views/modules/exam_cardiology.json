@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "cardiology",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "Cardiology",
+    "view":  "exam_cardiology.php",
+    "enabled_by_default": false,
+    "default_order":  null
+}

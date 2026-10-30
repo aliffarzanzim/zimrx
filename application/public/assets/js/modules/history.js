@@ -743,7 +743,8 @@
     function initMedicalHistorySettings() {
         const settingsBtn = document.getElementById('history-med-settings-btn');
         const modal = document.getElementById('history-med-settings-modal');
-        if (!settingsBtn || !modal) return;
+        const isSettingsPage = modal?.dataset.settingsPage === 'true';
+        if (!modal || (!settingsBtn && !isSettingsPage)) return;
 
         const searchInput = document.getElementById('med-settings-search');
         const catListContainer = document.getElementById('med-settings-cat-list');
@@ -753,6 +754,7 @@
         const tbody = document.getElementById('med-settings-tbody');
         const saveBtn = document.getElementById('med-settings-save-btn');
         const resetBtn = document.getElementById('med-settings-reset-btn');
+        const settingsStatus = document.getElementById('med-settings-status');
         const toggleAddBtn = document.getElementById('med-toggle-add-btn');
         const addCard = document.getElementById('med-add-card');
         const addCardClose = document.getElementById('med-add-card-close');
@@ -1135,9 +1137,11 @@
         }
 
         function openModal() {
-            modal.hidden = false;
-            modal.removeAttribute('hidden');
-            modal.style.display = 'flex';
+            if (!isSettingsPage) {
+                modal.hidden = false;
+                modal.removeAttribute('hidden');
+                modal.style.display = 'flex';
+            }
             if (addCard) addCard.style.display = 'none';
             customChips = [];
             refreshCustomChipContainer();
@@ -1151,19 +1155,22 @@
         }
 
         function closeModal() {
+            if (isSettingsPage) return;
             modal.hidden = true;
             modal.setAttribute('hidden', '');
             modal.style.display = 'none';
         }
 
-        settingsBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            openModal();
-        });
+        if (settingsBtn) {
+            settingsBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                openModal();
+            });
+        }
 
         document.addEventListener('click', (e) => {
-            if (e.target.closest('[data-med-settings-close]')) {
+            if (!isSettingsPage && e.target.closest('[data-med-settings-close]')) {
                 e.preventDefault();
                 closeModal();
             }
@@ -1640,6 +1647,7 @@
                     if (result.success && result.data) {
                         currentConfig = result.data;
                         rebuildOpdGrid(currentConfig.active_groups || {});
+                        if (settingsStatus) settingsStatus.textContent = 'Settings saved.';
                         closeModal();
                     } else {
                         alert('Error saving settings: ' + (result.error || 'Unknown error'));
@@ -1676,6 +1684,7 @@
                         renderCategories();
                         renderTableRows();
                         rebuildOpdGrid(currentConfig.active_groups || {});
+                        if (settingsStatus) settingsStatus.textContent = 'Defaults restored.';
                         closeModal();
                     } else {
                         alert('Error resetting settings: ' + (result.error || 'Unknown error'));
@@ -1687,6 +1696,10 @@
                     resetBtn.textContent = 'Reset to Defaults';
                 }
             });
+        }
+
+        if (isSettingsPage) {
+            openModal();
         }
 
         function rebuildOpdGrid(activeGroups) {

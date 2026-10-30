@@ -103,9 +103,9 @@ include 'header.php';
 ?>
 
 <main class="admin-page">
-    <section class="admin-hero">
-        <div>
-            <p class="eyebrow">Doctor Settings</p>
+    <section class="admin-hero zrx-settings-page-hero">
+        <div class="zrx-settings-page-hero-copy">
+            <a class="zrx-settings-page-back" href="settings.php">Settings</a>
             <h1>Profile Settings</h1>
             <p>Manage your professional details, credentials, and account credentials.</p>
         </div>

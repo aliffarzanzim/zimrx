@@ -1,104 +1,25 @@
 /* ZimRx - Support & Doctor Appreciation Modal Styling */
 
-.support-backdrop {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.65);
-    z-index: 99999;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    animation: supportFade 0.2s ease-out;
-}
-.support-backdrop.open {
-    display: flex !important;
-}
-
-@keyframes supportFade {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-}
-
-/* Dialog Box */
 .support-dialog {
-    background: var(--zrx-bg-card, #ffffff);
-    border-radius: 14px;
-    max-width: 530px;
-    width: 100%;
+    width: min(530px, 100%);
     max-height: 90vh;
-    overflow: hidden;
-    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(15, 23, 42, 0.08);
-    position: relative;
-    animation: supportPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-    font-family: inherit;
-    display: flex;
-    flex-direction: column;
-    border: 1px solid var(--zrx-border, #cbd5e1);
-}
-
-@keyframes supportPop {
-    from { opacity: 0; transform: translateY(16px) scale(0.97); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-/* Titlebar Header */
-.support-titlebar {
-    background: #f1f5f9;
-    border-bottom: 1px solid var(--zrx-border, #cbd5e1);
-    padding: 0.65rem 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.support-titlebar-title {
-    font-size: 0.86rem;
-    font-weight: 700;
-    color: var(--zrx-text-dark, #0f172a);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-.support-heart-icon {
-    font-size: 0.95rem;
-}
-
-/* Close Button */
-.support-close-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    background: transparent;
-    border: none;
-    color: var(--zrx-text-muted, #64748b);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-.support-close-btn:hover {
-    background: #e2e8f0;
-    color: var(--zrx-text-dark, #0f172a);
 }
 
 /* Scroll Area */
 .support-scroll-area {
+    padding: 0;
     overflow-y: auto;
     overflow-x: hidden;
     max-height: calc(90vh - 90px);
     flex: 1 1 auto;
     scrollbar-width: thin;
-    scrollbar-color: var(--zrx-border, #cbd5e1) transparent;
+    scrollbar-color: var(--zrx-border) transparent;
 }
 .support-scroll-area::-webkit-scrollbar {
     width: 5px;
 }
 .support-scroll-area::-webkit-scrollbar-thumb {
-    background: var(--zrx-border, #cbd5e1);
+    background: var(--zrx-border);
     border-radius: 999px;
 }
 
@@ -114,28 +35,26 @@
 .support-intro-block {
     display: flex;
     flex-direction: column;
-    gap: 0.65rem;
-    font-size: 0.85rem;
-    line-height: 1.55;
-    color: var(--zrx-slate-700, #334155);
+    gap: 0.55rem;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--zrx-slate-700);
 }
 .support-intro-block p {
     margin: 0;
 }
 
 .support-section-label {
-    font-size: 0.72rem;
+    font-size: 0.82rem;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--zrx-text-muted, #64748b);
-    margin-bottom: 0.45rem;
+    color: var(--zrx-text-main);
+    margin-bottom: 0.6rem;
 }
 
 /* Payment Cards Grid */
 .support-pay-grid {
     display: grid;
-    grid-template-columns: 1fr 1.3fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
     gap: 0.65rem;
 }
 
@@ -146,28 +65,21 @@
 }
 
 .support-pay-card {
-    border-radius: 8px;
-    padding: 0.75rem 0.85rem;
+    min-width: 0;
+    border-radius: 6px;
+    padding: 0.85rem;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    border: 1px solid var(--zrx-border-subtle, #e2e8f0);
-}
-
-.support-pay-bkash {
-    background: #fff1f2;
-    border-color: #fecdd3;
-}
-
-.support-pay-bank {
-    background: #f0fdf4;
-    border-color: #dcfce7;
+    justify-content: flex-start;
+    border: 1px solid var(--zrx-border-subtle);
+    background: var(--zrx-bg-subtle);
 }
 
 .support-pay-card-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 0.5rem;
     margin-bottom: 0.35rem;
 }
 
@@ -175,70 +87,76 @@
     font-size: 0.74rem;
     font-weight: 700;
 }
-.bkash-badge { color: #be123c; }
-.bank-badge  { color: #047857; }
+.bkash-badge,
+.bank-badge {
+    color: var(--zrx-text-main);
+}
 
 .btn-copy {
-    background: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.12);
-    border-radius: 4px;
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border-subtle);
+    border-radius: 5px;
     font-size: 0.7rem;
     font-weight: 600;
-    color: #334155;
-    padding: 2px 7px;
+    color: var(--zrx-text-body);
+    padding: 0.3rem 0.55rem;
     cursor: pointer;
     display: inline-flex;
+    flex-shrink: 0;
     align-items: center;
     gap: 4px;
     transition: all 0.15s ease;
 }
 .btn-copy:hover {
-    background: #1e293b;
-    color: #ffffff;
-    border-color: #1e293b;
+    background: var(--zrx-bg-hover);
+    color: var(--zrx-text-main);
+    border-color: var(--zrx-border);
 }
 .btn-copy.copied {
-    background: #059669;
-    color: #ffffff;
-    border-color: #059669;
+    background: var(--zrx-emerald-600);
+    color: var(--zrx-white);
+    border-color: var(--zrx-emerald-600);
 }
 
 .support-pay-number-row {
-    margin-top: 0.15rem;
+    margin-top: 1rem;
 }
 
 .support-pay-code {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: 0.95rem;
+    font-family: inherit;
+    font-size: 0.82rem;
     font-weight: 700;
-    color: #0f172a;
-    letter-spacing: 0.02em;
+    color: var(--zrx-text-main);
 }
 
 .support-bank-grid {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: minmax(0, 1fr);
     row-gap: 0.2rem;
-    column-gap: 0.5rem;
-    font-size: 0.74rem;
+    font-size: 0.82rem;
     line-height: 1.4;
     margin-top: 0.15rem;
 }
+.support-bank-field {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 0.5rem;
+    align-items: baseline;
+}
 .support-bank-grid .bank-k {
-    color: #64748b;
+    color: var(--zrx-text-muted);
     font-weight: 500;
 }
 .support-bank-grid .bank-v {
-    color: #334155;
+    color: var(--zrx-text-main);
     font-weight: 600;
 }
 .support-bank-grid .acct-mono {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-weight: 700;
-    color: #0f172a;
+    font-family: inherit;
+    font-weight: 600;
+    color: var(--zrx-text-main);
 }
 .support-bank-grid .bank-bold {
-    color: #0f172a;
     font-weight: 700;
 }
 
@@ -246,14 +164,18 @@
 .support-ways-list {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid var(--zrx-border-subtle);
+    border-radius: 6px;
 }
 
 .support-way-item {
-    background: #ffffff;
-    border: 1px solid var(--zrx-border-subtle, #e2e8f0);
-    border-radius: 8px;
-    padding: 0.65rem 0.85rem;
+    background: var(--zrx-white);
+    padding: 0.8rem 0.85rem;
+}
+.support-way-item + .support-way-item {
+    border-top: 1px solid var(--zrx-border-subtle);
 }
 
 .support-way-head {
@@ -263,60 +185,39 @@
 }
 
 .support-icon-circle {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    border-radius: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 }
-.icon-heart { background: #ffe4e6; color: #e11d48; }
-.icon-share { background: #dbeafe; color: #2563eb; }
+.icon-heart,
+.icon-share {
+    background: var(--zrx-bg-subtle);
+    color: var(--zrx-text-muted);
+}
 
 .support-way-title {
     font-size: 0.82rem;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--zrx-text-main);
     line-height: 1.25;
 }
 .support-way-desc {
     font-size: 0.78rem;
-    color: #64748b;
+    color: var(--zrx-text-muted);
     margin-top: 0.15rem;
     line-height: 1.35;
 }
 
-/* Blessing Card */
-.support-blessing-box {
-    background: #f8fafc;
-    border: 1px solid var(--zrx-border-subtle, #e2e8f0);
-    border-radius: 8px;
-    padding: 0.75rem 0.95rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-size: 0.79rem;
-    color: #475569;
-    line-height: 1.45;
-}
-.blessing-icon {
-    font-size: 1.3rem;
-    flex-shrink: 0;
-}
-
-/* Footer */
-.support-modal-footer {
-    background: #f8fafc;
-    border-top: 1px solid var(--zrx-border-subtle, #e2e8f0);
-    padding: 0.65rem 1.25rem;
-    font-size: 0.75rem;
-    color: #64748b;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-.support-license-tag {
-    font-weight: 600;
-    color: #475569;
+/* Closing note */
+.support-blessing-note {
+    margin: 0;
+    padding: 0.85rem 0.2rem 0;
+    border-top: 1px solid var(--zrx-border-subtle);
+    color: var(--zrx-text-muted);
+    font-size: 0.82rem;
+    line-height: 1.55;
 }

@@ -1,9 +1,8 @@
 // Top navigation controller: floating dropdown panels, responsive horizontal overflow, and drag scrolling.
 document.addEventListener('DOMContentLoaded', () => {
     // Floating Dropdown Menus
-    const initFloatingMenu = (toggleId, panelId) => {
-        const toggle = document.getElementById(toggleId);
-        const menu = document.getElementById(panelId);
+    const initFloatingMenu = (toggle) => {
+        const menu = document.getElementById(toggle.dataset.navMenuPanel || '');
         if (!toggle || !menu) {
             return null;
         }
@@ -61,14 +60,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return { toggle, menu, openMenu, closeMenu, positionMenu };
     };
 
-    const menus = [
-        initFloatingMenu('template-menu-toggle', 'template-menu-panel'),
-        initFloatingMenu('finance-menu-toggle', 'finance-menu-panel'),
-        initFloatingMenu('setup-menu-toggle', 'setup-menu-panel'),
-        initFloatingMenu('help-menu-toggle', 'help-menu-panel')
-    ].filter(Boolean);
+    const menus = Array.from(document.querySelectorAll('[data-nav-menu-toggle]'))
+        .map(initFloatingMenu)
+        .filter(Boolean);
 
     document.addEventListener('click', (event) => {
+        if (event.target.closest('[data-nav-action="support"]') && typeof window.zimrxOpenSupportModal === 'function') {
+            window.zimrxOpenSupportModal();
+        }
         menus.forEach(m => {
             if (m && !m.menu.hidden) {
                 if (event.target !== m.toggle && !m.toggle.contains(event.target) && !m.menu.contains(event.target)) {

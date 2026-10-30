@@ -7,6 +7,7 @@
         url("../../fonts/SolaimanLipi.ttf") format("truetype");
     font-weight: normal;
     font-style: normal;
+    font-display: optional;
 }
 
 
@@ -45,6 +46,17 @@
         url("../../fonts/Arimo.ttf") format("truetype");
     font-weight: normal;
     font-style: normal;
+    font-display: optional;
+}
+
+@font-face {
+    font-family: "Arimo Settings Variable";
+    src: url("../../fonts/Arimo.woff2") format("woff2"),
+        url("../../fonts/Arimo.woff") format("woff"),
+        url("../../fonts/Arimo.ttf") format("truetype");
+    font-weight: 400 700;
+    font-style: normal;
+    font-display: optional;
 }
 
 @font-face {

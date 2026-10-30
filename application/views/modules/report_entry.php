@@ -86,4 +86,4 @@ declare(strict_types=1);
     </template>
 </div>
 
-<script src="assets/js/modules/report_entry.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/modules/report_entry.js') ?>"></script>
+<script src="assets/js/modules/report_entry.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/modules/report_entry.js') ?>" defer></script>

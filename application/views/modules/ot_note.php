@@ -137,8 +137,4 @@ $ot_predefined_particulars = [
     </template>
 </div>
 
-<!-- Load NicEditor -->
-<script src="assets/vendor/nicedit/nicEdit-latest.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/vendor/nicedit/nicEdit-latest.js') ?>"></script>
-<script src="assets/vendor/nicedit/nicEdit-zimrx-custom.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/vendor/nicedit/nicEdit-zimrx-custom.js') ?>"></script>
-
-<script src="assets/js/modules/ot_note.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/modules/ot_note.js') ?>"></script>
+<script src="assets/js/modules/ot_note.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/modules/ot_note.js') ?>" defer></script>

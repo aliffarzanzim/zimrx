@@ -5,8 +5,10 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/init.php';
 require_login();
+require_once ZIMRX_BASE_DIR . '/lib/Services/PatientCustomFields.php';
 require_once ZIMRX_BASE_DIR . '/lib/emr_identity_lib.php';
 require_once ZIMRX_BASE_DIR . '/lib/particulars_audit_lib.php';
+require_once ZIMRX_BASE_DIR . '/lib/Services/PracticeProfileService.php';
 
 header('Content-Type: application/json');
 
@@ -15,15 +17,32 @@ function respond($payload): void {
     exit;
 }
 
+function reject_patient_payload(PDO $pdo, string $message): void {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+    http_response_code(422);
+    respond(['error' => $message]);
+}
+
 function value(array $data, string $key): string {
     return trim((string)($data[$key] ?? ''));
 }
 
-function normalized_date(string $date): string {
-    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
-        return $date;
+function parsed_date(string $date): ?string {
+    foreach (['!Y-m-d', '!d/m/Y'] as $format) {
+        $parsed = DateTimeImmutable::createFromFormat($format, $date);
+        $errors = DateTimeImmutable::getLastErrors();
+        if ($parsed && $parsed->format(substr($format, 1)) === $date
+            && ($errors === false || ($errors['warning_count'] === 0 && $errors['error_count'] === 0))) {
+            return $parsed->format('Y-m-d');
+        }
     }
-    return date('Y-m-d');
+    return null;
+}
+
+function normalized_date(string $date): string {
+    return parsed_date($date) ?? date('Y-m-d');
 }
 
 
@@ -34,31 +53,6 @@ function doctor_code_for_visit(PDO $pdo, int $doctorId): string {
     $code = strtoupper(trim((string)$stmt->fetchColumn()));
     return $code !== '' ? $code : 'D' . str_pad((string)$doctorId, 3, '0', STR_PAD_LEFT);
 }
-
-function appointment_doctor_options(PDO $pdo): array {
-    return zimrx_doctor_options_for_user($pdo, current_user_id(), current_user_role(), current_user_doctor_id());
-}
-
-function resolve_appointment_doctor_id(PDO $pdo, int $requestedDoctorId): int {
-    $options = appointment_doctor_options($pdo);
-    $ids = array_map(fn($row) => (int)$row['id'], $options);
-    if (current_user_role() !== 'assistant') {
-        return in_array($requestedDoctorId, $ids, true) ? $requestedDoctorId : current_user_doctor_id();
-    }
-
-    if (count($ids) === 1) {
-        $_SESSION['active_doctor_id'] = $ids[0];
-        return $ids[0];
-    }
-    if ($requestedDoctorId > 0 && in_array($requestedDoctorId, $ids, true)) {
-        $_SESSION['active_doctor_id'] = $requestedDoctorId;
-        return $requestedDoctorId;
-    }
-    $sessionDoctorId = (int)($_SESSION['active_doctor_id'] ?? 0);
-    return in_array($sessionDoctorId, $ids, true) ? $sessionDoctorId : 0;
-}
-
-
 
 function default_appointment_settings(): array {
     return [
@@ -76,22 +70,16 @@ function default_appointment_settings(): array {
     ];
 }
 
-function get_appointment_settings(PDO $pdo, int $doctorId): array {
-    $defaults = default_appointment_settings();
-    $stmt = $pdo->prepare(
-        "SELECT settings_json
-             FROM zimrx_appointment_settings
-         WHERE doctor_id = :doctor_id
-         LIMIT 1"
-    );
-    $stmt->execute(['doctor_id' => $doctorId]);
-    $row = $stmt->fetch();
-    if (!$row) {
-        return $defaults;
+function get_appointment_settings(PDO $pdo, int $doctorId, int $profileId): array {
+    if ($doctorId <= 0 || $profileId <= 0) {
+        throw new RuntimeException('Select an active practice profile before loading appointments.');
     }
-
-    $stored = json_decode((string)$row['settings_json'], true);
+    $defaults = default_appointment_settings();
+    $stored = (new \ZimRx\Services\PracticeProfileService($pdo))->settings($profileId, $doctorId, 'appointment') ?? [];
     if (!is_array($stored)) {
+        $stored = [];
+    }
+    if ($stored === []) {
         return $defaults;
     }
 
@@ -110,7 +98,7 @@ function get_appointment_settings(PDO $pdo, int $doctorId): array {
     return $settings;
 }
 
-function save_appointment_settings(PDO $pdo, array $payload, int $doctorId): array {
+function save_appointment_settings(PDO $pdo, array $payload, int $doctorId, int $profileId): array {
     $settings = [
         'default_start_time' => value($payload, 'default_start_time') ?: '14:00',
         'minutes_per_patient' => max(1, (int)value($payload, 'minutes_per_patient')),
@@ -132,16 +120,11 @@ function save_appointment_settings(PDO $pdo, array $payload, int $doctorId): arr
         $settings['token_fields'] = default_appointment_settings()['token_fields'];
     }
 
-    $stmt = $pdo->prepare(
-        "INSERT INTO zimrx_appointment_settings (doctor_id, settings_json, updated_at)
-         VALUES (:doctor_id, :settings_json, " . DbSql::now() . ")
-         " . DbSql::upsert('doctor_id', ['settings_json', 'updated_at'], ['updated_at' => DbSql::now()])
-    );
-    $stmt->execute([
-        'doctor_id' => $doctorId,
-        'settings_json' => json_encode($settings, JSON_UNESCAPED_UNICODE),
-    ]);
-    return get_appointment_settings($pdo, $doctorId);
+    if ($doctorId <= 0 || $profileId <= 0) {
+        throw new RuntimeException('Select an active practice profile before saving appointment settings.');
+    }
+    (new \ZimRx\Services\PracticeProfileService($pdo))->saveSettings($profileId, $doctorId, 'appointment', $settings);
+    return get_appointment_settings($pdo, $doctorId, $profileId);
 }
 
 function appointment_day_rule(array $settings, string $date): array {
@@ -176,24 +159,24 @@ function calculate_appointment_time(int $appointmentNo, string $date, array $set
     return $dt->format('H:i');
 }
 
-function next_appointment_no(PDO $pdo, string $date, array $settings, int $doctorId): int {
+function next_appointment_no(PDO $pdo, string $date, array $settings, int $doctorId, int $profileId): int {
     $stmt = $pdo->prepare(
         "SELECT COALESCE(MAX(appointment_no), 0) + 1
          FROM zimrx_appointments
-         WHERE doctor_id = :doctor_id AND appointment_date = :date"
+         WHERE doctor_id = :doctor_id AND profile_id = :profile_id AND appointment_date = :date"
     );
-    $stmt->execute(['doctor_id' => $doctorId, 'date' => $date]);
+    $stmt->execute(['doctor_id' => $doctorId, 'date' => $date, 'profile_id' => $profileId]);
     $nextNo = (int)$stmt->fetchColumn();
     return max($nextNo, (int)$settings['blank_slots'] + 1, 1);
 }
 
-function appointment_serial_is_free(PDO $pdo, string $date, int $appointmentNo, int $doctorId, int $excludeId = 0): bool {
+function appointment_serial_is_free(PDO $pdo, string $date, int $appointmentNo, int $doctorId, int $profileId, int $excludeId = 0): bool {
     if ($appointmentNo <= 0) {
         return false;
     }
 
-    $sql = "SELECT COUNT(*) FROM zimrx_appointments WHERE doctor_id = :doctor_id AND appointment_date = :date AND appointment_no = :appointment_no";
-    $params = ['doctor_id' => $doctorId, 'date' => $date, 'appointment_no' => $appointmentNo];
+    $sql = "SELECT COUNT(*) FROM zimrx_appointments WHERE doctor_id = :doctor_id AND profile_id = :profile_id AND appointment_date = :date AND appointment_no = :appointment_no";
+    $params = ['doctor_id' => $doctorId, 'profile_id' => $profileId, 'date' => $date, 'appointment_no' => $appointmentNo];
     if ($excludeId > 0) {
         $sql .= " AND id <> :exclude_id";
         $params['exclude_id'] = $excludeId;
@@ -204,11 +187,11 @@ function appointment_serial_is_free(PDO $pdo, string $date, int $appointmentNo, 
     return (int)$stmt->fetchColumn() === 0;
 }
 
-function confirmed_appointment_no(PDO $pdo, string $date, int $requestedNo, array $settings, int $doctorId, int $excludeId = 0): int {
-    if ($requestedNo > 0 && appointment_serial_is_free($pdo, $date, $requestedNo, $doctorId, $excludeId)) {
+function confirmed_appointment_no(PDO $pdo, string $date, int $requestedNo, array $settings, int $doctorId, int $profileId, int $excludeId = 0): int {
+    if ($requestedNo > 0 && appointment_serial_is_free($pdo, $date, $requestedNo, $doctorId, $profileId, $excludeId)) {
         return $requestedNo;
     }
-    return next_appointment_no($pdo, $date, $settings, $doctorId);
+    return next_appointment_no($pdo, $date, $settings, $doctorId, $profileId);
 }
 
 function next_reg_no(PDO $pdo, string $date, int $doctorId): string {
@@ -272,7 +255,12 @@ function add_visit_info(PDO $pdo, array $patient, int $doctorId): array {
     return $patient;
 }
 
-function patient_payload(array $row): array {
+function patient_payload(array $row, int $doctorId): array {
+    $rawExtra = json_decode((string)($row['extra_demographics_json'] ?? '{}'), true);
+    $extra = \ZimRx\Services\PatientCustomFields::projectForDoctor(
+        is_array($rawExtra) ? $rawExtra : [],
+        $doctorId
+    );
     return [
         'id' => (int)($row['id'] ?? 0),
         'reg_no' => (string)($row['reg_no'] ?? ''),
@@ -281,11 +269,18 @@ function patient_payload(array $row): array {
         'age' => (string)($row['age'] ?? ''),
         'age_unit' => (string)($row['age_unit'] ?? 'Years'),
         'dob' => (string)($row['dob'] ?? ''),
+        'dob_type' => (string)($row['dob_type'] ?? 'exact'),
         'gender' => (string)($row['gender'] ?? ''),
         'blood_group' => (string)($row['blood_group'] ?? ''),
+        'marital_status' => (string)($row['marital_status'] ?? ''),
         'mobile' => (string)($row['mobile'] ?? ''),
+        'email' => (string)($row['email'] ?? ''),
+        'nid_no' => (string)($row['nid_no'] ?? ''),
+        'passport_no' => (string)($row['passport_no'] ?? ''),
         'occupation' => (string)($row['occupation'] ?? ''),
         'address' => (string)($row['address'] ?? ''),
+        'extra_demographics_json' => json_encode($extra, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+        'extra_demographics' => $extra,
         'weight' => (string)($row['weight'] ?? ''),
         'weight_unit' => (string)($row['weight_unit'] ?? 'kg'),
         'height' => (string)($row['height'] ?? ''),
@@ -293,34 +288,35 @@ function patient_payload(array $row): array {
     ];
 }
 
-function patient_doctor_filter(string $alias = 'p'): string {
-    return "(COALESCE(NULLIF($alias.doctor_id, 0), 1) = :doctor_id
-        OR EXISTS (
-            SELECT 1
-            FROM zimrx_patient_doctor_access pda
-            WHERE pda.patient_id = $alias.id
-              AND pda.doctor_id = :doctor_id
-              AND pda.can_view = 1
-        ))";
+function patient_profile_filter(string $alias): string {
+    return "($alias.doctor_id = :doctor_id
+        AND ($alias.profile_id = :active_profile_id OR $alias.profile_id IN (
+            SELECT shared_profile.id FROM zimrx_doctor_profiles shared_profile
+            WHERE shared_profile.doctor_id = :profile_doctor_id
+              AND shared_profile.is_active = 1
+              AND shared_profile.is_deleted = 0
+              AND shared_profile.share_patient_particulars = 1
+        )))";
 }
 
-function lookup_patients(PDO $pdo, array $query, int $doctorId): array {
+function lookup_patients(PDO $pdo, array $query, int $doctorId, int $profileId): array {
     $date = normalized_date(value($query, 'date'));
     $regNo = strtoupper(value($query, 'reg_no'));
     $mobile = value($query, 'mobile');
+    $profileParams = ['active_profile_id' => $profileId, 'profile_doctor_id' => $doctorId];
 
     if ($regNo !== '') {
         $stmt = $pdo->prepare(
             "SELECT *
              FROM zimrx_patients p
-             WHERE " . patient_doctor_filter('p') . "
+             WHERE " . patient_profile_filter('p') . "
                AND upper(reg_no) LIKE :reg_no
              ORDER BY reg_no ASC
              LIMIT 10"
         );
-        $stmt->execute(['doctor_id' => $doctorId, 'reg_no' => $regNo . '%']);
+        $stmt->execute(['doctor_id' => $doctorId, 'reg_no' => $regNo . '%'] + $profileParams);
         return [
-            'patients' => array_map(fn($patient) => add_visit_info($pdo, patient_payload($patient), $doctorId), $stmt->fetchAll()),
+            'patients' => array_map(fn($patient) => add_visit_info($pdo, patient_payload($patient, $doctorId), $doctorId), $stmt->fetchAll()),
             'new_reg_no' => next_reg_no($pdo, $date, $doctorId),
         ];
     }
@@ -333,7 +329,7 @@ function lookup_patients(PDO $pdo, array $query, int $doctorId): array {
     $stmt = $pdo->prepare(
         "SELECT *
          FROM zimrx_patients p
-         WHERE " . patient_doctor_filter('p') . "
+         WHERE " . patient_profile_filter('p') . "
            AND (
                 replace(replace(replace(replace(coalesce(mobile, ''), '+88', ''), '-', ''), ' ', ''), '.', '') LIKE :mobile
                 OR mobile LIKE :raw_mobile
@@ -345,10 +341,10 @@ function lookup_patients(PDO $pdo, array $query, int $doctorId): array {
         'doctor_id' => $doctorId,
         'mobile' => '%' . $cleanMobile . '%',
         'raw_mobile' => '%' . $mobile . '%',
-    ]);
+    ] + $profileParams);
 
     return [
-        'patients' => array_map(fn($patient) => add_visit_info($pdo, patient_payload($patient), $doctorId), $stmt->fetchAll()),
+        'patients' => array_map(fn($patient) => add_visit_info($pdo, patient_payload($patient, $doctorId), $doctorId), $stmt->fetchAll()),
         'new_reg_no' => next_reg_no($pdo, $date, $doctorId),
     ];
 }
@@ -394,6 +390,18 @@ function revisit_discount_amount(array $row, array $settings, string $appointmen
 
 function decorate_appointment_rows(array $rows, array $settings, string $date): array {
     foreach ($rows as &$row) {
+        $appointmentExtra = trim((string)($row['appointment_extra_demographics_json'] ?? ''));
+        $patientExtra = trim((string)($row['patient_extra_demographics_json'] ?? ''));
+        $sourceExtra = $appointmentExtra !== '' ? $appointmentExtra : $patientExtra;
+        $decodedExtra = json_decode($sourceExtra !== '' ? $sourceExtra : '{}', true);
+        $projectedExtra = \ZimRx\Services\PatientCustomFields::projectForDoctor(
+            is_array($decodedExtra) ? $decodedExtra : [],
+            (int)($row['doctor_id'] ?? 0)
+        );
+        $row['extra_demographics'] = $projectedExtra;
+        $row['extra_demographics_json'] = json_encode($projectedExtra, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+        unset($row['appointment_extra_demographics_json'], $row['patient_extra_demographics_json'], $row['patient_owner_doctor_id']);
+
         $fee = $row['visit_fee'] !== null && $row['visit_fee'] !== '' ? (float)$row['visit_fee'] : (float)$settings['visit_fee'];
         $discount = revisit_discount_amount($row, $settings, $date);
         $discountNote = (string)($row['discount_note'] ?? '');
@@ -415,7 +423,7 @@ function decorate_appointment_rows(array $rows, array $settings, string $date): 
     return $rows;
 }
 
-function list_appointments(PDO $pdo, string $date, array $settings, int $doctorId): array {
+function list_appointments(PDO $pdo, string $date, array $settings, int $doctorId, int $profileId): array {
     $stmt = $pdo->prepare(
         "SELECT
             a.id,
@@ -429,11 +437,20 @@ function list_appointments(PDO $pdo, string $date, array $settings, int $doctorI
             coalesce(nullif(a.age, ''), p.age, '') AS age,
             coalesce(nullif(a.age_unit, ''), p.age_unit, 'Years') AS age_unit,
             coalesce(nullif(a.dob, ''), p.dob, '') AS dob,
+            coalesce(nullif(a.dob_type, ''), p.dob_type, 'exact') AS dob_type,
             coalesce(nullif(a.gender, ''), p.gender, '') AS gender,
             coalesce(nullif(a.blood_group, ''), p.blood_group, '') AS blood_group,
+            coalesce(nullif(a.marital_status, ''), p.marital_status, '') AS marital_status,
             coalesce(nullif(a.mobile, ''), p.mobile, '') AS mobile,
+            coalesce(nullif(a.email, ''), p.email, '') AS email,
+            coalesce(nullif(a.nid_no, ''), p.nid_no, '') AS nid_no,
+            coalesce(nullif(a.passport_no, ''), p.passport_no, '') AS passport_no,
             coalesce(nullif(a.occupation, ''), p.occupation, '') AS occupation,
             coalesce(nullif(a.address, ''), p.address, '') AS address,
+            coalesce(nullif(a.extra_demographics_json, ''), p.extra_demographics_json, '{}') AS extra_demographics_json,
+            a.extra_demographics_json AS appointment_extra_demographics_json,
+            p.extra_demographics_json AS patient_extra_demographics_json,
+            p.doctor_id AS patient_owner_doctor_id,
             coalesce(nullif(a.weight, ''), p.weight, '') AS weight,
             coalesce(nullif(a.weight_unit, ''), p.weight_unit, 'kg') AS weight_unit,
             coalesce(nullif(a.height, ''), p.height, '') AS height,
@@ -466,19 +483,27 @@ function list_appointments(PDO $pdo, string $date, array $settings, int $doctorI
                 FROM zimrx_visits v
                 WHERE v.patient_id = a.patient_id
                   AND v.doctor_id = a.doctor_id
+                  AND v.profile_id = a.profile_id
                   AND date(v.visit_date) < date(a.appointment_date)
             ) AS last_visit_date
          FROM zimrx_appointments a
          LEFT JOIN zimrx_patients p ON p.id = a.patient_id
+            AND (p.profile_id = a.profile_id OR EXISTS (
+                SELECT 1 FROM zimrx_doctor_profiles shared_profile
+                WHERE shared_profile.id = p.profile_id AND shared_profile.doctor_id = a.doctor_id
+                  AND shared_profile.is_active = 1 AND shared_profile.is_deleted = 0
+                  AND shared_profile.share_patient_particulars = 1
+            ))
          WHERE a.doctor_id = :doctor_id
+           AND a.profile_id = :profile_id
            AND a.appointment_date = :date
          ORDER BY a.appointment_no ASC, a.id ASC"
     );
-    $stmt->execute(['doctor_id' => $doctorId, 'date' => $date]);
+    $stmt->execute(['doctor_id' => $doctorId, 'date' => $date, 'profile_id' => $profileId]);
     return decorate_appointment_rows($stmt->fetchAll(), $settings, $date);
 }
 
-function appointment_detail(PDO $pdo, int $appointmentId, array $settings, int $doctorId): ?array {
+function appointment_detail(PDO $pdo, int $appointmentId, array $settings, int $doctorId, int $profileId): ?array {
     if ($appointmentId <= 0) {
         return null;
     }
@@ -496,11 +521,20 @@ function appointment_detail(PDO $pdo, int $appointmentId, array $settings, int $
             coalesce(nullif(a.age, ''), p.age, '') AS age,
             coalesce(nullif(a.age_unit, ''), p.age_unit, 'Years') AS age_unit,
             coalesce(nullif(a.dob, ''), p.dob, '') AS dob,
+            coalesce(nullif(a.dob_type, ''), p.dob_type, 'exact') AS dob_type,
             coalesce(nullif(a.gender, ''), p.gender, '') AS gender,
             coalesce(nullif(a.blood_group, ''), p.blood_group, '') AS blood_group,
+            coalesce(nullif(a.marital_status, ''), p.marital_status, '') AS marital_status,
             coalesce(nullif(a.mobile, ''), p.mobile, '') AS mobile,
+            coalesce(nullif(a.email, ''), p.email, '') AS email,
+            coalesce(nullif(a.nid_no, ''), p.nid_no, '') AS nid_no,
+            coalesce(nullif(a.passport_no, ''), p.passport_no, '') AS passport_no,
             coalesce(nullif(a.occupation, ''), p.occupation, '') AS occupation,
             coalesce(nullif(a.address, ''), p.address, '') AS address,
+            coalesce(nullif(a.extra_demographics_json, ''), p.extra_demographics_json, '{}') AS extra_demographics_json,
+            a.extra_demographics_json AS appointment_extra_demographics_json,
+            p.extra_demographics_json AS patient_extra_demographics_json,
+            p.doctor_id AS patient_owner_doctor_id,
             coalesce(nullif(a.weight, ''), p.weight, '') AS weight,
             coalesce(nullif(a.weight_unit, ''), p.weight_unit, 'kg') AS weight_unit,
             coalesce(nullif(a.height, ''), p.height, '') AS height,
@@ -534,16 +568,25 @@ function appointment_detail(PDO $pdo, int $appointmentId, array $settings, int $
                 FROM zimrx_visits v2
                 WHERE v2.patient_id = a.patient_id
                   AND v2.doctor_id = a.doctor_id
+                  AND v2.profile_id = a.profile_id
                   AND date(v2.visit_date) < date(a.appointment_date)
             ) AS last_visit_date
          FROM zimrx_appointments a
          LEFT JOIN zimrx_patients p ON p.id = a.patient_id
+            AND (p.profile_id = a.profile_id OR EXISTS (
+                SELECT 1 FROM zimrx_doctor_profiles shared_profile
+                WHERE shared_profile.id = p.profile_id AND shared_profile.doctor_id = a.doctor_id
+                  AND shared_profile.is_active = 1 AND shared_profile.is_deleted = 0
+                  AND shared_profile.share_patient_particulars = 1
+            ))
          LEFT JOIN zimrx_visits v ON (v.id = a.visit_record_id OR (a.visit_record_id IS NULL AND v.appointment_id = a.id AND v.doctor_id = a.doctor_id))
+            AND v.profile_id = a.profile_id
          WHERE a.id = :id
            AND a.doctor_id = :doctor_id
+           AND a.profile_id = :profile_id
          LIMIT 1"
     );
-    $stmt->execute(['id' => $appointmentId, 'doctor_id' => $doctorId]);
+    $stmt->execute(['id' => $appointmentId, 'doctor_id' => $doctorId, 'profile_id' => $profileId]);
     $row = $stmt->fetch();
     if (!$row) {
         return null;
@@ -553,7 +596,7 @@ function appointment_detail(PDO $pdo, int $appointmentId, array $settings, int $
     return $rows[0] ?? $row;
 }
 
-function list_appointment_history(PDO $pdo, array $query, array $settings, int $doctorId): array {
+function list_appointment_history(PDO $pdo, array $query, array $settings, int $doctorId, int $profileId): array {
     $patientId = (int)value($query, 'patient_id');
     $regNo = value($query, 'reg_no');
     $excludeId = (int)value($query, 'id');
@@ -592,11 +635,19 @@ function list_appointment_history(PDO $pdo, array $query, array $settings, int $
             a.status
          FROM zimrx_appointments a
          LEFT JOIN zimrx_patients p ON p.id = a.patient_id
+            AND (p.profile_id = a.profile_id OR EXISTS (
+                SELECT 1 FROM zimrx_doctor_profiles shared_profile
+                WHERE shared_profile.id = p.profile_id AND shared_profile.doctor_id = a.doctor_id
+                  AND shared_profile.is_active = 1 AND shared_profile.is_deleted = 0
+                  AND shared_profile.share_patient_particulars = 1
+            ))
          LEFT JOIN zimrx_doctors d ON d.id = a.doctor_id
          WHERE $where
+           AND a.profile_id = :profile_id
          ORDER BY date(a.appointment_date) DESC, a.appointment_no DESC, a.id DESC
          LIMIT 30"
     );
+    $params['profile_id'] = $profileId;
     $stmt->execute($params);
     $rows = $stmt->fetchAll();
 
@@ -616,22 +667,28 @@ function list_appointment_history(PDO $pdo, array $query, array $settings, int $
     return $rows;
 }
 
-function find_patient(PDO $pdo, int $patientId, string $regNo, int $doctorId): ?array {
+function find_patient(PDO $pdo, int $patientId, string $regNo, int $doctorId, int $profileId): ?array {
+    $profileParams = ['active_profile_id' => $profileId, 'profile_doctor_id' => $doctorId];
     if ($patientId > 0) {
         $stmt = $pdo->prepare(
             "SELECT *
              FROM zimrx_patients p
-             WHERE p.id = :id AND " . patient_doctor_filter('p') . "
+             WHERE p.id = :id AND " . patient_profile_filter('p') . "
              LIMIT 1"
         );
-        $stmt->execute(['id' => $patientId, 'doctor_id' => $doctorId]);
+        $stmt->execute(['id' => $patientId, 'doctor_id' => $doctorId] + $profileParams);
         $row = $stmt->fetch();
         if ($row) {
             return $row;
         }
 
-        $stmt = $pdo->prepare("SELECT * FROM zimrx_patients WHERE upper(reg_no) = upper(:reg_no) LIMIT 1");
-        $stmt->execute(['reg_no' => $regNo]);
+        $stmt = $pdo->prepare(
+            "SELECT * FROM zimrx_patients p
+             WHERE upper(p.reg_no) = upper(:reg_no)
+               AND " . patient_profile_filter('p') . "
+             LIMIT 1"
+        );
+        $stmt->execute(['reg_no' => $regNo, 'doctor_id' => $doctorId] + $profileParams);
         $row = $stmt->fetch();
         if ($row) {
             return $row;
@@ -642,11 +699,11 @@ function find_patient(PDO $pdo, int $patientId, string $regNo, int $doctorId): ?
         $stmt = $pdo->prepare(
             "SELECT *
              FROM zimrx_patients p
-             WHERE " . patient_doctor_filter('p') . "
+             WHERE " . patient_profile_filter('p') . "
                AND upper(p.reg_no) = upper(:reg_no)
              LIMIT 1"
         );
-        $stmt->execute(['doctor_id' => $doctorId, 'reg_no' => $regNo]);
+        $stmt->execute(['doctor_id' => $doctorId, 'reg_no' => $regNo] + $profileParams);
         $row = $stmt->fetch();
         if ($row) {
             return $row;
@@ -656,19 +713,20 @@ function find_patient(PDO $pdo, int $patientId, string $regNo, int $doctorId): ?
     return null;
 }
 
-function load_patient(PDO $pdo, int $patientId, int $doctorId): array {
+function load_patient(PDO $pdo, int $patientId, int $doctorId, int $profileId): array {
+    $profileParams = ['active_profile_id' => $profileId, 'profile_doctor_id' => $doctorId];
     $stmt = $pdo->prepare(
         "SELECT *
          FROM zimrx_patients p
-         WHERE p.id = :id AND " . patient_doctor_filter('p') . "
+         WHERE p.id = :id AND " . patient_profile_filter('p') . "
          LIMIT 1"
     );
-    $stmt->execute(['id' => $patientId, 'doctor_id' => $doctorId]);
+    $stmt->execute(['id' => $patientId, 'doctor_id' => $doctorId] + $profileParams);
     $row = $stmt->fetch();
-    return $row ? patient_payload($row) : [];
+    return $row ? patient_payload($row, $doctorId) : [];
 }
 
-function save_patient(PDO $pdo, array $payload, string $date, int $doctorId): array {
+function save_patient(PDO $pdo, array $payload, string $date, int $doctorId, int $profileId): array {
     $patientId = (int)value($payload, 'patient_id');
     $regNo = strtoupper(value($payload, 'reg_no'));
     if (in_array($regNo, ['AUTO', 'AUTO ON SAVE'], true)) {
@@ -681,7 +739,7 @@ function save_patient(PDO $pdo, array $payload, string $date, int $doctorId): ar
         respond(['error' => 'Patient name is required.']);
     }
 
-    $existing = find_patient($pdo, $patientId, $regNo, $doctorId);
+    $existing = find_patient($pdo, $patientId, $regNo, $doctorId, $profileId);
 
     // Safeguard: If patient_id was not explicitly selected, prevent overwriting existing patient data
     if ($patientId <= 0 && $existing && $regNo !== '') {
@@ -693,18 +751,63 @@ function save_patient(PDO $pdo, array $payload, string $date, int $doctorId): ar
         }
     }
 
+    if (array_key_exists('dob_type', $payload) && !is_string($payload['dob_type'])) {
+        reject_patient_payload($pdo, 'Invalid date of birth type.');
+    }
+    $dobType = array_key_exists('dob_type', $payload)
+        ? (trim($payload['dob_type']) ?: 'exact')
+        : (string)($existing['dob_type'] ?? 'exact');
+    if (!in_array($dobType, \ZimRx\Services\PatientDemographics::dobTypes(), true)) {
+        reject_patient_payload($pdo, 'Invalid date of birth type.');
+    }
+
+    $rawExistingExtra = (string)($existing['extra_demographics_json'] ?? '{}');
+    $decodedExistingExtra = json_decode($rawExistingExtra, true);
+    $existingExtra = is_array($decodedExistingExtra) ? $decodedExistingExtra : [];
+    if (array_key_exists('extra_demographics', $payload)) {
+        if (!is_array($payload['extra_demographics'])) {
+            reject_patient_payload($pdo, 'Invalid extended demographics.');
+        }
+        $extraDemo = $payload['extra_demographics'];
+    } else {
+        $extraDemo = $existingExtra;
+    }
+    try {
+        $customDefinitions = \ZimRx\Services\PatientCustomFields::loadForDoctor($pdo, $doctorId);
+        $extraDemo = \ZimRx\Services\PatientCustomFields::normalizeExtraValues(
+            $extraDemo,
+            $customDefinitions,
+            $existingExtra,
+            $doctorId
+        );
+        $extraDemoJson = json_encode($extraDemo, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+    } catch (\InvalidArgumentException $e) {
+        reject_patient_payload($pdo, $e->getMessage());
+    } catch (\JsonException) {
+        reject_patient_payload($pdo, 'Invalid extended demographics.');
+    }
+
     $params = [
         'doctor_id' => $doctorId,
+        'profile_id' => $profileId,
         'reg_no' => $regNo,
         'full_name' => $name,
         'age' => value($payload, 'age'),
         'age_unit' => value($payload, 'age_unit') ?: 'Years',
         'dob' => value($payload, 'dob'),
+        'dob_type' => $dobType,
         'gender' => value($payload, 'gender'),
         'blood_group' => value($payload, 'blood_group'),
+        'marital_status' => array_key_exists('marital_status', $payload)
+            ? value($payload, 'marital_status')
+            : (string)($existing['marital_status'] ?? ''),
         'address' => value($payload, 'address'),
         'mobile' => $mobile,
+        'email' => array_key_exists('email', $payload) ? value($payload, 'email') : (string)($existing['email'] ?? ''),
+        'nid_no' => array_key_exists('nid_no', $payload) ? value($payload, 'nid_no') : (string)($existing['nid_no'] ?? ''),
+        'passport_no' => array_key_exists('passport_no', $payload) ? value($payload, 'passport_no') : (string)($existing['passport_no'] ?? ''),
         'occupation' => value($payload, 'occupation'),
+        'extra_demographics_json' => $extraDemoJson,
         'weight' => value($payload, 'weight'),
         'weight_unit' => value($payload, 'weight_unit') ?: 'kg',
         'height' => value($payload, 'height'),
@@ -717,16 +820,21 @@ function save_patient(PDO $pdo, array $payload, string $date, int $doctorId): ar
         $stmt = $pdo->prepare(
             "UPDATE zimrx_patients
              SET reg_no = :reg_no,
-                 doctor_id = COALESCE(NULLIF(doctor_id, 0), :doctor_id),
                  full_name = :full_name,
                  age = coalesce(nullif(:age, ''), age),
                  age_unit = coalesce(nullif(:age_unit, ''), age_unit),
                  dob = coalesce(nullif(:dob, ''), dob),
+                 dob_type = :dob_type,
                  gender = coalesce(nullif(:gender, ''), gender),
                  blood_group = coalesce(nullif(:blood_group, ''), blood_group),
+                 marital_status = nullif(:marital_status, ''),
                  address = coalesce(nullif(:address, ''), address),
                  mobile = coalesce(nullif(:mobile, ''), mobile),
+                 email = nullif(:email, ''),
+                 nid_no = nullif(:nid_no, ''),
+                 passport_no = nullif(:passport_no, ''),
                  occupation = coalesce(nullif(:occupation, ''), occupation),
+                 extra_demographics_json = :extra_demographics_json,
                  weight = coalesce(nullif(:weight, ''), weight),
                  weight_unit = coalesce(nullif(:weight_unit, ''), weight_unit),
                  height = coalesce(nullif(:height, ''), height),
@@ -745,25 +853,26 @@ function save_patient(PDO $pdo, array $payload, string $date, int $doctorId): ar
             zimrx_record_user_occupation($pdo, $doctorId, (string)$params['occupation']);
         }
 
-        return load_patient($pdo, (int)$existing['id'], $doctorId);
+        return load_patient($pdo, (int)$existing['id'], $doctorId, $profileId);
     }
 
     $stmt = $pdo->prepare(
         "INSERT INTO zimrx_patients (
-            doctor_id, reg_no, full_name, age, age_unit, dob, gender, blood_group,
-            address, mobile, occupation, weight, weight_unit, height, height_unit
+            doctor_id, profile_id, reg_no, full_name, age, age_unit, dob, dob_type, gender, blood_group, marital_status,
+            address, mobile, email, nid_no, passport_no, occupation, extra_demographics_json, weight, weight_unit, height, height_unit
         ) VALUES (
-            :doctor_id, :reg_no, :full_name, nullif(:age, ''), nullif(:age_unit, ''), nullif(:dob, ''),
-            nullif(:gender, ''), nullif(:blood_group, ''), nullif(:address, ''), nullif(:mobile, ''),
-            nullif(:occupation, ''), nullif(:weight, ''), nullif(:weight_unit, ''),
+            :doctor_id, :profile_id, :reg_no, :full_name, nullif(:age, ''), nullif(:age_unit, ''), nullif(:dob, ''),
+            coalesce(nullif(:dob_type, ''), 'exact'), nullif(:gender, ''), nullif(:blood_group, ''), nullif(:marital_status, ''),
+            nullif(:address, ''), nullif(:mobile, ''), nullif(:email, ''), nullif(:nid_no, ''), nullif(:passport_no, ''),
+            nullif(:occupation, ''), coalesce(nullif(:extra_demographics_json, ''), '{}'), nullif(:weight, ''), nullif(:weight_unit, ''),
             nullif(:height, ''), nullif(:height_unit, '')
         )"
     );
 
     $assignedRegNo = '';
     if ($regNo !== '') {
-        $checkStmt = $pdo->prepare("SELECT 1 FROM zimrx_patients WHERE UPPER(reg_no) = UPPER(:reg_no) LIMIT 1");
-        $checkStmt->execute(['reg_no' => $regNo]);
+        $checkStmt = $pdo->prepare("SELECT 1 FROM zimrx_patients WHERE UPPER(reg_no) = UPPER(:reg_no) AND profile_id = :profile_id LIMIT 1");
+        $checkStmt->execute(['reg_no' => $regNo, 'profile_id' => $profileId]);
         if (!$checkStmt->fetchColumn()) {
             $assignedRegNo = $regNo;
             zimrx_sync_patient_sequence_highwater($pdo, $doctorId, $regNo);
@@ -785,7 +894,7 @@ function save_patient(PDO $pdo, array $payload, string $date, int $doctorId): ar
                 zimrx_record_user_occupation($pdo, $doctorId, (string)$params['occupation']);
             }
 
-            return load_patient($pdo, $newPatientId, $doctorId);
+            return load_patient($pdo, $newPatientId, $doctorId, $profileId);
         } catch (PDOException $e) {
             $assignedRegNo = '';
             if (!is_unique_constraint_error($e)) {
@@ -810,27 +919,17 @@ try {
         }
     }
 
-    $requestedDoctorId = $_SERVER['REQUEST_METHOD'] === 'GET'
-        ? (int)value($_GET, 'doctor_id')
-        : (int)value($payload, 'doctor_id');
-    $doctorOptions = appointment_doctor_options($pdo);
-    $doctorId = resolve_appointment_doctor_id($pdo, $requestedDoctorId);
+    $activePracticeProfile = (new \ZimRx\Services\PracticeProfileService($pdo))->activeForCurrentUser();
+    $profileId = (int)($activePracticeProfile['id'] ?? 0);
+    $doctorId = (int)($activePracticeProfile['doctor_id'] ?? 0);
 
-    if ($_SERVER['REQUEST_METHOD'] === 'GET' && value($_GET, 'action') === 'doctor_options') {
-        respond(['doctors' => $doctorOptions, 'active_doctor_id' => $doctorId]);
-    }
-
-    if ($doctorId <= 0) {
-        respond([
-            'needs_doctor' => true,
-            'doctor_options' => $doctorOptions,
-            'appointments' => [],
-            'settings' => default_appointment_settings(),
-        ]);
+    if ($doctorId <= 0 || $profileId <= 0) {
+        http_response_code(409);
+        respond(['error' => 'Create or select an active practice profile before using appointments.']);
     }
 
     $doctorCode = doctor_code_for_visit($pdo, $doctorId);
-    $settings = get_appointment_settings($pdo, $doctorId);
+    $settings = get_appointment_settings($pdo, $doctorId, $profileId);
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $action = value($_GET, 'action');
@@ -847,15 +946,15 @@ try {
         }
 
         if ($action === 'patient_lookup') {
-            respond(lookup_patients($pdo, $_GET, $doctorId));
+            respond(lookup_patients($pdo, $_GET, $doctorId, $profileId));
         }
 
         if ($action === 'appointment_history') {
-            respond(['history' => list_appointment_history($pdo, $_GET, $settings, $doctorId)]);
+            respond(['history' => list_appointment_history($pdo, $_GET, $settings, $doctorId, $profileId)]);
         }
 
         if ($action === 'appointment_detail') {
-            $appointment = appointment_detail($pdo, (int)value($_GET, 'id'), $settings, $doctorId);
+            $appointment = appointment_detail($pdo, (int)value($_GET, 'id'), $settings, $doctorId, $profileId);
             if (!$appointment) {
                 respond(['error' => 'Appointment not found.']);
             }
@@ -868,7 +967,7 @@ try {
 
         if ($action === 'next_reg') {
             $newRegNo = next_reg_no($pdo, $date, $doctorId);
-            $nextAppointmentNo = next_appointment_no($pdo, $date, $settings, $doctorId);
+            $nextAppointmentNo = next_appointment_no($pdo, $date, $settings, $doctorId, $profileId);
             respond([
                 'new_reg_no' => $newRegNo,
                 'appointment_no' => $nextAppointmentNo,
@@ -876,16 +975,15 @@ try {
                 'visit_no' => 1,
                 'visit_id' => format_visit_id($newRegNo, 1, $doctorCode),
                 'visit_code' => format_visit_id($newRegNo, 1, $doctorCode),
-                'doctor_options' => $doctorOptions,
                 'active_doctor_id' => $doctorId,
                 'day_rule' => appointment_day_rule($settings, $date),
             ]);
         }
 
         $newRegNo = next_reg_no($pdo, $date, $doctorId);
-        $nextAppointmentNo = next_appointment_no($pdo, $date, $settings, $doctorId);
+        $nextAppointmentNo = next_appointment_no($pdo, $date, $settings, $doctorId, $profileId);
         respond([
-            'appointments' => list_appointments($pdo, $date, $settings, $doctorId),
+            'appointments' => list_appointments($pdo, $date, $settings, $doctorId, $profileId),
             'new_reg_no' => $newRegNo,
             'appointment_no' => $nextAppointmentNo,
             'appointment_time' => calculate_appointment_time($nextAppointmentNo, $date, $settings),
@@ -893,7 +991,6 @@ try {
             'visit_id' => format_visit_id($newRegNo, 1, $doctorCode),
             'visit_code' => format_visit_id($newRegNo, 1, $doctorCode),
             'settings' => $settings,
-            'doctor_options' => $doctorOptions,
             'active_doctor_id' => $doctorId,
             'day_rule' => appointment_day_rule($settings, $date),
         ]);
@@ -905,13 +1002,13 @@ try {
         if (current_user_role() === 'assistant') {
             respond(['error' => 'Only doctors can change appointment settings.']);
         }
-        respond(['ok' => true, 'settings' => save_appointment_settings($pdo, $payload, $doctorId)]);
+        respond(['ok' => true, 'settings' => save_appointment_settings($pdo, $payload, $doctorId, $profileId)]);
     }
 
     if ($action === 'delete') {
         $id = (int)value($payload, 'id');
-        $stmt = $pdo->prepare("DELETE FROM zimrx_appointments WHERE id = :id AND doctor_id = :doctor_id");
-        $stmt->execute(['id' => $id, 'doctor_id' => $doctorId]);
+        $stmt = $pdo->prepare("DELETE FROM zimrx_appointments WHERE id = :id AND doctor_id = :doctor_id AND profile_id = :profile_id");
+        $stmt->execute(['id' => $id, 'doctor_id' => $doctorId, 'profile_id' => $profileId]);
         respond(['ok' => true]);
     }
 
@@ -921,9 +1018,9 @@ try {
         $stmt = $pdo->prepare(
             "UPDATE zimrx_appointments
              SET status = :status, updated_at = CURRENT_TIMESTAMP
-             WHERE id = :id AND doctor_id = :doctor_id"
+             WHERE id = :id AND doctor_id = :doctor_id AND profile_id = :profile_id"
         );
-        $stmt->execute(['id' => $id, 'status' => $status, 'doctor_id' => $doctorId]);
+        $stmt->execute(['id' => $id, 'status' => $status, 'doctor_id' => $doctorId, 'profile_id' => $profileId]);
         respond(['ok' => true]);
     }
 
@@ -944,11 +1041,12 @@ try {
                  vitals_entered_by = :vitals_entered_by,
                  vitals_entered_at = CURRENT_TIMESTAMP,
                  updated_at = CURRENT_TIMESTAMP
-             WHERE id = :id AND doctor_id = :doctor_id"
+             WHERE id = :id AND doctor_id = :doctor_id AND profile_id = :profile_id"
         );
         $stmt->execute([
             'id' => $id,
             'doctor_id' => $doctorId,
+            'profile_id' => $profileId,
             'bp' => value($payload, 'bp'),
             'pulse' => value($payload, 'pulse'),
             'temperature' => value($payload, 'temperature'),
@@ -977,11 +1075,12 @@ try {
                  paid_amount = :paid_amount,
                  payment_updated_at = CURRENT_TIMESTAMP,
                  updated_at = CURRENT_TIMESTAMP
-             WHERE id = :id AND doctor_id = :doctor_id"
+             WHERE id = :id AND doctor_id = :doctor_id AND profile_id = :profile_id"
         );
         $stmt->execute([
             'id' => $id,
             'doctor_id' => $doctorId,
+            'profile_id' => $profileId,
             'visit_fee' => $visitFee,
             'discount' => $discount,
             'discount_note' => value($payload, 'discount_note'),
@@ -991,17 +1090,40 @@ try {
     }
 
     $id = (int)value($payload, 'id');
-    $date = normalized_date(value($payload, 'appointment_date'));
-    $dayRule = appointment_day_rule($settings, $date);
-    if (!empty($dayRule['closed'])) {
-        respond(['error' => 'This appointment day is marked closed in appointment settings.']);
+    $isPrescription = value($payload, 'source') === 'prescription';
+    if ($isPrescription) {
+        if ($id > 0) {
+            $existingStmt = $pdo->prepare(
+                "SELECT appointment_date FROM zimrx_appointments WHERE id = :id AND doctor_id = :doctor_id AND profile_id = :profile_id LIMIT 1"
+            );
+            $existingStmt->execute(['id' => $id, 'doctor_id' => $doctorId, 'profile_id' => $profileId]);
+            $existingDate = $existingStmt->fetchColumn();
+            if (!is_string($existingDate) || $existingDate === '') {
+                http_response_code(422);
+                respond(['error' => 'The linked appointment could not be found. Reload the prescription before saving.']);
+            }
+            $date = normalized_date($existingDate);
+        } else {
+            $date = date('Y-m-d');
+        }
+    } else {
+        $submittedDate = value($payload, 'appointment_date');
+        $date = parsed_date($submittedDate);
+        if ($date === null) {
+            http_response_code(422);
+            respond(['error' => 'Enter a valid appointment date.']);
+        }
+        $dayRule = appointment_day_rule($settings, $date);
+        if (!empty($dayRule['closed'])) {
+            respond(['error' => 'This appointment day is marked closed in appointment settings.']);
+        }
     }
     $requestedAppointmentNo = (int)value($payload, 'appointment_no');
     $appointmentNo = $requestedAppointmentNo;
     $appointmentTimeInput = value($payload, 'appointment_time');
 
     zimrx_begin_immediate($pdo);
-    $patient = save_patient($pdo, $payload, $date, $doctorId);
+    $patient = save_patient($pdo, $payload, $date, $doctorId, $profileId);
     $visitNo = (int)value($payload, 'visit_no');
     if ($visitNo <= 0) {
         $visitNo = next_visit_info($pdo, (int)$patient['id'], (string)$patient['reg_no'], $doctorId)['visit_no'];
@@ -1015,7 +1137,8 @@ try {
 
     $params = [
         'doctor_id' => $doctorId,
-        'appointment_no' => confirmed_appointment_no($pdo, $date, $appointmentNo, $settings, $doctorId, $id),
+        'profile_id' => $profileId,
+        'appointment_no' => confirmed_appointment_no($pdo, $date, $appointmentNo, $settings, $doctorId, $profileId, $id),
         'appointment_date' => $date,
         'appointment_time' => '',
         'patient_id' => $patient['id'],
@@ -1024,11 +1147,17 @@ try {
         'age' => $patient['age'],
         'age_unit' => $patient['age_unit'],
         'dob' => $patient['dob'],
+        'dob_type' => $patient['dob_type'] ?? 'exact',
         'gender' => $patient['gender'],
         'blood_group' => $patient['blood_group'],
+        'marital_status' => $patient['marital_status'] ?? '',
         'mobile' => $patient['mobile'],
+        'email' => $patient['email'] ?? '',
+        'nid_no' => $patient['nid_no'] ?? '',
+        'passport_no' => $patient['passport_no'] ?? '',
         'occupation' => $patient['occupation'],
         'address' => $patient['address'],
+        'extra_demographics_json' => $patient['extra_demographics_json'] ?? '{}',
         'weight' => $patient['weight'],
         'weight_unit' => $patient['weight_unit'],
         'height' => $patient['height'],
@@ -1061,11 +1190,17 @@ try {
                  age = :age,
                  age_unit = :age_unit,
                  dob = :dob,
+                 dob_type = :dob_type,
                  gender = :gender,
                  blood_group = :blood_group,
+                 marital_status = :marital_status,
                  mobile = :mobile,
+                 email = :email,
+                 nid_no = :nid_no,
+                 passport_no = :passport_no,
                  occupation = :occupation,
                  address = :address,
+                 extra_demographics_json = :extra_demographics_json,
                  weight = :weight,
                  weight_unit = :weight_unit,
                  height = :height,
@@ -1081,11 +1216,11 @@ try {
                  status = :status,
                  notes = :notes,
                  updated_at = CURRENT_TIMESTAMP
-             WHERE id = :id AND doctor_id = :doctor_id"
+             WHERE id = :id AND doctor_id = :doctor_id AND profile_id = :profile_id"
         );
 
         for ($attempt = 0; $attempt < 5; $attempt++) {
-            $params['appointment_no'] = confirmed_appointment_no($pdo, $date, (int)$params['appointment_no'], $settings, $doctorId, $id);
+            $params['appointment_no'] = confirmed_appointment_no($pdo, $date, (int)$params['appointment_no'], $settings, $doctorId, $profileId, $id);
             $params['appointment_time'] = $appointmentTimeInput ?: calculate_appointment_time((int)$params['appointment_no'], $date, $settings);
             try {
                 $stmt->execute($params);
@@ -1095,7 +1230,7 @@ try {
                 if (!is_unique_constraint_error($e)) {
                     throw $e;
                 }
-                $params['appointment_no'] = next_appointment_no($pdo, $date, $settings, $doctorId);
+                $params['appointment_no'] = next_appointment_no($pdo, $date, $settings, $doctorId, $profileId);
             }
         }
 
@@ -1104,20 +1239,22 @@ try {
 
     $stmt = $pdo->prepare(
         "INSERT INTO zimrx_appointments (
-            doctor_id, appointment_no, appointment_date, appointment_time, patient_id, reg_no,
-            patient_name, age, age_unit, dob, gender, blood_group, mobile, occupation,
-            address, weight, weight_unit, height, height_unit, referral_category, referral_name, visit_no, visit_id,
+            doctor_id, profile_id, appointment_no, appointment_date, appointment_time, patient_id, reg_no,
+            patient_name, age, age_unit, dob, dob_type, gender, blood_group, marital_status, mobile, email,
+            nid_no, passport_no, occupation, address, extra_demographics_json, weight, weight_unit,
+            height, height_unit, referral_category, referral_name, visit_no, visit_id,
             visit_fee, discount, discount_note, paid_amount, status, notes, created_by
         ) VALUES (
-            :doctor_id, :appointment_no, :appointment_date, :appointment_time, :patient_id, :reg_no,
-            :patient_name, :age, :age_unit, :dob, :gender, :blood_group, :mobile, :occupation,
-            :address, :weight, :weight_unit, :height, :height_unit, :referral_category, :referral_name, :visit_no, :visit_id,
+            :doctor_id, :profile_id, :appointment_no, :appointment_date, :appointment_time, :patient_id, :reg_no,
+            :patient_name, :age, :age_unit, :dob, :dob_type, :gender, :blood_group, :marital_status, :mobile, :email,
+            :nid_no, :passport_no, :occupation, :address, :extra_demographics_json, :weight, :weight_unit,
+            :height, :height_unit, :referral_category, :referral_name, :visit_no, :visit_id,
             :visit_fee, :discount, :discount_note, :paid_amount, :status, :notes, :created_by
         )"
     );
 
     for ($attempt = 0; $attempt < 5; $attempt++) {
-        $params['appointment_no'] = confirmed_appointment_no($pdo, $date, (int)$params['appointment_no'], $settings, $doctorId);
+        $params['appointment_no'] = confirmed_appointment_no($pdo, $date, (int)$params['appointment_no'], $settings, $doctorId, $profileId);
         $params['appointment_time'] = $appointmentTimeInput ?: calculate_appointment_time((int)$params['appointment_no'], $date, $settings);
         try {
             $stmt->execute($params);
@@ -1128,7 +1265,7 @@ try {
             if (!is_unique_constraint_error($e)) {
                 throw $e;
             }
-            $params['appointment_no'] = next_appointment_no($pdo, $date, $settings, $doctorId);
+            $params['appointment_no'] = next_appointment_no($pdo, $date, $settings, $doctorId, $profileId);
         }
     }
 

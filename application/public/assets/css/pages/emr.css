@@ -196,37 +196,6 @@
     pointer-events: none;
 }
 
-.emr-scanner-indicator {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.74rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--zrx-emerald-600);
-    background: var(--zrx-emerald-50);
-    padding: 0.3rem 0.75rem;
-    border-radius: 20px;
-    margin-top: 1rem;
-    border: 1px solid var(--zrx-emerald-200);
-}
-
-.emr-scanner-dot {
-    width: 8px;
-    height: 8px;
-    background: var(--zrx-emerald-500);
-    border-radius: 50%;
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-    animation: scanner-pulse 1.8s infinite;
-}
-
-@keyframes scanner-pulse {
-    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-}
-
 /* Master patient profile grid */
 .emr-master-grid {
     display: grid;

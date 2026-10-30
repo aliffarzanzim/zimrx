@@ -282,20 +282,20 @@ return [
             'OTHER' => 'Other / Worldwide',
         ],
     ],
-    'clinical_languages' => [
-        'BD' => 'bn',
-    ],
-    'help_languages' => [
-        'BD' => 'bn',
-    ],
-    'header_defaults' => [
-        'BD' => [
-            'left' => 'doctor_native',
-            'right' => 'doctor_en',
-        ],
+    'country_defaults' => [
         'default' => [
-            'left' => 'doctor_en',
-            'right' => 'clinic',
+            'header' => [
+                'left' => 'doctor_en',
+                'right' => 'clinic',
+            ],
+        ],
+        'BD' => [
+            'clinical_language' => 'bn',
+            'help_language' => 'bn',
+            'header' => [
+                'left' => 'doctor_native',
+                'right' => 'doctor_en',
+            ],
         ],
     ],
 ];

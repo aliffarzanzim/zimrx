@@ -1,29 +1,31 @@
-/* Master prescription module styles bundle */
-@import "../modules/paediatric.css";
+/* Module stylesheets are linked before this page stylesheet for parallel loading. */
 
-/* Core clinical modules */
-@import "../modules/pres_particulars.css";
-@import "../modules/pc.css";
-@import "../modules/history.css";
-@import "../modules/oh.css";
-@import "../modules/rx.css";
-@import "../modules/reports.css";
-@import "../modules/table_resizer.css";
-@import "../modules/modals_dialogs.css";
-@import "../modules/ai_analyzer.css";
-@import "../modules/calculators.css";
-@import "../modules/ot_note.css";
-@import "../modules/text_pad.css";
-@import "../modules/font_format.css";
+.custom-visit-form-card {
+    display: grid;
+    align-content: start;
+}
 
-/* Specialized clinical examination modules */
-@import "../modules/exam_ophthalmology.css";
-@import "../modules/exam_breast.css";
-@import "../modules/exam_abdominal.css";
-@import "../modules/exam_pelvic.css";
-@import "../modules/exam_burn.css";
-@import "../modules/exam_ent.css";
-@import "../modules/exam_dental.css";
-@import "../modules/exam_diabetic_foot.css";
-@import "../modules/exam_dermatology.css";
-@import "../modules/exam_specialties.css";
+.custom-visit-form-card .visit-form-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    padding: 0.75rem;
+}
+
+.custom-visit-form-card .visit-form-field {
+    display: grid;
+    gap: 0.3rem;
+    min-width: 0;
+    color: var(--zrx-text-body);
+}
+
+.custom-visit-form-card .visit-form-field textarea {
+    min-height: 5rem;
+    resize: vertical;
+}
+
+@media (max-width: 720px) {
+    .custom-visit-form-card .visit-form-fields {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

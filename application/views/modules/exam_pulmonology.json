@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "pulmonology",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "Pulmonology",
+    "view":  "exam_pulmonology.php",
+    "enabled_by_default": false,
+    "default_order":  null
+}

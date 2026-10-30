@@ -21,12 +21,17 @@
     }
 
     function initDatePickers(container = tbody) {
+        if (window.ZimRxDatePicker) {
+            window.ZimRxDatePicker.init(container);
+            return;
+        }
         if (typeof flatpickr !== 'undefined') {
             container.querySelectorAll('.custom-date-picker').forEach(el => {
                 if (!el._flatpickr) {
                     flatpickr(el, {
                         dateFormat: "d/m/Y",
-                        allowInput: true
+                        allowInput: true,
+                        disableMobile: true
                     });
                 }
             });

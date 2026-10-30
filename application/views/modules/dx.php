@@ -66,5 +66,5 @@ declare(strict_types=1);
     </template>
 </div>
 
-<script src="assets/js/modules/dx.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/modules/dx.js') ?>"></script>
+<script src="assets/js/modules/dx.js?v=<?= filemtime(ZIMRX_PUBLIC_DIR . '/assets/js/modules/dx.js') ?>" defer></script>
 

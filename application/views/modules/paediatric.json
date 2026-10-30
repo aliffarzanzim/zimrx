@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "paediatric_history",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "Paediatric History",
+    "view":  "paediatric.php",
+    "enabled_by_default": false,
+    "default_order":  null
+}

@@ -23,7 +23,9 @@ if (!zimrx_verify_csrf()) {
 }
 
 try {
-    $doctorId = max(1, current_user_doctor_id());
+    $profile = (new \ZimRx\Services\PracticeProfileService($pdo))->activeForCurrentUser();
+    $profileId = (int)($profile['id'] ?? 0);
+    $doctorId = (int)($profile['doctor_id'] ?? 0);
     $isSkip = (trim((string)($_POST['skip'] ?? '')) === '1');
     $onboardDefaults = zimrx_onboarding_defaults();
 
@@ -335,7 +337,7 @@ try {
     ];
 
     // Save using standard bridge function (which updates print layout + header settings)
-    zimrx_print_save_setup($pdo, $doctorId, $payload);
+    zimrx_print_save_setup($pdo, $profileId, $payload);
 
     // Finalize first launch setup completion
     if (zimrx_db_table_exists($pdo, 'zimrx_app_config')) {

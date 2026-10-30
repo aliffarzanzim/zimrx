@@ -50,8 +50,10 @@
         tr.querySelector('.upload-file-path').value = cleanPath;
         dateInput.value = dateStr || new Date().toLocaleDateString('en-GB');
 
-        if (typeof flatpickr !== 'undefined') {
-            flatpickr(dateInput, { dateFormat: "d/m/Y", allowInput: true });
+        if (window.ZimRxDatePicker) {
+            window.ZimRxDatePicker.init(dateInput);
+        } else if (typeof flatpickr !== 'undefined') {
+            flatpickr(dateInput, { dateFormat: "d/m/Y", allowInput: true, disableMobile: true });
         }
 
         uploadTbody.appendChild(tr);
@@ -144,7 +146,7 @@
             visit_record_id: visitRecordId
         });
 
-        fetch('api/mobile_sync.php', {
+        return fetch('api/mobile_sync.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: params.toString()
@@ -164,10 +166,12 @@
             el.addEventListener('change', syncActivePatientToMobile);
         }
     });
-    setInterval(syncActivePatientToMobile, 8000);
+    let mobileUploadPollTimer = null;
+    let mobileUploadPollInFlight = false;
 
-    // Background upload poller (mobile to desktop table)
-    setInterval(async () => {
+    async function pollMobileUploads() {
+        if (!phoneModal || phoneModal.hidden || mobileUploadPollInFlight) return;
+        mobileUploadPollInFlight = true;
         try {
             const patientId = parseInt(document.getElementById('patient-id')?.value || '0', 10);
             const visitRecordId = parseInt(document.getElementById('visit-record-id')?.value || '0', 10);
@@ -200,8 +204,23 @@
             }
         } catch (e) {
             // Background check failure is non-blocking
+        } finally {
+            mobileUploadPollInFlight = false;
         }
-    }, 2500);
+    }
+
+    function startMobileUploadPolling() {
+        if (!phoneModal || phoneModal.hidden) return;
+        if (mobileUploadPollTimer !== null) return;
+        pollMobileUploads();
+        mobileUploadPollTimer = window.setInterval(pollMobileUploads, 2500);
+    }
+
+    function stopMobileUploadPolling() {
+        if (mobileUploadPollTimer === null) return;
+        window.clearInterval(mobileUploadPollTimer);
+        mobileUploadPollTimer = null;
+    }
 
     // Phone upload QR modal controller
     let cachedQrData = null;
@@ -213,7 +232,7 @@
         phoneModal.removeAttribute('hidden');
         phoneModal.style.display = 'flex';
 
-        syncActivePatientToMobile();
+        syncActivePatientToMobile().finally(startMobileUploadPolling);
 
         if (cachedQrData) {
             if (qrImg) {
@@ -252,6 +271,7 @@
 
     function closePhoneUploadModal() {
         if (!phoneModal) return;
+        stopMobileUploadPolling();
         phoneModal.hidden = true;
         phoneModal.setAttribute('hidden', '');
         phoneModal.style.display = 'none';

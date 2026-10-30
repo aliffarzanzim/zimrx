@@ -232,7 +232,15 @@
     justify-content: space-between; gap: 1rem;
     padding: 1.25rem 1.35rem; margin-bottom: 1rem;
 }
+.admin-hero.zrx-settings-page-hero {
+    margin-bottom: 0;
+    padding: var(--zrx-space-4) var(--zrx-space-5);
+    border-color: var(--zrx-border-subtle);
+    border-radius: var(--zrx-border-radius);
+    box-shadow: none;
+}
 .admin-hero h1 { margin: 0.1rem 0 0.35rem; color: var(--zrx-text-main); font-size: 1.5rem; letter-spacing: -0.02em; }
+.admin-hero.zrx-settings-page-hero h1 { margin: 0; letter-spacing: normal; }
 .admin-hero p, .admin-muted { margin: 0; color: var(--zrx-text-muted); font-size: 0.9rem; }
 .admin-layout {
     display: grid;

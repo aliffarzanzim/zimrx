@@ -102,7 +102,7 @@ final class CountryService
      */
     public static function getDefaultClinicalLanguage(string $code): ?string
     {
-        $langs = self::load()['clinical_languages'] ?? [];
+        $langs = self::getCountryDefaultMap('clinical_language');
         return $langs[strtoupper(trim($code))] ?? null;
     }
 
@@ -112,7 +112,7 @@ final class CountryService
      */
     public static function getCountryClinicalLanguages(): array
     {
-        return self::load()['clinical_languages'] ?? [];
+        return self::getCountryDefaultMap('clinical_language');
     }
 
     /**
@@ -120,7 +120,7 @@ final class CountryService
      */
     public static function getDefaultHelpLanguage(string $code): ?string
     {
-        $langs = self::load()['help_languages'] ?? [];
+        $langs = self::getCountryDefaultMap('help_language');
         return $langs[strtoupper(trim($code))] ?? null;
     }
 
@@ -130,7 +130,7 @@ final class CountryService
      */
     public static function getCountryHelpLanguages(): array
     {
-        return self::load()['help_languages'] ?? [];
+        return self::getCountryDefaultMap('help_language');
     }
 
     /**
@@ -140,7 +140,7 @@ final class CountryService
     public static function getDefaultHeaderSides(string $code): array
     {
         $c = strtoupper(trim($code));
-        $map = self::load()['header_defaults'] ?? [];
+        $map = self::getCountryHeaderDefaults();
         if (isset($map[$c]) && is_array($map[$c])) {
             return [
                 'left' => (string)($map[$c]['left'] ?? 'doctor_en'),
@@ -160,7 +160,27 @@ final class CountryService
      */
     public static function getCountryHeaderDefaults(): array
     {
-        return self::load()['header_defaults'] ?? [];
+        $countryDefaults = self::load()['country_defaults'] ?? [];
+        $headers = [];
+        foreach ($countryDefaults as $countryCode => $defaults) {
+            if (is_array($defaults) && isset($defaults['header']) && is_array($defaults['header'])) {
+                $headers[$countryCode] = $defaults['header'];
+            }
+        }
+        return $headers;
+    }
+
+    /** @return array<string, string> */
+    private static function getCountryDefaultMap(string $key): array
+    {
+        $countryDefaults = self::load()['country_defaults'] ?? [];
+        $values = [];
+        foreach ($countryDefaults as $countryCode => $defaults) {
+            if ($countryCode !== 'default' && is_array($defaults) && isset($defaults[$key]) && is_string($defaults[$key])) {
+                $values[$countryCode] = $defaults[$key];
+            }
+        }
+        return $values;
     }
 
     /** @var array<string, array<string, mixed>>|null */

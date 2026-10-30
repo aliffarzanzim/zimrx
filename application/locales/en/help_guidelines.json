@@ -89,9 +89,9 @@
     ]
   },
   "occupation": {
-    "title": "Occupation Guide & Directory Management",
+    "title": "Occupation Guide",
     "badge": "Patient Particulars & EMR",
-    "wide": true,
+    "wide": false,
     "steps": [
       {
         "icon": "1",
@@ -103,37 +103,14 @@
       },
       {
         "icon": "3",
-        "text": "Dropdown suggestions are dynamically ranked by usage frequency. Use the directory management table below to pin frequent occupations, add custom entries, edit, or reset to defaults."
+        "text": "Dropdown suggestions are ranked by usage frequency. Manage pinned, hidden, and custom suggestions in Settings under Address and Occupation Directories."
       }
-    ],
-    "ui": {
-      "placeholder_input": "Type new occupation...",
-      "btn_add": "+ Add",
-      "btn_reset": "Reset to Default",
-      "th_move": "Move",
-      "th_actions": "Actions",
-      "th_type": "Type",
-      "th_name": "Occupation Name",
-      "th_usage": "Usage",
-      "loading": "Loading occupations...",
-      "empty": "No occupations found.",
-      "btn_pin": "Pin",
-      "btn_unpin": "Unpin",
-      "btn_edit": "Edit",
-      "btn_remove": "Remove",
-      "btn_restore": "Restore",
-      "btn_delete": "Delete",
-      "tag_system": "System",
-      "tag_custom": "Custom",
-      "tag_hidden": "Hidden",
-      "confirm_reset": "Reset all occupation customizations to default? This will unpin, unhide, and restore all system occupations.",
-      "prompt_edit": "Edit occupation name:"
-    }
+    ]
   },
   "address": {
-    "title": "Address Guide & Directory Management",
+    "title": "Address Guide",
     "badge": "Patient Particulars & Geography",
-    "wide": true,
+    "wide": false,
     "steps": [
       {
         "icon": "1",
@@ -149,34 +126,9 @@
       },
       {
         "icon": "4",
-        "text": "<strong>Practice Region Filtering:</strong> Select your practice districts below to narrow suggestions to your local catchment area. You can also pin, edit, delete, or add custom addresses."
+        "text": "<strong>Practice Region Filtering:</strong> Select preferred districts and manage custom addresses in Settings under Address and Occupation Directories."
       }
-    ],
-    "ui": {
-      "section_districts_title": "Practice Districts Filter",
-      "btn_dist_all": "All Districts",
-      "btn_dist_save": "Save Districts",
-      "btn_dist_saved": "Saved ✓",
-      "district_search_placeholder": "Search District...",
-      "districts_loading": "Loading districts...",
-      "section_addr_title": "Address Directory & Management (Top 100)",
-      "btn_reset_addr": "Reset to Default",
-      "addr_search_placeholder": "Search locality, thana, upazila, district...",
-      "tab_all": "All (Top 100)",
-      "tab_custom": "Custom Only",
-      "tab_system": "System (National)",
-      "tab_pinned": "Pinned",
-      "new_addr_placeholder": "Type new custom address/area...",
-      "btn_add_addr": "+ Add",
-      "th_actions": "Actions",
-      "th_type": "Type",
-      "th_address": "Address / Combination",
-      "th_usage": "Usage",
-      "addr_loading": "Loading addresses...",
-      "addr_empty": "No addresses found.",
-      "confirm_reset_addr": "Reset all address customizations and district preferences to default?",
-      "prompt_edit_addr": "Edit address name:"
-    }
+    ]
   },
   "modal_ui": {
     "btn_ok": "Got it"

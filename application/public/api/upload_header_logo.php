@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/init.php';
 require_login();
+require_once ZIMRX_BASE_DIR . '/lib/print_setup_lib.php';
 
 header('Content-Type: application/json');
 
@@ -46,43 +47,25 @@ try {
         throw new RuntimeException('Only JPG, PNG, GIF, or WEBP logos are allowed.');
     }
 
-    $doctorId = current_user_doctor_id();
+    $profile = (new \ZimRx\Services\PracticeProfileService($pdo))->activeForCurrentUser();
+    $profileId = (int)($profile['id'] ?? 0);
+    $doctorId = (int)($profile['doctor_id'] ?? 0);
+    if ($profileId <= 0 || $doctorId <= 0) {
+        throw new RuntimeException('An active practice profile is required.');
+    }
     $targetDir = ZIMRX_UPLOADS_DIR . '/header-logos';
     if (!is_dir($targetDir) && !mkdir($targetDir, 0750, true) && !is_dir($targetDir)) {
         throw new RuntimeException('Unable to create header logo directory.');
     }
 
-    $filename = sprintf('doctor-%d-%d-%s.%s', $doctorId, time(), bin2hex(random_bytes(8)), $allowed[$mime]);
+    $filename = sprintf('profile-%d-%d-%s.%s', $profileId, time(), bin2hex(random_bytes(8)), $allowed[$mime]);
     $targetPath = $targetDir . '/' . $filename;
     if (!move_uploaded_file($tmpPath, $targetPath)) {
         throw new RuntimeException('Could not save uploaded logo.');
     }
 
     $publicPath = '/uploads/header-logos/' . $filename;
-    $chkStmt = $pdo->prepare("SELECT COUNT(*) FROM zimrx_prescription_header_settings WHERE doctor_id = :doctor_id");
-    $chkStmt->execute(['doctor_id' => $doctorId]);
-    $exists = (int)$chkStmt->fetchColumn() > 0;
-
-    if (!$exists) {
-        try {
-            $pdo->prepare(
-                "INSERT INTO zimrx_prescription_header_settings (doctor_id, doctor_name) VALUES (:doctor_id, :doctor_name)"
-            )->execute(['doctor_id' => $doctorId, 'doctor_name' => current_user_name()]);
-        } catch (PDOException $e) {
-            // Ignore if inserted concurrently
-        }
-    }
-
-    $stmt = $pdo->prepare(
-        "UPDATE zimrx_prescription_header_settings
-         SET logo_path = :logo_path,
-             updated_at = CURRENT_TIMESTAMP
-         WHERE doctor_id = :doctor_id"
-    );
-    $stmt->execute([
-        'logo_path' => $publicPath,
-        'doctor_id' => $doctorId,
-    ]);
+    zimrx_print_save_setup($pdo, $profileId, ['logo_path' => $publicPath]);
 
     echo json_encode([
         'ok' => true,

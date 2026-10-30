@@ -21,7 +21,8 @@ if (!zimrx_verify_csrf()) {
 }
 
 try {
-    zimrx_print_reset_setup($pdo, current_user_doctor_id());
+    $profile = (new \ZimRx\Services\PracticeProfileService($pdo))->activeForCurrentUser();
+    zimrx_print_reset_setup($pdo, (int)($profile['id'] ?? 0));
     echo json_encode(['ok' => true]);
 } catch (Throwable $e) {
     http_response_code(500);

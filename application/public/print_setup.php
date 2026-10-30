@@ -34,8 +34,9 @@ function bridge_render_font_options(string $selectedFont, array $fontOptions, ar
 
 $page_title = 'ZimRx - Print Setup';
 $extra_css = ['assets/css/pages/print_layout_editor.css'];
-$doctorId = current_user_doctor_id();
-$options = zimrx_print_load_options($pdo, $doctorId);
+$activeProfile = (new \ZimRx\Services\PracticeProfileService($pdo))->activeForCurrentUser();
+$profileId = (int)($activeProfile['id'] ?? 0);
+$options = zimrx_print_load_options($pdo, $profileId);
 
 // Standard right_width default to 11.0 (recommended layout balance)
 if (empty($options['right_width']) || (float)$options['right_width'] === 12.0) {
@@ -152,17 +153,11 @@ include 'header.php';
 ?>
 
 <div class="layout-editor-page zrx-page-container">
-    <div class="layout-editor-heading">
-        <div>
+    <div class="layout-editor-heading zrx-settings-page-hero">
+        <div class="zrx-settings-page-hero-copy">
+            <a class="zrx-settings-page-back" href="settings.php">Settings</a>
             <h1>Print Setup</h1>
             <p>Configure your prescription layout, typography, and print formatting.</p>
-        </div>
-        <div class="layout-editor-heading-actions">
-            <a href="prescription_preview.php" target="_blank" class="btn btn-outline">Full Preview</a>
-            <a href="page_setup.php" class="btn btn-outline">Page Setup</a>
-            <a href="header_footer_background_setup.php" class="btn btn-outline">Header/Footer/BG Setup</a>
-            <button type="button" class="btn btn-outline print-setup-reset-btn" id="factory-reset-btn">Reset to Defaults</button>
-            <button type="submit" form="print-setup-form" class="btn btn-primary">Save Settings</button>
         </div>
     </div>
 
@@ -855,6 +850,21 @@ include 'header.php';
                         </tbody>
                     </table>
                 </div>
+                <fieldset class="print-custom-patient-fields">
+                    <legend>Custom Patient Fields</legend>
+                    <p>Custom fields are not printed unless selected here.</p>
+                    <input type="hidden" name="patient_custom_fields_print_present" value="1">
+                    <?php if (!empty($options['patient_custom_fields'])): ?>
+                        <?php foreach ($options['patient_custom_fields'] as $customField): ?>
+                            <label>
+                                <input type="checkbox" name="patient_custom_fields_print[]" value="<?= preview_escape($customField['key']) ?>" <?= in_array($customField['key'], $options['patient_custom_fields_print'] ?? [], true) ? 'checked' : '' ?>>
+                                <span><?= preview_escape($customField['label']) ?></span>
+                            </label>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <span>No custom patient fields are defined.</span>
+                    <?php endif; ?>
+                </fieldset>
             </div>
 
             <div class="print-advanced-card">
@@ -1009,6 +1019,16 @@ include 'header.php';
 
         </div>
     </form>
+
+    <div class="zrx-settings-page-actions-footer">
+        <div>
+            <a href="prescription_preview.php" target="_blank" class="btn btn-outline">Full Preview</a>
+            <a href="page_setup.php" class="btn btn-outline">Page Setup</a>
+            <a href="header_footer_background_setup.php" class="btn btn-outline">Header/Footer/BG Setup</a>
+            <button type="button" class="btn btn-outline print-setup-reset-btn" id="factory-reset-btn">Reset to Defaults</button>
+            <button type="submit" form="print-setup-form" class="btn btn-primary">Save Settings</button>
+        </div>
+    </div>
 </div>
 
 <script src="assets/js/pages/print_setup.js?v=<?= filemtime(__DIR__ . '/assets/js/pages/print_setup.js') ?>"></script>

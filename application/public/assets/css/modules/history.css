@@ -1307,7 +1307,7 @@
     stroke: currentColor;
 }
 
-.pe-settings-modal[hidden] { display: none !important; }
+.pe-settings-modal[hidden] { display: none; }
 .pe-settings-modal { position: fixed; inset: 0; z-index: 1100; display: flex; align-items: center; justify-content: center; padding: 20px; }
 .pe-settings-backdrop { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(1px); }
 .pe-settings-panel { position: relative; width: min(1180px, calc(100vw - 32px)); height: min(740px, calc(100vh - 40px)); background: var(--zrx-bg-card); border-radius: 16px; box-shadow: var(--zrx-shadow-modal); border: 1px solid var(--zrx-border-subtle); display: flex; flex-direction: column; overflow: hidden; }

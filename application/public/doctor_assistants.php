@@ -67,9 +67,9 @@ $flash = admin_flash();
 ?>
 
 <main class="admin-page">
-    <section class="admin-hero">
-        <div>
-            <p class="eyebrow">Doctor Desk</p>
+    <section class="admin-hero zrx-settings-page-hero">
+        <div class="zrx-settings-page-hero-copy">
+            <a class="zrx-settings-page-back" href="settings.php">Settings</a>
             <h1>Manage Assistants</h1>
             <p><?= $adminExists ? 'Admin exists, so you can assign or disassign assistants from your chamber.' : 'Solo mode: you can create, edit, deactivate, or disassign your assistants here.' ?></p>
         </div>

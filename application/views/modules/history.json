@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "history",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "History",
+    "view":  "history.php",
+    "enabled_by_default": true,
+    "default_order":  3
+}

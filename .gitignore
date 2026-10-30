@@ -18,6 +18,9 @@ application/userdata/backups/*
 !application/userdata/uploads/
 application/userdata/uploads/*
 !application/userdata/uploads/.htaccess
+!application/userdata/extensions/
+!application/userdata/extensions/README.md
+!application/userdata/extensions/.htaccess
 !application/userdata/uploads/reports/
 application/userdata/uploads/reports/*
 !application/userdata/uploads/reports/.htaccess

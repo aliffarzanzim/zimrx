@@ -40,7 +40,7 @@ function ensureTableLayoutActions(table, tableKey) {
       <button type="button" class="zrx-btn-layout-save" title="Save this customized column layout">Save layout</button>
       <button type="button" class="zrx-btn-layout-reset" title="Reset column widths to default">Reset</button>
       <span role="button" tabindex="0" class="zrx-help-icon-btn zrx-tbl-layout-help" data-help-type="col-resize" title="টেবিল লেআউট নির্দেশিকা" aria-label="Layout Help">
-        ${typeof ZimRxIcon !== 'undefined' ? ZimRxIcon.render('help-circle', 14) : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>'}
+        ${typeof ZimRxIcon !== 'undefined' ? ZimRxIcon.render('help-circle', 16) : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>'}
       </span>
     `;
 

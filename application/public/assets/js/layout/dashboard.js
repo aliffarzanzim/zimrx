@@ -60,7 +60,149 @@ function initSetupUI() {
   const btnReset = document.getElementById('btn-reset-settings');
   if (btnSave) btnSave.addEventListener('click', saveSettings);
   if (btnReset) btnReset.addEventListener('click', resetSettings);
+  initModuleOrderUI();
   initDropdownThemeUI();
+}
+
+function initModuleOrderUI() {
+  const setupPage = document.querySelector('.interface-settings-page');
+  if (!setupPage) return;
+
+  const moduleLists = {
+    left: { container: document.getElementById('left-side-setup'), options: availableLeftModules },
+    right: { container: document.getElementById('right-side-setup'), options: availableRightModules }
+  };
+  const appendOrder = (side, value = '') => {
+    const list = moduleLists[side];
+    if (!list?.container) return;
+    const index = list.container.querySelectorAll('.form-group').length;
+    const row = createFormGroup(`Order #${String(index + 1).padStart(2, '0')}`, side, index, value, list.options);
+    list.container.querySelector('.interface-order-empty')?.remove();
+    list.container.appendChild(row);
+    refreshModuleOrderUI(side);
+    row.querySelector('select')?.focus();
+  };
+
+  Object.keys(moduleLists).forEach((side) => {
+    const container = moduleLists[side].container;
+    if (container && container.querySelectorAll('.form-group').length === 0) {
+      const emptyState = document.createElement('p');
+      emptyState.className = 'interface-order-empty';
+      emptyState.textContent = 'No modules configured. Add an order to place one.';
+      container.appendChild(emptyState);
+    }
+    refreshModuleOrderUI(side);
+  });
+  setupPage.addEventListener('change', (event) => {
+    const select = event.target;
+    const side = select instanceof HTMLSelectElement ? select.dataset.side : null;
+    if (side === 'left' || side === 'right') refreshModuleOrderOptions(side);
+  });
+  document.querySelectorAll('select[data-side="history"]').forEach((select) => {
+    const label = document.querySelector(`label[for="${select.id}"]`);
+    if (label) setSetupSelectAccessibleName(select, label.textContent.trim());
+  });
+
+  setupPage.addEventListener('click', (event) => {
+    const addButton = event.target.closest('[data-order-add]');
+    if (addButton) {
+      appendOrder(addButton.dataset.orderAdd);
+      return;
+    }
+
+    const removeButton = event.target.closest('.interface-order-remove');
+    if (!removeButton) return;
+
+    const select = removeButton.closest('.form-group')?.querySelector('select[data-side]');
+    const side = select?.dataset.side;
+    const list = moduleLists[side];
+    if (!list?.container) return;
+
+    removeButton.closest('.form-group').remove();
+    if (list.container.querySelectorAll('.form-group').length === 0) {
+      const emptyState = document.createElement('p');
+      emptyState.className = 'interface-order-empty';
+      emptyState.textContent = 'No modules configured. Add an order to place one.';
+      list.container.appendChild(emptyState);
+    }
+    refreshModuleOrderUI(side);
+  });
+}
+
+function refreshModuleOrderUI(side) {
+  const container = document.getElementById(`${side}-side-setup`);
+  if (!container) return;
+
+  const rows = Array.from(container.querySelectorAll('.form-group'));
+  rows.forEach((row, index) => {
+    const label = row.querySelector('.form-label');
+    const select = row.querySelector(`select[data-side="${side}"]`);
+    const removeButton = row.querySelector('.interface-order-remove');
+    const orderLabel = `Order #${String(index + 1).padStart(2, '0')}`;
+    if (label) {
+      label.textContent = orderLabel;
+      label.htmlFor = `interface-${side}-order-${index}`;
+    }
+    if (select) {
+      select.dataset.index = String(index);
+      select.id = `interface-${side}-order-${index}`;
+      setSetupSelectAccessibleName(select, `${side === 'left' ? 'Left' : 'Right'} panel ${orderLabel}`);
+    }
+    if (removeButton) removeButton.setAttribute('aria-label', `Remove ${orderLabel}`);
+  });
+
+  const count = document.querySelector(`[data-order-count="${side}"]`);
+  if (count) count.textContent = `${rows.length} ${rows.length === 1 ? 'order' : 'orders'}`;
+  refreshModuleOrderOptions(side);
+}
+
+function refreshModuleOrderOptions(side) {
+  const list = document.getElementById(`${side}-side-setup`);
+  const moduleOptions = side === 'left' ? availableLeftModules : availableRightModules;
+  if (!list || !moduleOptions) return;
+
+  const selects = Array.from(list.querySelectorAll(`select[data-side="${side}"]`));
+  const claimed = new Set();
+
+  selects.forEach((select) => {
+    const selected = select.value;
+    if (!selected) return;
+    if (claimed.has(selected)) {
+      select.value = '';
+      return;
+    }
+    claimed.add(selected);
+  });
+
+  selects.forEach((select) => {
+    const currentValue = select.value;
+    const selectedElsewhere = new Set(
+      selects.filter((other) => other !== select).map((other) => other.value).filter(Boolean)
+    );
+    const allowedOptions = moduleOptions.filter((option) =>
+      option === '' || option === currentValue || !selectedElsewhere.has(option)
+    );
+    const currentOptions = Array.from(select.options).map((option) => option.value);
+
+    if (currentOptions.length === allowedOptions.length
+      && currentOptions.every((value, index) => value === allowedOptions[index])) {
+      return;
+    }
+
+    select.replaceChildren(...allowedOptions.map((value) => {
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = value === '' ? '-- None --' : value;
+      option.selected = value === currentValue;
+      return option;
+    }));
+  });
+}
+
+function setSetupSelectAccessibleName(select, label) {
+  select.setAttribute('aria-label', label);
+  const trigger = select.nextElementSibling?.querySelector('.zrx-select-trigger');
+  if (trigger) trigger.setAttribute('aria-label', label);
 }
 
 function initDropdownThemeUI() {
@@ -82,25 +224,13 @@ function initDropdownThemeUI() {
     return match ? decodeURIComponent(match[2]) : null;
   };
 
-  let savedTheme = localStorage.getItem(storageKeys.dropdownTheme) || getCookieVal('zimrx_dropdown_theme') || 'slate-gray';
-  let savedBg    = localStorage.getItem(storageKeys.dropdownHoverBg) || getCookieVal('zimrx_dropdown_hover_bg') || '#868e96';
-  let savedText  = localStorage.getItem(storageKeys.dropdownHoverText) || getCookieVal('zimrx_dropdown_hover_text') || '#ffffff';
-
-  if (savedBg === '#ebedf0' || savedBg === '#edf2f7' || savedBg === '#e2e8f0' || savedTheme === 'subtle-tint') {
-    savedTheme = 'slate-gray';
-    savedBg = '#868e96';
-    savedText = '#ffffff';
-    try {
-      localStorage.setItem(storageKeys.dropdownTheme, 'slate-gray');
-      localStorage.setItem(storageKeys.dropdownHoverBg, '#868e96');
-      localStorage.setItem(storageKeys.dropdownHoverText, '#ffffff');
-    } catch (e) {}
-    document.cookie = `zimrx_dropdown_theme=slate-gray; path=/; max-age=31536000; SameSite=Lax`;
-    document.cookie = `zimrx_dropdown_hover_bg=${encodeURIComponent('#868e96')}; path=/; max-age=31536000; SameSite=Lax`;
-    document.cookie = `zimrx_dropdown_hover_text=${encodeURIComponent('#ffffff')}; path=/; max-age=31536000; SameSite=Lax`;
-    document.documentElement.style.setProperty('--zrx-dropdown-hover-bg', '#868e96');
-    document.documentElement.style.setProperty('--zrx-dropdown-hover-text', '#ffffff');
-  }
+  const allowedThemes = new Set(['slate-gray', 'subtle-tint', 'charcoal', 'theme-blue', 'soft-blue', 'emerald', 'custom']);
+  const savedThemeValue = getCookieVal('zimrx_dropdown_theme');
+  const savedBgValue = getCookieVal('zimrx_dropdown_hover_bg');
+  const savedTextValue = getCookieVal('zimrx_dropdown_hover_text');
+  const savedTheme = allowedThemes.has(savedThemeValue) ? savedThemeValue : 'slate-gray';
+  const savedBg = /^#[0-9a-f]{6}$/i.test(savedBgValue || '') ? savedBgValue : '#868e96';
+  const savedText = /^#[0-9a-f]{6}$/i.test(savedTextValue || '') ? savedTextValue : '#ffffff';
 
   const customControls   = document.getElementById('dd-custom-controls');
   const customBgPicker   = document.getElementById('dd-custom-bg-picker');
@@ -111,28 +241,10 @@ function initDropdownThemeUI() {
   const customOriginalCb = document.getElementById('dd-custom-original-text-cb');
   const customSwatch     = document.getElementById('dd-custom-preview-swatch');
 
-  const demoActiveItem = document.getElementById('demo-dd-active-item');
-  const demoItems      = document.querySelectorAll('#demo-dd-menu .demo-dd-item');
-
   // Track the previously selected preset so Custom Colors adopts its config
   let lastPreset = presets[savedTheme] ? { ...presets[savedTheme], theme: savedTheme } : { bg: savedBg, text: savedText, originalText: (savedTheme === 'subtle-tint'), theme: savedTheme };
 
   function updateLiveDemo(bg, text, isOriginalText = false) {
-    if (demoActiveItem) {
-      demoActiveItem.style.backgroundColor = bg;
-      const code = demoActiveItem.querySelector('.demo-code');
-      const name = demoActiveItem.querySelector('.demo-name');
-      const meta = demoActiveItem.querySelector('.demo-meta');
-      if (isOriginalText) {
-        if (code) code.style.color = '#0284c7';
-        if (name) name.style.color = '#0f172a';
-        if (meta) meta.style.color = '#64748b';
-      } else {
-        if (code) code.style.color = text;
-        if (name) name.style.color = text;
-        if (meta) meta.style.color = text;
-      }
-    }
     if (customSwatch) {
       customSwatch.style.backgroundColor = bg;
       customSwatch.style.color = isOriginalText ? '#0f172a' : text;
@@ -184,6 +296,7 @@ function initDropdownThemeUI() {
     if (customTextHex) customTextHex.value = text;
 
     updateLiveDemo(bg, text, isOriginalText);
+    document.dispatchEvent(new Event('zrx-dropdown-preview-theme-change'));
   }
 
   document.querySelectorAll('.dd-theme-card').forEach(card => {
@@ -205,51 +318,6 @@ function initDropdownThemeUI() {
       updateLiveDemo(bg, text, isOriginal);
     });
   }
-
-  demoItems.forEach(item => {
-    item.addEventListener('mouseenter', () => {
-      demoItems.forEach(it => {
-        it.classList.remove('active');
-        it.style.backgroundColor = '';
-        const c = it.querySelector('.demo-code');
-        const n = it.querySelector('.demo-name');
-        const m = it.querySelector('.demo-meta');
-        if (c) c.style.color = '#0284c7';
-        if (n) n.style.color = '#0f172a';
-        if (m) m.style.color = '#64748b';
-      });
-      item.classList.add('active');
-      const activeRadio = document.querySelector('input[name="dropdown_theme"]:checked');
-      const activeTheme = activeRadio ? activeRadio.value : 'slate-gray';
-      let bg = '#868e96';
-      let text = '#ffffff';
-      let isOriginal = false;
-
-      if (activeTheme === 'custom') {
-        bg = customBgHex?.value || '#ebedf0';
-        isOriginal = customOriginalCb ? customOriginalCb.checked : false;
-        text = isOriginal ? '#0f172a' : (customTextHex?.value || '#ffffff');
-      } else {
-        bg = presets[activeTheme]?.bg || '#868e96';
-        isOriginal = presets[activeTheme]?.originalText || false;
-        text = presets[activeTheme]?.text || '#ffffff';
-      }
-
-      item.style.backgroundColor = bg;
-      const c = item.querySelector('.demo-code');
-      const n = item.querySelector('.demo-name');
-      const m = item.querySelector('.demo-meta');
-      if (isOriginal) {
-        if (c) c.style.color = '#0284c7';
-        if (n) n.style.color = '#0f172a';
-        if (m) m.style.color = '#64748b';
-      } else {
-        if (c) c.style.color = text;
-        if (n) n.style.color = text;
-        if (m) m.style.color = text;
-      }
-    });
-  });
 
   if (customBgPicker && customBgHex) {
     customBgPicker.addEventListener('input', () => {
@@ -291,17 +359,19 @@ function createFormGroup(labelText, side, index, currentValue, options) {
 
   const label = document.createElement('label');
   label.className = 'form-label';
-  label.innerText = labelText;
+  label.textContent = labelText;
+  label.htmlFor = `interface-${side}-order-${index}`;
 
   const select = document.createElement('select');
-  select.className = 'form-select';
+  select.className = 'form-select zrx-select';
   select.dataset.side = side;
   select.dataset.index = index;
+  select.id = `interface-${side}-order-${index}`;
 
   options.forEach(opt => {
     const optionElement = document.createElement('option');
     optionElement.value = opt;
-    optionElement.innerText = opt === "" ? "-- None --" : opt;
+    optionElement.textContent = opt === "" ? "-- None --" : opt;
     if (opt === currentValue) {
       optionElement.selected = true;
     }
@@ -310,22 +380,30 @@ function createFormGroup(labelText, side, index, currentValue, options) {
 
   group.appendChild(label);
   group.appendChild(select);
+  if (window.ZimRxDropdown && typeof window.ZimRxDropdown.enhanceSelect === 'function') {
+    window.ZimRxDropdown.enhanceSelect(select);
+  }
+
+  if (side === 'left' || side === 'right') {
+    const removeButton = document.createElement('button');
+    removeButton.type = 'button';
+    removeButton.className = 'interface-order-remove';
+    removeButton.textContent = 'Remove';
+    removeButton.setAttribute('aria-label', `Remove ${labelText}`);
+    group.appendChild(removeButton);
+  }
 
   return group;
 }
 
-function saveSettings() {
+async function saveSettings() {
   const leftSelects    = document.querySelectorAll('select[data-side="left"]');
   const rightSelects   = document.querySelectorAll('select[data-side="right"]');
   const historySelects = document.querySelectorAll('select[data-side="history"]');
 
-  const newLeftLayout    = Array.from(leftSelects).map(sel => sel.value);
-  const newRightLayout   = Array.from(rightSelects).map(sel => sel.value);
+  const newLeftLayout    = Array.from(leftSelects).map(sel => sel.value).filter(Boolean);
+  const newRightLayout   = Array.from(rightSelects).map(sel => sel.value).filter(Boolean);
   const newHistoryLayout = Array.from(historySelects).map(sel => sel.value);
-
-  localStorage.setItem(storageKeys.leftLayout,    JSON.stringify(newLeftLayout));
-  localStorage.setItem(storageKeys.rightLayout,   JSON.stringify(newRightLayout));
-  localStorage.setItem(storageKeys.historyLayout, JSON.stringify(newHistoryLayout));
 
   // Save Dropdown Theme
   const activeThemeRadio = document.querySelector('input[name="dropdown_theme"]:checked');
@@ -352,47 +430,51 @@ function saveSettings() {
     }
   }
 
-  localStorage.setItem(storageKeys.dropdownTheme, themeKey);
-  localStorage.setItem(storageKeys.dropdownHoverBg, ddBg);
-  localStorage.setItem(storageKeys.dropdownHoverText, ddText);
-  localStorage.setItem('zimrx_layout_v', '3');
+  if (!/^#[0-9a-f]{6}$/i.test(ddBg) || !/^#[0-9a-f]{6}$/i.test(ddText)) {
+    showSetupToast('Choose valid dropdown highlight colors.');
+    return;
+  }
 
-  // Save to Cookies so that the server can prerender instantly
-  document.cookie = `zimrx_left_layout=${encodeURIComponent(JSON.stringify(newLeftLayout))}; path=/; max-age=31536000; SameSite=Lax`;
-  document.cookie = `zimrx_right_layout=${encodeURIComponent(JSON.stringify(newRightLayout))}; path=/; max-age=31536000; SameSite=Lax`;
-  document.cookie = `zimrx_history_layout=${encodeURIComponent(JSON.stringify(newHistoryLayout))}; path=/; max-age=31536000; SameSite=Lax`;
-  document.cookie = `zimrx_layout_v=3; path=/; max-age=31536000; SameSite=Lax`;
-  document.cookie = `zimrx_dropdown_theme=${encodeURIComponent(themeKey)}; path=/; max-age=31536000; SameSite=Lax`;
-  document.cookie = `zimrx_dropdown_hover_bg=${encodeURIComponent(ddBg)}; path=/; max-age=31536000; SameSite=Lax`;
-  document.cookie = `zimrx_dropdown_hover_text=${encodeURIComponent(ddText)}; path=/; max-age=31536000; SameSite=Lax`;
-
-  document.documentElement.setAttribute('data-dropdown-theme', themeKey);
-  document.documentElement.style.setProperty('--zrx-dropdown-hover-bg', ddBg);
-  document.documentElement.style.setProperty('--zrx-dropdown-hover-text', ddText);
-
-  // Save to Database via AJAX
-  fetch('api/save_interface_layout.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      left_layout: newLeftLayout,
-      right_layout: newRightLayout,
-      history_layout: newHistoryLayout,
-      dropdown_theme: themeKey,
-      dropdown_hover_bg: ddBg,
-      dropdown_hover_text: ddText
-    })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.error) {
-      console.error('Failed to sync layout to database:', data.error);
+  try {
+    const response = await fetch('api/save_interface_layout.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        left_layout: newLeftLayout,
+        right_layout: newRightLayout,
+        history_layout: newHistoryLayout,
+        dropdown_theme: themeKey,
+        dropdown_hover_bg: ddBg,
+        dropdown_hover_text: ddText
+      })
+    });
+    const data = await response.json();
+    if (!response.ok || data.error) {
+      throw new Error(data.error || 'Settings could not be saved.');
     }
-  })
-  .catch(err => console.error('Database sync error:', err));
 
-  // Show Toast modal dialog
-  showSetupToast('Saved successfully');
+    localStorage.setItem(storageKeys.leftLayout, JSON.stringify(newLeftLayout));
+    localStorage.setItem(storageKeys.rightLayout, JSON.stringify(newRightLayout));
+    localStorage.setItem(storageKeys.historyLayout, JSON.stringify(newHistoryLayout));
+    localStorage.setItem('zimrx_layout_v', '3');
+
+    const secureCookie = window.location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `zimrx_left_layout=${encodeURIComponent(JSON.stringify(newLeftLayout))}; path=/; max-age=31536000; SameSite=Lax${secureCookie}`;
+    document.cookie = `zimrx_right_layout=${encodeURIComponent(JSON.stringify(newRightLayout))}; path=/; max-age=31536000; SameSite=Lax${secureCookie}`;
+    document.cookie = `zimrx_history_layout=${encodeURIComponent(JSON.stringify(newHistoryLayout))}; path=/; max-age=31536000; SameSite=Lax${secureCookie}`;
+    document.cookie = `zimrx_layout_v=3; path=/; max-age=31536000; SameSite=Lax${secureCookie}`;
+    document.cookie = `zimrx_dropdown_theme=${encodeURIComponent(themeKey)}; path=/; max-age=31536000; SameSite=Lax${secureCookie}`;
+    document.cookie = `zimrx_dropdown_hover_bg=${encodeURIComponent(ddBg)}; path=/; max-age=31536000; SameSite=Lax${secureCookie}`;
+    document.cookie = `zimrx_dropdown_hover_text=${encodeURIComponent(ddText)}; path=/; max-age=31536000; SameSite=Lax${secureCookie}`;
+
+    document.documentElement.setAttribute('data-dropdown-theme', themeKey);
+    document.documentElement.style.setProperty('--zrx-dropdown-hover-bg', ddBg);
+    document.documentElement.style.setProperty('--zrx-dropdown-hover-text', ddText);
+    showSetupToast('Saved successfully');
+  } catch (error) {
+    console.error('Failed to save interface settings:', error);
+    showSetupToast('Could not save settings. Please try again.');
+  }
 }
 
 
@@ -431,17 +513,12 @@ function resetSettings() {
       confirmModal.hidden = true;
       const defaultHistoryLayout = ["medical", "treatment", "habits", "diet-hypersensitivity", "drug-history"];
 
-      // Reset Left Grid Selects
-      document.querySelectorAll('select[data-side="left"]').forEach(select => {
-        const idx = parseInt(select.dataset.index, 10);
-        select.value = defaultLeftLayout[idx] || "";
-      });
-
-      // Reset Right Grid Selects
-      document.querySelectorAll('select[data-side="right"]').forEach(select => {
-        const idx = parseInt(select.dataset.index, 10);
-        select.value = defaultRightLayout[idx] || "";
-      });
+      const leftList = document.getElementById('left-side-setup');
+      const rightList = document.getElementById('right-side-setup');
+      if (leftList) leftList.replaceChildren(...defaultLeftLayout.map((moduleName, index) => createFormGroup(`Order #${String(index + 1).padStart(2, '0')}`, 'left', index, moduleName, availableLeftModules)));
+      if (rightList) rightList.replaceChildren(...defaultRightLayout.map((moduleName, index) => createFormGroup(`Order #${String(index + 1).padStart(2, '0')}`, 'right', index, moduleName, availableRightModules)));
+      refreshModuleOrderUI('left');
+      refreshModuleOrderUI('right');
 
       // Reset History Grid Selects
       document.querySelectorAll('select[data-side="history"]').forEach(select => {
@@ -449,13 +526,13 @@ function resetSettings() {
         select.value = defaultHistoryLayout[idx] || "";
       });
 
-      localStorage.removeItem(storageKeys.dropdownTheme);
-      localStorage.removeItem(storageKeys.dropdownHoverBg);
-      localStorage.removeItem(storageKeys.dropdownHoverText);
+      localStorage.removeItem('zimrx_dropdown_theme');
+      localStorage.removeItem('zimrx_dropdown_hover_bg');
+      localStorage.removeItem('zimrx_dropdown_hover_text');
       document.cookie = `zimrx_dropdown_theme=; path=/; max-age=0; SameSite=Lax`;
       document.cookie = `zimrx_dropdown_hover_bg=; path=/; max-age=0; SameSite=Lax`;
       document.cookie = `zimrx_dropdown_hover_text=; path=/; max-age=0; SameSite=Lax`;
-      document.documentElement.setAttribute('data-dropdown-theme', 'subtle-tint');
+      document.documentElement.setAttribute('data-dropdown-theme', 'slate-gray');
       initDropdownThemeUI();
 
       showSetupToast('Default layout restored. Save to apply.');

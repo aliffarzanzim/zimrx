@@ -94,7 +94,7 @@ function zimrx_doctor_options_for_user(PDO $pdo, int $userId, string $role, int 
     return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 }
 
-// Sync persistent dashboard panel layouts from the database into cookies for rapid client-side rendering
+// Sync persistent dashboard preferences from the database into cookies for client-side rendering
 function zimrx_sync_interface_layout(PDO $pdo): void {
     if (!function_exists('current_user_doctor_id')) {
         return;
@@ -135,6 +135,35 @@ function zimrx_sync_interface_layout(PDO $pdo): void {
             ]);
             $_COOKIE[$cookieName] = $dbVal;
         }
+    }
+
+    $dropdownDefaults = [
+        'dropdown_theme' => 'slate-gray',
+        'dropdown_hover_bg' => '#868e96',
+        'dropdown_hover_text' => '#ffffff',
+    ];
+    $allowedDropdownThemes = ['slate-gray', 'subtle-tint', 'charcoal', 'theme-blue', 'soft-blue', 'emerald', 'custom'];
+    foreach ($dropdownDefaults as $key => $defaultValue) {
+        $dbVal = $dbSettings[$key] ?? $defaultValue;
+        if ($key === 'dropdown_theme') {
+            if (!is_string($dbVal) || !in_array($dbVal, $allowedDropdownThemes, true)) {
+                $dbVal = $defaultValue;
+            }
+        } elseif (!is_string($dbVal) || preg_match('/\A#[0-9a-fA-F]{6}\z/', $dbVal) !== 1) {
+            $dbVal = $defaultValue;
+        }
+
+        $cookieName = 'zimrx_' . $key;
+        if (($_COOKIE[$cookieName] ?? null) !== $dbVal) {
+            setcookie($cookieName, $dbVal, [
+                'expires' => time() + 31536000,
+                'path' => '/',
+                'secure' => $isHttps,
+                'httponly' => false,
+                'samesite' => 'Lax',
+            ]);
+        }
+        $_COOKIE[$cookieName] = $dbVal;
     }
 }
 

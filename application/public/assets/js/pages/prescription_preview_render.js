@@ -199,17 +199,100 @@ function scheduleHistoryLabelGapFit() {
 
 function renderPatientTable(patient) {
     const singleRow = String(previewOptions.info_row || '2') === '1';
+    let table;
     if (singleRow) {
         let row = '';
         for (let i = 1; i <= 8; i += 1) row += patientOrderHtml(i, patient, true);
-        return `<table class="zrx-patient-table"><tbody><tr>${row}</tr></tbody></table>`;
+        table = `<table class="zrx-patient-table"><tbody><tr>${row}</tr></tbody></table>`;
+    } else {
+        let first = '';
+        let second = '';
+        for (let i = 1; i <= 4; i += 1) first += patientOrderHtml(i, patient, false);
+        for (let i = 5; i <= 8; i += 1) second += patientOrderHtml(i, patient, false);
+        table = `<table class="zrx-patient-table"><tbody><tr>${first}</tr><tr>${second}</tr></tbody></table>`;
     }
 
-    let first = '';
-    let second = '';
-    for (let i = 1; i <= 4; i += 1) first += patientOrderHtml(i, patient, false);
-    for (let i = 5; i <= 8; i += 1) second += patientOrderHtml(i, patient, false);
-    return `<table class="zrx-patient-table"><tbody><tr>${first}</tr><tr>${second}</tr></tbody></table>`;
+    return table + patientCustomFieldsHtml(patient);
+}
+
+function syncPatientInfoVisibility() {
+    const strip = hasDom ? document.querySelector('.zrx-patient-strip') : null;
+    if (strip) {
+        strip.classList.toggle('zrx-patient-info-hidden', previewOptions.display_pt_info === 'no');
+    }
+}
+
+function syncPatientStripLayout() {
+    if (!hasDom) return;
+    const strip = document.querySelector('.zrx-patient-strip');
+    const leftBody = document.querySelector('.zrx-body-left');
+    const rightBody = document.querySelector('.zrx-body-right');
+    if (!strip || !leftBody || !rightBody) return;
+
+    const suppliedLayout = previewOptions.print_layout && typeof previewOptions.print_layout === 'object'
+        ? previewOptions.print_layout
+        : {};
+    const readCm = (value, fallback) => {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
+    };
+    const pageHeight = readCm(suppliedLayout.page_height, readCm(previewOptions.page_height, 0));
+    const configuredPatientHeight = readCm(suppliedLayout.patient_height, readCm(previewOptions.pt_info_height, 0));
+    if (pageHeight <= 0) return;
+
+    const headerHeight = readCm(
+        suppliedLayout.header_height,
+        previewOptions.preview_header_type === 'without_header' ? 0 : readCm(previewOptions.header_height, 0)
+    );
+    const footerHeight = readCm(
+        suppliedLayout.footer_height,
+        previewOptions.display_footer === 'no' ? 0 : readCm(previewOptions.footer_height, 0)
+    );
+    const availablePatientHeight = Math.max(0, pageHeight - headerHeight - footerHeight);
+    const defaultBodyHeight = Math.max(0, availablePatientHeight - configuredPatientHeight);
+    const configuredLeftHeight = readCm(suppliedLayout.left_height, readCm(previewOptions.left_height, defaultBodyHeight));
+    const configuredRightHeight = readCm(suppliedLayout.right_height, readCm(previewOptions.right_height, defaultBodyHeight));
+
+    strip.style.height = `${configuredPatientHeight}cm`;
+    const hasPatientInfo = previewOptions.display_pt_info !== 'no';
+    const contentOverflows = hasPatientInfo && strip.scrollHeight > strip.clientHeight + 1;
+    const measuredHeight = contentOverflows ? strip.scrollHeight / (96 / 2.54) : configuredPatientHeight;
+    const layoutWarning = document.getElementById('patient-layout-warning');
+    if (layoutWarning) {
+        layoutWarning.hidden = !hasPatientInfo || measuredHeight <= availablePatientHeight + 0.05;
+    }
+    const patientHeight = Math.min(availablePatientHeight, Math.max(configuredPatientHeight, measuredHeight));
+    const patientHeightIncrease = patientHeight - configuredPatientHeight;
+
+    strip.style.height = `${patientHeight}cm`;
+    leftBody.style.height = `${Math.max(0, configuredLeftHeight - patientHeightIncrease)}cm`;
+    rightBody.style.height = `${Math.max(0, configuredRightHeight - patientHeightIncrease)}cm`;
+}
+
+function schedulePatientStripLayout() {
+    if (hasDom) window.requestAnimationFrame(syncPatientStripLayout);
+}
+
+function patientCustomFieldsHtml(patient) {
+    const definitions = Array.isArray(previewOptions.patient_custom_fields) ? previewOptions.patient_custom_fields : [];
+    const selectedKeys = new Set(Array.isArray(previewOptions.patient_custom_fields_print)
+        ? previewOptions.patient_custom_fields_print
+        : []);
+    const extra = patient.extra_demographics && typeof patient.extra_demographics === 'object'
+        ? patient.extra_demographics
+        : {};
+    const values = extra.custom_fields && typeof extra.custom_fields === 'object' ? extra.custom_fields : {};
+    const rows = definitions
+        .filter(definition => selectedKeys.has(definition.key))
+        .map(definition => {
+            const value = cleanText(values[definition.key] || '');
+            if (!value) return '';
+            const label = cleanText(definition.label);
+            return `<div class="zrx-patient-custom-field"><span class="zrx-patient-label">${escapeHtml(label)}:</span><span class="zrx-patient-value">${escapeHtml(value)}</span></div>`;
+        })
+        .filter(Boolean)
+        .join('');
+    return rows ? `<div class="zrx-patient-custom-fields">${rows}</div>` : '';
 }
 
 function sectionTable(title, rows, modifier) {
@@ -485,6 +568,12 @@ function renderLeftSections(clinical) {
             html += simpleSection(items, titles[slot] || slot, bullet, `zrx-clinical-section--${slot.replace(/[^a-z0-9_-]/gi, '')}`, slot);
         }
     }
+    (Array.isArray(clinical.visit_form_modules) ? clinical.visit_form_modules : []).forEach(module => {
+        const rows = (Array.isArray(module.fields) ? module.fields : [])
+            .filter(field => field && field.print === true && cleanText(field.value))
+            .map(field => `${cleanText(field.label)}: ${cleanText(field.value)}`);
+        html += simpleSection(rows, cleanText(module.title), bullet, 'zrx-clinical-section--custom-form');
+    });
     return html;
 }
 
@@ -767,6 +856,8 @@ function applyPreviewData(data) {
     const clinical = previewCurrentData.clinical || {};
 
     setHtml('.zrx-patient-strip', renderPatientTable(patient));
+    syncPatientInfoVisibility();
+    schedulePatientStripLayout();
     schedulePatientAddressFit();
     toggleRef(patient);
     toggleBarcode(patient);
@@ -808,6 +899,11 @@ if (hasDom) {
     if (snapshot) {
         applyPreviewData(snapshot);
     }
+    syncPatientInfoVisibility();
+    schedulePatientStripLayout();
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(schedulePatientStripLayout);
+    }
     if (window.parent && window.parent !== window) {
         window.parent.postMessage({ type: 'PREVIEW_DOM_READY' }, window.location.origin);
     }
@@ -826,6 +922,8 @@ if (hasDom) {
         if (event.data.type === 'SYNC_PREVIEW_PATIENT_LABELS') {
             previewOptions = { ...previewOptions, ...(event.data.options || {}) };
             setHtml('.zrx-patient-strip', renderPatientTable(previewCurrentData.patient || {}));
+            syncPatientInfoVisibility();
+            schedulePatientStripLayout();
             schedulePatientAddressFit();
             setHtml('#preview-left-sections', renderLeftSections(previewCurrentData.clinical || {}));
             scheduleHistoryLabelGapFit();

@@ -4,15 +4,18 @@ declare(strict_types=1);
 // Layout configurator: reorder left/right dashboard modules, history sub-sections, and dropdown highlight themes.
 
 require_once __DIR__ . '/init.php';
+require_once ZIMRX_BASE_DIR . '/lib/Services/DashboardModules.php';
 require_login();
 $page_title = "ZimRx - Layout Configurator";
+$body_class = trim(($body_class ?? '') . ' zimrx-interface-settings-hold');
 
-// --- Read layout from cookie (same source as prescription.php pre-rendering) ---
-$availableLeftModules  = ["P/C", "AI Analyzer", "History", "P/E", "Breast Examination", "Local Examination", "Burn Assessment", "ENT Examination", "Dental Chart", "Diabetic Foot", "Dermatology", "Psychiatry", "Orthopaedics", "Urology", "Neurology", "Cardiology", "Pulmonology", "Endocrinology", "Dx", "Ix", "Plan", "Note", "O/H", "M/H", "Paediatric History", ""];
-$availableRightModules = ["Rx", "Drug Summary & Interaction", "Advice", "Report Entry", "Upload Reports & Documents", "Calculators", "Ophthalmology", "Text Pad", "OT Note", "Font Format", ""];
-
-$defaultLeftLayout  = ["P/C", "AI Analyzer", "History", "P/E", "Dx", "Ix", "Plan", "O/H", "M/H"];
-$defaultRightLayout = ["Rx", "Advice", "Report Entry", "Upload Reports & Documents", "Calculators", "Text Pad", "OT Note", "Font Format"];
+$dashboardModules = new \ZimRx\Services\DashboardModules(
+    ZIMRX_BASE_DIR . '/views/modules'
+);
+$availableLeftModules = array_merge([''], $dashboardModules->availableNames('left'));
+$availableRightModules = array_merge([''], $dashboardModules->availableNames('right'));
+$defaultLeftLayout = $dashboardModules->defaultLayout('left');
+$defaultRightLayout = $dashboardModules->defaultLayout('right');
 
 $doctorId = current_user_doctor_id();
 
@@ -65,6 +68,14 @@ function decode_layout_source(PDO $pdo, int $doctorId, string $cookieName, strin
 
 $leftLayout  = decode_layout_source($pdo, $doctorId, 'zimrx_left_layout',  'left_layout',  $defaultLeftLayout);
 $rightLayout = decode_layout_source($pdo, $doctorId, 'zimrx_right_layout', 'right_layout', $defaultRightLayout);
+$leftLayout = array_map(
+    static fn(mixed $name): string => is_string($name) ? ($dashboardModules->canonicalName($name) ?? $name) : '',
+    $leftLayout
+);
+$rightLayout = array_map(
+    static fn(mixed $name): string => is_string($name) ? ($dashboardModules->canonicalName($name) ?? $name) : '',
+    $rightLayout
+);
 
 if (($_COOKIE['zimrx_layout_v'] ?? '') !== '3' && !headers_sent()) {
     setcookie('zimrx_layout_v', '3', time() + 31536000, '/', '', false, false);
@@ -85,24 +96,21 @@ $defaultHistoryLayout = ['medical', 'treatment', 'habits', 'diet-hypersensitivit
 $historyLayout = decode_layout_source($pdo, $doctorId, 'zimrx_history_layout', 'history_layout', $defaultHistoryLayout);
 while (count($historyLayout) < 5) $historyLayout[] = '';
 
-// Pad to 32 slots
-while (count($leftLayout)  < 32) $leftLayout[]  = '';
-while (count($rightLayout) < 32) $rightLayout[] = '';
-
-function render_setup_selects(array $layout, string $side, array $options, int $total = 32): string {
+function render_setup_selects(array $layout, string $side, array $options): string {
     $html = '';
-    for ($i = 0; $i < $total; $i++) {
+    foreach ($layout as $i => $current) {
         $current = $layout[$i] ?? '';
         $label   = 'Order #' . str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT);
         $html .= '<div class="form-group">';
-        $html .= '<label class="form-label">' . htmlspecialchars($label) . '</label>';
-        $html .= '<select class="form-select" data-side="' . $side . '" data-index="' . $i . '">';
+        $html .= '<label class="form-label" for="interface-' . $side . '-order-' . $i . '">' . htmlspecialchars($label) . '</label>';
+        $html .= '<select class="form-select zrx-select" id="interface-' . $side . '-order-' . $i . '" data-side="' . $side . '" data-index="' . $i . '">';
         foreach ($options as $opt) {
             $selected = ($opt === $current) ? ' selected' : '';
             $label_text = ($opt === '') ? '-- None --' : htmlspecialchars($opt);
             $html .= '<option value="' . htmlspecialchars($opt) . '"' . $selected . '>' . $label_text . '</option>';
         }
         $html .= '</select>';
+        $html .= '<button type="button" class="interface-order-remove" aria-label="Remove ' . htmlspecialchars($label) . '">Remove</button>';
         $html .= '</div>';
     }
     return $html;
@@ -115,8 +123,8 @@ function render_history_selects(array $layout, array $labelMap): string {
         $current = $layout[$i] ?? '';
         $label   = 'Order #' . str_pad((string)($i + 1), 2, '0', STR_PAD_LEFT);
         $html .= '<div class="form-group">';
-        $html .= '<label class="form-label">' . htmlspecialchars($label) . '</label>';
-        $html .= '<select class="form-select" data-side="history" data-index="' . $i . '">';
+        $html .= '<label class="form-label" for="interface-history-order-' . $i . '">' . htmlspecialchars($label) . '</label>';
+        $html .= '<select class="form-select zrx-select" id="interface-history-order-' . $i . '" data-side="history" data-index="' . $i . '">';
         foreach ($options as $opt) {
             $selected = ($opt === $current) ? ' selected' : '';
             $label_text = htmlspecialchars($labelMap[$opt] ?? $opt);
@@ -128,28 +136,45 @@ function render_history_selects(array $layout, array $labelMap): string {
     return $html;
 }
 
-$extra_css = ['assets/css/pages/setup.css'];
+$extra_css = [
+    'assets/css/pages/setup.css',
+    'assets/css/pages/interface_settings.css',
+    'assets/css/modules/pres_particulars.css',
+    'assets/css/modules/rx.css',
+    'assets/css/modules/modals_dialogs.css',
+];
 include 'header.php';
 ?>
 
-    <div class="setup-container">
-        <div class="setup-header">
-            <h1>Customize Dashboard Layout</h1>
-            <p>Assign modules to left/right panels. Leave empty to skip an order.</p>
-        </div>
+    <main class="setup-container zrx-page-container interface-settings-page">
+        <header class="setup-header zrx-settings-page-hero">
+            <div class="zrx-settings-page-hero-copy">
+                <a class="zrx-settings-page-back" href="settings.php">Settings</a>
+                <h1>Interface Settings</h1>
+                <p>Arrange prescription modules and configure dashboard display preferences.</p>
+            </div>
+        </header>
 
         <div class="setup-grid">
             <div class="setup-section">
-                <h2>Left Panel Elements (20 Max)</h2>
+                <h2>Left Panel Elements</h2>
                 <div id="left-side-setup">
                     <?= render_setup_selects($leftLayout, 'left', $availableLeftModules) ?>
+                </div>
+                <div class="interface-order-actions">
+                    <span class="interface-order-count" data-order-count="left" aria-live="polite"></span>
+                    <button type="button" class="btn btn-outline interface-order-add" data-order-add="left">Add order</button>
                 </div>
             </div>
 
             <div class="setup-section">
-                <h2>Right Panel Elements (20 Max)</h2>
+                <h2>Right Panel Elements</h2>
                 <div id="right-side-setup">
                     <?= render_setup_selects($rightLayout, 'right', $availableRightModules) ?>
+                </div>
+                <div class="interface-order-actions">
+                    <span class="interface-order-count" data-order-count="right" aria-live="polite"></span>
+                    <button type="button" class="btn btn-outline interface-order-add" data-order-add="right">Add order</button>
                 </div>
             </div>
         </div>
@@ -167,7 +192,7 @@ include 'header.php';
 
         <!-- Dropdown Highlight Theme & Style -->
         <div class="setup-section">
-            <h2>Dropdown Highlight Style <small class="setup-heading-desc">(Choose the hover/active selection appearance across all autocompletes and dropdown menus.)</small></h2>
+            <h2>Dropdown Highlight Style</h2>
             
             <div class="setup-theme-layout-grid">
                 <!-- Presets selection grid -->
@@ -240,29 +265,29 @@ include 'header.php';
                 <div class="dropdown-live-demo-card setup-preview-card">
                     <div class="setup-preview-header">
                         <span class="setup-preview-label">Live Preview</span>
-                        <span class="setup-preview-hint">Hover or click below</span>
                     </div>
-                    <div class="setup-preview-anchor">
-                        <div class="setup-preview-input">
-                            Dropdown button <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    <div id="dropdown-preview-content" class="setup-preview-anchor">
+                        <div class="setup-preview-controls">
+                            <label for="dropdown-preview-type">Show dropdown</label>
+                            <select id="dropdown-preview-type" class="form-select zrx-select">
+                                <option value="global">Global Dropdown</option>
+                                <option value="registration">Registration Dropdown</option>
+                                <option value="phone">Phone Number Dropdown</option>
+                                <option value="rx">Rx Dropdown</option>
+                            </select>
                         </div>
-                        <ul id="demo-dd-menu" class="setup-preview-dropdown">
-                            <li class="demo-dd-item setup-preview-item">
-                                <div class="demo-code setup-preview-brand">A260416002</div>
-                                <strong class="demo-name setup-preview-name">Rahim Uddin</strong>
-                                <span class="demo-meta setup-preview-company">0172222222 | Mirpur, Dhaka</span>
-                            </li>
-                            <li class="demo-dd-item active is-selected" id="demo-dd-active-item">
-                                <div class="demo-code setup-preview-brand">A260416003</div>
-                                <strong class="demo-name setup-preview-name">Momena Begum</strong>
-                                <span class="demo-meta setup-preview-company">0173333333 | Uttara, Dhaka</span>
-                            </li>
-                            <li class="demo-dd-item setup-preview-item">
-                                <div class="demo-code setup-preview-brand">A260416004</div>
-                                <strong class="demo-name setup-preview-name">Arif Hasan</strong>
-                                <span class="demo-meta setup-preview-company">0171111111 | Kazipara, Dhaka</span>
-                            </li>
-                        </ul>
+                        <div id="dropdown-preview-global-area" class="setup-preview-global-area" hidden>
+                            <label for="dropdown-preview-global-select">Interface modules</label>
+                            <select id="dropdown-preview-global-select" class="form-select zrx-select"></select>
+                        </div>
+                        <div id="dropdown-preview-search-area" class="setup-preview-search-area" hidden>
+                            <label id="dropdown-preview-search-label" for="dropdown-preview-search">Search</label>
+                            <div id="dropdown-preview-search-wrapper" class="autocomplete-wrapper setup-preview-search-wrapper">
+                                <input id="dropdown-preview-search" class="form-control setup-preview-search" type="search" autocomplete="off">
+                                <ul id="dropdown-preview-results" class="zrx-dropdown autocomplete-list" aria-label="Live dropdown results"></ul>
+                            </div>
+                            <p id="dropdown-preview-note" class="setup-preview-note">Results load from local application data as you type.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -284,7 +309,6 @@ include 'header.php';
                         <input type="checkbox" id="dd-custom-original-text-cb" class="setup-checkbox-input">
                         Keep Original Text Colors
                     </label>
-                    <span class="setup-hint-sm">(Preserves blue codes, dark names & muted meta)</span>
                 </div>
             </div>
         </div>
@@ -293,20 +317,19 @@ include 'header.php';
             <button id="btn-reset-settings" class="btn btn-outline print-setup-reset-btn">Reset to Defaults</button>
             <button id="btn-save-settings" class="btn btn-primary">Save Configuration</button>
         </div>
-    </div>
+    </main>
 
-    <div id="setup-toast" class="print-setup-toast" hidden>
-        <div class="print-setup-toast-panel" role="dialog" aria-modal="true" aria-labelledby="setup-toast-message">
-            <span class="print-setup-toast-icon" aria-hidden="true">&#10003;</span>
+    <div id="setup-toast" class="zrx-modal-overlay" hidden>
+        <div class="zrx-modal-dialog setup-toast-panel" role="dialog" aria-modal="true" aria-labelledby="setup-toast-message">
+            <span class="setup-toast-icon" aria-hidden="true">&#10003;</span>
             <strong id="setup-toast-message">Saved successfully</strong>
             <button type="button" id="setup-toast-close" class="btn btn-primary">Okay</button>
         </div>
     </div>
 
-    <div id="setup-confirm-modal" class="print-setup-toast" hidden>
-        <div class="print-setup-toast-panel setup-confirm-panel" role="dialog" aria-modal="true">
-            <span class="print-setup-toast-icon setup-confirm-icon" aria-hidden="true">&#9888;</span>
-            <strong class="setup-confirm-title">Reset to Defaults?</strong>
+    <div id="setup-confirm-modal" class="zrx-modal-overlay" hidden>
+        <div class="zrx-modal-dialog setup-confirm-panel" role="dialog" aria-modal="true" aria-labelledby="setup-confirm-title">
+            <strong id="setup-confirm-title" class="setup-confirm-title">Reset to Defaults?</strong>
             <p class="setup-confirm-text">Are you sure you want to restore the layout to default settings? This cannot be undone.</p>
             <div class="setup-confirm-actions">
                 <button type="button" id="confirm-reset-cancel" class="btn btn-outline setup-confirm-btn">Cancel</button>
@@ -315,8 +338,11 @@ include 'header.php';
         </div>
     </div>
 
-    <script src="assets/js/layout/config.js"></script>
-    <script src="assets/js/layout/dashboard.js"></script>
+    <script id="dashboard-module-config" type="application/json"><?= json_encode($dashboardModules->clientConfig(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR) ?></script>
+    <script src="assets/js/layout/config.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/config.js') ?>"></script>
+    <script src="assets/js/layout/dashboard.js?v=<?= filemtime(__DIR__ . '/assets/js/layout/dashboard.js') ?>"></script>
+    <script src="assets/js/modules/dosage_form_icons.js?v=<?= filemtime(__DIR__ . '/assets/js/modules/dosage_form_icons.js') ?>"></script>
+    <script src="assets/js/pages/dropdown_highlight_preview.js?v=<?= filemtime(__DIR__ . '/assets/js/pages/dropdown_highlight_preview.js') ?>"></script>
     <script src="assets/js/layout/help_guidelines.js"></script>
     <script src="assets/js/layout/table_column_resizer.js"></script>
     <script src="assets/js/layout/grid_navigation.js"></script>

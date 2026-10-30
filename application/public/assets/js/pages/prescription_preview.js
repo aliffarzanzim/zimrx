@@ -767,6 +767,7 @@ function formatRevisitText() {
 function collectPrescriptionPreviewSnapshot() {
   const drugs = collectRxPreviewDrugs();
   const history = collectHistoryPreviewSection();
+  const visitForms = window.collectVisitFormModules?.() || { values: {}, modules: [] };
 
   return {
     patient: {
@@ -778,6 +779,14 @@ function collectPrescriptionPreviewSnapshot() {
       regno: readFieldValue('#patient-reg-no'),
       weight: formatPatientWeight(),
       mobile: readFieldValue('#patient-mobile'),
+      dob: readFieldValue('#patient-dob'),
+      dob_type: readFieldValue('#patient-dob-type') || 'exact',
+      marital_status: readFieldValue('#patient-marital-status'),
+      email: readFieldValue('#patient-email'),
+      nid_no: readFieldValue('#patient-nid-no'),
+      passport_no: readFieldValue('#patient-passport-no'),
+      occupation: readFieldValue('#patient-occupation'),
+      extra_demographics: window.PatientParticulars?.getExtraDemographics?.() || {},
       ref_by: getPrintablePatientRefBy(),
       referral: getPatientReferralPayload(),
       visit_no: firstNonEmptyValue(['#patient-visit-no', '#visit-no'])
@@ -825,7 +834,9 @@ function collectPrescriptionPreviewSnapshot() {
         duration_english: drug.duration_english
       })),
       advice: collectAdviceSection(),
-      revisit: formatRevisitText()
+      revisit: formatRevisitText(),
+      visit_form_values: visitForms.values,
+      visit_form_modules: visitForms.modules
     }
   };
 }
@@ -912,6 +923,11 @@ function saveCurrentPrescriptionVisit() {
   }
 
   const snapshot = typeof collectPrescriptionPreviewSnapshot === 'function' ? collectPrescriptionPreviewSnapshot() : null;
+  const invalidFormField = document.querySelector('.visit-form-module :invalid');
+  if (invalidFormField) {
+    invalidFormField.reportValidity();
+    return;
+  }
   const previewPaper = document.getElementById('prescription-preview-content') || document.querySelector('.zrx-preview-paper');
   const previewHtml = previewPaper ? (previewPaper.outerHTML || previewPaper.innerHTML || '') : '';
 
@@ -961,6 +977,13 @@ function learnRxRegimensOnSave(event) {
 function openPrescriptionPreview(event) {
   const previewLink = event.target.closest('#btn-preview-prescription');
   if (!previewLink) return;
+
+  const invalidFormField = document.querySelector('.visit-form-module :invalid');
+  if (invalidFormField) {
+    event.preventDefault();
+    invalidFormField.reportValidity();
+    return;
+  }
 
   event.preventDefault();
   storePrescriptionPreviewSnapshot();

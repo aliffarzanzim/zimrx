@@ -8,15 +8,22 @@ $page_title = "Billings & Financials - ZimRx";
 require_once __DIR__ . '/init.php';
 require_login();
 require_once ZIMRX_BASE_DIR . '/lib/Services/BillingService.php';
+require_once ZIMRX_BASE_DIR . '/lib/Services/PracticeProfileService.php';
 
 $pdo = DbConnections::userdata();
-$doctorId = max(1, (int)(function_exists('current_user_doctor_id') ? current_user_doctor_id() : 1));
+$activePracticeProfile = (new \ZimRx\Services\PracticeProfileService($pdo))->activeForCurrentUser();
+$doctorId = (int)($activePracticeProfile['doctor_id'] ?? 0);
+$profileId = (int)($activePracticeProfile['id'] ?? 0);
+if ($doctorId <= 0 || $profileId <= 0) {
+    http_response_code(403);
+    exit('An active practice profile is required to access billing records.');
+}
 
 $billingService = new BillingService($pdo);
 
 // Atomically reconcile any unbilled appointment fees within a transactional boundary
 try {
-    $billingService->reconcileMissingAppointmentPayments($doctorId);
+    $billingService->reconcileMissingAppointmentPayments($doctorId, $profileId);
 } catch (Throwable $e) {
     error_log("BillingService::reconcileMissingAppointmentPayments failed: " . $e->getMessage());
 }
@@ -44,12 +51,12 @@ $criteria = [
 ];
 
 // Query domain metrics and transaction logs
-$summaryMetrics = $billingService->getSummaryMetrics($doctorId);
+$summaryMetrics = $billingService->getSummaryMetrics($doctorId, $profileId);
 $todayMetrics = $summaryMetrics['today'];
 $monthMetrics = $summaryMetrics['month'];
 $dueMetrics = $summaryMetrics['due'];
 
-$filteredResult = $billingService->getFilteredTransactions($doctorId, $criteria);
+$filteredResult = $billingService->getFilteredTransactions($doctorId, $criteria, $profileId);
 $transactions = $filteredResult['transactions'];
 $filteredCollected = $filteredResult['aggregates']['collected'];
 $filteredInvoiced = $filteredResult['aggregates']['invoiced'];

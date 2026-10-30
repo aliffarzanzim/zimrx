@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "report_entry",
+    "aliases":  [
+
+                ],
+    "panel":  "right",
+    "name":  "Report Entry",
+    "view":  "report_entry.php",
+    "enabled_by_default": true,
+    "default_order":  3
+}

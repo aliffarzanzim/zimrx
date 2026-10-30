@@ -14,6 +14,11 @@ if (!window.ZimRxUtils.escapeHtml) {
 window.escapeHtml = window.escapeHtml || window.ZimRxUtils.escapeHtml;
 
 function initializeDynamicDatePickers(root = document) {
+  if (window.ZimRxDatePicker) {
+    window.ZimRxDatePicker.init(root);
+    return;
+  }
+
   if (typeof flatpickr !== 'function') {
     return;
   }
@@ -26,6 +31,7 @@ function initializeDynamicDatePickers(root = document) {
     flatpickr(input, {
       dateFormat: 'd/m/Y',
       allowInput: true,
+      disableMobile: true,
       onChange: (_, dateStr, instance) => {
         instance.input.dispatchEvent(new Event('input', { bubbles: true }));
         instance.input.dispatchEvent(new Event('change', { bubbles: true }));
@@ -65,7 +71,7 @@ function initializeSimplePcTableReorder(root = document) {
     '[data-zrx-reorderable]'
   ].join(',');
 
-  const rowSelector = 'tr.pc-row, tr.rx-row, tr.oh-row, tr.ot-row, tr.phrase-row, tr.template-row, .advice-row, tr[draggable="true"]';
+  const rowSelector = 'tr.pc-row, tr.rx-row, tr.oh-row, tr.ot-row, tr.phrase-row, tr.template-row, .advice-row, .zrx-sortable-item, tr[draggable="true"]';
   const handleSelector = '.pc-row-move-btn, .rx-row-move-btn, .oh-row-move-btn, .ot-row-move-btn, .zrx-drag-handle, .pc-drag, .rx-drag, .oh-drag, .ot-drag, .adv-drag, .phrase-handle, .instruction-handle, [data-drag-handle]';
 
   if (document.documentElement.dataset.simplePcReorderReady === '1') {
@@ -308,6 +314,12 @@ function initializeSimplePcTableReorder(root = document) {
     });
     draggedRow = null;
     draggedTbody = null;
+  });
+
+  document.addEventListener('zrx:sortable-transfer', (event) => {
+    if (draggedRow && event.detail?.item === draggedRow) {
+      draggedTbody = draggedRow.parentElement;
+    }
   });
 }
 

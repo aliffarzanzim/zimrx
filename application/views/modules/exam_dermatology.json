@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "dermatology",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "Dermatology",
+    "view":  "exam_dermatology.php",
+    "enabled_by_default": false,
+    "default_order":  null
+}

@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "advice",
+    "aliases":  [
+
+                ],
+    "panel":  "right",
+    "name":  "Advice",
+    "view":  "advice.php",
+    "enabled_by_default": true,
+    "default_order":  2
+}

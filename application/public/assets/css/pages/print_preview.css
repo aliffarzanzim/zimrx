@@ -106,6 +106,10 @@ body {
     box-sizing: border-box;
 }
 
+.zrx-patient-strip.zrx-patient-info-hidden > * {
+    visibility: hidden;
+}
+
 .zrx-patient-table {
     margin: 0 auto;
     border-collapse: collapse;
@@ -128,6 +132,21 @@ body {
 .zrx-patient-value {
     min-width: 0;
     width: 25%;
+}
+
+.zrx-patient-custom-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.75rem;
+    width: 100%;
+    padding: 2px 4px;
+    box-sizing: border-box;
+}
+
+.zrx-patient-custom-field {
+    display: inline-flex;
+    gap: 0.2rem;
+    max-width: 100%;
 }
 
 .zrx-patient-position-4,
@@ -581,4 +600,29 @@ tr.highlight-active {
     top: 0;
     left: 0;
     z-index: 1;
+}
+
+.zrx-print-layout-warning[hidden] {
+    display: none;
+}
+
+.zrx-print-layout-warning:not([hidden]) {
+    position: fixed;
+    top: 0.25cm;
+    left: 50%;
+    z-index: 10000;
+    width: max-content;
+    max-width: calc(100vw - 1rem);
+    padding: 0.35rem 0.5rem;
+    transform: translateX(-50%);
+    border: 1px solid currentColor;
+    background: Canvas;
+    color: CanvasText;
+    font: 12px/1.35 sans-serif;
+}
+
+@media print {
+    .zrx-print-layout-warning:not([hidden]) {
+        display: none;
+    }
 }

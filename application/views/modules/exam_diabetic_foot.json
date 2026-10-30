@@ -1,0 +1,12 @@
+{
+    "schema_version":  1,
+    "id":  "diabetic_foot",
+    "aliases":  [
+
+                ],
+    "panel":  "left",
+    "name":  "Diabetic Foot",
+    "view":  "exam_diabetic_foot.php",
+    "enabled_by_default": false,
+    "default_order":  null
+}

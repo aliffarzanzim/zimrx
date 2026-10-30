@@ -71,27 +71,6 @@ function renderSearchResults(data, mode = currentMode) {
         $('#resultsList').append(html);
     });
 
-    if (mode === 'brand') {
-        scheduleSidebarBrandPreload();
-    }
-}
-
-function scheduleSidebarBrandPreload() {
-    const run = () => {
-        if (typeof warmBrandDetail !== 'function') return;
-        $('#resultsList .res-row[data-brand-id]').slice(0, 8).each(function() {
-            const brandId = this.dataset.brandId || '';
-            if (brandId) {
-                warmBrandDetail(brandId);
-            }
-        });
-    };
-
-    if (typeof window.requestIdleCallback === 'function') {
-        window.requestIdleCallback(run, { timeout: 800 });
-    } else {
-        window.setTimeout(run, 120);
-    }
 }
 
 function docsBookmarks() {
@@ -315,8 +294,6 @@ $(document).ready(function() {
         if (typeof syncDrugHeaderLayout === 'function') {
             requestAnimationFrame(syncDrugHeaderLayout);
         }
-    } else if (urlMode === 'brand') {
-        scheduleSidebarBrandPreload();
     }
 
     $('#midSearchInput, #midFormFilter').on('input change', function() {

@@ -1,0 +1,68 @@
+{
+  "page": {
+    "back": "Back to Settings",
+    "title": "Address and Occupation Directories",
+    "intro": "Manage the suggestions used in patient particulars. Guide popups contain instructions only.",
+    "load_error": "Directory settings could not be loaded."
+  },
+  "tabs": {
+    "occupation": "Occupation",
+    "address": "Address"
+  },
+  "occupation": {
+    "title": "Occupation Directory",
+    "description": "Manage the occupation suggestions available in patient particulars.",
+    "ui": {
+      "placeholder_input": "Type new occupation...",
+      "btn_add": "+ Add",
+      "btn_reset": "Reset to Default",
+      "th_move": "Move",
+      "th_actions": "Actions",
+      "th_type": "Type",
+      "th_name": "Occupation Name",
+      "th_usage": "Usage",
+      "loading": "Loading occupations...",
+      "empty": "No occupations found.",
+      "btn_pin": "Pin",
+      "btn_unpin": "Unpin",
+      "btn_edit": "Edit",
+      "btn_remove": "Remove",
+      "btn_restore": "Restore",
+      "btn_delete": "Delete",
+      "tag_system": "System",
+      "tag_custom": "Custom",
+      "tag_hidden": "Hidden",
+      "confirm_reset": "Reset all occupation customizations to default? This will unpin, unhide, and restore all system occupations.",
+      "prompt_edit": "Edit occupation name:"
+    }
+  },
+  "address": {
+    "title": "Address Directory",
+    "description": "Choose preferred districts and manage custom address suggestions.",
+    "ui": {
+      "section_districts_title": "Practice Districts Filter",
+      "btn_dist_all": "All Districts",
+      "btn_dist_save": "Save Districts",
+      "btn_dist_saved": "Saved",
+      "district_search_placeholder": "Search District...",
+      "districts_loading": "Loading districts...",
+      "section_addr_title": "Address Directory & Management (Top 100)",
+      "btn_reset_addr": "Reset to Default",
+      "addr_search_placeholder": "Search locality, thana, upazila, district...",
+      "tab_all": "All (Top 100)",
+      "tab_custom": "Custom Only",
+      "tab_system": "System (National)",
+      "tab_pinned": "Pinned",
+      "new_addr_placeholder": "Type new custom address/area...",
+      "btn_add_addr": "+ Add",
+      "th_actions": "Actions",
+      "th_type": "Type",
+      "th_address": "Address / Combination",
+      "th_usage": "Usage",
+      "addr_loading": "Loading addresses...",
+      "addr_empty": "No addresses found.",
+      "confirm_reset_addr": "Reset all address customizations and district preferences to default?",
+      "prompt_edit_addr": "Edit address name:"
+    }
+  }
+}

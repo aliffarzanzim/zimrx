@@ -304,7 +304,7 @@ function zimrx_verify_patient_ownership(PDO $pdo, int $doctorId, int $patientId,
     $chk = $pdo->prepare(
         "SELECT id FROM zimrx_patients
          WHERE id = :pid
-           AND (COALESCE(NULLIF(doctor_id, 0), 1) = :did
+           AND (doctor_id = :did
                 OR EXISTS (
                     SELECT 1 FROM zimrx_patient_doctor_access
                     WHERE patient_id = :pid AND doctor_id = :did AND can_view = 1
