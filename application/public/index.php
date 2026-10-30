@@ -46,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $password = (string)($_POST['password'] ?? '');
         $csrfToken = $_POST['csrf_token'] ?? null;
 
-        if ($csrfToken !== null && !zimrx_verify_csrf((string)$csrfToken)) {
+        if (!is_string($csrfToken) || !zimrx_verify_csrf($csrfToken)) {
             $error = "Session expired or invalid security token. Please refresh and try again.";
         } else {
             $stmt = $pdo->prepare(
