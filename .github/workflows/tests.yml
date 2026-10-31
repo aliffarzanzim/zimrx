@@ -38,3 +38,6 @@ jobs:
 
       - name: Run ZimRx Test Suite
         run: php application/tests/run_tests.php
+
+      - name: Verify sync journal record transactions
+        run: php application/tests/sync_journal_records_test.php
