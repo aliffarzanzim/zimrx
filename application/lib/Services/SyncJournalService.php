@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace ZimRx\Services;
 
-use PDO;
+use DbSchema;
 use InvalidArgumentException;
+use PDO;
+use RuntimeException;
 
 // Append-only delta log for entity mutations (patients, vitals, visits) to synchronize with companion apps.
 class SyncJournalService
