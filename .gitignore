@@ -50,6 +50,10 @@ error_log
 /tools/geo-studio/cache/*
 !/tools/geo-studio/cache/.gitkeep
 
+# Raw reference tables are fetched from pinned upstream sources during the build
+/tools/growth-chart/raw/who_*.txt
+/tools/growth-chart/raw/*.csv
+
 
 # 4. Local Runtimes & Server Binaries
 runtime/

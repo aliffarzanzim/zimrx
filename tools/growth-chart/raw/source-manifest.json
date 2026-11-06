@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 3,
+  "whoDaysPerMonth": 30.4375,
+  "rightsProfiles": {
+    "cdc_2000": {
+      "status": "documented_public_domain",
+      "license": "U.S. public domain",
+      "attribution": "Centers for Disease Control and Prevention, National Center for Health Statistics",
+      "citation": "Centers for Disease Control and Prevention. CDC Growth Charts: United States. 2000.",
+      "terms": "Attribute CDC/NCHS, state that CDC does not endorse this tool, do not substantively alter CDC material, and state that the source material is available from CDC at no charge.",
+      "termsUrl": "https://www.cdc.gov/other/agencymaterials.html"
+    },
+    "cdc_2022_extended": {
+      "status": "documented_public_domain",
+      "license": "U.S. public domain",
+      "attribution": "Centers for Disease Control and Prevention, National Center for Health Statistics",
+      "citation": "Centers for Disease Control and Prevention. CDC Extended BMI-for-Age Growth Charts. 2022.",
+      "terms": "Attribute CDC/NCHS, state that CDC does not endorse this tool, do not substantively alter CDC material, and state that the source material is available from CDC at no charge.",
+      "termsUrl": "https://www.cdc.gov/other/agencymaterials.html"
+    },
+    "who_2006": {
+      "status": "licensed_for_product_incorporation",
+      "license": "WHO non-exclusive permission for incorporation into the growth-chart product; see visualizer/data-sources.html.",
+      "upstreamLicenseUrl": "https://github.com/WorldHealthOrganization/anthro/blob/b776d8a12b1c97369c748b561159fd2ec4f4db58/LICENSE.md",
+      "attribution": "Use the full bibliographical acknowledgements in visualizer/data-sources.html.",
+      "citation": "WHO Multicentre Growth Reference Study Group. WHO Child Growth Standards: length/height-for-age, weight-for-age, weight-for-length, weight-for-height and body mass index-for-age: methods and development. World Health Organization, 2006. The head-circumference tables also require the relevant 2007 acknowledgement in visualizer/data-sources.html.",
+      "terms": "Permission covers incorporation into the product and worldwide licensing of the product to users, for the purposes and media described in the request. The licensed tables must not be distributed on a stand-alone basis. Use only in a factual, appropriate, noncommercial context; no marketing, promotion, or implied WHO endorsement. The request disclosed JSON conversion and age conversion; other changes require prior written authorization. Do not make the data publicly available for unrestricted reuse or release it into public LLMs. See visualizer/data-sources.html for product notices.",
+      "termsUrl": "https://www.who.int/about/policies/publishing/copyright/terms-and-conditions"
+    },
+    "who_2007": {
+      "status": "licensed_for_product_incorporation",
+      "license": "WHO non-exclusive permission for incorporation into the growth-chart product; see visualizer/data-sources.html.",
+      "upstreamLicenseUrl": "https://github.com/WorldHealthOrganization/anthroplus/blob/7cfcdb39026e9a55de55732bc3cf14c82261bcf7/LICENSE.md",
+      "attribution": "Use the full bibliographical acknowledgements in visualizer/data-sources.html.",
+      "citation": "de Onis M, Onyango AW, Borghi E, Siyam A, Nishida C, Siekmann J. Development of a WHO growth reference for school-aged children and adolescents. Bulletin of the World Health Organization. 2007;85:660-667.",
+      "terms": "Permission covers incorporation into the product and worldwide licensing of the product to users, for the purposes and media described in the request. The licensed tables must not be distributed on a stand-alone basis. Use only in a factual, appropriate, noncommercial context; no marketing, promotion, or implied WHO endorsement. The request disclosed JSON conversion; other changes require prior written authorization. Do not make the data publicly available for unrestricted reuse or release it into public LLMs. See visualizer/data-sources.html for product notices.",
+      "termsUrl": "https://www.who.int/about/policies/publishing/copyright/terms-and-conditions"
+    }
+  },
+  "sources": [
+    {
+      "file": "cdc_wtage_2000.csv",
+      "url": "https://www.cdc.gov/growthcharts/data/zscore/wtage.csv",
+      "sha256": "3406c9d125bcb69c062a9e84eb8c0209bfe9346542bdc1d308643750dcc241b7",
+      "format": "csv",
+      "reference": "cdc_2000",
+      "metric": "wfa"
+    },
+    {
+      "file": "cdc_statage_2000.csv",
+      "url": "https://www.cdc.gov/growthcharts/data/zscore/statage.csv",
+      "sha256": "45130d2a9d7c50c54a47e7ba626b66c61d4554bc2d901198cedd9419a53f7251",
+      "format": "csv",
+      "reference": "cdc_2000",
+      "metric": "hfa"
+    },
+    {
+      "file": "cdc_bmiagerev_2000.csv",
+      "url": "https://www.cdc.gov/growthcharts/data/zscore/bmiagerev.csv",
+      "sha256": "cbeea0e8d500ee15c652f3fdc45bcd02cb9c15d4d1e86f4d8048bbfea8d166e5",
+      "format": "csv",
+      "reference": "cdc_2000",
+      "metric": "bmifa"
+    },
+    {
+      "file": "cdc_bmi_extended_2022.csv",
+      "url": "https://www.cdc.gov/growthcharts/data/extended-bmi/bmi-age-2022.csv",
+      "sha256": "7f416a213157a5209bb6cbfd1b19292510248f3f31fe43c9ff63f6d8e39f7890",
+      "format": "csv",
+      "reference": "cdc_2022_extended",
+      "metric": "bmifa"
+    },
+    {
+      "file": "who_weianthro_2006.txt",
+      "url": "https://raw.githubusercontent.com/WorldHealthOrganization/anthro/b776d8a12b1c97369c748b561159fd2ec4f4db58/data-raw/growthstandards/weianthro.txt",
+      "sha256": "bc15a6a623dd1d5beaeed1497666332aa54bc4ccd15ff9658c487d79694ab77b",
+      "format": "tsv",
+      "reference": "who_2006",
+      "metric": "wfa"
+    },
+    {
+      "file": "who_lenanthro_2006.txt",
+      "url": "https://raw.githubusercontent.com/WorldHealthOrganization/anthro/b776d8a12b1c97369c748b561159fd2ec4f4db58/data-raw/growthstandards/lenanthro.txt",
+      "sha256": "709f7a11881451daf7820f022d363d5bdb93746b5361d6bd9218af6ff838e0c2",
+      "format": "tsv",
+      "reference": "who_2006",
+      "metric": "lhfa"
+    },
+    {
+      "file": "who_hcanthro_2006.txt",
+      "url": "https://raw.githubusercontent.com/WorldHealthOrganization/anthro/b776d8a12b1c97369c748b561159fd2ec4f4db58/data-raw/growthstandards/hcanthro.txt",
+      "sha256": "e794e46f06b91223ad2c6435148dc08794a1d75b67613a652c3151201a98bf7c",
+      "format": "tsv",
+      "reference": "who_2006",
+      "metric": "hcfa"
+    },
+    {
+      "file": "who_bmianthro_2006.txt",
+      "url": "https://raw.githubusercontent.com/WorldHealthOrganization/anthro/b776d8a12b1c97369c748b561159fd2ec4f4db58/data-raw/growthstandards/bmianthro.txt",
+      "sha256": "78a4364e99303114fb2c458d28d64c6d10ac33832a5d5b2d437bc5cea1c93a0d",
+      "format": "tsv",
+      "reference": "who_2006",
+      "metric": "bmifa"
+    },
+    {
+      "file": "who_2007_hfa.txt",
+      "url": "https://raw.githubusercontent.com/WorldHealthOrganization/anthroplus/7cfcdb39026e9a55de55732bc3cf14c82261bcf7/data-raw/growthstandards/hfawho2007.txt",
+      "sha256": "9ac02aa4908f8ec3c6ba2362a4c7e1356043408b2873548ca22eedc016c235ad",
+      "format": "tsv",
+      "reference": "who_2007",
+      "metric": "hfa"
+    },
+    {
+      "file": "who_2007_wfa.txt",
+      "url": "https://raw.githubusercontent.com/WorldHealthOrganization/anthroplus/7cfcdb39026e9a55de55732bc3cf14c82261bcf7/data-raw/growthstandards/wfawho2007.txt",
+      "sha256": "9234dc640ba54001a9afd42ef15ab675b211a721c8f3c0a07c3431fd9cea0e1c",
+      "format": "tsv",
+      "reference": "who_2007",
+      "metric": "wfa"
+    },
+    {
+      "file": "who_2007_bmifa.txt",
+      "url": "https://raw.githubusercontent.com/WorldHealthOrganization/anthroplus/7cfcdb39026e9a55de55732bc3cf14c82261bcf7/data-raw/growthstandards/bfawho2007.txt",
+      "sha256": "70ef3260df08e48ce560c28cff4e733db78fb952cbd881eba63c9d3a15f38a6a",
+      "format": "tsv",
+      "reference": "who_2007",
+      "metric": "bmifa"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Data sources and licensing - Growth Reference Visualizer</title>
+    <link rel="stylesheet" href="assets/css/visualizer.css">
+</head>
+<body>
+    <main>
+        <h1>Data sources and licensing</h1>
+        <p><a href="index.php">Back to the visualizer</a></p>
+
+        <h2>WHO growth references</h2>
+        <p>WHO growth-reference values are included as runtime data for this visualizer under permission granted for the product. The permission covers the visualizer and its distribution to users, not a standalone data set. The generated JSON is a required visualizer asset, not a stand-alone data product. WHO does not endorse this tool.</p>
+        <p>WHO 2006 ages supplied in days are represented in months using 30.4375 days per month. The requested JSON conversion and age conversion are described in the permission request. Other changes to the licensed values require prior written WHO authorization. Use is limited to the factual, noncommercial purpose in the request. The WHO material must not be used for marketing or promotion, and the WHO name or emblem must not be used separately from the licensed material.</p>
+        <p>The agreement requires these bibliographical acknowledgements in electronic documentation accompanying the product:</p>
+        <ul>
+            <li>WHO Multicentre Growth Reference Study Group. <cite>WHO Child Growth Standards: length/height-for-age, weight-for-age, weight-for-length, weight-for-height and body mass index-for-age: methods and development.</cite> World Health Organization, 2006.</li>
+            <li>WHO Multicentre Growth Reference Study Group. <cite>WHO Child Growth Standards: head circumference-for-age, arm circumference-for-age, triceps skinfold-for-age and subscapular skinfold-for-age: methods and development.</cite> World Health Organization, 2007.</li>
+            <li>WHO Multicentre Growth Reference Study Group. <cite>WHO Child Growth Standards: growth velocity based on weight, length and head circumference: methods and development.</cite> World Health Organization, 2009.</li>
+            <li>de Onis M, Onyango AW, Borghi E, Siyam A, Nishida C, Siekmann J. Development of a WHO growth reference for school-aged children and adolescents. <cite>Bulletin of the World Health Organization.</cite> 2007;85:660-667.</li>
+        </ul>
+        <p>Sources: <a href="https://www.who.int/tools/child-growth-standards">WHO Child Growth Standards</a> and <a href="https://www.who.int/tools/growth-reference-data-for-5to19-years">WHO Growth Reference data for 5-19 years</a>.</p>
+
+        <h2>CDC growth references</h2>
+        <p>CDC 2000 growth-reference data are public domain. The visualizer also includes the 2022 Extended BMI-for-Age reference for ages 2 to 20 years, with curves through the 99.99th percentile. CDC states that the extended reference uses a new method above the 95th percentile and that the values through the 95th percentile match the CDC 2000 BMI reference. It is intended for BMI-for-age only; CDC recommends it when BMI is above the 97th percentile.</p>
+        <p>Credit the Centers for Disease Control and Prevention and National Center for Health Statistics, state that CDC does not endorse this tool, and state that the source data are available from CDC at no charge. CDC material must not be substantively altered.</p>
+        <p>Sources: <a href="https://www.cdc.gov/growthcharts/extended-bmi-data-files.htm">CDC 2022 Extended BMI data and methods</a> and <a href="https://www.cdc.gov/other/agencymaterials.html">CDC use of agency materials</a>. Citation: Centers for Disease Control and Prevention. <cite>CDC Extended BMI-for-Age Growth Charts.</cite> National Center for Health Statistics, 2022.</p>
+
+        <h2 id="measurement-position">Measurement position</h2>
+        <p>For WHO 2006 measurements from birth through 60 months, the visualizer converts standing height to recumbent length by adding 0.7 cm before age 24 months, or converts recumbent length to standing height by subtracting 0.7 cm from age 24 months onward. CDC's 2000 growth-chart program applies the corresponding 0.8 cm conversion. WHO 2007 height-for-age requires standing height; the under-five conversion is not applied.</p>
+        <p>Sources: <a href="https://www.who.int/docs/default-source/child-growth/growth-reference-5-19-years/who-anthroplus-manual.pdf">WHO AnthroPlus manual</a> and the CDC <a href="https://www.cdc.gov/growth-chart-training/hcp/computer-programs/sas.html">growth-chart SAS program documentation</a>.</p>
+    </main>
+</body>
+</html>
