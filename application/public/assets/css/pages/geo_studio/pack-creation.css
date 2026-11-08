@@ -1,0 +1,132 @@
+.geo-new-pack-page {
+    flex: 0 0 auto;
+    overflow: visible;
+    background: var(--zrx-bg-app);
+}
+
+.geo-new-pack-card {
+    display: flex;
+    flex-direction: column;
+    width: var(--zrx-page-width);
+    max-width: var(--zrx-page-max-width);
+    min-height: calc(100% - 32px);
+    margin: 16px auto;
+}
+
+.geo-new-pack-header {
+    min-height: 32px;
+}
+
+.geo-new-pack-header .geo-modal-back-btn {
+    transition: color 0.15s ease;
+}
+
+.geo-new-pack-header .geo-modal-back-btn:hover {
+    background: transparent;
+    color: var(--zrx-primary);
+}
+
+.geo-new-pack-header .geo-modal-back-btn:active {
+    background: transparent;
+    color: var(--zrx-primary-hover);
+}
+
+.geo-new-pack-heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.geo-new-pack-title {
+    color: var(--zrx-text-dark);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.geo-new-pack-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 20px 24px;
+    font-size: 12px;
+}
+
+.geo-new-pack-content > .geo-form-grid {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.geo-new-pack-content > .geo-form-grid > .geo-form-group {
+    min-width: 0;
+}
+
+.geo-new-pack-content .geo-pack-notes {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.geo-radio-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.geo-pack-types,
+.geo-preset-chips {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.geo-pack-types {
+    gap: 24px;
+    margin-top: 4px;
+}
+
+.geo-preset-chips {
+    gap: 6px;
+    margin-top: 5px;
+}
+
+.geo-code-hint,
+.geo-identifier-hint,
+.geo-hierarchy-hint {
+    color: var(--zrx-text-muted);
+    font-size: 10px;
+}
+
+.geo-code-hint { margin-top: 2px; }
+.geo-identifier-hint { margin-top: 3px; }
+.geo-hierarchy-hint { margin-top: 4px; }
+
+.geo-new-pack-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: auto;
+    padding: 12px 16px;
+    border-top: 1px solid var(--zrx-border-subtle);
+    background: var(--zrx-surface-muted);
+}
+
+@media (max-width: 680px) {
+    .geo-new-pack-content > .geo-form-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .geo-new-pack-card {
+        width: var(--zrx-page-width);
+        min-height: calc(100% - 24px);
+        margin: 12px auto;
+    }
+
+    .geo-new-pack-content {
+        padding: 16px;
+    }
+}
