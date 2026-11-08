@@ -13,6 +13,8 @@ set_time_limit(600);
 $baseDir = dirname(__DIR__, 2); // ZimRx/application
 $seedsDir = $baseDir . DIRECTORY_SEPARATOR . 'systemdata' . DIRECTORY_SEPARATOR . 'seeds';
 $dbDir = $baseDir . DIRECTORY_SEPARATOR . 'systemdata' . DIRECTORY_SEPARATOR . 'database';
+require_once $baseDir . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'Services'
+    . DIRECTORY_SEPARATOR . 'AddressPackImporter.php';
 
 if (!is_dir($dbDir)) {
     mkdir($dbDir, 0755, true);
@@ -838,6 +840,18 @@ function buildDatabaseFromSql(
     ?string $countryCode = null
 ): bool {
     $name = basename($dbFile);
+    $addressPackCatalog = [];
+    $addressPackSeedHash = '';
+
+    if (str_starts_with($name, 'zimrx_static')) {
+        try {
+            $addressPackCatalog = \ZimRx\Services\AddressPackImporter::catalog(dirname($sqlFile));
+            $addressPackSeedHash = \ZimRx\Services\AddressPackImporter::catalogDigest($addressPackCatalog);
+        } catch (Throwable $error) {
+            buildDbLog('[ERROR] Address pack seeds are invalid: ' . $error->getMessage(), true);
+            return false;
+        }
+    }
 
     // If countryCode is null, try reading from userdata database app_config
     if ($countryCode === null) {
@@ -857,8 +871,7 @@ function buildDatabaseFromSql(
     }
 
     if ($countryCode === null) {
-        // CLI or unconfigured default: use 'BD' for backwards compatibility and test suites
-        $countryCode = (php_sapi_name() === 'cli') ? 'BD' : 'INT';
+        $countryCode = 'INT';
     } else {
         $countryCode = strtoupper(trim($countryCode));
     }
@@ -882,18 +895,33 @@ function buildDatabaseFromSql(
                     }
                     buildDbLog("[INFO] Existing {$name} does not match country {$countryCode} (hasBrandBd=" . ($hasBrandBd ? '1' : '0') . "). Rebuilding...");
                 } elseif (str_starts_with($name, 'zimrx_static')) {
-                    $hasPlacesHierarchy = (bool)$testPdo->query("SELECT 1 FROM sqlite_master WHERE type='table' AND name='zimrx_address_hierarchy'")->fetchColumn();
-                    $hasPlacesBd = false;
-                    if ($hasPlacesHierarchy) {
-                        $hasPlacesBd = (bool)$testPdo->query("SELECT 1 FROM zimrx_address_hierarchy WHERE country = 'BD' LIMIT 1")->fetchColumn();
-                    }
-                    $isBd = ($countryCode === 'BD');
+                    $schemaVersion = (string)$testPdo->query(
+                        'SELECT version FROM zimrx_static_db_version WHERE id = 1'
+                    )->fetchColumn();
+                    $expectedPackIds = array_column($addressPackCatalog, 'pack_id');
+                    $actualPackIds = array_column(
+                        $testPdo->query('SELECT pack_id FROM zimrx_address_packs ORDER BY pack_id')->fetchAll(PDO::FETCH_ASSOC),
+                        'pack_id'
+                    );
+                    $installedSeedHash = (string)$testPdo->query(
+                        'SELECT address_pack_seed_hash FROM zimrx_static_db_version WHERE id = 1'
+                    )->fetchColumn();
+                    sort($expectedPackIds, SORT_STRING);
+                    sort($actualPackIds, SORT_STRING);
 
-                    if ($hasPlacesBd === $isBd) {
-                        buildDbLog("[SKIP] {$name} already exists and matches {$countryCode} places pack ({$count} rows in {$testTable}).");
+                    if ($schemaVersion === '3.2.0'
+                        && $actualPackIds === $expectedPackIds
+                        && hash_equals($addressPackSeedHash, $installedSeedHash)) {
+                        buildDbLog("[SKIP] {$name} already contains all " . count($actualPackIds) . " address packs ({$count} rows in {$testTable}).");
                         return true;
                     }
-                    buildDbLog("[INFO] Existing {$name} places pack does not match country {$countryCode}. Rebuilding...");
+                    if ($schemaVersion !== '3.2.0') {
+                        buildDbLog("[INFO] Existing {$name} uses address schema {$schemaVersion}. Rebuilding with schema 3.2.0...");
+                    } elseif (!hash_equals($addressPackSeedHash, $installedSeedHash)) {
+                        buildDbLog("[INFO] Address pack JSON seeds changed. Rebuilding {$name}...");
+                    } else {
+                        buildDbLog("[INFO] Existing {$name} address pack catalog differs from the seed files. Rebuilding...");
+                    }
                 } else {
                     buildDbLog("[SKIP] {$name} already exists and is healthy ({$count} rows in {$testTable}).");
                     return true;
@@ -975,23 +1003,15 @@ function buildDatabaseFromSql(
             compilePrescribeCatalog($pdo, $sqlFile);
         }
 
-        // If compiling zimrx_static.db, check for regional address hierarchy packs matching selected country
+        // Address packs are independent of practice country and ship together in the static database.
         if (str_starts_with($name, 'zimrx_static')) {
-            $seedsDir = dirname($sqlFile);
-            if ($countryCode === 'BD') {
-                $bdPlaceSeed = $seedsDir . DIRECTORY_SEPARATOR . 'zimrx_address_hierarchy_bd.sql';
-                if (file_exists($bdPlaceSeed)) {
-                    buildDbLog("[BUILD] Found Bangladesh Address Hierarchy Pack: " . basename($bdPlaceSeed) . " (" . round(filesize($bdPlaceSeed) / 1024, 1) . " KB). Importing...");
-                    executeSqlStream($pdo, $bdPlaceSeed, $stmtCount);
-                }
-            } else {
-                $countryLower = strtolower($countryCode);
-                $regPlaceSeed = $seedsDir . DIRECTORY_SEPARATOR . "zimrx_address_hierarchy_{$countryLower}.sql";
-                if ($countryLower !== '' && file_exists($regPlaceSeed)) {
-                    buildDbLog("[BUILD] Found {$countryCode} Address Hierarchy Pack: " . basename($regPlaceSeed) . " (" . round(filesize($regPlaceSeed) / 1024, 1) . " KB). Importing...");
-                    executeSqlStream($pdo, $regPlaceSeed, $stmtCount);
-                }
-            }
+            $result = \ZimRx\Services\AddressPackImporter::import($pdo, $addressPackCatalog);
+            $seedHashUpdate = $pdo->prepare(
+                'UPDATE zimrx_static_db_version SET address_pack_seed_hash = :seed_hash WHERE id = 1'
+            );
+            $seedHashUpdate->execute(['seed_hash' => $result['digest']]);
+            $stmtCount += $result['statements'] + 1;
+            buildDbLog("[BUILD] Imported {$result['packs']} address packs from JSON ({$result['places']} places).");
         }
 
         // Optimize database for read-heavy production usage

@@ -2409,23 +2409,48 @@ CREATE TABLE zimrx_static_db_version (
             id INTEGER PRIMARY KEY CHECK (id = 1),
             version TEXT NOT NULL,
             migrated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            notes TEXT
+            notes TEXT,
+            address_pack_seed_hash TEXT NOT NULL DEFAULT ''
         );
-INSERT INTO zimrx_static_db_version VALUES(1,'1.0.0','2026-04-30 13:49:42','Split static database generated from legacy ZimRx data.');
-CREATE TABLE IF NOT EXISTS zimrx_address_hierarchy (
+INSERT INTO zimrx_static_db_version VALUES(1,'3.2.0','2026-11-08 00:00:00','Three-table address pack schema with JSON seed imports.','');
+CREATE TABLE IF NOT EXISTS zimrx_address_packs (
+    pack_id TEXT PRIMARY KEY,
+    pack_type TEXT NOT NULL CHECK (pack_type IN ('national', 'custom')),
+    code_label TEXT NOT NULL,
+    default_language TEXT NOT NULL,
+    languages_json TEXT NOT NULL,
+    root_names_json TEXT NOT NULL,
+    levels_json TEXT NOT NULL,
+    version TEXT NOT NULL,
+    release_date TEXT NOT NULL,
+    last_updated TEXT NOT NULL,
+    author TEXT NOT NULL,
+    contributors_json TEXT NOT NULL,
+    license TEXT NOT NULL,
+    sources_json TEXT NOT NULL,
+    notes TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS zimrx_address_places (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    country TEXT NOT NULL,
+    pack_id TEXT NOT NULL,
     parent_id INTEGER NULL,
     level INTEGER NOT NULL,
-    place_type TEXT NOT NULL,
-    name_en TEXT NOT NULL,
-    name_loc TEXT NULL,
-    postcode TEXT NULL,
-    FOREIGN KEY(parent_id) REFERENCES zimrx_address_hierarchy(id)
+    type_key TEXT NOT NULL,
+    code TEXT NULL,
+    FOREIGN KEY(pack_id) REFERENCES zimrx_address_packs(pack_id) ON DELETE CASCADE,
+    UNIQUE(pack_id, id),
+    FOREIGN KEY(pack_id, parent_id) REFERENCES zimrx_address_places(pack_id, id) ON DELETE CASCADE
 );
-CREATE INDEX IF NOT EXISTS idx_address_country_search ON zimrx_address_hierarchy(country, name_en COLLATE NOCASE, name_loc);
-CREATE INDEX IF NOT EXISTS idx_address_parent ON zimrx_address_hierarchy(parent_id);
-CREATE INDEX IF NOT EXISTS idx_address_level_type ON zimrx_address_hierarchy(country, level, place_type);
+CREATE TABLE IF NOT EXISTS zimrx_address_place_names (
+    place_id INTEGER NOT NULL,
+    language TEXT NOT NULL,
+    name TEXT NOT NULL,
+    PRIMARY KEY (place_id, language),
+    FOREIGN KEY(place_id) REFERENCES zimrx_address_places(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_address_places_pack_parent ON zimrx_address_places(pack_id, parent_id);
+CREATE INDEX IF NOT EXISTS idx_address_places_pack_level_type ON zimrx_address_places(pack_id, level, type_key);
+CREATE INDEX IF NOT EXISTS idx_address_place_names_search ON zimrx_address_place_names(language, name COLLATE NOCASE, place_id);
 CREATE TABLE IF NOT EXISTS "zimrx_static_instructions" (
         id INTEGER PRIMARY KEY,
         instruction_en TEXT,
