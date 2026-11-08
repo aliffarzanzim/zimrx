@@ -1,0 +1,293 @@
+/* Flash Toast */
+.geo-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--zrx-text-dark);
+    color: var(--zrx-text-inverse);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: 0 4px 6px var(--zrx-selected-badge-bg);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.2s ease;
+    pointer-events: none;
+    z-index: 3000;
+}
+
+.geo-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.geo-empty-state {
+    padding: 32px;
+    text-align: center;
+    color: var(--zrx-text-muted);
+    font-size: 13px;
+}
+
+/* Home screen */
+.geo-view-wrapper {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+}
+
+.geo-view-wrapper[hidden] {
+    display: none;
+}
+
+.geo-home-view {
+    flex: 0 0 auto;
+    overflow: visible;
+    padding: 0;
+    background: var(--zrx-bg-app);
+}
+
+.geo-home-inner {
+    width: var(--zrx-page-width, calc(100% - 2.5rem));
+    max-width: var(--zrx-page-max-width, 1680px);
+    margin: var(--zrx-page-margin, 1.25rem auto);
+    padding-bottom: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-sizing: border-box;
+}
+
+.geo-home-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.geo-home-toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.geo-home-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 350px), 1fr));
+    gap: 18px;
+}
+
+.geo-home-grid.is-status {
+    min-height: clamp(220px, calc(100vh - 360px), 520px);
+    grid-template-columns: minmax(0, 1fr);
+    place-items: center;
+}
+
+.geo-home-grid.is-status .geo-grid-message {
+    grid-column: 1;
+    width: min(100%, 440px);
+    box-sizing: border-box;
+}
+
+.geo-pack-issues {
+    grid-column: 1 / -1;
+    padding: 12px 16px;
+    border: 1px solid var(--zrx-amber-200);
+    background: var(--zrx-amber-100);
+    color: var(--zrx-amber-800);
+}
+
+.geo-pack-issues h2 {
+    margin: 0 0 8px;
+    font-size: 13px;
+}
+
+.geo-pack-issues ul {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding-left: 20px;
+    font-size: 12px;
+}
+
+.geo-pack-issues li strong {
+    margin-right: 6px;
+}
+
+.pack-card {
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 1px 3px var(--zrx-shadow-soft-color);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.pack-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px var(--zrx-hover-overlay);
+    border-color: var(--zrx-primary);
+}
+
+.pack-card-header {
+    padding: 12px 16px;
+    background: var(--zrx-bg-app);
+    border-bottom: 1px solid var(--zrx-border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.scope-pill {
+    font-size: 10px;
+    font-weight: 400;
+    text-transform: uppercase;
+    padding: 1px 6px;
+    border-radius: 10px;
+    letter-spacing: 0.4px;
+    background: var(--zrx-bg-card);
+    color: var(--zrx-text-muted);
+    border: 1px solid var(--zrx-border-subtle);
+}
+
+.pack-card-identity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pack-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--zrx-text-dark);
+}
+
+.pack-card-ver {
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--zrx-text-muted);
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-dropdown-border-item);
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+
+.pack-card-body {
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.pack-stat-badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.c-stat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--zrx-bg-app);
+    color: var(--zrx-text-body);
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--zrx-tree-hover);
+}
+
+.c-stat-pill strong {
+    color: var(--zrx-text-dark);
+    font-weight: 700;
+}
+
+.pack-card-meta {
+    font-size: 11px;
+    color: var(--zrx-text-muted);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-top: 1px dashed var(--zrx-tree-hover);
+    padding-top: 10px;
+    margin-top: auto;
+}
+
+.pack-card-footer {
+    padding: 12px 16px;
+    background: var(--zrx-surface-muted);
+    border-top: 1px solid var(--zrx-border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+
+.pack-card-count { display:flex; align-items:baseline; gap:8px; }
+
+.pack-card-badges { display:flex; align-items:center; gap:6px; }
+
+.pack-card-dates { display:flex; justify-content:space-between; margin-top:2px; }
+
+.pack-card-size { font-size:11px; color:var(--zrx-text-muted); }
+
+.pack-card-units { font-size:12px; font-weight:600; color:var(--zrx-text-muted); }
+
+.pack-card-total { font-size:22px; font-weight:800; color:var(--zrx-text-dark); }
+
+.geo-grid-message { grid-column: 1 / -1; }
+
+.pack-card-open { flex:1; justify-content:center; }
+.pack-card-export {
+    flex: 0 0 auto;
+    color: var(--zrx-text-main);
+    background: var(--zrx-bg-card);
+    border-color: var(--zrx-border-subtle);
+    text-decoration: none;
+    justify-content: center;
+}
+.pack-card-export:hover {
+    color: var(--zrx-text-main);
+    background: var(--zrx-bg-subtle);
+    border-color: var(--zrx-border);
+}
+.pack-card-source {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 7px;
+    border: 1px solid var(--zrx-border-subtle);
+    border-radius: 999px;
+    color: var(--zrx-text-muted);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.pack-card-delete {
+    color: var(--zrx-danger);
+    border-color: var(--zrx-danger-border);
+    background: var(--zrx-bg-card);
+}
+.pack-card-delete:hover {
+    color: var(--zrx-danger);
+    border-color: var(--zrx-danger);
+    background: var(--zrx-danger-light);
+}
+
+.pack-card-delete:disabled {
+    opacity: 0.7;
+    filter: none;
+    color: var(--zrx-text-muted);
+    border-color: var(--zrx-border-subtle);
+    background: var(--zrx-bg-subtle);
+    cursor: not-allowed;
+    pointer-events: auto;
+}
