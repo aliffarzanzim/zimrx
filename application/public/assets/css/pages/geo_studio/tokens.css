@@ -1,0 +1,35 @@
+.geo-studio-app {
+    --zrx-bg-app: var(--zrx-bg-canvas);
+    --zrx-header-bg: var(--zrx-bg-header);
+    --zrx-header-border: var(--zrx-border-divider);
+    --zrx-text-dark: var(--zrx-text-main);
+    --zrx-text-inverse: var(--zrx-text-white);
+    --zrx-radius: var(--zrx-border-radius);
+    --zrx-shadow: var(--zrx-shadow-sm);
+    --zrx-tree-hover: var(--zrx-bg-hover);
+    --zrx-tree-active: var(--zrx-dropdown-hover-bg);
+    --zrx-amber-800: var(--zrx-amber-700);
+    --zrx-cyan-100: var(--zrx-cyan-50);
+    --zrx-cyan-200: var(--zrx-blue-200);
+    --zrx-cyan-800: var(--zrx-teal-800);
+    --zrx-danger-border: var(--zrx-red-200);
+    --zrx-danger-light: var(--zrx-red-100);
+    --zrx-hover-overlay: var(--zrx-bg-hover);
+    --zrx-hover-wash: var(--zrx-bg-subtle);
+    --zrx-indigo-800: var(--zrx-indigo-700);
+    --zrx-modal-overlay: color-mix(in srgb, var(--zrx-slate-900) 65%, transparent);
+    --zrx-nested-modal-overlay: color-mix(in srgb, var(--zrx-slate-900) 28%, transparent);
+    --zrx-modal-shadow-color: color-mix(in srgb, var(--zrx-black) 25%, transparent);
+    --zrx-primary-alpha-16: color-mix(in srgb, var(--zrx-primary) 16%, transparent);
+    --zrx-primary-alpha-20: color-mix(in srgb, var(--zrx-primary) 20%, transparent);
+    --zrx-purple-100: var(--zrx-violet-100);
+    --zrx-purple-200: var(--zrx-violet-200);
+    --zrx-purple-800: var(--zrx-violet-700);
+    --zrx-selected-badge-bg: color-mix(in srgb, var(--zrx-black) 20%, transparent);
+    --zrx-selected-chip-bg: color-mix(in srgb, var(--zrx-white) 25%, transparent);
+    --zrx-shadow-color: color-mix(in srgb, var(--zrx-black) 15%, transparent);
+    --zrx-shadow-soft-color: color-mix(in srgb, var(--zrx-black) 4%, transparent);
+    --zrx-surface-muted: var(--zrx-bg-subtle);
+    --zrx-teal-100: var(--zrx-cyan-50);
+    --zrx-teal-200: var(--zrx-blue-100);
+}
