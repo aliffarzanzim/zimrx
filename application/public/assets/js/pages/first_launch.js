@@ -255,7 +255,7 @@ function updateFormularyState(countryCode) {
 // Dynamic Address Hierarchy Availability Detection
 function updateAddressState(countryCode) {
     const code = (countryCode || '').toUpperCase().trim();
-    const addressPacks = window.ZimRxAvailableAddressPacks || {};
+    const addressPacks = window.ZimRxNationalAddressPacks || {};
     const i18n = window.ZimRxFirstLaunchI18n || {};
     const pack = code ? (addressPacks[code] || null) : null;
 

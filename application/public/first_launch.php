@@ -7,9 +7,11 @@ require_once __DIR__ . '/init.php';
 require_once __DIR__ . '/api/zrx_icons.php';
 require_once ZIMRX_BASE_DIR . '/lib/Services/LocaleService.php';
 require_once ZIMRX_BASE_DIR . '/lib/Services/CountryService.php';
+require_once ZIMRX_BASE_DIR . '/lib/Services/AddressPackService.php';
 
 use ZimRx\Services\LocaleService;
 use ZimRx\Services\CountryService;
+use ZimRx\Services\AddressPackService;
 
 // Helper
 function fl_config_get(PDO $pdo, string $key): string {
@@ -37,13 +39,19 @@ $fl = $localeService->catalog($currentLang, 'first_launch');
 $t = static fn (string $key): string => htmlspecialchars((string)($fl[$key] ?? ''), ENT_QUOTES, 'UTF-8');
 $countryGroups = CountryService::getGrouped();
 $availableFormularies = CountryService::getAvailableFormularies();
-$availableAddressPacks = CountryService::getAvailableAddressPacks();
+$nationalAddressPacks = [];
+foreach (AddressPackService::getNationalPacksByCountry() as $countryCode => $pack) {
+    $nationalAddressPacks[$countryCode] = [
+        'pack_id' => (string)$pack['pack_id'],
+        'places_count' => max(0, (int)($pack['places_count'] ?? 0)),
+    ];
+}
 $defaultCountry = trim((string)($_GET['country'] ?? ''));
 if ($defaultCountry === '') {
     $defaultCountry = fl_config_get($pdo, 'practice_country');
 }
 $defaultHasFormulary = ($defaultCountry !== '') ? CountryService::hasFormulary($defaultCountry) : false;
-$defaultHasAddressHierarchy = ($defaultCountry !== '') ? CountryService::hasAddressHierarchy($defaultCountry) : false;
+$defaultHasAddressPack = ($defaultCountry !== '') ? AddressPackService::hasNationalPackForCountry($defaultCountry) : false;
 $defaultPrescribingMode = trim((string)($_GET['prescribing_mode'] ?? ''));
 if ($defaultPrescribingMode === '') {
     $defaultPrescribingMode = $defaultHasFormulary ? 'brand' : 'generic';
@@ -291,14 +299,14 @@ if ($step === 4 && !is_logged_in()) {
                 </div>
 
                 <!-- Address Hierarchy Status Notice -->
-                <div class="fl-address-box <?= $defaultCountry === '' ? 'hidden' : '' ?> <?= $defaultHasAddressHierarchy ? 'available' : 'unavailable' ?>" id="addressStatusBox">
+                <div class="fl-address-box <?= $defaultCountry === '' ? 'hidden' : '' ?> <?= $defaultHasAddressPack ? 'available' : 'unavailable' ?>" id="addressStatusBox">
                     <span class="fl-status-icon" id="addressStatusIcon">
-                        <?= $defaultHasAddressHierarchy ? zrx_icon('map-pin', 14) : zrx_icon('info-circle', 14) ?>
+                        <?= $defaultHasAddressPack ? zrx_icon('map-pin', 14) : zrx_icon('info-circle', 14) ?>
                     </span>
                     <span class="fl-status-text" id="addressStatusText">
                         <?php 
-                        if ($defaultHasAddressHierarchy) {
-                            $aPack = $availableAddressPacks[$defaultCountry] ?? [];
+                        if ($defaultHasAddressPack) {
+                            $aPack = $nationalAddressPacks[strtoupper($defaultCountry)] ?? [];
                             $pCount = (int)($aPack['places_count'] ?? 0);
                             $formatNum = function(int $num) use ($currentLang): string {
                                 $formatted = number_format($num);
@@ -640,7 +648,7 @@ if ($step === 4 && !is_logged_in()) {
     window.ZimRxCountryHelpMap = <?= json_encode(CountryService::getCountryHelpLanguages(), JSON_UNESCAPED_SLASHES) ?>;
     window.ZimRxCountryHeaderDefaults = <?= json_encode(CountryService::getCountryHeaderDefaults(), JSON_UNESCAPED_SLASHES) ?>;
     window.ZimRxAvailableFormularies = <?= json_encode(CountryService::getAvailableFormularies(), JSON_UNESCAPED_UNICODE) ?>;
-    window.ZimRxAvailableAddressPacks = <?= json_encode(CountryService::getAvailableAddressPacks(), JSON_UNESCAPED_UNICODE) ?>;
+    window.ZimRxNationalAddressPacks = <?= json_encode($nationalAddressPacks, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
     window.ZimRxFirstLaunchI18n = <?= json_encode($fl, JSON_UNESCAPED_UNICODE) ?>;
 </script>
 

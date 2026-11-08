@@ -6,8 +6,10 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/init.php';
 require_once ZIMRX_BASE_DIR . '/lib/Services/CountryService.php';
+require_once ZIMRX_BASE_DIR . '/lib/Services/AddressPackService.php';
 
 use ZimRx\Services\CountryService;
+use ZimRx\Services\AddressPackService;
 
 header('Content-Type: application/json');
 
@@ -219,6 +221,10 @@ try {
     // Save app config
     app_config_set($pdo, 'practice_type', $practiceType);
     app_config_set($pdo, 'practice_country', $country);
+    $addressPack = AddressPackService::getNationalPackForCountry($country);
+    app_config_set($pdo, 'address_pack_id', (string)($addressPack['pack_id'] ?? ''));
+    app_config_set($pdo, 'address_pack_source', 'system');
+    app_config_set($pdo, 'address_language', (string)($addressPack['default_language'] ?? ''));
     app_config_set($pdo, 'prescribing_mode', $prescribingMode);
     app_config_set($pdo, 'clinical_lang', $clinicalLang);
     app_config_set($pdo, 'help_lang', $helpLang);
