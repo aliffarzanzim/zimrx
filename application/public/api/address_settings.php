@@ -46,37 +46,15 @@ try {
     if ($action === 'list') {
         $searchQ = trim((string)($_GET['q'] ?? $jsonInput['q'] ?? ''));
         $filterType = trim((string)($_GET['filter'] ?? $jsonInput['filter'] ?? 'all')); // 'all', 'custom', 'system', 'pinned', 'hidden'
-
-        // Preferred districts for the doctor's prescription layout
-        $preferredDistricts = [];
-        $stmtPref = $pdo_user->prepare("
-            SELECT setting_value FROM zimrx_interface_settings 
-            WHERE doctor_id = :doc AND setting_scope = 'prescription' AND setting_key = 'preferred_districts' 
-            LIMIT 1
-        ");
-        $stmtPref->execute(['doc' => $doctorId]);
-        $prefRow = $stmtPref->fetch(PDO::FETCH_ASSOC);
-        if ($prefRow && !empty($prefRow['setting_value'])) {
-            $decoded = json_decode($prefRow['setting_value'], true);
-            if (is_array($decoded)) {
-                $preferredDistricts = array_map('trim', $decoded);
-            }
-        }
-
-        // Static district catalog
-        $stmtDist = $pdo_static->query("SELECT id, name_en AS name, name_loc AS bn_name FROM zimrx_address_hierarchy WHERE place_type = 'district' ORDER BY name_en ASC");
-        $districtsRaw = $stmtDist->fetchAll(PDO::FETCH_ASSOC) ?: [];
-        $districts = [];
-        foreach ($districtsRaw as $d) {
-            $dName = trim((string)$d['name']);
-            $isSelected = empty($preferredDistricts) || in_array($dName, $preferredDistricts, true);
-            $districts[] = [
-                'id' => (int)$d['id'],
-                'name' => $dName,
-                'bn_name' => trim((string)($d['bn_name'] ?? '')),
-                'is_selected' => $isSelected,
-            ];
-        }
+        $activePack = \ZimRx\Services\AddressPackService::getConfiguredPack($pdo_static, $pdo_user);
+        $packId = is_array($activePack) ? (string)$activePack['pack_id'] : '';
+        $defaultLanguage = is_array($activePack) ? (string)$activePack['default_language'] : 'en';
+        $displayLanguage = is_array($activePack) ? (string)$activePack['display_language'] : $defaultLanguage;
+        $packSource = is_array($activePack) ? (string)$activePack['source'] : 'system';
+        $packTables = \ZimRx\Services\AddressPackService::tableNames($packSource);
+        $packPdo = $packSource === 'user' ? $pdo_user : $pdo_static;
+        $placesTable = $packTables['places'];
+        $namesTable = $packTables['names'];
 
         // Custom address entries saved by doctor
         $customItems = [];
@@ -116,24 +94,41 @@ try {
 
         // Fall back to static administrative units when searching or viewing catalog
         $systemItems = [];
-        if (($filterType === 'system' || ($filterType === 'all' && $searchQ !== '')) && count($customItems) < 100) {
+        if ($packId !== '' && ($filterType === 'system' || ($filterType === 'all' && $searchQ !== '')) && count($customItems) < 100) {
             $limitSystem = 100 - count($customItems);
             $pLike = "%{$searchQ}%";
 
             $sqlSys = "
-                SELECT place_type as entity, name_en as name, name_loc as bn_name 
-                FROM zimrx_address_hierarchy 
-                WHERE name_en LIKE :p OR name_loc LIKE :p 
-                ORDER BY level ASC 
-                LIMIT {$limitSystem}
+                SELECT h.id, h.type_key AS entity,
+                       COALESCE(display_name.name, default_name.name, '') AS name
+                FROM {$placesTable} h
+                LEFT JOIN {$namesTable} display_name
+                    ON display_name.place_id = h.id AND display_name.language = :display_language
+                LEFT JOIN {$namesTable} default_name
+                    ON default_name.place_id = h.id AND default_name.language = :default_language
+                WHERE h.pack_id = :pack_id
+                  AND EXISTS (
+                      SELECT 1 FROM {$namesTable} searchable_name
+                      WHERE searchable_name.place_id = h.id AND searchable_name.name LIKE :search_name
+                  )
+                ORDER BY h.level ASC
+                LIMIT :row_limit
             ";
-            $stmtSys = $pdo_static->prepare($sqlSys);
-            $stmtSys->execute(['p' => $pLike]);
+            $stmtSys = $packPdo->prepare($sqlSys);
+            $stmtSys->bindValue(':display_language', $displayLanguage, PDO::PARAM_STR);
+            $stmtSys->bindValue(':default_language', $defaultLanguage, PDO::PARAM_STR);
+            $stmtSys->bindValue(':pack_id', $packId, PDO::PARAM_STR);
+            $stmtSys->bindValue(':search_name', $pLike, PDO::PARAM_STR);
+            $stmtSys->bindValue(':row_limit', $limitSystem, PDO::PARAM_INT);
+            $stmtSys->execute();
             while ($sr = $stmtSys->fetch(PDO::FETCH_ASSOC)) {
                 $sName = trim((string)$sr['name']);
+                if ($sName === '') {
+                    continue;
+                }
                 $systemItems[] = [
-                    'id' => 's_' . md5($sName),
-                    'name' => $sName . (!empty($sr['bn_name']) ? " ({$sr['bn_name']})" : ""),
+                    'id' => 's_' . (int)$sr['id'],
+                    'name' => $sName,
                     'usage_count' => 0,
                     'is_pinned' => 0,
                     'is_hidden' => 0,
@@ -147,32 +142,11 @@ try {
 
         respond([
             'ok' => true,
-            'districts' => $districts,
-            'preferred_districts' => $preferredDistricts,
             'addresses' => $allAddresses,
             'total_loaded' => count($allAddresses),
             'filter' => $filterType,
             'query' => $searchQ,
         ]);
-    }
-
-    if ($action === 'save_districts') {
-        $selected = $jsonInput['districts'] ?? $_POST['districts'] ?? [];
-        if (!is_array($selected)) $selected = [];
-        $selected = array_values(array_unique(array_filter(array_map('trim', $selected))));
-
-        $jsonStr = json_encode($selected, JSON_UNESCAPED_UNICODE);
-
-        $stmtSave = $pdo_user->prepare("
-            INSERT INTO zimrx_interface_settings (doctor_id, setting_scope, setting_key, setting_value, updated_at)
-            VALUES (:doc, 'prescription', 'preferred_districts', :json, CURRENT_TIMESTAMP)
-            ON CONFLICT(doctor_id, setting_scope, setting_key) DO UPDATE SET
-                setting_value = :json,
-                updated_at = CURRENT_TIMESTAMP
-        ");
-        $stmtSave->execute(['doc' => $doctorId, 'json' => $jsonStr]);
-
-        respond(['ok' => true, 'saved_districts' => $selected]);
     }
 
     if ($action === 'add') {
@@ -255,27 +229,12 @@ try {
     }
 
     if ($action === 'reset') {
-        $pdo_user->beginTransaction();
-        try {
-            $stmtDelPref = $pdo_user->prepare("
-                DELETE FROM zimrx_interface_settings
-                WHERE doctor_id = :doc AND setting_scope = 'prescription' AND setting_key = 'preferred_districts'
-            ");
-            $stmtDelPref->execute(['doc' => $doctorId]);
-
-            $stmtResetAddr = $pdo_user->prepare("
-                UPDATE zimrx_user_address
-                SET is_pinned = 0, is_hidden = 0
-                WHERE doctor_id = :doc
-            ");
-            $stmtResetAddr->execute(['doc' => $doctorId]);
-            $pdo_user->commit();
-        } catch (Throwable $e) {
-            if ($pdo_user->inTransaction()) {
-                $pdo_user->rollBack();
-            }
-            throw $e;
-        }
+        $stmtResetAddr = $pdo_user->prepare("
+            UPDATE zimrx_user_address
+            SET is_pinned = 0, is_hidden = 0
+            WHERE doctor_id = :doc
+        ");
+        $stmtResetAddr->execute(['doc' => $doctorId]);
 
         respond(['ok' => true]);
     }

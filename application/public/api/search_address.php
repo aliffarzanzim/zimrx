@@ -21,66 +21,66 @@ try {
     $segment = isset($_GET['segment']) ? (int)$_GET['segment'] : 0;
     $prev = isset($_GET['prev']) ? trim($_GET['prev']) : '';
 
-    // Resolve practice country
-    $countryCode = 'INT';
-    $hasStaticPlaces = false;
-    try {
-        $stC = $pdo_user->query("SELECT config_value FROM zimrx_app_config WHERE config_key = 'practice_country' LIMIT 1");
-        $valC = $stC ? $stC->fetchColumn() : null;
-        if ($valC) {
-            $candidateCountry = strtoupper(trim((string)$valC));
-            // Check if static places exist for selected country
-            $stCheck = $pdo_static->prepare("SELECT 1 FROM zimrx_address_hierarchy WHERE country = :c LIMIT 1");
-            $stCheck->execute(['c' => $candidateCountry]);
-            if ($stCheck->fetch()) {
-                $countryCode = $candidateCountry;
-                $hasStaticPlaces = true;
-            } else {
-                $countryCode = $candidateCountry;
-                $hasStaticPlaces = false;
-            }
-        }
-    } catch (Throwable) {}
-
-    // Resolve clinical / local language preference
-    $reqLang = strtolower(trim((string)($_GET['lang'] ?? '')));
-    if ($reqLang === '') {
-        try {
-            $stL = $pdo_user->query("SELECT config_value FROM zimrx_app_config WHERE config_key = 'clinical_lang' LIMIT 1");
-            $valL = $stL ? $stL->fetchColumn() : null;
-            if ($valL) {
-                $reqLang = strtolower(trim((string)$valL));
-            }
-        } catch (Throwable) {}
-    }
-    $isBengaliTyped = (bool)preg_match('/[\x{0980}-\x{09FF}]/u', $query . $prev);
-    $preferLocal = ($reqLang === 'bn') || $isBengaliTyped;
+    $activePack = \ZimRx\Services\AddressPackService::getConfiguredPack($pdo_static, $pdo_user);
+    $packId = is_array($activePack) ? (string)$activePack['pack_id'] : '';
+    $packSource = is_array($activePack) ? (string)$activePack['source'] : 'system';
+    $packTables = \ZimRx\Services\AddressPackService::tableNames($packSource);
+    $packPdo = $packSource === 'user' ? $pdo_user : $pdo_static;
+    $placesTable = $packTables['places'];
+    $namesTable = $packTables['names'];
+    $hasPackPlaces = $packId !== '';
+    $defaultLanguage = is_array($activePack) ? (string)$activePack['default_language'] : 'en';
+    $displayLanguage = is_array($activePack) ? (string)$activePack['display_language'] : $defaultLanguage;
 
     $all_suggestions = [];
 
     // Contextual suggestions based on preceding address segments
-    if ($hasStaticPlaces && $prev !== '') {
-        $stmtContext = $pdo_static->prepare("
-            SELECT 
-                p.name_en AS parent_en, p.name_loc AS parent_loc, p.place_type AS parent_type,
-                gp.name_en AS gp_en, gp.name_loc AS gp_loc, gp.place_type AS gp_type
-            FROM zimrx_address_hierarchy c
-            LEFT JOIN zimrx_address_hierarchy p ON c.parent_id = p.id
-            LEFT JOIN zimrx_address_hierarchy gp ON p.parent_id = gp.id
-            WHERE c.country = :country AND (c.name_en = :p OR c.name_loc = :p OR c.postcode = :p)
+    if ($hasPackPlaces && $prev !== '') {
+        $stmtContext = $packPdo->prepare("
+            SELECT
+                COALESCE(parent_name.name, parent_default.name, '') AS parent_name,
+                p.type_key AS parent_type,
+                COALESCE(grandparent_name.name, grandparent_default.name, '') AS grandparent_name,
+                gp.type_key AS grandparent_type
+            FROM {$placesTable} c
+            LEFT JOIN {$placesTable} p ON c.parent_id = p.id AND p.pack_id = :parent_pack
+            LEFT JOIN {$namesTable} parent_name
+                ON parent_name.place_id = p.id AND parent_name.language = :parent_language
+            LEFT JOIN {$namesTable} parent_default
+                ON parent_default.place_id = p.id AND parent_default.language = :parent_default_language
+            LEFT JOIN {$placesTable} gp ON p.parent_id = gp.id AND gp.pack_id = :grandparent_pack
+            LEFT JOIN {$namesTable} grandparent_name
+                ON grandparent_name.place_id = gp.id AND grandparent_name.language = :grandparent_language
+            LEFT JOIN {$namesTable} grandparent_default
+                ON grandparent_default.place_id = gp.id AND grandparent_default.language = :grandparent_default_language
+            WHERE c.pack_id = :current_pack
+              AND (EXISTS (
+                    SELECT 1 FROM {$namesTable} current_name
+                    WHERE current_name.place_id = c.id AND current_name.name = :previous_name
+                ) OR c.code = :previous_code)
         ");
-        $stmtContext->execute(['country' => $countryCode, 'p' => $prev]);
+        $stmtContext->execute([
+            'parent_pack' => $packId,
+            'parent_language' => $displayLanguage,
+            'parent_default_language' => $defaultLanguage,
+            'grandparent_pack' => $packId,
+            'grandparent_language' => $displayLanguage,
+            'grandparent_default_language' => $defaultLanguage,
+            'current_pack' => $packId,
+            'previous_name' => $prev,
+            'previous_code' => $prev,
+        ]);
         while ($r = $stmtContext->fetch(PDO::FETCH_ASSOC)) {
-            if (!empty($r['parent_en'])) {
-                $pName = ($preferLocal && !empty($r['parent_loc'])) ? $r['parent_loc'] : $r['parent_en'];
+            if (!empty($r['parent_name'])) {
+                $pName = (string)$r['parent_name'];
                 if (!isset($all_suggestions[$pName])) {
                     $all_suggestions[$pName] = ['type' => $r['parent_type'], 'score' => 1000];
                 }
             }
-            if (!empty($r['gp_en'])) {
-                $gpName = ($preferLocal && !empty($r['gp_loc'])) ? $r['gp_loc'] : $r['gp_en'];
+            if (!empty($r['grandparent_name'])) {
+                $gpName = (string)$r['grandparent_name'];
                 if (!isset($all_suggestions[$gpName])) {
-                    $all_suggestions[$gpName] = ['type' => $r['gp_type'], 'score' => 900];
+                    $all_suggestions[$gpName] = ['type' => $r['grandparent_type'], 'score' => 900];
                 }
             }
         }
@@ -104,90 +104,88 @@ try {
         }
     }
 
-    // Load doctor's preferred districts filter if set
-    $preferredDistricts = [];
-    $stmtPref = $pdo_user->prepare("
-        SELECT setting_value FROM zimrx_interface_settings 
-        WHERE doctor_id = :doc AND setting_scope = 'prescription' AND setting_key = 'preferred_districts'
-        LIMIT 1
-    ");
-    $stmtPref->execute(['doc' => $doctorId]);
-    $prefRow = $stmtPref->fetch(PDO::FETCH_ASSOC);
-    if ($prefRow && !empty($prefRow['setting_value'])) {
-        $decoded = json_decode($prefRow['setting_value'], true);
-        if (is_array($decoded) && !empty($decoded)) {
-            $preferredDistricts = array_values(array_unique(array_filter(array_map('trim', $decoded))));
-        }
-    }
-
-    // Build district SQL filter clause for unified places table
-    $distFilterSql = "";
-    if (!empty($preferredDistricts)) {
-        $quotedDistList = implode("','", array_map(fn($d) => str_replace("'", "''", $d), $preferredDistricts));
-        $distFilterSql = "AND (
-            (place_type = 'district' AND name_en IN ('{$quotedDistList}'))
-            OR parent_id IN (SELECT id FROM zimrx_address_hierarchy WHERE country = :country AND place_type = 'district' AND name_en IN ('{$quotedDistList}'))
-            OR parent_id IN (
-                SELECT id FROM zimrx_address_hierarchy WHERE parent_id IN (
-                    SELECT id FROM zimrx_address_hierarchy WHERE country = :country AND place_type = 'district' AND name_en IN ('{$quotedDistList}')
-                )
-            )
-        )";
-    }
-
-    // Text search matching prefix and substring
-    if ($hasStaticPlaces && strlen($query) >= 1) {
+    if (strlen($query) >= 1) {
         $pLike = "{$query}%";
         $cLike = "%{$query}%";
 
-        // Prefix query across all places in country
-        $sqlPrefix = "
-            SELECT place_type, name_en, name_loc, postcode, level
-            FROM zimrx_address_hierarchy
-            WHERE country = :country
-              AND (name_en LIKE :p OR name_loc LIKE :p OR postcode LIKE :p)
-              {$distFilterSql}
-            ORDER BY level ASC
-            LIMIT 35
-        ";
-        $stmt = $pdo_static->prepare($sqlPrefix);
-        $stmt->execute(['country' => $countryCode, 'p' => $pLike]);
-        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $name = ($preferLocal && !empty($r['name_loc'])) ? $r['name_loc'] : $r['name_en'];
-            if (!isset($all_suggestions[$name])) {
-                $all_suggestions[$name] = ['type' => $r['place_type'], 'score' => 0];
-            }
-        }
-
-        // Substring match for queries with 2 or more characters
-        if (mb_strlen($query) >= 2) {
-            $sqlContains = "
-                SELECT place_type, name_en, name_loc, postcode, level
-                FROM zimrx_address_hierarchy
-                WHERE country = :country
-                  AND (name_en LIKE :c OR name_loc LIKE :c OR postcode LIKE :c)
-                  AND name_en NOT LIKE :p AND (name_loc IS NULL OR name_loc NOT LIKE :p)
-                  {$distFilterSql}
-                ORDER BY level ASC
-                LIMIT 20
+        if ($hasPackPlaces) {
+            $sqlPrefix = "
+                SELECT h.type_key, COALESCE(display_name.name, default_name.name, '') AS name, h.level
+                FROM {$placesTable} h
+                LEFT JOIN {$namesTable} display_name
+                    ON display_name.place_id = h.id AND display_name.language = :prefix_language
+                LEFT JOIN {$namesTable} default_name
+                    ON default_name.place_id = h.id AND default_name.language = :prefix_default_language
+                WHERE h.pack_id = :prefix_pack
+                  AND (EXISTS (
+                        SELECT 1 FROM {$namesTable} searchable_name
+                        WHERE searchable_name.place_id = h.id AND searchable_name.name LIKE :prefix_name
+                    ) OR h.code LIKE :prefix_code)
+                ORDER BY h.level ASC
+                LIMIT 35
             ";
-            $stmtContains = $pdo_static->prepare($sqlContains);
-            $stmtContains->execute(['country' => $countryCode, 'c' => $cLike, 'p' => $pLike]);
-            while ($r = $stmtContains->fetch(PDO::FETCH_ASSOC)) {
-                $name = ($preferLocal && !empty($r['name_loc'])) ? $r['name_loc'] : $r['name_en'];
-                if (!isset($all_suggestions[$name])) {
-                    $all_suggestions[$name] = ['type' => $r['place_type'], 'score' => 0];
+            $prefixParams = [
+                'prefix_language' => $displayLanguage,
+                'prefix_default_language' => $defaultLanguage,
+                'prefix_pack' => $packId,
+                'prefix_name' => $pLike,
+                'prefix_code' => $pLike,
+            ];
+            $stmt = $packPdo->prepare($sqlPrefix);
+            $stmt->execute($prefixParams);
+            while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $name = trim((string)$r['name']);
+                if ($name !== '' && !isset($all_suggestions[$name])) {
+                    $all_suggestions[$name] = ['type' => $r['type_key'], 'score' => 0];
+                }
+            }
+
+            if (mb_strlen($query) >= 2) {
+                $sqlContains = "
+                    SELECT h.type_key, COALESCE(display_name.name, default_name.name, '') AS name, h.level
+                    FROM {$placesTable} h
+                    LEFT JOIN {$namesTable} display_name
+                        ON display_name.place_id = h.id AND display_name.language = :contains_language
+                    LEFT JOIN {$namesTable} default_name
+                        ON default_name.place_id = h.id AND default_name.language = :contains_default_language
+                    WHERE h.pack_id = :contains_pack
+                      AND (EXISTS (
+                            SELECT 1 FROM {$namesTable} searchable_name
+                            WHERE searchable_name.place_id = h.id AND searchable_name.name LIKE :contains_name
+                        ) OR h.code LIKE :contains_code)
+                      AND NOT EXISTS (
+                            SELECT 1 FROM {$namesTable} prefix_name
+                            WHERE prefix_name.place_id = h.id AND prefix_name.name LIKE :contains_prefix
+                        )
+                      AND (h.code IS NULL OR h.code NOT LIKE :contains_code_prefix)
+                    ORDER BY h.level ASC
+                    LIMIT 20
+                ";
+                $containsParams = [
+                    'contains_language' => $displayLanguage,
+                    'contains_default_language' => $defaultLanguage,
+                    'contains_pack' => $packId,
+                    'contains_name' => $cLike,
+                    'contains_code' => $cLike,
+                    'contains_prefix' => $pLike,
+                    'contains_code_prefix' => $pLike,
+                ];
+                $stmtContains = $packPdo->prepare($sqlContains);
+                $stmtContains->execute($containsParams);
+                while ($r = $stmtContains->fetch(PDO::FETCH_ASSOC)) {
+                    $name = trim((string)$r['name']);
+                    if ($name !== '' && !isset($all_suggestions[$name])) {
+                        $all_suggestions[$name] = ['type' => $r['type_key'], 'score' => 0];
+                    }
                 }
             }
         }
 
-        // Search custom user address database (userdata)
-        $doctor_id = $doctorId;
         $sql_user = "
             SELECT * FROM (
                 SELECT 'custom' as type, name, usage_count, is_pinned 
                 FROM zimrx_user_address 
-                WHERE doctor_id = :doc AND is_hidden = 0 AND name LIKE :p
+                WHERE doctor_id = :prefix_doc AND is_hidden = 0 AND name LIKE :user_prefix
                 ORDER BY is_pinned DESC, usage_count DESC 
                 LIMIT 20
             )
@@ -195,13 +193,19 @@ try {
             SELECT * FROM (
                 SELECT 'custom' as type, name, usage_count, is_pinned 
                 FROM zimrx_user_address 
-                WHERE doctor_id = :doc AND is_hidden = 0 AND name LIKE :c AND name NOT LIKE :p
+                WHERE doctor_id = :contains_doc AND is_hidden = 0 AND name LIKE :user_contains AND name NOT LIKE :user_prefix_exclude
                 ORDER BY is_pinned DESC, usage_count DESC 
                 LIMIT 10
             )
         ";
         $stmt_user = $pdo_user->prepare($sql_user);
-        $stmt_user->execute(['doc' => $doctor_id, 'p' => $pLike, 'c' => $cLike]);
+        $stmt_user->execute([
+            'prefix_doc' => $doctorId,
+            'user_prefix' => $pLike,
+            'contains_doc' => $doctorId,
+            'user_contains' => $cLike,
+            'user_prefix_exclude' => $pLike,
+        ]);
         while ($r = $stmt_user->fetch(PDO::FETCH_ASSOC)) {
             $name = $r['name'];
             if (!isset($all_suggestions[$name])) {

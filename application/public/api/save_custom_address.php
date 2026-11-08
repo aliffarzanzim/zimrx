@@ -34,6 +34,13 @@ if (!$full_address) { echo json_encode(['status' => 'empty']); exit; }
 try {
     $pdo_user = DbConnections::userdata();
     $pdo_static = DbConnections::staticDb();
+    $activePack = \ZimRx\Services\AddressPackService::getConfiguredPack($pdo_static, $pdo_user);
+    $packId = is_array($activePack) ? (string)$activePack['pack_id'] : '';
+    $packSource = is_array($activePack) ? (string)$activePack['source'] : 'system';
+    $packTables = \ZimRx\Services\AddressPackService::tableNames($packSource);
+    $packPdo = $packSource === 'user' ? $pdo_user : $pdo_static;
+    $placesTable = $packTables['places'];
+    $namesTable = $packTables['names'];
     $doctor_id = current_user_doctor_id();
     if ($doctor_id <= 0) {
         http_response_code(403);
@@ -66,14 +73,22 @@ try {
             updated_at = CURRENT_TIMESTAMP
     ");
 
-    $stmt_check = $pdo_static->prepare("
-        SELECT 1 FROM zimrx_address_hierarchy WHERE name_en = :p OR name_loc = :p LIMIT 1
-    ");
+    $stmt_check = $packId !== '' ? $packPdo->prepare("
+        SELECT 1
+        FROM {$placesTable} h
+        INNER JOIN {$namesTable} n ON n.place_id = h.id
+        WHERE h.pack_id = :pack_id AND n.name = :name
+        LIMIT 1
+    ") : null;
 
     // Save individual parts not found in the static address database
     foreach ($clean_parts as $part) {
-        $stmt_check->execute(['p' => $part]);
-        if (!$stmt_check->fetch()) {
+        $isInPack = false;
+        if ($stmt_check !== null) {
+            $stmt_check->execute(['pack_id' => $packId, 'name' => $part]);
+            $isInPack = (bool)$stmt_check->fetchColumn();
+        }
+        if (!$isInPack) {
             $stmt_upsert->execute(['doctor_id' => $doctor_id, 'name' => $part]);
             $inserted++;
         }
