@@ -1,6 +1,4 @@
 {
-  "page": {},
-  "tabs": {},
   "occupation": {
     "ui": {
       "placeholder_input": "নতুন পেশা (New Occupation) লিখুন...",
@@ -27,14 +25,9 @@
     }
   },
   "address": {
+    "description": "ঠিকানা খোঁজার সেটিংস ও সংরক্ষিত ঠিকানা পরিচালনা করুন।",
     "ui": {
-      "section_districts_title": "প্র্যাক্টিস জেলা ফিল্টার (Practice Districts Filter)",
-      "btn_dist_all": "All (সমগ্র বাংলাদেশ)",
-      "btn_dist_save": "Save Districts",
-      "btn_dist_saved": "Saved",
-      "district_search_placeholder": "জেলা সার্চ করুন (Search District)...",
-      "districts_loading": "Loading districts...",
-      "section_addr_title": "ঠিকানা ডিরেক্টরি ও ম্যানেজমেন্ট (Address Directory - Top 100)",
+      "section_addr_title": "ঠিকানা ডিরেক্টরি",
       "btn_reset_addr": "Reset to Default",
       "addr_search_placeholder": "ঠিকানা সার্চ করুন (Search locality, thana, upazila, district)...",
       "tab_all": "All (Top 100)",
@@ -49,7 +42,7 @@
       "th_usage": "Usage",
       "addr_loading": "Loading addresses...",
       "addr_empty": "No addresses found.",
-      "confirm_reset_addr": "Reset all address customizations and district preferences to default?",
+      "confirm_reset_addr": "Reset address customizations to default?",
       "prompt_edit_addr": "Edit address name:"
     }
   }

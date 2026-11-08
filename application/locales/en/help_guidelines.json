@@ -99,7 +99,7 @@
       },
       {
         "icon": "3",
-        "text": "Dropdown suggestions are ranked by usage frequency. Manage pinned, hidden, and custom suggestions in Settings under Address and Occupation Directories."
+        "text": "Dropdown suggestions are ranked by usage frequency. Manage pinned, hidden, and custom suggestions in Settings under Occupation Settings."
       }
     ]
   },
@@ -122,7 +122,7 @@
       },
       {
         "icon": "4",
-        "text": "<strong>Practice Region Filtering:</strong> Select preferred districts and manage custom addresses in Settings under Address and Occupation Directories."
+        "text": "<strong>Custom Addresses:</strong> Add, edit, pin, and manage address suggestions in Settings under Address Settings."
       }
     ]
   },

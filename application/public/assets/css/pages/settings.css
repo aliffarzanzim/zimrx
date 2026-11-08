@@ -97,52 +97,6 @@
     gap: 1rem;
 }
 
-.zrx-settings-back-link {
-    display: inline-flex;
-    align-items: center;
-    width: fit-content;
-    min-height: 2.25rem;
-    padding: var(--zrx-space-1) var(--zrx-space-2);
-    border: 1px solid var(--zrx-border-subtle);
-    border-radius: 0.4rem;
-    background: var(--zrx-bg-card);
-    color: var(--zrx-primary);
-    text-decoration: none;
-}
-
-.zrx-settings-back-link:hover,
-.zrx-settings-back-link:focus-visible {
-    border-color: var(--zrx-primary-border);
-    background: var(--zrx-primary-light);
-}
-
-.zrx-settings-back-link:focus-visible {
-    outline: 2px solid var(--zrx-primary);
-    outline-offset: 2px;
-}
-
-.zrx-directory-tabs {
-    display: flex;
-    gap: 0.5rem;
-    border-bottom: 1px solid var(--zrx-border);
-}
-
-.zrx-directory-tabs button {
-    padding: 0.6rem 0.9rem;
-    border: 1px solid transparent;
-    border-bottom: 2px solid transparent;
-    background: transparent;
-    color: var(--zrx-text-muted);
-    font: inherit;
-    cursor: pointer;
-}
-
-.zrx-directory-tabs button.active {
-    border-bottom-color: var(--zrx-primary);
-    color: var(--zrx-primary);
-    font-weight: 600;
-}
-
 .zrx-directory-settings-root,
 .zrx-directory-panel {
     min-width: 0;
@@ -184,7 +138,6 @@
 }
 
 .zrx-directory-panel .zrx-occ-add-form input,
-.zrx-directory-panel .zrx-district-search-bar input,
 .zrx-directory-panel .zrx-addr-search-wrap input {
     min-width: 0;
     flex: 1;

@@ -55,7 +55,7 @@ if (isset($pdo) && $pdo instanceof PDO && is_logged_in() && DbSchema::tableExist
 }
 
 $setup_menu_pages = [
-    'settings.php', 'header_menu_settings.php', 'directory_settings.php', 'patient_particulars_settings.php', 'visit_form_settings.php', 'history_settings.php', 'physical_examination_settings.php', 'presenting_complaint_settings.php', 'profile_settings.php', 'interface_settings.php', 'page_setup.php', 'print_setup.php',
+    'settings.php', 'header_menu_settings.php', 'address_settings.php', 'geo_studio.php', 'occupation_settings.php', 'patient_particulars_settings.php', 'visit_form_settings.php', 'history_settings.php', 'physical_examination_settings.php', 'presenting_complaint_settings.php', 'profile_settings.php', 'interface_settings.php', 'page_setup.php', 'print_setup.php',
     'header_footer_background_setup.php', 'appointment_settings.php', 'emr_settings.php', 'doctor_assistants.php',
     'instruction_template.php', 'dose_template.php', 'duration_template.php', 'advice_template.php', 'manufacturer_preferences.php',
 ];

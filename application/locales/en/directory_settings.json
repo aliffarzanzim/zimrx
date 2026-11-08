@@ -1,14 +1,4 @@
 {
-  "page": {
-    "back": "Back to Settings",
-    "title": "Address and Occupation Directories",
-    "intro": "Manage the suggestions used in patient particulars. Guide popups contain instructions only.",
-    "load_error": "Directory settings could not be loaded."
-  },
-  "tabs": {
-    "occupation": "Occupation",
-    "address": "Address"
-  },
   "occupation": {
     "title": "Occupation Directory",
     "description": "Manage the occupation suggestions available in patient particulars.",
@@ -38,15 +28,9 @@
   },
   "address": {
     "title": "Address Directory",
-    "description": "Choose preferred districts and manage custom address suggestions.",
+    "description": "Configure address search and manage saved suggestions.",
     "ui": {
-      "section_districts_title": "Practice Districts Filter",
-      "btn_dist_all": "All Districts",
-      "btn_dist_save": "Save Districts",
-      "btn_dist_saved": "Saved",
-      "district_search_placeholder": "Search District...",
-      "districts_loading": "Loading districts...",
-      "section_addr_title": "Address Directory & Management (Top 100)",
+      "section_addr_title": "Address Directory",
       "btn_reset_addr": "Reset to Default",
       "addr_search_placeholder": "Search locality, thana, upazila, district...",
       "tab_all": "All (Top 100)",
@@ -61,7 +45,7 @@
       "th_usage": "Usage",
       "addr_loading": "Loading addresses...",
       "addr_empty": "No addresses found.",
-      "confirm_reset_addr": "Reset all address customizations and district preferences to default?",
+      "confirm_reset_addr": "Reset address customizations to default?",
       "prompt_edit_addr": "Edit address name:"
     }
   }

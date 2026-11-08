@@ -50,7 +50,8 @@ include __DIR__ . '/header.php';
                 <a class="zrx-settings-link" href="history_settings.php"><span>History Catalog</span><small>Manage available medical and family history entries.</small></a>
                 <a class="zrx-settings-link" href="physical_examination_settings.php"><span>Physical Examination Catalog</span><small>Manage examination findings and sections.</small></a>
                 <a class="zrx-settings-link" href="presenting_complaint_settings.php"><span>Presenting Complaint Catalog</span><small>Manage complaint suggestions and ordering.</small></a>
-                <a class="zrx-settings-link" href="directory_settings.php"><span>Address and Occupation Directories</span><small>Manage address and occupation suggestions.</small></a>
+                <a class="zrx-settings-link" href="address_settings.php"><span>Address Settings</span><small>Manage custom address suggestions.</small></a>
+                <a class="zrx-settings-link" href="occupation_settings.php"><span>Occupation Settings</span><small>Manage occupation suggestions in patient particulars.</small></a>
                 <a class="zrx-settings-link" href="instruction_template.php"><span>Instruction Presets</span><small>Manage saved medication instructions.</small></a>
                 <a class="zrx-settings-link" href="dose_template.php"><span>Dose Presets</span><small>Manage reusable medication doses.</small></a>
                 <a class="zrx-settings-link" href="duration_template.php"><span>Duration Presets</span><small>Manage reusable treatment durations.</small></a>
