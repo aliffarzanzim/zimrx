@@ -1,0 +1,28 @@
+@media (max-width: 1100px) {
+    .geo-appbar { height: auto; min-height: 50px; flex-wrap: wrap; padding: 10px 12px; gap: 8px; }
+    .geo-actions { flex-wrap: wrap; }
+    .geo-tree-pane { width: 36%; }
+    .geo-tree-search { flex-wrap: wrap; }
+    .geo-input-search { flex-basis: 100%; }
+}
+
+@media (max-width: 680px) {
+    .geo-workspace { flex-direction: column; overflow-y: auto; }
+    .geo-tree-pane { width: 100%; height: 260px; }
+    .geo-editor-pane { flex: none; min-height: 360px; }
+    .geo-form-grid { grid-template-columns: minmax(0, 1fr); }
+    .geo-form-group.full { grid-column: 1; }
+    .geo-modal-card { max-width: calc(100vw - 24px); max-height: calc(100dvh - 24px); }
+    .geo-modal-header { padding: 0 12px; }
+    .geo-modal-body { padding: 12px; }
+    .geo-modal-footer { flex-wrap: wrap; }
+    .geo-field-header-row { gap: 8px; flex-wrap: wrap; }
+    .subplaces-table-wrapper { overflow-x: auto; }
+    .subplaces-table { min-width: 520px; }
+    .geo-actions { width: 100%; }
+    .depth-types-box { overflow-x: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: 0s; animation-duration: 0s; }
+}

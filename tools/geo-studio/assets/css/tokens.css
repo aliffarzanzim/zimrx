@@ -1,0 +1,73 @@
+:root {
+    --zrx-primary: #2563eb;
+    --zrx-primary-hover: #1d4ed8;
+    --zrx-primary-light: #eff6ff;
+    --zrx-primary-border: #bfdbfe;
+    --zrx-bg-app: #f1f5f9;
+    --zrx-bg-card: #ffffff;
+    --zrx-border: #b8c5d6;
+    --zrx-border-subtle: #cbd5e1;
+    --zrx-header-bg: #cbd5e1;
+    --zrx-header-border: #94a3b8;
+    --zrx-text-dark: #0f172a;
+    --zrx-text-body: #334155;
+    --zrx-text-muted: #64748b;
+    --zrx-text-inverse: #ffffff;
+    --zrx-radius: 6px;
+    --zrx-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --zrx-tree-hover: #e2e8f0;
+    --zrx-tree-active: #868e96;
+
+    /* Global ZimRx Dropdown Design Tokens */
+    --zrx-dropdown-bg: #ffffff;
+    --zrx-dropdown-border: #cbd5e1;
+    --zrx-dropdown-hover-bg: #868e96;
+    --zrx-dropdown-border-item: #cbd5e1;
+
+    /* Universal Page Container & Layout Margins */
+    --zrx-page-max-width: 1680px;
+    --zrx-page-width: calc(100% - 2.5rem);
+    --zrx-page-margin: 1.25rem auto;
+    --geo-contributor-setup-max-width: 1200px;
+    --zrx-surface-muted: #f8fafc;
+    --zrx-shadow-soft-color: rgba(0,0,0,0.04);
+    --zrx-danger-light: #fee2e2;
+    --zrx-danger: #dc2626;
+    --zrx-red-500: #ef4444;
+    --zrx-selected-badge-bg: rgba(0,0,0,0.2);
+    --zrx-selected-chip-bg: rgba(255,255,255,0.25);
+    --zrx-slate-600: #475569;
+    --zrx-blue-100: #dbeafe;
+    --zrx-blue-800: #1e40af;
+    --zrx-cyan-100: #cffafe;
+    --zrx-cyan-800: #155e75;
+    --zrx-cyan-200: #a5f3fc;
+    --zrx-violet-100: #ede9fe;
+    --zrx-violet-800: #5b21b6;
+    --zrx-violet-200: #ddd6fe;
+    --zrx-indigo-100: #e0e7ff;
+    --zrx-indigo-800: #3730a3;
+    --zrx-indigo-200: #c7d2fe;
+    --zrx-teal-100: #ccfbf1;
+    --zrx-teal-800: #115e59;
+    --zrx-teal-200: #99f6e4;
+    --zrx-amber-100: #fef3c7;
+    --zrx-amber-800: #92400e;
+    --zrx-amber-200: #fde68a;
+    --zrx-purple-100: #f3e8ff;
+    --zrx-purple-800: #6b21a8;
+    --zrx-purple-200: #e9d5ff;
+    --zrx-hover-wash: rgba(0,0,0,0.03);
+    --zrx-danger-border: #fca5a5;
+    --zrx-hover-overlay: rgba(0,0,0,0.08);
+    --zrx-modal-overlay: rgba(15, 23, 42, 0.65);
+    --zrx-nested-modal-overlay: rgba(15, 23, 42, 0.28);
+    --zrx-modal-shadow-color: rgba(0,0,0,0.25);
+    --zrx-slate-800: #1e293b;
+    --zrx-shadow-color: rgba(0, 0, 0, 0.15);
+    --zrx-shadow-medium-color: rgba(0,0,0,0.14);
+    --zrx-success: #16a34a;
+    --zrx-success-hover: #15803d;
+    --zrx-primary-alpha-20: rgba(37, 99, 235, 0.2);
+    --zrx-primary-alpha-16: rgba(37, 99, 235, 0.16);
+}

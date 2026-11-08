@@ -1,0 +1,243 @@
+/* Left Pane: Tree & Search */
+.geo-tree-pane {
+    width: 440px;
+    flex-shrink: 0;
+}
+
+.geo-tree-search {
+    padding: 8px;
+    background: var(--zrx-surface-muted);
+    border-bottom: 1px solid var(--zrx-border-subtle);
+    display: flex;
+    gap: 6px;
+}
+
+.geo-input-search {
+    flex: 1;
+    height: 28px;
+    padding: 0 8px;
+    font-size: 12px;
+    border: 1px solid var(--zrx-border);
+    border-radius: 4px;
+    outline: none;
+}
+
+.geo-input-search:focus {
+    border-color: var(--zrx-primary);
+}
+
+.geo-tree-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px 0;
+    background: var(--zrx-bg-card);
+}
+
+.tree-row {
+    height: 26px;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    padding: 3px 8px;
+    cursor: pointer;
+    user-select: none;
+    gap: 4px;
+    font-size: 12px;
+    line-height: 1.4;
+    border-left: 3px solid transparent;
+}
+
+.tree-row.depth-0 { padding-left: 22px; }
+.tree-row.depth-1 { padding-left: 36px; }
+.tree-row.depth-2 { padding-left: 50px; }
+.tree-row.depth-3 { padding-left: 64px; }
+.tree-row.depth-4 { padding-left: 78px; }
+.tree-row.depth-5 { padding-left: 92px; }
+.tree-row.depth-6 { padding-left: 106px; }
+.tree-row.depth-7 { padding-left: 120px; }
+.tree-row.depth-8 { padding-left: 134px; }
+.tree-row.depth-9 { padding-left: 148px; }
+.tree-row.depth-10 { padding-left: 162px; }
+.tree-row.depth-11 { padding-left: 176px; }
+.tree-row.depth-12 { padding-left: 190px; }
+.tree-row.depth-13 { padding-left: 204px; }
+.tree-row.depth-14 { padding-left: 218px; }
+.tree-row.depth-15 { padding-left: 232px; }
+.tree-row.depth-16 { padding-left: 246px; }
+.tree-row.depth-17 { padding-left: 260px; }
+.tree-row.depth-18 { padding-left: 274px; }
+.tree-row.depth-19 { padding-left: 288px; }
+.tree-row.depth-20 { padding-left: 302px; }
+.tree-row.depth-21 { padding-left: 316px; }
+.tree-row.depth-22 { padding-left: 330px; }
+.tree-row.depth-23 { padding-left: 344px; }
+.tree-row.depth-24 { padding-left: 358px; }
+.tree-row.depth-25 { padding-left: 372px; }
+.tree-row.depth-26 { padding-left: 386px; }
+.tree-row.depth-27 { padding-left: 400px; }
+.tree-row.depth-28 { padding-left: 414px; }
+.tree-row.depth-29 { padding-left: 428px; }
+.tree-row.depth-30 { padding-left: 442px; }
+.tree-row.depth-31 { padding-left: 456px; }
+.tree-row.depth-32 { padding-left: 470px; }
+.tree-row.depth-33 { padding-left: 484px; }
+.tree-row.depth-34 { padding-left: 498px; }
+.tree-row.depth-35 { padding-left: 512px; }
+.tree-row.depth-36 { padding-left: 526px; }
+.tree-row.depth-37 { padding-left: 540px; }
+.tree-row.depth-38 { padding-left: 554px; }
+.tree-row.depth-39 { padding-left: 568px; }
+.tree-row.depth-40 { padding-left: 582px; }
+.tree-row.depth-41 { padding-left: 596px; }
+.tree-row.depth-42 { padding-left: 610px; }
+.tree-row.depth-43 { padding-left: 624px; }
+.tree-row.depth-44 { padding-left: 638px; }
+.tree-row.depth-45 { padding-left: 652px; }
+.tree-row.depth-46 { padding-left: 666px; }
+.tree-row.depth-47 { padding-left: 680px; }
+.tree-row.depth-48 { padding-left: 694px; }
+.tree-row.depth-49 { padding-left: 708px; }
+.tree-row.depth-50 { padding-left: 722px; }
+.tree-row.depth-51 { padding-left: 736px; }
+.tree-row.depth-52 { padding-left: 750px; }
+.tree-row.depth-53 { padding-left: 764px; }
+.tree-row.depth-54 { padding-left: 778px; }
+.tree-row.depth-55 { padding-left: 792px; }
+.tree-row.depth-56 { padding-left: 806px; }
+.tree-row.depth-57 { padding-left: 820px; }
+.tree-row.depth-58 { padding-left: 834px; }
+.tree-row.depth-59 { padding-left: 848px; }
+.tree-row.depth-60 { padding-left: 862px; }
+.tree-row.depth-61 { padding-left: 876px; }
+.tree-row.depth-62 { padding-left: 890px; }
+.tree-row.depth-63 { padding-left: 904px; }
+
+.tree-pack-root-row {
+    padding-left: 8px;
+    background: var(--zrx-surface-muted);
+    color: var(--zrx-text-dark);
+    cursor: pointer;
+}
+
+.tree-pack-root-row:hover {
+    background: var(--zrx-surface-muted);
+}
+
+.tree-pack-root-row .tree-title {
+    font-weight: 700;
+}
+
+.type-badge.pack-root {
+    background: var(--zrx-header-bg);
+    color: var(--zrx-text-dark);
+    border-color: var(--zrx-header-border);
+}
+
+.geo-virtual-spacer { position: relative; }
+.geo-virtual-window { position: absolute; top: 0; left: 0; width: 100%; }
+.geo-breadcrumb-link { cursor: pointer; }
+
+.tree-row:hover {
+    background-color: var(--zrx-tree-hover);
+}
+
+.tree-row.selected {
+    background-color: var(--zrx-tree-active);
+    color: var(--zrx-text-inverse);
+    border-left-color: var(--zrx-primary);
+}
+
+.tree-row.selected .tree-caret {
+    color: var(--zrx-text-inverse);
+}
+
+.tree-row.selected .tree-caret svg {
+    color: var(--zrx-text-inverse);
+    stroke: var(--zrx-text-inverse);
+}
+
+.tree-row.selected .tree-bullet {
+    background: var(--zrx-bg-card);
+}
+
+.tree-row.selected .type-badge {
+    border-color: var(--zrx-text-inverse);
+    color: var(--zrx-text-inverse);
+    background: var(--zrx-selected-badge-bg);
+}
+
+.tree-row.selected .code-badge {
+    background: var(--zrx-selected-chip-bg);
+    color: var(--zrx-text-inverse);
+}
+
+.tree-row.selected .tree-loc {
+    color: var(--zrx-tree-hover);
+}
+
+.tree-row.selected .tree-child-count {
+    background: var(--zrx-selected-chip-bg);
+    color: var(--zrx-text-inverse);
+}
+
+.tree-caret {
+    width: 14px;
+    height: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--zrx-text-muted);
+    cursor: pointer;
+}
+
+.type-badge {
+    font-size: 9px;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 1px 4px;
+    border-radius: 3px;
+    border: 1px solid var(--zrx-dropdown-border-item);
+    background: var(--zrx-bg-app);
+    color: var(--zrx-slate-600);
+}
+
+.type-badge.division, .type-badge.state, .type-badge.province { background: var(--zrx-blue-100); color: var(--zrx-blue-800); border-color: var(--zrx-primary-border); }
+.type-badge.district, .type-badge.county, .type-badge.canton { background: var(--zrx-cyan-100); color: var(--zrx-cyan-800); border-color: var(--zrx-cyan-200); }
+.type-badge.city, .type-badge.municipality, .type-badge.borough { background: var(--zrx-violet-100); color: var(--zrx-violet-800); border-color: var(--zrx-violet-200); }
+.type-badge.upazila, .type-badge.thana { background: var(--zrx-indigo-100); color: var(--zrx-indigo-800); border-color: var(--zrx-indigo-200); }
+.type-badge.union, .type-badge.ward, .type-badge.parish { background: var(--zrx-teal-100); color: var(--zrx-teal-800); border-color: var(--zrx-teal-200); }
+.type-badge.place, .type-badge.village { background: var(--zrx-amber-100); color: var(--zrx-amber-800); border-color: var(--zrx-amber-200); }
+.type-badge.dual { background: var(--zrx-purple-100); color: var(--zrx-purple-800); border-color: var(--zrx-purple-200); }
+
+.code-badge {
+    font-size: 10px;
+    background: var(--zrx-tree-hover);
+    color: var(--zrx-text-body);
+    padding: 0 4px;
+    border-radius: 3px;
+    font-family: monospace;
+}
+
+.tree-title {
+    flex: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tree-loc {
+    font-size: 11px;
+    color: var(--zrx-text-muted);
+}
+
+.tree-child-count {
+    font-size: 10px;
+    color: var(--zrx-text-muted);
+    background: var(--zrx-bg-app);
+    padding: 0 4px;
+    border-radius: 8px;
+}

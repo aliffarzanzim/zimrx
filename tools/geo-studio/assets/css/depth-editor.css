@@ -1,0 +1,124 @@
+/* Depth Chain Builder */
+.depth-chain-wrapper {
+    background: var(--zrx-surface-muted);
+    border: 1px solid var(--zrx-border);
+    border-radius: 6px;
+    padding: 10px;
+}
+
+.depth-chain-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.depth-level-card {
+    background: var(--zrx-bg-card);
+    border: 1px solid var(--zrx-border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    box-shadow: 0 1px 2px var(--zrx-shadow-soft-color);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.depth-level-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.depth-level-title {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--zrx-text-dark);
+}
+
+.depth-types-box {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.depth-type-headers {
+    display: flex;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--zrx-text-muted);
+    padding: 0 2px;
+}
+
+.depth-type-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.depth-key-label,
+.depth-inp-key {
+    flex: 0 0 110px;
+}
+
+.depth-name-label,
+.depth-inp-name {
+    flex: 1 1 130px;
+    min-width: 130px;
+}
+
+.depth-action-label,
+.depth-type-action-slot {
+    flex: 0 0 24px;
+}
+
+.depth-inp {
+    border: 1px solid var(--zrx-border-subtle);
+    border-radius: 4px;
+    font-size: 11px;
+    padding: 3px 6px;
+    outline: none;
+    color: var(--zrx-text-dark);
+    background: var(--zrx-bg-card);
+    width: 100%;
+}
+
+.depth-inp:focus {
+    border-color: var(--zrx-primary);
+}
+
+.depth-arrow-down {
+    text-align: center;
+    color: var(--zrx-primary);
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.depth-btn-remove {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--zrx-header-border);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 4px;
+    border-radius: 3px;
+    line-height: 1;
+}
+
+.depth-btn-remove:hover {
+    color: var(--zrx-red-500);
+    background: var(--zrx-danger-light);
+}
+
+
+.depth-level-actions { display: flex; gap: 6px; align-items: center; }
+.depth-add-type { font-size: 10px; padding: 2px 6px; }
