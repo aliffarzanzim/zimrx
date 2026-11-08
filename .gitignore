@@ -54,6 +54,10 @@ error_log
 /tools/growth-chart/raw/who_*.txt
 /tools/growth-chart/raw/*.csv
 
+# Geo Studio keeps per-pack locks and atomic-write temporaries beside JSON seeds
+/application/systemdata/seeds/zimrx_address_pack_*.json.lock
+/application/systemdata/seeds/zimrx_address_pack_*.json.*.tmp
+
 
 # 4. Local Runtimes & Server Binaries
 runtime/
