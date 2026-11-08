@@ -1,0 +1,198 @@
+.zrx-address-pack-settings {
+    margin-bottom: 0;
+}
+
+.zrx-address-pack-panel {
+    display: grid;
+    gap: var(--zrx-space-4);
+    padding: var(--zrx-space-5);
+    border: 1px solid var(--zrx-border-subtle);
+    border-radius: var(--zrx-border-radius);
+    background: var(--zrx-bg-subtle);
+    box-shadow: var(--zrx-shadow-sm);
+}
+
+.zrx-address-pack-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--zrx-space-4);
+    padding-bottom: var(--zrx-space-3);
+    border-bottom: 1px solid var(--zrx-border-subtle);
+}
+
+.zrx-address-pack-heading h2 {
+    margin: 0;
+    font-size: 1.15rem;
+}
+
+.zrx-address-pack-heading p {
+    margin: var(--zrx-space-1) 0 0;
+    color: var(--zrx-text-muted);
+}
+
+.zrx-address-pack-controls {
+    display: grid;
+    grid-template-columns: minmax(220px, 1.6fr) minmax(160px, 0.8fr) auto;
+    align-items: end;
+    gap: var(--zrx-space-4);
+}
+
+.zrx-address-pack-field {
+    display: grid;
+    gap: var(--zrx-space-1);
+    min-width: 0;
+}
+
+.zrx-address-pack-field label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--zrx-text-body);
+}
+
+.zrx-address-pack-field select {
+    min-width: 0;
+    width: 100%;
+    min-height: 40px;
+}
+
+.zrx-address-pack-controls > button {
+    min-height: 40px;
+    white-space: nowrap;
+}
+
+.zrx-address-pack-status {
+    margin: 0;
+    color: var(--zrx-text-muted);
+}
+
+.zrx-address-pack-status:empty {
+    display: none;
+}
+
+.zrx-directory-settings-page .zrx-directory-panel {
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.zrx-directory-settings-page .zrx-addr-section {
+    display: grid;
+    gap: var(--zrx-space-4);
+    margin: 0;
+    padding: 0;
+    border-top: 0;
+}
+
+.zrx-directory-settings-page .zrx-addr-section-header {
+    min-height: 64px;
+    margin: 0;
+    padding: var(--zrx-space-3) var(--zrx-space-5);
+    background: var(--zrx-bg-subtle);
+    border-bottom: 1px solid var(--zrx-border-subtle);
+}
+
+.zrx-directory-settings-page .zrx-addr-section-title {
+    display: flex;
+    align-items: center;
+    gap: var(--zrx-space-2);
+    color: var(--zrx-text-main);
+    font-size: 1.1rem;
+}
+
+.zrx-directory-settings-page .zrx-addr-filter-row,
+.zrx-directory-settings-page .zrx-occ-toolbar,
+.zrx-directory-settings-page .zrx-directory-table-wrap {
+    margin-right: var(--zrx-space-5);
+    margin-left: var(--zrx-space-5);
+}
+
+.zrx-directory-settings-page .zrx-addr-filter-row {
+    gap: var(--zrx-space-3);
+    margin-top: 0;
+}
+
+.zrx-directory-settings-page .zrx-addr-search-wrap input,
+.zrx-directory-settings-page .zrx-occ-add-form input {
+    min-height: 40px;
+    padding: 0 var(--zrx-space-3);
+    border-color: var(--zrx-border-subtle);
+    border-radius: var(--zrx-border-radius);
+    color: var(--zrx-text-main);
+    font: inherit;
+}
+
+.zrx-directory-settings-page .zrx-addr-search-wrap input:focus,
+.zrx-directory-settings-page .zrx-occ-add-form input:focus {
+    border-color: var(--zrx-interaction-focus-border);
+    box-shadow: var(--zrx-shadow-focus);
+}
+
+.zrx-directory-settings-page .zrx-addr-filter-tabs {
+    min-height: 40px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.zrx-directory-settings-page .zrx-addr-tab-btn {
+    min-height: 32px;
+}
+
+.zrx-directory-settings-page .zrx-directory-table-wrap {
+    margin-bottom: var(--zrx-space-5);
+    border: 1px solid var(--zrx-border-subtle);
+    border-radius: var(--zrx-border-radius);
+}
+
+.zrx-directory-settings-page .zrx-occ-table {
+    margin: 0;
+}
+
+@media (max-width: 700px) {
+    .zrx-address-pack-heading {
+        flex-direction: column;
+    }
+
+    .zrx-address-pack-panel {
+        padding: var(--zrx-space-4);
+    }
+
+    .zrx-address-pack-controls {
+        grid-template-columns: 1fr;
+    }
+
+    .zrx-directory-settings-page .zrx-addr-section-header {
+        align-items: flex-start;
+        padding: var(--zrx-space-3) var(--zrx-space-4);
+    }
+
+    .zrx-directory-settings-page .zrx-addr-filter-row {
+        align-items: stretch;
+        flex-direction: column;
+        margin-right: var(--zrx-space-4);
+        margin-left: var(--zrx-space-4);
+    }
+
+    .zrx-directory-settings-page .zrx-addr-search-wrap {
+        min-width: 0;
+    }
+
+    .zrx-directory-settings-page .zrx-addr-filter-tabs {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    .zrx-directory-settings-page .zrx-occ-toolbar,
+    .zrx-directory-settings-page .zrx-directory-table-wrap {
+        margin-right: var(--zrx-space-4);
+        margin-left: var(--zrx-space-4);
+    }
+
+    .zrx-directory-settings-page .zrx-occ-add-form {
+        align-items: stretch;
+    }
+
+    .zrx-directory-settings-page .zrx-occ-add-form button {
+        flex-shrink: 0;
+    }
+}
