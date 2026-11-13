@@ -374,7 +374,7 @@ function compilePrescribeCatalog(PDO $pdo, ?string $sqlFile = null): void
                 form TEXT,
                 form_variant TEXT,
                 generic_name TEXT,
-                us_generic_name TEXT,
+                alternative_names TEXT,
                 who_atc_class TEXT,
                 is_antibiotic TEXT,
                 is_high_alert_medicine TEXT,
@@ -406,7 +406,7 @@ function compilePrescribeCatalog(PDO $pdo, ?string $sqlFile = null): void
         $query = "
             SELECT 
                 b.brand_id, b.generic_id, b.manufacturer_id, b.brand_name, b.form, b.form_variant, b.strength, b.price, b.packsize,
-                g.generic_name, g.us_generic_name, g.who_atc_class, g.is_antibiotic, g.is_high_alert_medicine,
+                g.generic_name, g.alternative_names, g.who_atc_class, g.is_antibiotic, g.is_high_alert_medicine,
                 g.is_safe_in_pregnancy, g.is_safe_in_lactation, g.require_renal_adjustments, g.is_safe_in_hepatic_impairment,
                 g.is_safe_in_paediatric, g.requires_tapering, g.immediate_warning, g.pregnancy_category
             FROM drug_brand_bd b
@@ -467,7 +467,7 @@ function compilePrescribeCatalog(PDO $pdo, ?string $sqlFile = null): void
                 $form,
                 $formVar,
                 $genName,
-                $row['us_generic_name'] ?? '',
+                $row['alternative_names'] ?? '[]',
                 $row['who_atc_class'] ?? '',
                 $row['is_antibiotic'] ?? '',
                 $row['is_high_alert_medicine'] ?? '',
@@ -508,7 +508,6 @@ function compilePrescribeCatalog(PDO $pdo, ?string $sqlFile = null): void
             CREATE INDEX IF NOT EXISTS idx_drug_prescribe_prescribe_brand_short ON drug_prescribe_bd(prescribe_brand_short);
             CREATE INDEX IF NOT EXISTS idx_drug_prescribe_prescribe_brand_full ON drug_prescribe_bd(prescribe_brand_full);
             CREATE INDEX IF NOT EXISTS idx_drug_prescribe_generic_name ON drug_prescribe_bd(generic_name);
-            CREATE INDEX IF NOT EXISTS idx_drug_prescribe_us_generic_name ON drug_prescribe_bd(us_generic_name);
             CREATE INDEX IF NOT EXISTS idx_drug_prescribe_who_atc_class ON drug_prescribe_bd(who_atc_class);
             CREATE INDEX IF NOT EXISTS idx_drug_prescribe_pregnancy_category ON drug_prescribe_bd(pregnancy_category);
             CREATE INDEX IF NOT EXISTS idx_drug_prescribe_manufacturer_name ON drug_prescribe_bd(manufacturer_name);
@@ -642,7 +641,7 @@ function compilePrescribeCatalog(PDO $pdo, ?string $sqlFile = null): void
                 drug_class TEXT,
                 form TEXT,
                 generic_name TEXT,
-                us_generic_name TEXT,
+                alternative_names TEXT,
                 who_atc_class TEXT,
                 is_antibiotic TEXT,
                 is_high_alert_medicine TEXT,
@@ -670,7 +669,7 @@ function compilePrescribeCatalog(PDO $pdo, ?string $sqlFile = null): void
         $query = "
             SELECT 
                 p.product_id, p.generic_id, p.form, p.strength, p.is_who_eml, p.who_eml_category,
-                g.generic_name, g.us_generic_name, g.who_atc_class, g.is_antibiotic, g.is_high_alert_medicine,
+                g.generic_name, g.alternative_names, g.who_atc_class, g.is_antibiotic, g.is_high_alert_medicine,
                 g.is_safe_in_pregnancy, g.is_safe_in_lactation, g.require_renal_adjustments, g.is_safe_in_hepatic_impairment,
                 g.is_safe_in_paediatric, g.requires_tapering, g.immediate_warning, g.pregnancy_category
             FROM drug_generic_product p
@@ -711,7 +710,7 @@ function compilePrescribeCatalog(PDO $pdo, ?string $sqlFile = null): void
                 'drugCls' => $drugClasses[$genId] ?? '',
                 'form' => $form,
                 'genName' => $genName,
-                'usGen' => $row['us_generic_name'] ?? '',
+                'alternativeNames' => $row['alternative_names'] ?? '[]',
                 'whoAtc' => $row['who_atc_class'] ?? '',
                 'isAb' => $row['is_antibiotic'] ?? '',
                 'isHa' => $row['is_high_alert_medicine'] ?? '',
@@ -773,7 +772,7 @@ function compilePrescribeCatalog(PDO $pdo, ?string $sqlFile = null): void
                 $p['drugCls'],
                 $p['form'],
                 $p['genName'],
-                $p['usGen'],
+                $p['alternativeNames'],
                 $p['whoAtc'],
                 $p['isAb'],
                 $p['isHa'],
@@ -806,7 +805,7 @@ function compilePrescribeCatalog(PDO $pdo, ?string $sqlFile = null): void
             CREATE VIEW IF NOT EXISTS drug_prescribe AS SELECT 
                 product_id AS brand_id, generic_id, '' AS manufacturer_id, '' AS manufacturer_name,
                 '' AS manufacturer_name_short, drug_class, generic_name AS brand_name, form, form AS form_variant,
-                generic_name, us_generic_name, who_atc_class, is_antibiotic, is_high_alert_medicine,
+                generic_name, alternative_names, who_atc_class, is_antibiotic, is_high_alert_medicine,
                 is_safe_in_pregnancy, is_safe_in_lactation, require_renal_adjustments, is_safe_in_hepatic_impairment,
                 is_safe_in_paediatric, requires_tapering, immediate_warning, pregnancy_category,
                 strength, '' AS price, '' AS packsize, prescribe_generic_short AS prescribe_brand_short,

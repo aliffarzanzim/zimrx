@@ -299,8 +299,10 @@ function loadBrand(id, preloadedData = null) {
             statusBadge = `<span class="clinical-meta-pill clinical-meta-draft" style="background:#f1f5f9;color:#64748b;">Draft</span>`;
         }
 
+        const alternativeNames = [b.alternative_names, c.alternative_names]
+            .map(parseClinicalJson).find(value => Array.isArray(value) && value.length) || [];
         const meta = [
-            firstPresent(b.us_generic_name, c.us_generic_name) ? `<span class="clinical-meta-pill">US: ${escapeHtml(firstPresent(b.us_generic_name, c.us_generic_name))}</span>` : '',
+            alternativeNames.length ? `<span class="clinical-meta-pill">Alternative names: ${escapeHtml(alternativeNames.join(', '))}</span>` : '',
             firstPresent(b.who_atc_class, c.who_atc_class) ? `<span class="clinical-meta-pill">ATC: ${escapeHtml(firstPresent(b.who_atc_class, c.who_atc_class))}</span>` : '',
             statusBadge
         ].filter(Boolean).join('');

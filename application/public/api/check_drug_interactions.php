@@ -65,9 +65,10 @@ function rx_build_generic_lookup(PDO $pdo): array {
     $keys = [];
     $ambiguous = [];
     // Static generic lookup on read-only drug catalog (zero parameters)
-    foreach ($pdo->query('SELECT generic_id, generic_name, us_generic_name FROM drug_generic') as $row) {
+    foreach ($pdo->query('SELECT generic_id, generic_name, alternative_names FROM drug_generic') as $row) {
         $genericId = rx_norm_space($row['generic_id'] ?? '');
-        foreach ([$row['generic_name'] ?? '', $row['us_generic_name'] ?? ''] as $name) {
+        $alternativeNames = json_decode($row['alternative_names'] ?? '[]', true);
+        foreach (array_merge([$row['generic_name'] ?? ''], is_array($alternativeNames) ? array_filter($alternativeNames, 'is_string') : []) as $name) {
             $key = rx_normalize_drug_name($name);
             if ($key === '') {
                 continue;
@@ -91,7 +92,7 @@ function rx_build_generic_lookup(PDO $pdo): array {
 function rx_fetch_selected_generic_context(PDO $pdo, array $genericIds): array {
     $placeholders = implode(',', array_fill(0, count($genericIds), '?'));
     $stmt = $pdo->prepare(
-        "SELECT generic_id, generic_name, us_generic_name
+        "SELECT generic_id, generic_name, alternative_names
          FROM drug_generic
          WHERE CAST(generic_id AS TEXT) IN ({$placeholders})"
     );
@@ -107,7 +108,8 @@ function rx_fetch_selected_generic_context(PDO $pdo, array $genericIds): array {
         }
 
         $components = [$selectedId => $selectedName ?: $selectedId];
-        foreach ([$row['generic_name'] ?? '', $row['us_generic_name'] ?? ''] as $name) {
+        $alternativeNames = json_decode($row['alternative_names'] ?? '[]', true);
+        foreach (array_merge([$row['generic_name'] ?? ''], is_array($alternativeNames) ? array_filter($alternativeNames, 'is_string') : []) as $name) {
             foreach (rx_split_component_names($name) as $componentName) {
                 $componentId = $lookup[$componentName] ?? '';
                 if ($componentId !== '') {

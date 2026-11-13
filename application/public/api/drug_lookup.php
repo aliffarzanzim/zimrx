@@ -51,11 +51,11 @@ try {
             '' AS manufacturer
          FROM drug_generic
          WHERE generic_name LIKE :q
-            OR us_generic_name LIKE :q
+            OR EXISTS (SELECT 1 FROM json_each(drug_generic.alternative_names) WHERE value LIKE :q)
          ORDER BY
             CASE
                 WHEN generic_name LIKE :qStart THEN 0
-                WHEN us_generic_name LIKE :qStart THEN 1
+                WHEN EXISTS (SELECT 1 FROM json_each(drug_generic.alternative_names) WHERE value LIKE :qStart) THEN 1
                 ELSE 2
             END,
             generic_name ASC

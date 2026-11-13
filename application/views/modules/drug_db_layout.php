@@ -228,9 +228,10 @@ function drug_db_view_snapshot_html($brand, $clinical) {
     }
 
     $meta = '';
-    $usGeneric = drug_db_view_first_present($brand['us_generic_name'] ?? '', $clinical['us_generic_name'] ?? '');
+    $alternativeNames = json_decode($brand['alternative_names'] ?? '[]', true)
+        ?: json_decode($clinical['alternative_names'] ?? '[]', true);
     $atc = drug_db_view_first_present($brand['who_atc_class'] ?? '', $clinical['who_atc_class'] ?? '');
-    if ($usGeneric !== '') $meta .= '<span class="clinical-meta-pill">US: ' . drug_db_view_e($usGeneric) . '</span>';
+    if (is_array($alternativeNames) && $alternativeNames) $meta .= '<span class="clinical-meta-pill">Alternative names: ' . drug_db_view_e(implode(', ', array_filter($alternativeNames, 'is_string'))) . '</span>';
     if ($atc !== '') $meta .= '<span class="clinical-meta-pill">ATC: ' . drug_db_view_e($atc) . '</span>';
 
     $statusVal = strtolower(trim((string)($clinical['verification_status'] ?? 'draft')));

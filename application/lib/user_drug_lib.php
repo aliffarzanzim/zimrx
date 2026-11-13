@@ -404,7 +404,7 @@ function zimrx_user_drug_index_to_catalog_row(array $row): array {
         'brand_name' => (string)($row['brand_name'] ?? ''),
         'generic' => (string)($row['generic_name'] ?? ''),
         'generic_name' => (string)($row['generic_name'] ?? ''),
-        'us_generic_name' => '',
+        'alternative_names' => '[]',
         'who_atc_class' => '',
         'generic_id' => (string)($row['generic_id'] ?? ''),
         'company_id' => 'user',
